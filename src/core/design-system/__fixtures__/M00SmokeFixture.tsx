@@ -85,7 +85,7 @@ export function M00SmokeFixture() {
             <Button variant="secondary">Passe o mouse</Button>
           </Tooltip>
           <Dropdown
-            trigger={<Button variant="secondary">Menu</Button>}
+            trigger={<span>Menu</span>}
             items={[
               { id: "profile", label: "Perfil" },
               { id: "exit", label: "Sair", danger: true },
