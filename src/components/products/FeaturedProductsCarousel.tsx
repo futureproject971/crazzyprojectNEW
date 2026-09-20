@@ -55,6 +55,7 @@ export function FeaturedProductsCarousel() {
                 className={`product-card product-card--${product.art} ${isActive ? "is-active" : ""}`}
                 style={{
                   ["--offset" as string]: offset,
+                  ["--abs-offset" as string]: Math.abs(offset),
                   zIndex: 10 - Math.abs(offset),
                 }}
                 aria-hidden={!isActive}
