@@ -16,3 +16,5 @@ export * from "./components/Pagination";
 export * from "./components/Progress";
 export * from "./components/CrazzyIcon";
 export * from "./icons/registry";
+export * from "./components/ConfirmDialog";
+export * from "./components/PageHeader";
