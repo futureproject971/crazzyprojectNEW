@@ -2,16 +2,7 @@ import { storeCategories } from "@/data/home";
 import { NeonSectionIcon } from "@/components/ui/NeonSectionIcon";
 
 function CategoryIcon({ src, tone }: { src: string; tone: string }) {
-  return (
-    <span
-      className={`store-category-icon store-category-icon--${tone}`}
-      aria-hidden="true"
-      style={{
-        WebkitMaskImage: `url("${src}")`,
-        maskImage: `url("${src}")`,
-      }}
-    />
-  );
+  return <img className={`store-category-icon store-category-icon--${tone}`} src={src} alt="" aria-hidden="true" />;
 }
 
 export function StoreShowcase() {
@@ -19,7 +10,7 @@ export function StoreShowcase() {
     <section className="store-showcase" id="loja" aria-labelledby="store-title">
       <div className="store-head">
         <div className="store-title-wrap">
-          <NeonSectionIcon src="/icons/package.svg" />
+          <NeonSectionIcon src="/icons/neon-v2/cube.svg" />
           <div>
             <h2 id="store-title">Explore Nossa Loja</h2>
             <p>Tudo que um gamer precisa, em um só lugar.</p>
