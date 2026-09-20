@@ -17,7 +17,7 @@ export function TicketPanel() {
       <section className="social-panel ticket-panel" aria-labelledby="ticket-title">
         <header className="panel-heading ticket-heading">
           <div className="panel-heading-main">
-            <NeonSectionIcon src="/icons/headset.svg" />
+            <NeonSectionIcon src="/icons/neon-v2/ticket.svg" />
             <div>
               <h2 id="ticket-title">Abrir Ticket</h2>
               <p>Precisa de ajuda? Nossa equipe está pronta para te atender.</p>
@@ -42,7 +42,7 @@ export function TicketPanel() {
 
       <section className="social-panel why-panel" aria-labelledby="why-title">
         <header className="why-heading">
-          <NeonSectionIcon src="/icons/crown.svg" />
+          <NeonSectionIcon src="/icons/neon-v2/crown.svg" />
           <h2 id="why-title">Por que escolher a CRAZZY?</h2>
         </header>
         <div className="why-list">
