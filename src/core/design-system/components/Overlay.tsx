@@ -1,7 +1,19 @@
 "use client";
 
+import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { IconButton } from "./IconButton";
+
+function useEscape(open: boolean, onClose: () => void) {
+  useEffect(() => {
+    if (!open) return;
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [open, onClose]);
+}
 
 export function Dialog({
   open,
@@ -14,7 +26,9 @@ export function Dialog({
   children: ReactNode;
   onClose: () => void;
 }) {
+  useEscape(open, onClose);
   if (!open) return null;
+
   return (
     <div className="crz-dialog-backdrop" role="presentation" onMouseDown={onClose}>
       <section
@@ -26,7 +40,7 @@ export function Dialog({
       >
         <header className="crz-dialog-head">
           <strong>{title}</strong>
-          <IconButton label="Fechar" icon="×" onClick={onClose} />
+          <IconButton label="Fechar" icon="×" onClick={onClose} autoFocus />
         </header>
         <div className="crz-dialog-body">{children}</div>
       </section>
@@ -45,7 +59,9 @@ export function Drawer({
   children: ReactNode;
   onClose: () => void;
 }) {
+  useEscape(open, onClose);
   if (!open) return null;
+
   return (
     <div className="crz-drawer-backdrop" role="presentation" onMouseDown={onClose}>
       <aside
@@ -57,7 +73,7 @@ export function Drawer({
       >
         <header className="crz-drawer-head">
           <strong>{title}</strong>
-          <IconButton label="Fechar" icon="×" onClick={onClose} />
+          <IconButton label="Fechar" icon="×" onClick={onClose} autoFocus />
         </header>
         <div className="crz-drawer-body">{children}</div>
       </aside>
