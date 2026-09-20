@@ -1,10 +1,15 @@
 import { FloatingNavbar } from "@/components/navigation/FloatingNavbar";
+import { HeroSection } from "@/components/hero/HeroSection";
+import { BenefitsBar } from "@/components/hero/BenefitsBar";
 
 export default function Home() {
   return (
     <main className="site-shell" id="inicio">
       <FloatingNavbar />
-      <section className="navbar-stage" aria-label="Área em construção">
+      <HeroSection />
+      <BenefitsBar />
+
+      <section className="navbar-stage" aria-label="Próximas seções em construção">
         <div className="navbar-stage-grid" />
       </section>
     </main>
