@@ -6,13 +6,11 @@ export function NeonSectionIcon({
   variant?: "blue" | "pink" | "gold" | "green";
 }) {
   return (
-    <span
+    <img
       className={`section-neon-icon section-neon-icon--${variant}`}
+      src={src}
+      alt=""
       aria-hidden="true"
-      style={{
-        WebkitMaskImage: `url("${src}")`,
-        maskImage: `url("${src}")`,
-      }}
     />
   );
 }
