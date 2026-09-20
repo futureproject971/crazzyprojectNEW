@@ -700,3 +700,49 @@
   -webkit-mask-size: contain;
   mask-size: contain;
 }
+
+
+.crz-display {
+  font-family: var(--crz-font-display);
+  letter-spacing: .055em;
+}
+
+.crz-ui {
+  font-family: var(--crz-font-ui);
+}
+
+.crz-container {
+  width: min(var(--crz-container), calc(100% - 24px));
+  margin-inline: auto;
+}
+
+.crz-stack {
+  display: grid;
+  gap: var(--crz-space-3);
+}
+
+.crz-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--crz-space-2);
+}
+
+@media (max-width: 767px) {
+  .crz-container {
+    width: min(100% - 16px, var(--crz-container));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
+  .crz-skeleton::after,
+  .crz-spinner {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
