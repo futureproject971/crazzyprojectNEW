@@ -19,3 +19,7 @@ export function Panel({ soft, interactive, className, ...props }: PanelProps) {
     />
   );
 }
+
+export function Card(props: PanelProps) {
+  return <Panel {...props} />;
+}
