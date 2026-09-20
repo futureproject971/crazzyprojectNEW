@@ -10,7 +10,7 @@ export function GeneralChat() {
     <section className="social-panel chat-panel" id="comunidade" aria-labelledby="chat-title">
       <header className="panel-heading chat-heading">
         <div className="panel-heading-main">
-          <NeonSectionIcon src="/icons/message-circle.svg" />
+          <NeonSectionIcon src="/icons/neon-v2/chat.svg" />
           <div>
             <h2 id="chat-title">Chat Geral</h2>
             <p>Converse com a comunidade. Todos são bem-vindos!</p>
