@@ -75,3 +75,38 @@ export const whyCrazzy = [
   { title: "Comunidade Ativa", subtitle: "+50.000 gamers já fazem parte", icon: "/icons/users.svg" },
   { title: "Cupons e Promoções", subtitle: "Ofertas exclusivas para membros", icon: "/icons/tag.svg" },
 ];
+
+
+export type FeaturedProduct = {
+  id: string;
+  name: string;
+  subtitle: string;
+  badge?: string;
+  art: "rdr2" | "cod" | "gta" | "valorant" | "fortnite";
+};
+
+export const featuredProducts: FeaturedProduct[] = [
+  { id: "rdr2", name: "RDR2", subtitle: "Conta Premium", art: "rdr2" },
+  { id: "cod", name: "Call of Duty", subtitle: "Conta Premium", art: "cod" },
+  { id: "gta", name: "GTA V", subtitle: "Conta Premium", art: "gta", badge: "Mais Vendido" },
+  { id: "valorant", name: "VALORANT", subtitle: "Conta Premium", art: "valorant" },
+  { id: "fortnite", name: "Fortnite", subtitle: "Conta Premium", art: "fortnite" },
+];
+
+export type StoreCategory = {
+  id: string;
+  name: string;
+  subtitle: string;
+  icon: string;
+  art: string;
+  tone: "blue" | "violet" | "gold";
+};
+
+export const storeCategories: StoreCategory[] = [
+  { id: "accounts", name: "Contas de Jogos", subtitle: "Steam, EA, Rockstar e mais", icon: "/icons/circle-dots.svg", art: "cars", tone: "blue" },
+  { id: "software", name: "Softwares Gamer", subtitle: "Windows, Office e mais", icon: "/icons/package.svg", art: "setup", tone: "blue" },
+  { id: "stream", name: "Utilitários pra Stream", subtitle: "Overlays, OBS, Plugins", icon: "/icons/message-circle.svg", art: "stream", tone: "violet" },
+  { id: "premium", name: "Produtos Premium", subtitle: "Cards, Gift Cards e mais", icon: "/icons/crown.svg", art: "premium", tone: "gold" },
+  { id: "launches", name: "Lançamentos", subtitle: "Jogos e contas recentes", icon: "/icons/bolt.svg", art: "launches", tone: "blue" },
+  { id: "best", name: "Mais Vendidos", subtitle: "Os preferidos da galera", icon: "/icons/crown.svg", art: "best", tone: "gold" },
+];
