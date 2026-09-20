@@ -51,6 +51,7 @@ button {
 }
 
 .site-shell {
+  position: relative;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -75,10 +76,13 @@ button {
 }
 
 .floating-navbar-wrap {
-  position: relative;
+  position: absolute;
   z-index: 50;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
   width: min(1380px, calc(100% - 62px));
-  margin: 7px auto 0;
+  margin: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 9px;
@@ -1166,7 +1170,7 @@ button {
 
 .featured-section {
   position: relative;
-  min-height: 330px;
+  min-height: 292px;
   padding: 14px 14px 11px;
   border: 1px solid rgba(75, 133, 224, 0.17);
   border-radius: 12px;
@@ -1627,7 +1631,7 @@ button {
 
 .footer-inner {
   width: min(1420px, calc(100% - 38px));
-  min-height: 96px;
+  min-height: 72px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1.1fr .7fr 1fr;
