@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { IconButton } from "./IconButton";
 
@@ -15,6 +15,38 @@ function useEscape(open: boolean, onClose: () => void) {
   }, [open, onClose]);
 }
 
+function useFocusTrap(open: boolean) {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!open || !ref.current) return;
+    const root = ref.current;
+    const selector =
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusables = Array.from(root.querySelectorAll<HTMLElement>(selector));
+    focusables[0]?.focus();
+
+    const handler = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    root.addEventListener("keydown", handler);
+    return () => root.removeEventListener("keydown", handler);
+  }, [open]);
+
+  return ref;
+}
+
 export function Dialog({
   open,
   title,
@@ -27,11 +59,13 @@ export function Dialog({
   onClose: () => void;
 }) {
   useEscape(open, onClose);
+  const dialogRef = useFocusTrap(open);
   if (!open) return null;
 
   return (
     <div className="crz-dialog-backdrop" role="presentation" onMouseDown={onClose}>
       <section
+        ref={dialogRef}
         className="crz-dialog"
         role="dialog"
         aria-modal="true"
@@ -40,7 +74,7 @@ export function Dialog({
       >
         <header className="crz-dialog-head">
           <strong>{title}</strong>
-          <IconButton label="Fechar" icon="×" onClick={onClose} autoFocus />
+          <IconButton label="Fechar" icon="×" onClick={onClose} />
         </header>
         <div className="crz-dialog-body">{children}</div>
       </section>
@@ -60,11 +94,13 @@ export function Drawer({
   onClose: () => void;
 }) {
   useEscape(open, onClose);
+  const drawerRef = useFocusTrap(open);
   if (!open) return null;
 
   return (
     <div className="crz-drawer-backdrop" role="presentation" onMouseDown={onClose}>
       <aside
+        ref={drawerRef}
         className="crz-drawer"
         role="dialog"
         aria-modal="true"
@@ -73,7 +109,7 @@ export function Drawer({
       >
         <header className="crz-drawer-head">
           <strong>{title}</strong>
-          <IconButton label="Fechar" icon="×" onClick={onClose} autoFocus />
+          <IconButton label="Fechar" icon="×" onClick={onClose} />
         </header>
         <div className="crz-drawer-body">{children}</div>
       </aside>
