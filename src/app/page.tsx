@@ -1,6 +1,7 @@
 import { FloatingNavbar } from "@/components/navigation/FloatingNavbar";
 import { HeroSection } from "@/components/hero/HeroSection";
 import { BenefitsBar } from "@/components/hero/BenefitsBar";
+import { SocialSection } from "@/sections/SocialSection";
 
 export default function Home() {
   return (
@@ -8,10 +9,7 @@ export default function Home() {
       <FloatingNavbar />
       <HeroSection />
       <BenefitsBar />
-
-      <section className="navbar-stage" aria-label="Próximas seções em construção">
-        <div className="navbar-stage-grid" />
-      </section>
+      <SocialSection />
     </main>
   );
 }
