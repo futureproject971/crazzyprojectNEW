@@ -1,55 +1,50 @@
 # CRAZZY PROJECT — Module Status
 
-## Current module
-
+## M00
 **GRUPO 00 — CORE DA PLATAFORMA**  
 **M00 — CRAZZY DESIGN SYSTEM**  
-Status: **IN PROGRESS / QA**
+Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
 
 Branch: `m00-design-system`
 
-### Implemented in M00
+Último QA técnico:
+- typecheck: PASS
+- build: PASS
+- GitHub Actions: PASS
 
-- global design tokens
-- CRAZZY typography tokens and fonts
-- color hierarchy
-- gradients
-- spacing
-- radius
+### Implementado
+- tokens globais
+- tipografia CRAZZY
+- cores / gradientes / radius / spacing
 - glow / shadows
-- motion durations
-- z-index
-- responsive container primitives
+- motion / reduced motion
+- responsividade base
 - Button / IconButton
 - Input / SearchInput / Select
 - Checkbox
 - Badge
 - Panel / Card
 - Tooltip
-- Tabs with keyboard navigation
+- Tabs
 - Dropdown
-- Dialog / Drawer with Escape and focus trapping
+- Dialog / Drawer
 - ConfirmDialog
 - Skeleton
-- Spinner / LoadingState
-- EmptyState
-- ErrorState
+- Loading / Empty / Error
 - Toast
 - Avatar
-- SectionTitle
-- PageHeader
-- ProgressBar
-- Pagination
-- official CRAZZY_PROJECT_NEON_ICONS_V2 registry
-- fallback icon registry
+- SectionTitle / PageHeader
+- ProgressBar / Pagination
 - scrollbar primitives
-- reduced-motion support
-- typecheck + build CI
+- CRAZZY_PROJECT_NEON_ICONS_V2 registry
+- fallback icon registry
+- smoke fixture de compilação
+- CI com typecheck + build
 
-### Important
+### Proteção
+A Home existente em `phase-1-home` continua preservada como protótipo provisório.
 
-The already-existing Home on `phase-1-home` is a provisional visual prototype and has been preserved.
+**NÃO iniciar M01 automaticamente.**
 
-Do **not** start M01 until M00 QA/build is green and the user explicitly authorizes the next module.
-
-Do **not** add product/cart/ticket/rewards/admin/auth business logic to M00.
+Próximo módulo previsto, somente após autorização explícita:
+**M01 — CRAZZY APP SHELL**
