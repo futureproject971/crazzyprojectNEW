@@ -11,3 +11,6 @@ export * from "./components/States";
 export * from "./components/Tabs";
 export * from "./components/Toast";
 export * from "./components/Tooltip";
+export * from "./components/Dropdown";
+export * from "./components/Pagination";
+export * from "./components/Progress";
