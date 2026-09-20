@@ -14,3 +14,5 @@ export * from "./components/Tooltip";
 export * from "./components/Dropdown";
 export * from "./components/Pagination";
 export * from "./components/Progress";
+export * from "./components/CrazzyIcon";
+export * from "./icons/registry";
