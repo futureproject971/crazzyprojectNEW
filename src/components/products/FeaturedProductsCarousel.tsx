@@ -27,7 +27,7 @@ export function FeaturedProductsCarousel() {
     <section className="featured-section" id="produtos" aria-labelledby="featured-title">
       <div className="featured-head">
         <div className="featured-title-wrap">
-          <NeonSectionIcon src="/icons/star.svg" />
+          <NeonSectionIcon src="/icons/neon-v2/featured.svg" />
           <div>
             <h2 id="featured-title">Produtos em Destaque</h2>
             <p>Selecionados especialmente para você.</p>
