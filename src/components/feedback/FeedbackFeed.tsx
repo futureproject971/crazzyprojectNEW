@@ -10,7 +10,7 @@ export function FeedbackFeed() {
     <section className="social-panel feedback-panel" id="feedbacks" aria-labelledby="feedback-title">
       <header className="panel-heading">
         <div className="panel-heading-main">
-          <NeonSectionIcon src="/icons/star.svg" />
+          <NeonSectionIcon src="/icons/neon-v2/feedback.svg" />
           <div>
             <h2 id="feedback-title">Feedback de Clientes</h2>
             <p>Apenas clientes podem ver e publicar feedbacks.</p>
