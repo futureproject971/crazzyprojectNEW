@@ -1787,3 +1787,31 @@ button {
     justify-self: center;
   }
 }
+
+
+/* CRAZZY_PROJECT_NEON_ICONS_V2: official primary neon assets */
+img.section-neon-icon {
+  object-fit: contain;
+  background: transparent;
+  filter: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+img.benefit-icon {
+  object-fit: contain;
+  background: transparent;
+  filter: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+img.store-category-icon,
+img.store-category-icon--violet,
+img.store-category-icon--gold {
+  object-fit: contain;
+  background: transparent;
+  filter: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
