@@ -103,10 +103,10 @@ export type StoreCategory = {
 };
 
 export const storeCategories: StoreCategory[] = [
-  { id: "accounts", name: "Contas de Jogos", subtitle: "Steam, EA, Rockstar e mais", icon: "/icons/circle-dots.svg", art: "cars", tone: "blue" },
-  { id: "software", name: "Softwares Gamer", subtitle: "Windows, Office e mais", icon: "/icons/package.svg", art: "setup", tone: "blue" },
-  { id: "stream", name: "Utilitários pra Stream", subtitle: "Overlays, OBS, Plugins", icon: "/icons/message-circle.svg", art: "stream", tone: "violet" },
-  { id: "premium", name: "Produtos Premium", subtitle: "Cards, Gift Cards e mais", icon: "/icons/crown.svg", art: "premium", tone: "gold" },
-  { id: "launches", name: "Lançamentos", subtitle: "Jogos e contas recentes", icon: "/icons/bolt.svg", art: "launches", tone: "blue" },
-  { id: "best", name: "Mais Vendidos", subtitle: "Os preferidos da galera", icon: "/icons/crown.svg", art: "best", tone: "gold" },
+  { id: "accounts", name: "Contas de Jogos", subtitle: "Steam, EA, Rockstar e mais", icon: "/icons/neon-v2/gamepad.svg", art: "cars", tone: "blue" },
+  { id: "software", name: "Softwares Gamer", subtitle: "Windows, Office e mais", icon: "/icons/neon-v2/gear.svg", art: "setup", tone: "blue" },
+  { id: "stream", name: "Utilitários pra Stream", subtitle: "Overlays, OBS, Plugins", icon: "/icons/neon-v2/book.svg", art: "stream", tone: "violet" },
+  { id: "premium", name: "Produtos Premium", subtitle: "Cards, Gift Cards e mais", icon: "/icons/neon-v2/crown.svg", art: "premium", tone: "gold" },
+  { id: "launches", name: "Lançamentos", subtitle: "Jogos e contas recentes", icon: "/icons/neon-v2/lightning.svg", art: "launches", tone: "blue" },
+  { id: "best", name: "Mais Vendidos", subtitle: "Os preferidos da galera", icon: "/icons/neon-v2/crown.svg", art: "best", tone: "gold" },
 ];
