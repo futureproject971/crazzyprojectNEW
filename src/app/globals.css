@@ -1276,10 +1276,10 @@ button {
   transform:
     translate(-50%, -50%)
     translateX(calc(var(--offset) * 155px))
-    translateZ(calc((2 - abs(var(--offset))) * -12px))
+    translateZ(calc((2 - var(--abs-offset)) * -12px))
     rotateY(calc(var(--offset) * -6deg))
-    scale(calc(1 - (abs(var(--offset)) * 0.07)));
-  opacity: calc(1 - (abs(var(--offset)) * 0.09));
+    scale(calc(1 - (var(--abs-offset) * 0.07)));
+  opacity: calc(1 - (var(--abs-offset) * 0.09));
   transition:
     transform 330ms cubic-bezier(.2,.7,.2,1),
     opacity 330ms ease,
@@ -1717,7 +1717,7 @@ button {
     transform:
       translate(-50%, -50%)
       translateX(calc(var(--offset) * 130px))
-      scale(calc(1 - (abs(var(--offset)) * .08)));
+      scale(calc(1 - (var(--abs-offset) * .08)));
   }
 }
 
@@ -1750,7 +1750,7 @@ button {
     transform:
       translate(-50%, -50%)
       translateX(calc(var(--offset) * 102px))
-      scale(calc(1 - (abs(var(--offset)) * .1)));
+      scale(calc(1 - (var(--abs-offset) * .1)));
   }
 
   .product-card.is-active {
