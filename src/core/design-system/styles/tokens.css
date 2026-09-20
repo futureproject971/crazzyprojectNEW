@@ -46,6 +46,10 @@
   --crz-space-10: 40px;
   --crz-space-12: 48px;
 
+  --crz-font-display: var(--font-orbitron), Arial, sans-serif;
+  --crz-font-body: var(--font-inter), Arial, sans-serif;
+  --crz-font-ui: var(--font-poppins), var(--font-inter), Arial, sans-serif;
+
   --crz-font-xs: 11px;
   --crz-font-sm: 12px;
   --crz-font-md: 14px;
