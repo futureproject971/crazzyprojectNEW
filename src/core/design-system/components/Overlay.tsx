@@ -15,6 +15,17 @@ function useEscape(open: boolean, onClose: () => void) {
   }, [open, onClose]);
 }
 
+function useBodyScrollLock(open: boolean) {
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
+}
+
 function useFocusTrap(open: boolean) {
   const ref = useRef<HTMLElement>(null);
 
@@ -59,6 +70,7 @@ export function Dialog({
   onClose: () => void;
 }) {
   useEscape(open, onClose);
+  useBodyScrollLock(open);
   const dialogRef = useFocusTrap(open);
   if (!open) return null;
 
@@ -94,6 +106,7 @@ export function Drawer({
   onClose: () => void;
 }) {
   useEscape(open, onClose);
+  useBodyScrollLock(open);
   const drawerRef = useFocusTrap(open);
   if (!open) return null;
 
