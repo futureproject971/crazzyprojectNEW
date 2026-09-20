@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "../core/design-system/styles/tokens.css";
+@import "../core/design-system/styles/primitives.css";
 
 :root {
   --bg-0: #02050a;
