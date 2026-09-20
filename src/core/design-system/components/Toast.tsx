@@ -11,7 +11,11 @@ export function Toast({
   children: ReactNode;
 }) {
   return (
-    <div className={cn("crz-toast", tone !== "info" && `crz-toast--${tone}`)} role="status">
+    <div
+      className={cn("crz-toast", tone !== "info" && `crz-toast--${tone}`)}
+      role={tone === "error" ? "alert" : "status"}
+      aria-live={tone === "error" ? "assertive" : "polite"}
+    >
       {icon}
       <div>{children}</div>
     </div>
