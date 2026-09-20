@@ -681,3 +681,22 @@
   background: rgba(0, 91, 218, .32);
   box-shadow: 0 0 12px rgba(0, 104, 255, .22);
 }
+
+
+.crz-neon-icon {
+  display: inline-block;
+  object-fit: contain;
+  filter: drop-shadow(0 0 7px rgba(0, 144, 255, .34));
+}
+
+.crz-line-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  background: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
