@@ -379,3 +379,42 @@ Quando M11 estiver 100% verde:
 - abrir PR;
 - mergear;
 - iniciar M12 CRAZZY PROFILE apenas depois.
+
+
+## AUDITORIA CLAIM_PAID_DELIVERY — CONCLUÍDA
+
+A função `public.claim_paid_delivery` foi lida integralmente.
+
+Conclusões:
+- usa caminho rápido de idempotência por:
+  - payment_id
+  - payment_item_index
+  - payment_unit_index
+- seleciona estoque com:
+  - `FOR UPDATE SKIP LOCKED`
+- marca o item como usado dentro da mesma transação;
+- cria order_ticket com coordenadas de pagamento;
+- em corrida de `unique_violation`, o bloco interno reverte a mutação de estoque e recupera o ticket vencedor;
+- risco de duas entregas consumirem o MESMO stock item está mitigado corretamente;
+- execute da função:
+  - anon: false
+  - authenticated: false
+  - service_role: true
+
+Portanto:
+- NÃO reescrever a lógica de claim sem necessidade;
+- o problema do M11 está na exposição pós-entrega do plaintext.
+
+## AUDITORIA GRANTS/RLS — CONCLUÍDA
+
+Confirmado:
+- `stock_items`: authenticated possui SELECT/INSERT/UPDATE/DELETE em grant, mas RLS restringe mutações a admin; policy de SELECT permite owner ler stock após delivery, incluindo `content`.
+- `reward_deliveries`: owner pode SELECT da própria linha, incluindo `content`.
+- `trial_stock_items`: somente admin passa pela policy.
+- `order_tickets`: owner/admin SELECT; mutações comuns restritas por policy.
+- `entitlements`: authenticated SELECT da própria linha/admin.
+- `lzt_sales`: grants amplos existem, mas policy ALL é admin-only.
+- `payments`: authenticated SELECT da própria linha/admin; escrita protegida.
+
+Próximo passo:
+- migration M11 para retirar exposição direta de payload sensível sem quebrar claim_paid_delivery.
