@@ -208,6 +208,38 @@ using (
   )
 );
 
+-- Cover Support foreign keys used by context/staff queries.
+create index if not exists support_tickets_product_id_idx
+  on public.support_tickets(product_id)
+  where product_id is not null;
+
+create index if not exists support_tickets_product_plan_id_idx
+  on public.support_tickets(product_plan_id)
+  where product_plan_id is not null;
+
+create index if not exists support_tickets_entitlement_id_idx
+  on public.support_tickets(entitlement_id)
+  where entitlement_id is not null;
+
+create index if not exists support_tickets_order_ticket_id_idx
+  on public.support_tickets(order_ticket_id)
+  where order_ticket_id is not null;
+
+create index if not exists support_tickets_library_delivery_id_idx
+  on public.support_tickets(library_delivery_id)
+  where library_delivery_id is not null;
+
+create index if not exists support_attachments_message_id_idx
+  on public.support_attachments(message_id)
+  where message_id is not null;
+
+create index if not exists support_attachments_owner_user_id_idx
+  on public.support_attachments(owner_user_id);
+
+create index if not exists support_ticket_events_actor_user_id_idx
+  on public.support_ticket_events(actor_user_id)
+  where actor_user_id is not null;
+
 -- =========================================================
 -- PRIVATE SUPPORT STORAGE
 -- =========================================================
