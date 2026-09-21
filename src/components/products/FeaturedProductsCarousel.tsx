@@ -6,6 +6,13 @@ import { NeonSectionIcon } from "@/components/ui/NeonSectionIcon";
 
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
+const productImages: Record<string, string> = {
+  rdr2: "/products/rdr2.jpg",
+  cod: "/products/cod.jpg",
+  gta: "/products/gta.jpg",
+  valorant: "/products/valorant.jpg",
+};
+
 export function FeaturedProductsCarousel() {
   const [active, setActive] = useState(2);
   const total = featuredProducts.length;
@@ -37,18 +44,13 @@ export function FeaturedProductsCarousel() {
       </div>
 
       <div className="coverflow-shell">
-        <button
-          type="button"
-          className="coverflow-arrow coverflow-arrow--left"
-          onClick={() => move(-1)}
-          aria-label="Produto anterior"
-        >
-          ‹
-        </button>
+        <button type="button" className="coverflow-arrow coverflow-arrow--left" onClick={() => move(-1)} aria-label="Produto anterior">‹</button>
 
         <div className="coverflow-stage">
-          {cards.map(({ product, index, offset }) => {
+          {cards.map(({ product, offset }) => {
             const isActive = offset === 0;
+            const image = productImages[product.art];
+
             return (
               <article
                 key={product.id}
@@ -61,10 +63,13 @@ export function FeaturedProductsCarousel() {
                 aria-hidden={!isActive}
               >
                 {product.badge && <span className="product-badge">★ {product.badge}</span>}
+
                 <div className="product-art">
+                  {image ? <img src={image} alt="" aria-hidden="true" /> : null}
                   <div className="product-art-noise" />
                   <span className="product-art-brand">{product.name}</span>
                 </div>
+
                 <div className="product-info">
                   <strong>{product.name}</strong>
                   <span>{product.subtitle}</span>
@@ -75,14 +80,7 @@ export function FeaturedProductsCarousel() {
           })}
         </div>
 
-        <button
-          type="button"
-          className="coverflow-arrow coverflow-arrow--right"
-          onClick={() => move(1)}
-          aria-label="Próximo produto"
-        >
-          ›
-        </button>
+        <button type="button" className="coverflow-arrow coverflow-arrow--right" onClick={() => move(1)} aria-label="Próximo produto">›</button>
       </div>
 
       <div className="coverflow-dots" aria-label="Selecionar produto em destaque">
