@@ -12,6 +12,7 @@ const footerLinks = [
   { label: "Feedbacks", href: "/feedbacks" },
   { label: "Comunidade", href: "/comunidade" },
   { label: "Suporte", href: "/tickets" },
+  { label: "Status", href: "/status" },
 ];
 
 export function AppFooter() {
@@ -48,7 +49,7 @@ export function AppFooter() {
 
       <div className="crz-shell-footer__bottom">
         <span>© {new Date().getFullYear()} CRAZZY PROJECT</span>
-        <span className="crz-shell-footer__status"><i /> Serviços online</span>
+        <a className="crz-shell-footer__status" href="/status"><i /> Ver status dos serviços</a>
         <strong>GAMERS BUILD A BETTER TOMORROW</strong>
       </div>
     </footer>
