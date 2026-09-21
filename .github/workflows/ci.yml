@@ -95,3 +95,7 @@ jobs:
       - name: Test M23 Help
         if: github.ref_name == 'm23-help'
         run: node scripts/test-m23-help.mjs
+
+      - name: Test M23.1 MT Sounds
+        if: github.ref_name == 'm23-1-mtsounds-clean'
+        run: node scripts/test-m23-1-mtsounds.mjs

@@ -15,6 +15,7 @@ const footerLinks = [
   { label: "Status", href: "/status" },
   { label: "Academy", href: "/academy" },
   { label: "Ajuda", href: "/help" },
+  { label: "MT Sounds", href: "/mtsounds" },
 ];
 
 export function AppFooter() {
