@@ -37,6 +37,7 @@ export type AccountsMarketItem = {
   skinIds: string[];
   agentIds: string[];
   buddyIds: string[];
+  offlineDays: number | null;
 };
 
 export type AccountsMarketPageData = {
