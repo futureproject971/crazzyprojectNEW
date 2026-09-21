@@ -356,3 +356,74 @@ Toda integração externa deve suportar:
 - reconcile job.
 
 Nunca considerar um POST externo como infalível.
+
+
+---
+
+## 12. Security Sentinel
+
+M47 centraliza auditoria, detecção de abuso e alertas.
+
+### Eventos mínimos
+- auth_failed
+- auth_rate_limited
+- admin_forbidden
+- stock_forbidden
+- stock_probe
+- privilege_escalation_attempt
+- price_tamper_attempt
+- webhook_signature_invalid
+- webhook_replay_detected
+- fulfillment_failure
+- stock_reservation_conflict
+- discord_sync_failure
+- lzt_provider_error
+- payment_value_mismatch
+- suspicious_request_pattern
+- application_5xx
+- critical_bug
+
+### Estrutura sugerida
+
+`security_events`
+- id
+- event_type
+- severity
+- user_id nullable
+- discord_user_id nullable
+- request_id
+- route
+- method
+- ip_hash_or_masked
+- user_agent_summary
+- metadata jsonb
+- created_at
+- acknowledged_at nullable
+- acknowledged_by nullable
+- resolved_at nullable
+
+### Pipeline
+1. detectar evento;
+2. registrar evento estruturado;
+3. mascarar/remover dados sensíveis;
+4. deduplicar/agrupar;
+5. calcular severidade;
+6. disparar alerta Discord quando necessário;
+7. manter evento no painel;
+8. permitir acknowledge/resolution.
+
+### Segurança do próprio log
+- sem API keys;
+- sem tokens;
+- sem senhas;
+- sem keys/licenças;
+- sem conteúdo entregue em texto aberto;
+- acesso admin restrito.
+
+### Discord
+O M47 usa o M44 para entregar alertas.
+Discord recebe somente resumo seguro.
+Falha do Discord não bloqueia o fluxo principal.
+
+### Anti-spam
+Eventos repetidos devem ser agregados por janela de tempo para não inundar o canal.
