@@ -60,7 +60,7 @@
 
 ---
 
-## 🟡 M06 — CRAZZY ACCOUNTS MARKET — INÍCIO LIBERADO
+## 🟡 M06 — CRAZZY ACCOUNTS MARKET — EM ANDAMENTO
 Fonte: FortuneECrazzy + LZT.
 
 - [ ] migrar listagem
@@ -494,6 +494,6 @@ Fonte visual: Pink.
 - [x] fechar decisões D01-D10
 - [x] mergear PR #6 M05
 - [x] mergear PR #7 Architecture V2
-- [ ] criar branch m06-accounts-market
+- [x] criar branch m06-accounts-market
 - [ ] migrar Fortune/LZT
 - [ ] seguir M07 -> M08 -> M09...
