@@ -1,4 +1,6 @@
-export type CartPlanCode = "1d" | "3d" | "7d" | "15d" | "30d" | "90d" | "lifetime";
+import type { ComboPlanFamily, StandardPlanCode } from "@/core/commerce/policy";
+
+export type CartPlanCode = StandardPlanCode;
 
 export type CartItemKind = "product" | "lzt-account";
 
@@ -21,13 +23,6 @@ export type CartItem = {
   comboEligible?: boolean;
   lztItemId?: string;
   lztGame?: string;
-};
-
-export type ComboPlanFamily = "30d" | "lifetime";
-
-export type ComboTier = {
-  products: number;
-  discountPercent: number;
 };
 
 export type ComboGroupSummary = {
