@@ -226,77 +226,74 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] catálogo público continua público
 - [x] boundaries M11/M22/M43/M44 preservadas
 
-## 🟡 M11 — CRAZZY LIBRARY — AUDITORIA/SEGURANÇA EM ANDAMENTO
+## ✅ M11 — CRAZZY LIBRARY — CONCLUÍDO
 
-### Estado atual
-- [x] branch `m11-library` criada
-- [x] checklist e handoff carregados
-- [x] banco relevante mapeado
-- [x] `stock_items` auditado
-- [x] `trial_stock_items` auditado
-- [x] `reward_deliveries` auditado
-- [x] `order_tickets` auditado
-- [x] `entitlements` auditado
-- [x] `lzt_sales` auditado
-- [x] `payments` auditado
-- [x] função `claim_paid_delivery` identificada
-- [x] problema crítico de exposição direta de segredo identificado
-- [x] terminar auditoria interna de `claim_paid_delivery`
-- [x] conferir GRANTs diretos de stock/reward/order/trial
-- [ ] migration de segurança M11
-- [ ] separar payload secreto de metadata/status
-- [ ] tabela `library_reveal_events`
-- [ ] revogar SELECT direto de conteúdo sensível
-- [ ] snapshot seguro da Library sem plaintext
-- [ ] endpoint server-side de reveal
-- [ ] auditoria de reveal/copy
-- [ ] owner de outro usuário = bloqueado
-- [ ] nenhum secret em localStorage
+### Segurança / arquitetura
+- [x] branch `m11-library`
+- [x] auditoria integral de `claim_paid_delivery`
+- [x] `FOR UPDATE SKIP LOCKED` e idempotência preservados
+- [x] GRANTs/RLS de stock/reward/order/trial auditados
+- [x] migration `m11_library_secure_reveal`
+- [x] migration `m11_library_account_payload_format`
+- [x] `public.library_deliveries`
+- [x] `private.library_delivery_secrets`
+- [x] `public.library_reveal_events`
+- [x] stock plaintext removido do acesso do cliente
+- [x] reward plaintext removido do acesso do cliente
+- [x] secrets server-only
+- [x] authenticated sem SELECT em secret table
+- [x] reveal/copy RPCs service-role only
+- [x] snapshot sem key/login/senha/token/link privado
+- [x] reveal valida sessão + ownership + status + expiração + entitlement
+- [x] reveal registra auditoria
+- [x] copy registra evento sem reenviar o segredo
+- [x] nenhum secret em localStorage/sessionStorage/cookie/URL
+- [x] plaintext existe apenas temporariamente em React state
+- [x] rate limit de reveal
+- [x] usuário banido bloqueado no backend
+
+### Writers legados alinhados
+- [x] `rewards` v5 não retorna mais `content` no status
+- [x] `purincash-payment` v6 não envia credenciais LZT em ticket
+- [x] tutorial sensível não é mais publicado em ticket
+- [x] ticket de produto entregue aponta para CRAZZY LIBRARY
+- [x] Client Hub lê metadata segura da Library
 
 ### Library UI
-- [ ] /biblioteca
-- [ ] alias /painel/biblioteca
-- [ ] Minhas Keys
-- [ ] Minhas Contas
-- [ ] Links / Downloads
-- [ ] Trials / Recompensas
-- [ ] revelar
-- [ ] copiar
-- [ ] mascarar novamente
-- [ ] histórico de revelações
-- [ ] produto/plano/status
-- [ ] entitlement/status
-- [ ] expiração
-- [ ] tutorial associado sem expor conteúdo M22
-- [ ] status cargo Discord sem invadir M44
-- [ ] reconsulta segura
-- [ ] loading/error/empty
-- [ ] desktop/tablet/mobile
-
-### BLOQUEIO CRÍTICO M11 — NÃO CRIAR UI ANTES DE CORRIGIR
-- [x] risco confirmado: `stock_items.content` fica legível diretamente pelo cliente após delivery
-- [ ] corrigir exposição direta de `stock_items.content`
-- [x] risco confirmado: `reward_deliveries.content` fica legível diretamente pela REST do owner
-- [ ] corrigir exposição direta de `reward_deliveries.content`
-- [ ] secrets devem ser server-only
-- [ ] listagem normal nunca retorna key/login/senha/token/link privado
-- [ ] reveal deve validar sessão + ownership + order/entitlement + status
-- [ ] reveal deve registrar evento de auditoria
-- [ ] browser não pode receber service_role
-- [ ] LZT não pode inventar credencial/payload
+- [x] `/biblioteca`
+- [x] alias `/painel/biblioteca`
+- [x] Minhas Keys
+- [x] Minhas Contas
+- [x] Links / Downloads
+- [x] Trials / Recompensas
+- [x] revelar
+- [x] copiar
+- [x] ocultar / mascarar novamente
+- [x] histórico de revelações e cópias
+- [x] produto/plano/status
+- [x] entitlement/status
+- [x] expiração
+- [x] tutorial associado sem expor conteúdo M22
+- [x] status cargo Discord sem invadir M44
+- [x] loading/error/empty
+- [x] desktop/tablet/mobile
+- [x] link no menu da conta
+- [x] Client Hub → Library
 
 ### QA M11
-- [ ] anon bloqueado da secret table
-- [ ] authenticated bloqueado de SELECT direto em secrets
-- [ ] owner consegue listar somente metadata/status próprios
-- [ ] reveal exige sessão
-- [ ] reveal de item de outro usuário falha
-- [ ] reveal válido retorna apenas payload próprio
-- [ ] Security Advisor Supabase sem lints
-- [ ] TypeScript PASS
-- [ ] production build PASS
-- [ ] smoke M11 PASS
-- [ ] GitHub Actions PASS
+- [x] anon bloqueado de stock/reward/library/events
+- [x] private secret schema não exposto
+- [x] Library snapshot exige autenticação
+- [x] Library reveal exige autenticação
+- [x] catálogo público continua público
+- [x] authenticated sem EXECUTE direto de reveal/copy RPC
+- [x] Security Advisor Supabase: 0 lints
+- [x] npm ci PASS
+- [x] TypeScript PASS
+- [x] production build PASS
+- [x] smoke M11 PASS
+- [x] validação isolada GitHub Actions PASS
+- [ ] CI oficial no head final
 - [ ] PR M11
 - [ ] merge M11
 
@@ -668,5 +665,6 @@ Fonte visual: Pink.
 - [x] M08 concluído estruturalmente
 - [x] M09 concluído estruturalmente
 - [x] M10 concluído
-- [x] M11 iniciado e auditado parcialmente
-- [ ] concluir M11 — CRAZZY LIBRARY
+- [x] M11 concluído tecnicamente
+- [ ] mergear M11 — CRAZZY LIBRARY
+- [ ] iniciar M12 — CRAZZY PROFILE
