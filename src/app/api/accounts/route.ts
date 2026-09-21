@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { normalizeLztPage } from "@/modules/accounts-market/normalizer";
+import { normalizeAccountPage } from "@/modules/accounts-market/normalizer";
 import type { AccountsMarketGame } from "@/modules/accounts-market/types";
 
 const DEFAULT_SUPABASE_URL = "https://nnmglkdpmffmaiuwbcct.supabase.co";
@@ -89,36 +89,26 @@ export async function GET(request: NextRequest) {
       cache: "no-store",
     });
 
-    const payload: any = await response.json().catch(() => null);
-
     if (!response.ok) {
-      if (payload?.error === "LZT token not configured") {
-        return NextResponse.json(
-          {
-            error: "Catálogo temporariamente em configuração.",
-            code: "LZT_CREDENTIAL_MISSING",
-          },
-          { status: 503 }
-        );
-      }
-
       return NextResponse.json(
         {
-          error: "Não foi possível consultar o catálogo de contas agora.",
-          code: "LZT_PROVIDER_ERROR",
-          providerStatus: payload?.status ?? response.status,
+          error: response.status === 429
+            ? "Muitas buscas ao mesmo tempo. Tente novamente em alguns segundos."
+            : "O catálogo de contas está temporariamente indisponível.",
+          code: response.status === 429 ? "CATALOG_BUSY" : "CATALOG_UNAVAILABLE",
         },
-        { status: 502 }
+        { status: response.status === 429 ? 429 : 503 }
       );
     }
 
-    return NextResponse.json(normalizeLztPage(payload, game), {
+    const payload: unknown = await response.json().catch(() => null);
+    return NextResponse.json(normalizeAccountPage(payload, game), {
       headers: { "Cache-Control": "no-store" },
     });
   } catch {
     return NextResponse.json(
-      { error: "Falha temporária ao consultar o catálogo de contas.", code: "LZT_NETWORK_ERROR" },
-      { status: 502 }
+      { error: "O catálogo de contas está temporariamente indisponível.", code: "CATALOG_UNAVAILABLE" },
+      { status: 503 }
     );
   }
 }
