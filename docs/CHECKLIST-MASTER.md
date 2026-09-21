@@ -139,20 +139,32 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] stock 0 oculto por padrão
 - [x] admin poderá exibir stock 0 como esgotado
 
-## ❌ M08 — CRAZZY CHECKOUT
-- [ ] PIX PurinCash
-- [ ] cartão PurinCash
-- [ ] LTC PurinCash
-- [ ] QR/copia e cola
-- [ ] checkout hospedado
-- [ ] endereço LTC
-- [ ] expiração/status
-- [ ] webhook
-- [ ] HMAC
-- [ ] idempotência
-- [ ] polling
-- [ ] value check
-- [ ] anti-entrega-duplicada
+## ✅ M08 — CRAZZY CHECKOUT — ESTRUTURA CONCLUÍDA
+- [x] /checkout
+- [x] PIX PurinCash
+- [x] cartão PurinCash
+- [x] LTC PurinCash
+- [x] QR/copia e cola
+- [x] checkout hospedado
+- [x] endereço LTC sem arredondamento
+- [x] expiração/status
+- [x] webhook
+- [x] HMAC SHA-256 sobre corpo cru
+- [x] idempotência de criação por user + attempt key
+- [x] polling/reconcile
+- [x] value check
+- [x] checkout proof assinado
+- [x] anti-entrega-duplicada
+- [x] combo recalculado server-side
+- [x] cupom recalculado server-side
+- [x] combo/cupom usa melhor benefício sem acumular
+- [x] RLS de payments auditado
+- [x] LZT sem câmbio RUB fixo
+- [x] métodos ficam fail-closed quando desabilitados
+- [x] gate de autenticação preparado para M09
+- [ ] ativar secrets PurinCash na etapa de integrações/SQL
+- [ ] habilitar payment_settings após testes
+- [ ] sessão real fornecida pelo M09
 
 ## ❌ M09 — CRAZZY AUTH
 - [ ] Discord OAuth/link

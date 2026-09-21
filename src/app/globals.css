@@ -8,6 +8,7 @@
 @import "../modules/product-view/styles.css";
 @import "../modules/accounts-market/styles.css";
 @import "../modules/cart/styles.css";
+@import "../modules/checkout/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */

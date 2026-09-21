@@ -39,3 +39,7 @@ jobs:
       - name: Test M06 LZT preview
         if: github.ref_name == 'm06-accounts-market'
         run: node scripts/test-lzt-preview.mjs
+
+      - name: Test M08 checkout security
+        if: github.ref_name == 'm08-checkout'
+        run: node scripts/test-m08-checkout.mjs
