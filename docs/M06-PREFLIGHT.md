@@ -1,6 +1,6 @@
 # M06 — PREFLIGHT BEFORE IMPLEMENTATION
 
-Status: **LIBERADO PARA INÍCIO após merge do M05 e Architecture V2.**
+Status: **M06 INICIADO em 2026-09-21.**
 
 ## Fonte obrigatória
 FortuneECrazzy / integração LZT existente.
@@ -49,8 +49,8 @@ Resumo:
 
 ## Gate
 - [x] D01-D10 aprovadas.
-- [ ] PR #6 M05 mergeado.
-- [ ] PR #7 Architecture V2 mergeado.
-- [ ] branch `m06-accounts-market` criada a partir da base consolidada.
+- [x] PR #6 M05 mergeado.
+- [x] PR #7 Architecture V2 mergeado.
+- [x] branch `m06-accounts-market` criada a partir da base consolidada.
 
 Após os três itens acima, M06 pode iniciar pela **auditoria/migração do FortuneECrazzy/LZT**, nunca do zero.
