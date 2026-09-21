@@ -21,7 +21,7 @@ function ItemArt({ item }: { item: CartItem }) {
       {item.image ? (
         <img src={item.image} alt="" />
       ) : (
-        <NeonIcon name={item.kind === "lzt-account" ? "gamepad" : "cube"} size={42} />
+        <NeonIcon name={item.kind === "account" ? "gamepad" : "cube"} size={42} />
       )}
     </div>
   );
@@ -155,7 +155,7 @@ export function CartPage() {
                     <div className="crz-cart-item__body">
                       <div className="crz-cart-item__headline">
                         <div>
-                          <small>{item.category ?? (item.kind === "lzt-account" ? "Conta" : "Produto digital")}</small>
+                          <small>{item.category ?? (item.kind === "account" ? "Conta" : "Produto digital")}</small>
                           <strong>{item.name}</strong>
                           <span>{item.subtitle}</span>
                         </div>
@@ -202,7 +202,7 @@ export function CartPage() {
                           <div>
                             <button
                               type="button"
-                              disabled={item.kind === "lzt-account" || item.quantity <= 1}
+                              disabled={item.kind === "account" || item.quantity <= 1}
                               onClick={() => setQuantity(item.key, item.quantity - 1)}
                             >
                               −
@@ -210,7 +210,7 @@ export function CartPage() {
                             <strong>{item.quantity}</strong>
                             <button
                               type="button"
-                              disabled={item.kind === "lzt-account" || item.quantity >= 20}
+                              disabled={item.kind === "account" || item.quantity >= 20}
                               onClick={() => setQuantity(item.key, item.quantity + 1)}
                             >
                               +
