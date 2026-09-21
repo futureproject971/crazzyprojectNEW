@@ -75,8 +75,8 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
     product.stock === "available" ? "green" : product.stock === "limited" ? "gold" : "neutral";
 
   const handlePurchase = () => {
-    if (product.stock === "out") {
-      setNotice("Este produto está indisponível.");
+    if (product.stock === "out" || selectedPlanData.stockCount === 0) {
+      setNotice("Este plano está esgotado no momento.");
       return;
     }
 
@@ -200,12 +200,13 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
                     key={plan.id}
                     className={plan.id === selectedPlan ? "is-selected" : ""}
                     aria-pressed={plan.id === selectedPlan}
+                    disabled={plan.stockCount === 0}
                     onClick={() => setSelectedPlan(plan.id)}
                   >
                     {plan.featured && <b>RECOMENDADO</b>}
                     <strong>{plan.name}</strong>
                     <span>{plan.duration}</span>
-                    <small>{plan.note}</small>
+                    <small>{plan.stockCount === 0 ? "ESGOTADO" : plan.note}</small>
                     <em>{plan.priceLabel}</em>
                   </button>
                 ))}
@@ -221,11 +222,13 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
 
               <Button
                 size="lg"
-                disabled={product.stock === "out"}
+                disabled={product.stock === "out" || selectedPlanData.stockCount === 0}
                 onClick={handlePurchase}
                 leadingIcon={<NeonIcon name="lightning" size={20} />}
               >
-                {product.stock === "out" ? "Indisponível" : "Adicionar ao carrinho"}
+                {product.stock === "out" || selectedPlanData.stockCount === 0
+                  ? "Plano esgotado"
+                  : "Adicionar ao carrinho"}
               </Button>
 
               <p>
