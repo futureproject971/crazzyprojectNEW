@@ -87,3 +87,7 @@ jobs:
       - name: Test M21 Status security
         if: github.ref_name == 'm21-status'
         run: node scripts/test-m21-status.mjs
+
+      - name: Test M22 Academy security
+        if: github.ref_name == 'm22-academy'
+        run: node scripts/test-m22-academy.mjs

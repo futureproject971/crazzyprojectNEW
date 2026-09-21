@@ -23,6 +23,7 @@
 @import "../modules/coupons/styles.css";
 @import "../modules/rank/styles.css";
 @import "../modules/status/styles.css";
+@import "../modules/academy/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */

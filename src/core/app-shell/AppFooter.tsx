@@ -13,6 +13,7 @@ const footerLinks = [
   { label: "Comunidade", href: "/comunidade" },
   { label: "Suporte", href: "/tickets" },
   { label: "Status", href: "/status" },
+  { label: "Academy", href: "/academy" },
 ];
 
 export function AppFooter() {
