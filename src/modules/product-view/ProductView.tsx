@@ -232,7 +232,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
               </Button>
 
               <p>
-                O carrinho preserva o plano escolhido. Checkout e pagamento entram no M08.
+                Seu plano escolhido fica salvo no carrinho até a finalização da compra.
               </p>
             </div>
 
@@ -320,7 +320,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
                 <div className="crz-product-reviews__summary">
                   <strong>{detail.rating.toFixed(1)}</strong>
                   <span>★★★★★</span>
-                  <small>{detail.ratingCount} avaliações mockadas</small>
+                  <small>{detail.ratingCount} avaliações</small>
                   <ProgressBar value={96} label="Satisfação visual" showValue />
                 </div>
 
