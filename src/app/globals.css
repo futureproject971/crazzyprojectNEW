@@ -1836,3 +1836,37 @@ img.store-category-icon--gold {
   -webkit-mask-image: none;
   mask-image: none;
 }
+
+
+/* Shell-safe spacing for all public pages */
+.crz-cart-hero,
+.crz-combo-hero,
+.crz-checkout-hero,
+.crz-hub-hero,
+.crz-library-hero,
+.crz-support-hero,
+.crz-community-hero {
+  padding-top: 88px;
+}
+
+.crz-profile-stage {
+  padding-top: 82px;
+}
+
+.crz-account-detail {
+  padding-top: 88px;
+}
+
+@media (max-width: 980px) {
+  .crz-cart-hero,
+  .crz-combo-hero,
+  .crz-checkout-hero,
+  .crz-hub-hero,
+  .crz-library-hero,
+  .crz-support-hero,
+  .crz-community-hero,
+  .crz-profile-stage,
+  .crz-account-detail {
+    padding-top: 78px;
+  }
+}
