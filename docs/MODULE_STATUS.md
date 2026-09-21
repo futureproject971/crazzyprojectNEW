@@ -3,48 +3,43 @@
 ## M00
 **GRUPO 00 — CORE DA PLATAFORMA**  
 **M00 — CRAZZY DESIGN SYSTEM**  
-Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+Status: **APROVADO E INTEGRADO**
 
-Branch: `m00-design-system`
+Merged into `phase-1-home`:
+`0531d09b81b5a3f5324871bb30224cc060c71dae`
 
-Último QA técnico:
+QA:
 - typecheck: PASS
 - build: PASS
 - GitHub Actions: PASS
 
-### Implementado
-- tokens globais
-- tipografia CRAZZY
-- cores / gradientes / radius / spacing
-- glow / shadows
-- motion / reduced motion
-- responsividade base
-- Button / IconButton
-- Input / SearchInput / Select
-- Checkbox
-- Badge
-- Panel / Card
-- Tooltip
-- Tabs
-- Dropdown
-- Dialog / Drawer
-- ConfirmDialog
-- Skeleton
-- Loading / Empty / Error
-- Toast
-- Avatar
-- SectionTitle / PageHeader
-- ProgressBar / Pagination
-- scrollbar primitives
-- CRAZZY_PROJECT_NEON_ICONS_V2 registry
-- fallback icon registry
-- smoke fixture de compilação
-- CI com typecheck + build
+---
 
-### Proteção
-A Home existente em `phase-1-home` continua preservada como protótipo provisório.
+## M01
+**GRUPO 00 — CORE DA PLATAFORMA**  
+**M01 — CRAZZY APP SHELL**  
+Status: **EM IMPLEMENTAÇÃO / QA**
 
-**NÃO iniciar M01 automaticamente.**
+Branch:
+`m01-app-shell`
 
-Próximo módulo previsto, somente após autorização explícita:
-**M01 — CRAZZY APP SHELL**
+Responsabilidade:
+- AppShell
+- Header/Navbar
+- visitor/client/admin shell modes
+- account area
+- responsive mobile navigation
+- mobile Drawer
+- global Footer
+- structural layout boundaries
+- compatibility wrappers for legacy Navbar/Footer
+
+Não inclui:
+- Auth real
+- Client Hub
+- Admin pages
+- Product/Cart/Ticket business logic
+- backend/Supabase
+
+Próximo módulo após aprovação do M01:
+**M02 — CRAZZY HOME**
