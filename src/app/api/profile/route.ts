@@ -61,6 +61,7 @@ export async function GET() {
     grantsResult,
     entitlementsResult,
     paymentsResult,
+    rankResult,
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -98,6 +99,7 @@ export async function GET() {
       .eq("user_id", user.id)
       .eq("status", "COMPLETED")
       .limit(100),
+    supabase.rpc("get_my_rank"),
   ]);
 
   if (profileResult.data?.banned) {
@@ -159,6 +161,17 @@ export async function GET() {
     badges.push(badge("lifetime", "LIFETIME", "gold"));
   }
 
+  const rankData = rankResult.data && typeof rankResult.data === "object"
+    ? (rankResult.data as any)
+    : null;
+
+  if (rankData?.current?.label) {
+    const rankTone = ["blue","green","gold","pink","neutral"].includes(String(rankData.current.tone))
+      ? rankData.current.tone
+      : "blue";
+    badges.push(badge("rank", String(rankData.current.label).toUpperCase(), rankTone));
+  }
+
   const snapshot: ProfileSnapshot = {
     account: {
       id: user.id,
@@ -194,6 +207,24 @@ export async function GET() {
       revokedAt: item.revoked_at,
     })),
     badges,
+    rank: rankData?.current ? {
+      points: Number(rankData.points || 0),
+      progressPercent: Number(rankData.progress_percent || 0),
+      current: {
+        code: String(rankData.current.code || "member"),
+        label: String(rankData.current.label || "Member"),
+        color: String(rankData.current.color || "#2AA8FF"),
+        tone: ["blue","green","gold","pink","neutral"].includes(String(rankData.current.tone))
+          ? rankData.current.tone
+          : "blue",
+      },
+      next: rankData.next ? {
+        code: String(rankData.next.code || ""),
+        label: String(rankData.next.label || ""),
+        minPoints: Number(rankData.next.min_points || 0),
+        pointsNeeded: Number(rankData.next.points_needed || 0),
+      } : null,
+    } : null,
     stats: {
       entitlements: entitlements.length,
       activeEntitlements: activeEntitlements.length,
