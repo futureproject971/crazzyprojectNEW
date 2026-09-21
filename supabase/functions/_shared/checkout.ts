@@ -511,7 +511,7 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
           ticket_id: ticket.id,
           sender_id: payment.user_id,
           sender_role: "staff",
-          message: "✅ Seu produto foi entregue automaticamente! Veja a chave acima.",
+          message: "✅ Seu produto foi entregue automaticamente! Abra sua Biblioteca CRAZZY para revelar a entrega com segurança.",
         });
 
         const { data: productData } = await supabaseAdmin
@@ -520,31 +520,12 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
           .eq("id", item.productId)
           .single();
 
-        if (productData?.tutorial_text) {
-          const txtContent = productData.tutorial_text;
-          const txtBlob = new Blob([txtContent], { type: "text/plain" });
-          const txtPath = `tutorials/${crypto.randomUUID()}.txt`;
-          const { error: uploadErr } = await supabaseAdmin.storage
-            .from("game-images")
-            .upload(txtPath, txtBlob, { contentType: "text/plain" });
-
-          if (!uploadErr) {
-            const { data: urlData } = supabaseAdmin.storage.from("game-images").getPublicUrl(txtPath);
-            await supabaseAdmin.from("ticket_messages").insert({
-              ticket_id: ticket.id,
-              sender_id: payment.user_id,
-              sender_role: "staff",
-              message: `📖 **Tutorial:** ${urlData.publicUrl}`,
-            });
-          }
-        }
-
-        if (productData?.tutorial_file_url) {
+        if (productData?.tutorial_text || productData?.tutorial_file_url) {
           await supabaseAdmin.from("ticket_messages").insert({
             ticket_id: ticket.id,
             sender_id: payment.user_id,
             sender_role: "staff",
-            message: `📎 **Arquivo:** ${productData.tutorial_file_url}`,
+            message: "📖 Tutorial associado ao produto. O acesso protegido ficará disponível na CRAZZY ACADEMY.",
           });
         }
       } else if (!stockId) {
@@ -796,13 +777,11 @@ async function fulfillLztAccount(supabaseAdmin: any, payment: any, item: any) {
       .single();
 
     if (ticket && buyRes.ok && email) {
-      // Send single structured credential message
-      const credentialData = JSON.stringify({ login: email, password: password, email: accountEmail });
       await supabaseAdmin.from("ticket_messages").insert({
         ticket_id: ticket.id,
         sender_id: payment.user_id,
         sender_role: "staff",
-        message: `[CREDENTIALS]${credentialData}`,
+        message: "✅ Conta entregue com segurança. As credenciais ficam disponíveis somente na sua Biblioteca CRAZZY.",
       });
 
     } else if (ticket && !buyRes.ok) {
