@@ -92,6 +92,33 @@ function safeStringList(value: any): string[] {
   return [];
 }
 
+function ageToDays(value: any, period?: any): number | null {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric < 0) return null;
+  const unit = String(period || "day").toLowerCase();
+  if (unit === "year") return Math.round(numeric * 365);
+  if (unit === "month") return Math.round(numeric * 30);
+  return Math.round(numeric);
+}
+
+function accountOfflineDays(item: any, game: string): number | null {
+  if (game === "minecraft") {
+    return ageToDays(
+      item?.last_login_hypixel ?? item?.minecraft_last_login_hypixel,
+      item?.last_login_hypixel_period ?? item?.minecraft_last_login_hypixel_period ?? "day"
+    );
+  }
+
+  return ageToDays(
+    item?.daybreak ??
+      item?.offline_days ??
+      item?.days_offline ??
+      item?.riot_daybreak ??
+      item?.fortnite_daybreak,
+    "day"
+  );
+}
+
 function safeRemoteImageUrl(value: string | null): string | null {
   if (!value) return null;
   try {
@@ -549,6 +576,7 @@ Deno.serve(async (req) => {
         skinIds: safeStringList(item?.valorantInventory?.WeaponSkins),
         agentIds: safeStringList(item?.valorantInventory?.Agent),
         buddyIds: safeStringList(item?.valorantInventory?.Buddy),
+        offlineDays: accountOfflineDays(item, safeGame),
       };
 
       return new Response(JSON.stringify({ item: safeItem }), {
@@ -601,6 +629,7 @@ Deno.serve(async (req) => {
         "win_rate_min", "win_rate_max", "blue_min", "blue_max", "orange_min", "orange_max",
         "mythic_min", "mythic_max", "riot_min", "riot_max", "email", "tel",
         "valorant_knife_min", "valorant_knife_max", "rp_min", "rp_max", "fa_min", "fa_max",
+        "daybreak",
       ];
       const riotArrays = [
         "weaponSkin[]", "buddy[]", "agent[]", "champion[]", "skin[]",
@@ -842,6 +871,7 @@ Deno.serve(async (req) => {
         skinIds: safeStringList(item?.valorantInventory?.WeaponSkins),
         agentIds: safeStringList(item?.valorantInventory?.Agent),
         buddyIds: safeStringList(item?.valorantInventory?.Buddy),
+        offlineDays: accountOfflineDays(item, url.searchParams.get("game") || category),
         price: (() => {
           const base = Number(first(item, ["price", "price_value", "item_price"]) || 0);
           const game = url.searchParams.get("game") || "";
