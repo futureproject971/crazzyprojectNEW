@@ -201,3 +201,52 @@ M47:
 ## REGRA DE PERSISTÊNCIA
 Cada avanço relevante deve ser commitado no Git.
 Atualizar este handoff se a conversa estiver perto do limite.
+
+
+## CHECKPOINT — M14 IMPLEMENTADO
+
+Implementado e versionado:
+- migration `202609211530_m14_community_core.sql` aplicada;
+- community_channels;
+- community_messages;
+- community_reactions;
+- community_attachments;
+- canal `geral`;
+- bucket privado `community-media`;
+- Edge Function `community` v1 ativa;
+- /comunidade privada;
+- mensagens;
+- reply;
+- reações;
+- soft delete própria/admin-mod;
+- perfil clicável;
+- avatar M12;
+- app roles;
+- cargos Discord já concedidos;
+- badges;
+- cargo principal/cor segura enquanto M44 não fornece prioridade oficial;
+- imagem/vídeo/áudio privados;
+- signed upload;
+- signed media URL curta;
+- polling 4s somente com aba visível;
+- rate limits;
+- App Shell aponta para /comunidade;
+- Security Advisor 0 lints;
+- smoke M14 versionado e adicionado ao CI;
+- regra completa em `docs/M14-COMMUNITY-RULES.md`.
+
+QA:
+- primeiro CI encontrou import relativo errado no proxy de upload;
+- corrigido no commit `5cf1f5e2e8a3039e8ba1dfd99e6fb0f22086d09d`;
+- novo CI está rodando.
+
+Próximo passo exato:
+1. confirmar TypeScript PASS;
+2. confirmar build PASS;
+3. confirmar smoke M14 PASS;
+4. corrigir qualquer falha;
+5. atualizar checklist;
+6. PR M14;
+7. squash merge;
+8. validar phase-1-home pós-merge;
+9. iniciar M15 CRAZZY REVIEWS.
