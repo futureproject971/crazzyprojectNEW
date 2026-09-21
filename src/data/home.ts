@@ -82,15 +82,16 @@ export type FeaturedProduct = {
   name: string;
   subtitle: string;
   badge?: string;
+  slug: string;
   art: "rdr2" | "cod" | "gta" | "valorant" | "fortnite";
 };
 
 export const featuredProducts: FeaturedProduct[] = [
-  { id: "rdr2", name: "RDR2", subtitle: "Conta Premium", art: "rdr2" },
-  { id: "cod", name: "Call of Duty", subtitle: "Conta Premium", art: "cod" },
-  { id: "gta", name: "GTA V", subtitle: "Conta Premium", art: "gta", badge: "Mais Vendido" },
-  { id: "valorant", name: "VALORANT", subtitle: "Conta Premium", art: "valorant" },
-  { id: "fortnite", name: "Fortnite", subtitle: "Conta Premium", art: "fortnite" },
+  { id: "rdr2", name: "RDR2", subtitle: "Conta Premium", slug: "rdr2-premium", art: "rdr2" },
+  { id: "cod", name: "Call of Duty", subtitle: "Conta Premium", slug: "call-of-duty-premium", art: "cod" },
+  { id: "gta", name: "GTA V", subtitle: "Conta Premium", slug: "gta-v-premium", art: "gta", badge: "Mais Vendido" },
+  { id: "valorant", name: "VALORANT", subtitle: "Conta Premium", slug: "valorant-premium", art: "valorant" },
+  { id: "fortnite", name: "Fortnite", subtitle: "Conta Premium", slug: "fortnite-premium", art: "fortnite" },
 ];
 
 export type StoreCategory = {

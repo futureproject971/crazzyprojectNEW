@@ -109,7 +109,7 @@ Próximo módulo previsto após aprovação:
 ## M04 — CRAZZY CATALOG
 **GRUPO 02 — COMÉRCIO**
 
-Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+Status: **APROVADO E INTEGRADO**
 
 Branch:
 `m04-catalog`
@@ -142,3 +142,43 @@ QA:
 
 Próximo módulo previsto após aprovação:
 **M05 — CRAZZY PRODUCT VIEW**
+
+
+---
+
+## M05 — CRAZZY PRODUCT VIEW
+**GRUPO 02 — COMÉRCIO**
+
+Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+
+Branch:
+`m05-product-view`
+
+Rota:
+- `/produto/[slug]`
+
+Implementado:
+- galeria e thumbnails
+- zoom
+- metadata por produto
+- not-found por slug
+- badges e estoque
+- planos e seleção
+- CTA visual
+- benefícios
+- descrição
+- compatibilidade e requisitos
+- avaliações
+- FAQ
+- produtos relacionados
+- Home coverflow ligado ao Product View
+- loading / error
+- desktop / tablet / mobile
+
+QA:
+- typecheck: PASS
+- build: PASS
+- GitHub Actions: PASS
+
+Próximo módulo previsto após aprovação:
+**M06 — CRAZZY ACCOUNTS**
