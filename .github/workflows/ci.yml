@@ -1,0 +1,69 @@
+name: CRAZZY PROJECT Front CI
+
+on:
+  push:
+    branches:
+      - phase-1-home
+      - m00-design-system
+      - "m*-*"
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: crazzy-front-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Test M06 LZT preview
+        if: github.ref_name == 'm06-accounts-market'
+        run: node scripts/test-lzt-preview.mjs
+
+      - name: Test M08 checkout security
+        if: github.ref_name == 'm08-checkout'
+        run: node scripts/test-m08-checkout.mjs
+
+      - name: Test M09 auth security
+        if: github.ref_name == 'm09-auth'
+        run: node scripts/test-m09-auth.mjs
+
+      - name: Test M10 client hub security
+        if: github.ref_name == 'm10-client-hub'
+        run: node scripts/test-m10-client-hub.mjs
+
+      - name: Test M11 Library security
+        if: github.ref_name == 'm11-library'
+        run: node scripts/test-m11-library.mjs
+
+      - name: Test M12 profile security
+        if: github.ref_name == 'm12-profile'
+        run: node scripts/test-m12-profile.mjs
+
+      - name: Test M13 Support security
+        if: github.ref_name == 'm13-support'
+        run: node scripts/test-m13-support.mjs
+
+      - name: Test M14 Community security
+        if: github.ref_name == 'm14-community'
+        run: node scripts/test-m14-community.mjs
