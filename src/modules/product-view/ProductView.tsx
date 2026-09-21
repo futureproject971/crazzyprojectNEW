@@ -14,6 +14,7 @@ import {
 import { catalogCategories } from "@/modules/catalog";
 import { useCart } from "@/modules/cart/CartProvider";
 import { VerifiedReviewFeed } from "@/modules/reviews";
+import { InteractiveImGuiDemo } from "@/modules/interactive-demo";
 import {
   getRelatedProducts,
   type ProductDetail,
@@ -22,6 +23,7 @@ import {
 
 const tabItems = [
   { id: "description", label: "Descrição" },
+  { id: "demo", label: "Demo Interativa" },
   { id: "compatibility", label: "Compatibilidade" },
   { id: "reviews", label: "Avaliações" },
   { id: "faq", label: "Dúvidas" },
@@ -287,6 +289,17 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {activeTab === "demo" && (
+              <div className="crz-product-demo-tab">
+                <SectionTitle
+                  icon={<NeonIcon name="customization" size={28} />}
+                  title="Teste o menu no navegador"
+                  description="Uma simulação interativa do painel para você experimentar abas, botões, sliders e o preview antes da compra."
+                />
+                <InteractiveImGuiDemo title={product.name} />
               </div>
             )}
 
