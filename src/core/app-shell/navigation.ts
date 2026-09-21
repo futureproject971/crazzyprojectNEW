@@ -27,10 +27,13 @@ export const clientNavigation: ShellNavItem[] = [
 ];
 
 export const adminNavigation: ShellNavItem[] = [
-  { id: "admin", label: "Admin", href: "#inicio", icon: "/icons/home.svg" },
-  { id: "products", label: "Produtos", href: "#produtos", icon: "/icons/shopping-bag.svg" },
-  { id: "orders", label: "Pedidos", href: "#produtos", icon: "/icons/package.svg" },
-  { id: "users", label: "Usuários", href: "#comunidade", icon: "/icons/users.svg" },
+  { id: "admin", label: "Control", href: "/admin#inicio", icon: "/icons/home.svg" },
+  { id: "payments", label: "Pagamentos", href: "/admin#pagamentos", icon: "/icons/credit-card.svg" },
+  { id: "fulfillment", label: "Entregas", href: "/admin#fulfillment", icon: "/icons/package.svg" },
+  { id: "discord", label: "Discord", href: "/admin#discord", icon: "/icons/users.svg" },
+  { id: "stock", label: "Estoque", href: "/admin#estoque", icon: "/icons/shopping-bag.svg" },
+  { id: "academy", label: "Tutoriais", href: "/admin#tutorial", icon: "/icons/book.svg" },
+  { id: "alerts", label: "Alertas", href: "/admin#alertas", icon: "/icons/flame.svg" },
 ];
 
 export function getNavigation(mode: ShellMode): ShellNavItem[] {
