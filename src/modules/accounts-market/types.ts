@@ -35,6 +35,8 @@ export type AccountsMarketItem = {
   imageUrl: string | null;
   cosmetics: AccountCosmetic[];
   skinIds: string[];
+  agentIds: string[];
+  buddyIds: string[];
 };
 
 export type AccountsMarketPageData = {
