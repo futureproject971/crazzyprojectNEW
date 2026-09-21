@@ -21,8 +21,9 @@ Se a função antiga vende/entrega/suporta o mesmo tipo de produto que vendemos 
 | Entrega PurinCash supplier | docs oficiais | opcional por produto |
 | Discord roles | arquitetura nova | criar integração própria |
 | Discord profile/role colors | Discord behavior + CRAZZY UI | criar |
-| Tutorial viewer | CRAZZY | expandir M22 |
-| Tutorial editor | novo | criar M45 |
+| Tutorial viewer | CRAZZY + Pink | migrar ideia de tutorial por produto, expandir M22 |
+| Tutorial media/upload | Pink | reaproveitar conceitos de upload, mídia e sort_order |
+| Tutorial editor em blocos | Pink parcial + novo | migrar base útil e criar M45 block editor |
 | Entitlement/Fulfillment | novo | criar M43 |
 | MT Sounds | site existente | migrar source |
 | Admin product manager | CRAZZY + Pink/Fortune ideas | expandir M25 |
@@ -51,7 +52,8 @@ Se a função antiga vende/entrega/suporta o mesmo tipo de produto que vendemos 
 Exemplos:
 - Raspadinha Pink;
 - pagamento IFOOD;
-- estoque antigo.
+- estoque antigo;
+- tutorial Pink: aproveitar upload/texto/arquivo/mídia, mas recriar o editor como sistema de blocos.
 
 ## Pergunta obrigatória antes de uma reescrita grande
 
