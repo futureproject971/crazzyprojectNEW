@@ -342,3 +342,50 @@
 .product-card--gta .product-art-brand {
   display: none;
 }
+
+
+/* M02 final interaction / anchor polish */
+#produtos,
+#feedbacks,
+#comunidade,
+#ticket,
+#loja {
+  scroll-margin-top: 78px;
+}
+
+.crz-home-hero__cta:focus-visible,
+.section-link:focus-visible,
+.coverflow-arrow:focus-visible,
+.coverflow-dots button:focus-visible,
+.product-info button:focus-visible,
+.ticket-category:focus-visible,
+.open-ticket-button:focus-visible,
+.panel-login-gate button:focus-visible,
+.send-button:focus-visible,
+.compose-mini:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--crz-color-black),
+    0 0 0 4px var(--crz-color-blue-2),
+    var(--crz-shadow-blue);
+}
+
+.crz-home .social-panel,
+.crz-home .featured-section,
+.crz-home .store-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crz-home-hero__backdrop {
+    transform: none;
+  }
+
+  .crz-home-hero__cta,
+  .product-card,
+  .store-card,
+  .coverflow-arrow {
+    transition-duration: 0ms !important;
+  }
+}
