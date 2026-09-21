@@ -3,7 +3,7 @@ import {
   communityAuthHeader,
   communityEdgeUrl,
   proxyCommunityJson,
-} from "../../../_shared";
+} from "../../../../_shared";
 
 export async function POST(
   request: NextRequest,
