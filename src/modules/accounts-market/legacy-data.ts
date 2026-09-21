@@ -1,7 +1,6 @@
 import type { AccountsMarketGame } from "./types";
 
-const legacyAsset = (name: string) =>
-  "https://raw.githubusercontent.com/futureproject971/crazzyproject/main/src/assets/" + name;
+const legacyAsset = (name: string) => "/accounts-assets/" + name;
 
 export const valorantRegions = [
   { id: "all", label: "Todas as regiões" },
@@ -86,12 +85,22 @@ export const weapons = [
   { id: "vandal", name: "Vandal", img: legacyAsset("weapon-vandal.png") },
 ] as const;
 
-export const gameTabs: Array<{ id: AccountsMarketGame; label: string }> = [
-  { id: "valorant", label: "VALORANT" },
-  { id: "lol", label: "League of Legends" },
-  { id: "fortnite", label: "Fortnite" },
-  { id: "minecraft", label: "Minecraft" },
+export const gameTabs: Array<{
+  id: AccountsMarketGame;
+  label: string;
+  shortLabel: string;
+  accent: string;
+  accentSoft: string;
+}> = [
+  { id: "valorant", label: "VALORANT", shortLabel: "VAL", accent: "#ff4655", accentSoft: "rgba(255,70,85,.14)" },
+  { id: "lol", label: "League of Legends", shortLabel: "LOL", accent: "#27b8ff", accentSoft: "rgba(39,184,255,.14)" },
+  { id: "fortnite", label: "Fortnite", shortLabel: "FN", accent: "#8b5cf6", accentSoft: "rgba(139,92,246,.14)" },
+  { id: "minecraft", label: "Minecraft", shortLabel: "MC", accent: "#55c95f", accentSoft: "rgba(85,201,95,.14)" },
 ];
+
+export const gameTheme = Object.fromEntries(
+  gameTabs.map((game) => [game.id, { accent: game.accent, accentSoft: game.accentSoft }])
+) as Record<AccountsMarketGame, { accent: string; accentSoft: string }>;
 
 export function valorantRankImage(rankValue: number | null) {
   if (rankValue == null) return legacyAsset("rank-unranked.png");
