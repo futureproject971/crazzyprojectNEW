@@ -22,6 +22,7 @@ export function AuthPage({
     user,
     loading,
     signIn,
+    linkDiscord,
     discordEnabled,
     googleEnabled,
   } = useAuth();
@@ -76,7 +77,7 @@ export function AuthPage({
             <div>
               <strong>{user.username}</strong>
               <span>{user.email || "Conta conectada"}</span>
-              {user.discord.connected && (
+              {user.discord.connected ? (
                 <small>
                   Discord conectado
                   {user.discord.guildId
@@ -85,9 +86,21 @@ export function AuthPage({
                       : " • fora do servidor no último login"
                     : ""}
                 </small>
+              ) : (
+                <small>Discord ainda não conectado</small>
               )}
             </div>
-            <a href={nextPath}>Continuar →</a>
+            <div className="crz-auth-current__actions">
+              {!user.discord.connected && discordEnabled && (
+                <button
+                  type="button"
+                  onClick={() => void linkDiscord(nextPath)}
+                >
+                  Conectar Discord
+                </button>
+              )}
+              <a href={nextPath}>Continuar →</a>
+            </div>
           </div>
         ) : (
           <>
