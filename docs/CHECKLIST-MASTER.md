@@ -81,6 +81,15 @@ Fonte: FortuneECrazzy + LZT.
 - [x] loading/error/empty
 - [x] desktop/tablet/mobile
 
+### BLOQUEIO EXTERNO M06
+- [ ] LZT credential configurada no backend (Edge Secret ou system_credentials admin-only)
+- [x] placeholder seguro criado sem valor
+- [x] adapter multijogo Riot/LoL + Fortnite + Minecraft criado
+- [x] action de detalhe sanitizado criada
+- [x] fallback de credencial server-side preparado
+- [ ] smoke test real contra provider (desbloqueia automaticamente quando a credencial existir)
+- [ ] regra RUB -> BRL / markup comercial recuperada e validada
+
 ### QA M06 — corte VALORANT
 - [x] API pública somente leitura via Next
 - [x] token LZT não exposto
