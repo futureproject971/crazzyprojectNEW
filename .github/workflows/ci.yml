@@ -51,3 +51,7 @@ jobs:
       - name: Test M10 client hub security
         if: github.ref_name == 'm10-client-hub'
         run: node scripts/test-m10-client-hub.mjs
+
+      - name: Test M11 Library security
+        if: github.ref_name == 'm11-library'
+        run: node scripts/test-m11-library.mjs
