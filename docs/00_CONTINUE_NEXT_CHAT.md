@@ -550,3 +550,27 @@ QA:
 Próximo:
 - PR/merge M12
 - M13 — CRAZZY SUPPORT
+
+
+---
+
+## M13 — CRAZZY SUPPORT — EM ANDAMENTO
+
+Branch:
+- `m13-support`
+
+LEITURA OBRIGATÓRIA EM NOVO CHAT/WORKER:
+1. `docs/CHECKLIST-MASTER.md`
+2. `docs/M13-WORKER-HANDOFF.md`
+3. `docs/00_CONTINUE_NEXT_CHAT.md`
+
+Estado:
+- M12 mergeado via PR #14;
+- M13 iniciado;
+- auditoria inicial de Support + Storage concluída;
+- `order_tickets` NÃO será reutilizado como suporte genérico;
+- anexos precisarão de bucket privado próprio;
+- nenhum schema final M13 foi aplicado ainda;
+- próximo passo: migration de Support + bucket privado + RLS.
+
+Não iniciar M14 antes de concluir/mergear M13.
