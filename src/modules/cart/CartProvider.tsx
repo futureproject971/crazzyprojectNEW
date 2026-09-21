@@ -87,7 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           ? {
               ...item,
               ...incoming,
-              quantity: item.kind === "lzt-account"
+              quantity: item.kind === "account"
                 ? 1
                 : Math.min(MAX_QUANTITY, item.quantity + quantity),
             }
@@ -104,7 +104,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((current) =>
       current.map((item) => {
         if (item.key !== key) return item;
-        if (item.kind === "lzt-account") return { ...item, quantity: 1 };
+        if (item.kind === "account") return { ...item, quantity: 1 };
         return {
           ...item,
           quantity: Math.max(1, Math.min(MAX_QUANTITY, Math.round(quantity) || 1)),
