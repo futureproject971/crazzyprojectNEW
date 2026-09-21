@@ -555,3 +555,96 @@
   content-visibility: auto;
   contain-intrinsic-size: auto 240px;
 }
+
+
+.crz-discovery-tags {
+  margin-top: 9px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.crz-discovery-tags button {
+  min-height: 26px;
+  border: 1px solid rgba(102, 129, 173, .18);
+  border-radius: var(--crz-radius-pill);
+  padding: 0 9px;
+  color: #72839a;
+  background: rgba(4, 10, 19, .62);
+  font: inherit;
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition:
+    color var(--crz-duration-base) var(--crz-ease),
+    border-color var(--crz-duration-base) var(--crz-ease),
+    background var(--crz-duration-base) var(--crz-ease),
+    box-shadow var(--crz-duration-base) var(--crz-ease);
+}
+
+.crz-discovery-tags button:hover,
+.crz-discovery-tags button.is-active {
+  color: #dff7ff;
+  border-color: rgba(45, 182, 255, .44);
+  background: rgba(0, 104, 210, .14);
+  box-shadow: 0 0 10px rgba(0, 122, 255, .12);
+}
+
+.crz-discovery-tags button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--crz-color-black),
+    0 0 0 4px var(--crz-color-blue-2),
+    var(--crz-shadow-blue);
+}
+
+.crz-discovery-state-page {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+  padding: 110px 20px 50px;
+}
+
+.crz-discovery-state-card {
+  width: min(100%, 560px);
+  min-height: 260px;
+  border: 1px solid rgba(71, 134, 226, .28);
+  border-radius: 14px;
+  padding: 28px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(8, 18, 32, .96), rgba(3, 9, 17, .98));
+  box-shadow: var(--crz-shadow-panel);
+}
+
+.crz-discovery-state-card h2 {
+  margin: 0;
+  color: white;
+  font-size: 20px;
+}
+
+.crz-discovery-state-card p {
+  max-width: 420px;
+  margin: 0;
+  color: #8493a7;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.crz-discovery-state-card button {
+  min-height: 36px;
+  border: 1px solid rgba(53, 149, 255, .55);
+  border-radius: 8px;
+  padding: 0 13px;
+  color: white;
+  background: rgba(0, 93, 218, .22);
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
