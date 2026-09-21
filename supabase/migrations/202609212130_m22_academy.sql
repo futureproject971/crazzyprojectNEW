@@ -349,6 +349,7 @@ grant execute on function public.academy_has_access(uuid,uuid) to service_role;
 
 grant execute on function public.get_academy_catalog() to anon,authenticated;
 grant execute on function public.get_academy_tutorial(text) to anon,authenticated;
+revoke execute on function public.save_academy_progress(text,integer,boolean) from anon;
 grant execute on function public.save_academy_progress(text,integer,boolean) to authenticated;
 
 -- Useful public tutorial seeded as real content.
