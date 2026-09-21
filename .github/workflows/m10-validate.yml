@@ -1,4 +1,5 @@
 name: M10 Isolated Validation
+# retry after typecheck fix
 
 on:
   push:
