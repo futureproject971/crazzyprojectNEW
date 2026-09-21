@@ -1,0 +1,33 @@
+name: M10 Isolated Validation
+
+on:
+  push:
+    branches:
+      - m10-client-hub
+    paths:
+      - ".github/workflows/m10-validate.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Test M10 client hub security
+        run: node scripts/test-m10-client-hub.mjs
