@@ -4,10 +4,14 @@ import { useMemo, useState } from "react";
 import { NeonIcon } from "@/core/design-system";
 import { discoveryCategories, discoveryItems, discoveryNews, discoveryTags } from "./data";
 
-export function DiscoveryPage() {
+export function DiscoveryPage({
+  variant = "news",
+}: {
+  variant?: "news" | "categories" | "highlights";
+}) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
-  const [tag, setTag] = useState("all");
+  const [tag, setTag] = useState(variant === "highlights" ? "destaques" : "all");
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -34,12 +38,22 @@ export function DiscoveryPage() {
         <div className="crz-container crz-discovery-hero__inner">
           <div className="crz-discovery-kicker">
             <NeonIcon name="featured" size={34} />
-            <span>CRAZZY DISCOVERY</span>
+            <span>{variant === "categories" ? "CRAZZY CATEGORIES" : variant === "highlights" ? "CRAZZY HIGHLIGHTS" : "CRAZZY DISCOVERY"}</span>
           </div>
 
-          <h1>Descubra o universo CRAZZY</h1>
+          <h1>
+            {variant === "categories"
+              ? "Explore as categorias"
+              : variant === "highlights"
+                ? "Destaques da CRAZZY"
+                : "Descubra o universo CRAZZY"}
+          </h1>
           <p>
-            Encontre novidades, categorias e destaques sem precisar caçar pela plataforma inteira.
+            {variant === "categories"
+              ? "Navegue pelas principais áreas da loja e encontre o tipo de produto que você procura."
+              : variant === "highlights"
+                ? "Uma seleção visual dos produtos e áreas que merecem atenção agora."
+                : "Encontre novidades, categorias e destaques sem precisar caçar pela plataforma inteira."}
           </p>
 
           <label className="crz-discovery-search">
