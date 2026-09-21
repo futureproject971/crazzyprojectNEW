@@ -328,18 +328,49 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] production build PASS
 - [x] smoke M12 PASS
 - [x] GitHub Actions PASS
-- [ ] PR M12
-- [ ] merge M12
+- [x] PR #14 M12
+- [x] merge M12 — 339fb34d4c466a34a23d5a78e23fc5bcaf62072d
 
-## ❌ M13 — CRAZZY SUPPORT
-- [ ] ticket real
+## 🟡 M13 — CRAZZY SUPPORT — EM ANDAMENTO
+- [x] branch `m13-support` criada
+- [x] M12 confirmado mergeado
+- [x] auditoria inicial de `order_tickets` e `ticket_messages`
+- [x] decisão: suporte genérico NÃO reutiliza `order_tickets` como tabela principal
+- [x] Storage auditado
+- [x] bucket público `game-images` identificado como inadequado para anexos de suporte
+- [x] docs Supabase verificadas para private buckets + RLS
+- [ ] migration Support
+- [ ] `support_tickets`
+- [ ] `support_messages`
+- [ ] `support_attachments`
+- [ ] contexto opcional de pedido/produto/entitlement/library delivery
+- [ ] categorias de ticket
+- [ ] prioridade/status
+- [ ] criação de ticket autenticado
+- [ ] mensagens cliente/staff
+- [ ] anexos privados
 - [ ] imagem
 - [ ] vídeo
 - [ ] áudio
 - [ ] arquivos
-- [ ] contexto produto/pedido/key
+- [ ] signed URL / download autenticado
+- [ ] Realtime privado ou polling seguro
+- [ ] ticket real
+- [ ] contexto produto/pedido/key sem expor segredo
 - [ ] entitlement
 - [ ] tutorial relacionado
+- [ ] histórico de status
+- [ ] fechar/reabrir conforme regra
+- [ ] fila preparada para M32 Support Desk
+- [ ] desktop/tablet/mobile
+- [ ] loading/error/empty
+- [ ] Security Advisor
+- [ ] smoke M13
+- [ ] TypeScript
+- [ ] production build
+- [ ] GitHub Actions
+- [ ] PR M13
+- [ ] merge M13
 
 ## ❌ M14 — CRAZZY COMMUNITY
 - [ ] chat real
@@ -693,3 +724,11 @@ Fonte visual: Pink.
 - [x] M10 concluído
 - [x] M11 concluído e mergeado
 - [x] iniciar M12 — CRAZZY PROFILE
+
+
+## CONTINUIDADE ATUAL
+- [x] M11 concluído e mergeado
+- [x] M12 concluído e mergeado
+- [x] iniciar M13 — CRAZZY SUPPORT
+- [ ] concluir M13 — CRAZZY SUPPORT
+- [ ] iniciar M14 — CRAZZY COMMUNITY
