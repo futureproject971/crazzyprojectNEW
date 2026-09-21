@@ -418,3 +418,49 @@ Confirmado:
 
 Próximo passo:
 - migration M11 para retirar exposição direta de payload sensível sem quebrar claim_paid_delivery.
+
+
+## M11 IMPLEMENTAÇÃO — CONCLUÍDA TECNICAMENTE
+
+Implementado no branch `m11-library`:
+
+### Banco
+- `public.library_deliveries`
+- `private.library_delivery_secrets`
+- `public.library_reveal_events`
+- triggers de sync para order_tickets + rewards
+- reveal RPC service-only
+- copy audit RPC service-only
+- antigas policies de owner sobre stock/reward plaintext removidas
+
+### Backend
+- Edge Function `library` v1
+- Edge Function `rewards` v5 sem plaintext em status
+- Edge Function `purincash-payment` v6 sem credenciais LZT/tutorial sensível em ticket
+
+### Next/UI
+- /biblioteca
+- /painel/biblioteca -> redirect
+- /api/library
+- /api/library/reveal
+- /api/library/copy-event
+- middleware protege /biblioteca
+- menu da conta aponta para Library
+- Client Hub aponta para Library
+- reveal/copy/ocultar/histórico
+- plaintext somente em React state temporário
+
+### QA já concluído
+- npm ci PASS
+- TypeScript PASS
+- production build PASS
+- smoke M11 PASS
+- validação isolada GitHub Actions PASS
+- Supabase Security Advisor: 0 lints
+
+### Falta apenas
+- CI oficial no head final após docs/limpeza
+- abrir PR
+- mergear PR
+- atualizar docs pós-merge
+- iniciar M12 CRAZZY PROFILE
