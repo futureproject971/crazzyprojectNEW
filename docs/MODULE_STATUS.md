@@ -3,48 +3,58 @@
 ## M00
 **GRUPO 00 — CORE DA PLATAFORMA**  
 **M00 — CRAZZY DESIGN SYSTEM**  
-Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+Status: **APROVADO E INTEGRADO**
 
-Branch: `m00-design-system`
+Merged into `phase-1-home`:
+`0531d09b81b5a3f5324871bb30224cc060c71dae`
 
-Último QA técnico:
+QA:
 - typecheck: PASS
 - build: PASS
 - GitHub Actions: PASS
 
-### Implementado
-- tokens globais
-- tipografia CRAZZY
-- cores / gradientes / radius / spacing
-- glow / shadows
-- motion / reduced motion
-- responsividade base
-- Button / IconButton
-- Input / SearchInput / Select
-- Checkbox
-- Badge
-- Panel / Card
-- Tooltip
-- Tabs
-- Dropdown
-- Dialog / Drawer
-- ConfirmDialog
-- Skeleton
-- Loading / Empty / Error
-- Toast
-- Avatar
-- SectionTitle / PageHeader
-- ProgressBar / Pagination
-- scrollbar primitives
-- CRAZZY_PROJECT_NEON_ICONS_V2 registry
-- fallback icon registry
-- smoke fixture de compilação
-- CI com typecheck + build
+---
 
-### Proteção
-A Home existente em `phase-1-home` continua preservada como protótipo provisório.
+## M01
+**GRUPO 00 — CORE DA PLATAFORMA**  
+**M01 — CRAZZY APP SHELL**  
+Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
 
-**NÃO iniciar M01 automaticamente.**
+Branch:
+`m01-app-shell`
 
-Próximo módulo previsto, somente após autorização explícita:
-**M01 — CRAZZY APP SHELL**
+QA:
+- typecheck: PASS
+- build: PASS
+- GitHub Actions: PASS
+
+Implementado:
+- AppShell
+- Header/Navbar
+- visitor/client/admin modes
+- account menus mock
+- responsive mobile Drawer
+- shell search visual
+- global Footer
+- social fallback icons
+- compatibility wrappers
+- Home provisória consumindo AppShell
+- compile fixture dos três modos
+
+Não inclui:
+- Auth real
+- Client Hub
+- Admin pages
+- Product/Cart/Ticket business logic
+- backend/Supabase
+
+**NÃO iniciar M02 automaticamente.**
+
+Próximo módulo previsto, após autorização:
+**M02 — CRAZZY HOME**
+
+Prioridade do M02:
+- corrigir wallpaper do Hero;
+- inserir logo grande oficial separada;
+- reconstruir Hero em camadas reais;
+- continuar fidelidade pixel-level à referência.
