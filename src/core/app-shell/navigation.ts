@@ -12,6 +12,7 @@ export const visitorNavigation: ShellNavItem[] = [
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
   { id: "help", label: "Ajuda", href: "/help", icon: "/icons/book.svg" },
   { id: "ticket", label: "Ticket", href: "/tickets", icon: "/icons/headset.svg" },
+  { id: "mtsounds", label: "MT Sounds", href: "/mtsounds", icon: "/icons/music.svg" },
 ];
 
 export const clientNavigation: ShellNavItem[] = [
