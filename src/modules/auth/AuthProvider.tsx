@@ -82,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = createBrowserSupabaseClient();
     const callback = new URL("/auth/callback", window.location.origin);
     callback.searchParams.set("next", safeNext(next));
+    callback.searchParams.set("provider", provider);
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -98,6 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = createBrowserSupabaseClient();
     const callback = new URL("/auth/callback", window.location.origin);
     callback.searchParams.set("next", safeNext(next || "/perfil"));
+    callback.searchParams.set("provider", "discord");
 
     const { error } = await supabase.auth.linkIdentity({
       provider: "discord",
