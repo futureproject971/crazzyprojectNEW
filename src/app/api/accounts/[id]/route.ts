@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { normalizeLztItem } from "@/modules/accounts-market/normalizer";
+import { normalizeAccountItem } from "@/modules/accounts-market/normalizer";
 import type { AccountsMarketGame } from "@/modules/accounts-market/types";
 
 const DEFAULT_SUPABASE_URL = "https://nnmglkdpmffmaiuwbcct.supabase.co";
@@ -11,7 +11,7 @@ export async function GET(
 ) {
   const { id } = await params;
   if (!/^\d{1,30}$/.test(id)) {
-    return NextResponse.json({ error: "Identificador inválido." }, { status: 400 });
+    return NextResponse.json({ error: "Conta inválida." }, { status: 400 });
   }
 
   const requestedGame = request.nextUrl.searchParams.get("game") || "valorant";
@@ -31,38 +31,28 @@ export async function GET(
       cache: "no-store",
     });
 
-    const payload: any = await response.json().catch(() => null);
-
     if (!response.ok) {
-      if (payload?.error === "LZT token not configured") {
-        return NextResponse.json(
-          { error: "Catálogo temporariamente em configuração.", code: "LZT_CREDENTIAL_MISSING" },
-          { status: 503 }
-        );
-      }
-
       return NextResponse.json(
         {
-          error: response.status === 404 ? "Conta não encontrada." : "Não foi possível carregar esta conta.",
-          code: "LZT_PROVIDER_ERROR",
+          error: response.status === 404
+            ? "Esta conta não está mais disponível."
+            : "Não foi possível carregar esta conta agora.",
+          code: response.status === 404 ? "ACCOUNT_NOT_FOUND" : "ACCOUNT_UNAVAILABLE",
         },
-        { status: response.status === 404 ? 404 : 502 }
+        { status: response.status === 404 ? 404 : 503 }
       );
     }
 
+    const payload: any = await response.json().catch(() => null);
+    const source = payload?.item ?? payload;
     return NextResponse.json(
-      {
-        item: normalizeLztItem(payload?.item, game),
-        source: "lzt",
-        credentialReady: true,
-        commercialPriceReady: false,
-      },
+      { item: normalizeAccountItem(source, game) },
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch {
     return NextResponse.json(
-      { error: "Falha temporária ao carregar a conta.", code: "LZT_NETWORK_ERROR" },
-      { status: 502 }
+      { error: "Não foi possível carregar esta conta agora.", code: "ACCOUNT_UNAVAILABLE" },
+      { status: 503 }
     );
   }
 }
