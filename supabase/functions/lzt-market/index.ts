@@ -119,6 +119,203 @@ function accountOfflineDays(item: any, game: string): number | null {
   );
 }
 
+type PublicFact = {
+  key: string;
+  label: string;
+  value: string;
+  group: "Geral" | "Acesso" | "Jogo" | "Inventário" | "Atividade" | "Segurança";
+};
+
+function displayScalar(value: any): string | null {
+  if (value === null || value === undefined || value === "") return null;
+  if (typeof value === "boolean") return value ? "Sim" : "Não";
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    if (trimmed === "yes" || trimmed === "true") return "Sim";
+    if (trimmed === "no" || trimmed === "false") return "Não";
+    return trimmed;
+  }
+  return null;
+}
+
+function factValue(item: any, aliases: string[]): string | null {
+  for (const key of aliases) {
+    const value = displayScalar(item?.[key]);
+    if (value !== null) return value;
+  }
+  return null;
+}
+
+function addFact(
+  out: PublicFact[],
+  item: any,
+  key: string,
+  label: string,
+  aliases: string[],
+  group: PublicFact["group"],
+  transform?: (value: string) => string,
+) {
+  const raw = factValue(item, aliases);
+  if (raw === null) return;
+  out.push({
+    key,
+    label,
+    value: transform ? transform(raw) : raw,
+    group,
+  });
+}
+
+function publicAccountFacts(item: any, game: string): PublicFact[] {
+  const facts: PublicFact[] = [];
+  const number = (value: string) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed.toLocaleString("pt-BR") : value;
+  };
+  const money = (value: string) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed.toLocaleString("pt-BR", { maximumFractionDigits: 2 }) : value;
+  };
+  const guarantee = (value: string) => {
+    const map: Record<string, string> = {
+      "-1": "12 horas",
+      "0": "24 horas",
+      "1": "3 dias",
+      "2": "No momento da compra",
+    };
+    return map[value] || value;
+  };
+
+  addFact(facts, item, "country", "País", ["riot_country", "country", "country_name"], "Geral");
+  addFact(facts, item, "email_type", "Tipo de e-mail", ["email_type", "emailType"], "Acesso");
+  addFact(facts, item, "email_provider", "Provedor de e-mail", ["email_provider", "emailProvider"], "Acesso");
+  addFact(facts, item, "email_login_data", "Dados de login do e-mail", ["email_login_data"], "Acesso");
+  addFact(facts, item, "temp_email", "E-mail temporário disponível", ["temp_email"], "Acesso");
+  addFact(facts, item, "change_email", "Pode alterar e-mail", ["change_email"], "Acesso");
+  addFact(facts, item, "can_change_details", "Pode alterar dados", ["can_change_details"], "Acesso");
+  addFact(facts, item, "item_domain", "Domínio do e-mail", ["item_domain"], "Acesso");
+  addFact(facts, item, "guarantee", "Garantia informada", ["eg"], "Segurança", guarantee);
+  addFact(facts, item, "daybreak", "Dias sem atividade", ["daybreak", "offline_days", "days_offline"], "Atividade", number);
+  addFact(facts, item, "registration_age", "Idade da conta", ["reg"], "Atividade", number);
+  addFact(facts, item, "registration_period", "Unidade da idade", ["reg_period"], "Atividade");
+
+  if (game === "valorant" || game === "lol") {
+    addFact(facts, item, "riot_username", "Usuário Riot", ["riot_username"], "Jogo");
+    addFact(facts, item, "valorant_rank", "Rank VALORANT", ["riot_valorant_rank", "valorant_rank"], "Jogo", number);
+    addFact(facts, item, "valorant_previous_rank", "Rank anterior VALORANT", ["riot_valorant_previous_rank", "valorant_previous_rank"], "Jogo", number);
+    addFact(facts, item, "valorant_rank_type", "Tipo de rank VALORANT", ["riot_valorant_rank_type", "valorant_rank_type"], "Jogo");
+    addFact(facts, item, "valorant_region", "Região VALORANT", ["riot_valorant_region", "valorantRegionPhrase", "valorant_region"], "Jogo");
+    addFact(facts, item, "valorant_level", "Nível VALORANT", ["riot_valorant_level", "valorant_level"], "Jogo", number);
+    addFact(facts, item, "valorant_skin_count", "Skins VALORANT", ["riot_valorant_skin_count", "valorant_skin_count"], "Inventário", number);
+    addFact(facts, item, "valorant_knife_count", "Knifes VALORANT", ["riot_valorant_knife_count", "riot_valorant_knife", "valorant_knife_count"], "Inventário", number);
+    addFact(facts, item, "valorant_agent_count", "Agentes VALORANT", ["riot_valorant_agent_count", "valorant_agent_count"], "Inventário", number);
+    addFact(facts, item, "valorant_inventory_value", "Valor do inventário VALORANT", ["riot_valorant_inventory_value", "inventory_value"], "Inventário", money);
+    addFact(facts, item, "valorant_vp", "VP", ["riot_valorant_wallet_vp", "valorant_vp", "vp"], "Inventário", number);
+    addFact(facts, item, "valorant_rp", "RP", ["riot_valorant_wallet_rp", "valorant_rp", "rp"], "Inventário", number);
+
+    addFact(facts, item, "lol_rank", "Rank League of Legends", ["riot_lol_rank", "lol_rank"], "Jogo");
+    addFact(facts, item, "lol_region", "Região League of Legends", ["riot_lol_region", "lol_region"], "Jogo");
+    addFact(facts, item, "lol_level", "Nível League of Legends", ["riot_lol_level", "lol_level"], "Jogo", number);
+    addFact(facts, item, "lol_skin_count", "Skins League of Legends", ["riot_lol_skin_count", "lol_skin_count"], "Inventário", number);
+    addFact(facts, item, "lol_champion_count", "Campeões", ["riot_lol_champion_count", "lol_champion_count"], "Inventário", number);
+    addFact(facts, item, "lol_blue_essence", "Essência Azul", ["riot_lol_wallet_blue", "lol_wallet_blue"], "Inventário", number);
+    addFact(facts, item, "lol_orange_essence", "Essência Laranja", ["riot_lol_wallet_orange", "lol_wallet_orange"], "Inventário", number);
+    addFact(facts, item, "lol_mythic_essence", "Essência Mítica", ["riot_lol_wallet_mythic", "lol_wallet_mythic"], "Inventário", number);
+    addFact(facts, item, "riot_points", "Riot Points", ["riot_lol_wallet_riot", "lol_wallet_riot"], "Inventário", number);
+    addFact(facts, item, "linked_email", "E-mail vinculado", ["email"], "Acesso");
+    addFact(facts, item, "linked_mobile", "Celular vinculado", ["tel"], "Acesso");
+    addFact(facts, item, "valorant_free_agents", "Agentes gratuitos disponíveis", ["riot_valorant_free_agents", "valorant_free_agents"], "Inventário", number);
+    addFact(facts, item, "lol_win_rate", "Win rate ranqueada", ["riot_lol_rank_win_rate", "lol_rank_win_rate"], "Jogo", (value) => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed.toLocaleString("pt-BR", { maximumFractionDigits: 2 }) + "%" : value;
+    });
+  }
+
+  if (game === "fortnite") {
+    addFact(facts, item, "fortnite_level", "Nível", ["fortnite_level", "level"], "Jogo", number);
+    addFact(facts, item, "fortnite_vbucks", "V-Bucks", ["fortnite_balance", "fortnite_vbucks", "vbucks"], "Inventário", number);
+    addFact(facts, item, "fortnite_skin_count", "Skins", ["fortnite_skin_count", "skin_count"], "Inventário", number);
+    addFact(facts, item, "fortnite_pickaxe_count", "Picaretas", ["fortnite_pickaxe_count", "pickaxe_count"], "Inventário", number);
+    addFact(facts, item, "fortnite_dance_count", "Danças", ["fortnite_dance_count", "dance_count"], "Inventário", number);
+    addFact(facts, item, "fortnite_glider_count", "Planadores", ["fortnite_glider_count", "glider_count"], "Inventário", number);
+    addFact(facts, item, "battle_pass", "Battle Pass", ["bp", "battle_pass"], "Jogo");
+    addFact(facts, item, "battle_pass_level", "Nível do Battle Pass", ["bp_level", "battle_pass_level"], "Jogo", number);
+    addFact(facts, item, "xbox_linkable", "Pode vincular Xbox", ["xbox_linkable"], "Acesso");
+    addFact(facts, item, "psn_linkable", "Pode vincular PSN", ["psn_linkable"], "Acesso");
+    addFact(facts, item, "refund_credits", "Créditos de reembolso", ["refund_credits"], "Inventário", number);
+    addFact(facts, item, "friends", "Amigos", ["friends", "friend_count"], "Jogo", number);
+    addFact(facts, item, "stw", "Save the World", ["stw"], "Jogo");
+    addFact(facts, item, "rocket_league_purchases", "Compras Rocket League", ["rl_purchases"], "Jogo");
+    addFact(facts, item, "no_transactions", "Sem transações", ["no_trans"], "Atividade");
+    addFact(facts, item, "last_transaction", "Última transação", ["last_trans_date"], "Atividade", number);
+    addFact(facts, item, "last_transaction_period", "Unidade da última transação", ["last_trans_date_period"], "Atividade");
+  }
+
+  if (game === "minecraft") {
+    addFact(facts, item, "minecraft_nickname", "Nickname", ["minecraft_nickname", "nickname"], "Jogo");
+    addFact(facts, item, "minecraft_java", "Java Edition", ["minecraft_java", "java"], "Jogo");
+    addFact(facts, item, "minecraft_bedrock", "Bedrock Edition", ["minecraft_bedrock", "bedrock"], "Jogo");
+    addFact(facts, item, "minecraft_dungeons", "Minecraft Dungeons", ["minecraft_dungeons", "dungeons"], "Jogo");
+    addFact(facts, item, "minecraft_legends", "Minecraft Legends", ["minecraft_legends", "legends"], "Jogo");
+    addFact(facts, item, "change_nickname", "Pode alterar nickname", ["change_nickname"], "Acesso");
+    addFact(facts, item, "subscription", "Assinatura", ["subscription"], "Acesso");
+    addFact(facts, item, "subscription_length", "Duração da assinatura", ["subscription_length"], "Acesso", number);
+    addFact(facts, item, "subscription_period", "Unidade da assinatura", ["subscription_period"], "Acesso");
+    addFact(facts, item, "autorenewal", "Renovação automática", ["autorenewal"], "Acesso");
+    addFact(facts, item, "hypixel_rank", "Rank Hypixel", ["minecraft_hypixel_rank", "rank_hypixel"], "Jogo");
+    addFact(facts, item, "hypixel_level", "Nível Hypixel", ["minecraft_hypixel_level", "level_hypixel"], "Jogo", number);
+    addFact(facts, item, "hypixel_achievement", "Achievement Hypixel", ["achievement_hypixel"], "Jogo", number);
+    addFact(facts, item, "hypixel_ban", "Ban Hypixel ativo", ["minecraft_hypixel_ban", "hypixel_ban"], "Segurança");
+    addFact(facts, item, "hypixel_api", "API SkyBlock habilitada", ["hypixel_skyblock_api_enabled"], "Jogo");
+    addFact(facts, item, "hypixel_skyblock_level", "Nível SkyBlock", ["level_hypixel_skyblock"], "Jogo", number);
+    addFact(facts, item, "hypixel_skyblock_net_worth", "Patrimônio SkyBlock", ["net_worth_hypixel_skyblock"], "Inventário", number);
+    addFact(facts, item, "capes", "Capas", ["minecraft_capes_count", "capes_count"], "Inventário", number);
+    addFact(facts, item, "minecoins", "Minecoins", ["minecraft_minecoins", "minecoins"], "Inventário", number);
+    addFact(facts, item, "last_login_hypixel", "Tempo desde último login Hypixel", ["last_login_hypixel", "minecraft_last_login_hypixel"], "Atividade", number);
+    addFact(facts, item, "last_login_hypixel_period", "Unidade do último login Hypixel", ["last_login_hypixel_period", "minecraft_last_login_hypixel_period"], "Atividade");
+  }
+
+  const existing = new Set(facts.map((fact) => fact.key));
+  const sensitive = /(password|passwd|pass_|token|secret|cookie|authorization|credential|seller|owner|provider|source|origin|market|raw|login_data|email_address|email_login|email_password|user_id|buyer|purchase)/i;
+  const allowedPrefix =
+    game === "valorant" || game === "lol"
+      ? /^(riot_|valorant_|lol_)/
+      : game === "fortnite"
+        ? /^fortnite_/
+        : game === "minecraft"
+          ? /^minecraft_/
+          : /^$/;
+
+  for (const [key, raw] of Object.entries(item || {})) {
+    if (!allowedPrefix.test(key) || sensitive.test(key) || existing.has(key)) continue;
+    const value = displayScalar(raw);
+    if (value === null) continue;
+
+    const label = key
+      .replace(/^(riot_|valorant_|lol_|fortnite_|minecraft_)/, "")
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+    facts.push({
+      key,
+      label,
+      value,
+      group: /wallet|balance|skin|knife|agent|champion|cape|coin|inventory|pickaxe|dance|glider/i.test(key)
+        ? "Inventário"
+        : /ban|guarantee|risk/i.test(key)
+          ? "Segurança"
+          : /daybreak|last_|reg_|date/i.test(key)
+            ? "Atividade"
+            : "Jogo",
+    });
+
+    if (facts.length >= 80) break;
+  }
+
+  return facts.slice(0, 80);
+}
+
 function safeRemoteImageUrl(value: string | null): string | null {
   if (!value) return null;
   try {
@@ -577,6 +774,7 @@ Deno.serve(async (req) => {
         agentIds: safeStringList(item?.valorantInventory?.Agent),
         buddyIds: safeStringList(item?.valorantInventory?.Buddy),
         offlineDays: accountOfflineDays(item, safeGame),
+        facts: publicAccountFacts(item, safeGame),
       };
 
       return new Response(JSON.stringify({ item: safeItem }), {
@@ -872,6 +1070,7 @@ Deno.serve(async (req) => {
         agentIds: safeStringList(item?.valorantInventory?.Agent),
         buddyIds: safeStringList(item?.valorantInventory?.Buddy),
         offlineDays: accountOfflineDays(item, url.searchParams.get("game") || category),
+        facts: publicAccountFacts(item, url.searchParams.get("game") || category),
         price: (() => {
           const base = Number(first(item, ["price", "price_value", "item_price"]) || 0);
           const game = url.searchParams.get("game") || "";

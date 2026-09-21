@@ -2376,3 +2376,150 @@
     flex-direction: column;
   }
 }
+
+
+/* Complete customer-visible account facts */
+.crz-account-detail__facts-panel {
+  margin-top: 15px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--account-accent) 26%, rgba(76,132,211,.2));
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 10% 0%, var(--account-accent-soft), transparent 35%),
+    linear-gradient(180deg, rgba(7,15,27,.98), rgba(3,9,17,.99));
+  box-shadow:
+    0 15px 36px rgba(0,0,0,.24),
+    0 0 28px color-mix(in srgb, var(--account-accent) 8%, transparent);
+}
+
+.crz-account-detail__facts-panel > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid rgba(83,132,198,.15);
+}
+
+.crz-account-detail__facts-panel > header > div {
+  display: grid;
+  gap: 3px;
+}
+
+.crz-account-detail__facts-panel > header span {
+  color: var(--account-accent);
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: .09em;
+}
+
+.crz-account-detail__facts-panel > header h2 {
+  margin: 0;
+  color: #f4f8ff;
+  font-size: 16px;
+}
+
+.crz-account-detail__facts-panel > header p {
+  margin: 0;
+  color: #7f90a6;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.crz-account-detail__facts-panel > header b {
+  min-width: 60px;
+  min-height: 28px;
+  border: 1px solid color-mix(in srgb, var(--account-accent) 34%, transparent);
+  border-radius: 999px;
+  padding: 0 9px;
+  color: color-mix(in srgb, var(--account-accent) 82%, white 18%);
+  background: var(--account-accent-soft);
+  display: inline-grid;
+  place-items: center;
+  font-size: 7px;
+}
+
+.crz-account-detail__facts-sections {
+  margin-top: 13px;
+  display: grid;
+  gap: 12px;
+}
+
+.crz-account-detail__facts-section {
+  min-width: 0;
+}
+
+.crz-account-detail__facts-section h3 {
+  margin: 0 0 7px;
+  color: #9fb3ca;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.crz-account-detail__facts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.crz-account-detail__fact {
+  min-width: 0;
+  min-height: 58px;
+  border: 1px solid rgba(80,129,194,.17);
+  border-radius: 9px;
+  padding: 9px 10px;
+  background:
+    linear-gradient(180deg, rgba(8,18,32,.92), rgba(5,12,22,.96));
+  display: grid;
+  align-content: center;
+  gap: 4px;
+}
+
+.crz-account-detail__fact span {
+  color: #70839b;
+  font-size: 6.5px;
+  font-weight: 700;
+}
+
+.crz-account-detail__fact strong {
+  overflow: hidden;
+  color: #edf5ff;
+  font-size: 8.5px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+}
+
+.crz-account-detail__facts-panel > footer {
+  margin-top: 13px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(83,132,198,.13);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #77899f;
+  font-size: 7px;
+}
+
+@media (max-width: 1050px) {
+  .crz-account-detail__facts-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .crz-account-detail__facts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 460px) {
+  .crz-account-detail__facts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crz-account-detail__facts-panel > header {
+    flex-direction: column;
+  }
+}
