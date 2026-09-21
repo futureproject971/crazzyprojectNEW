@@ -1,0 +1,81 @@
+:root {
+  /* CRAZZY PROJECT — M00 core tokens */
+  --crz-color-black: #040a0f;
+  --crz-color-navy-950: #07111b;
+  --crz-color-navy-900: #0b1726;
+  --crz-color-navy-850: #0e1c2d;
+  --crz-color-line: rgba(55, 119, 255, 0.28);
+  --crz-color-line-strong: rgba(52, 139, 255, 0.56);
+  --crz-color-text: #ffffff;
+  --crz-color-text-soft: #d8e1ec;
+  --crz-color-muted: #8e9bad;
+  --crz-color-blue: #0000ff;
+  --crz-color-blue-2: #087cff;
+  --crz-color-cyan: #00d7ff;
+  --crz-color-magenta: #ff2f9b;
+  --crz-color-green: #18e59a;
+  --crz-color-gold: #ffc33d;
+  --crz-color-danger: #ff4d67;
+
+  --crz-gradient-brand: linear-gradient(180deg, #1374ff 0%, #0456e7 100%);
+  --crz-gradient-panel: linear-gradient(180deg, rgba(13, 24, 44, 0.96), rgba(4, 10, 20, 0.96));
+  --crz-gradient-panel-soft: linear-gradient(180deg, rgba(11, 23, 38, 0.92), rgba(6, 13, 24, 0.92));
+  --crz-gradient-magenta: linear-gradient(180deg, #ff54b7 0%, #b61570 100%);
+  --crz-gradient-gold: linear-gradient(180deg, #ffe984 0%, #ffae00 100%);
+
+  --crz-shadow-panel: 0 14px 38px rgba(0, 0, 0, 0.34);
+  --crz-shadow-blue: 0 0 18px rgba(0, 102, 255, 0.42);
+  --crz-shadow-blue-strong: 0 0 26px rgba(0, 111, 255, 0.56);
+  --crz-shadow-magenta: 0 0 18px rgba(255, 47, 155, 0.34);
+  --crz-shadow-green: 0 0 15px rgba(24, 229, 154, 0.32);
+
+  --crz-radius-xs: 6px;
+  --crz-radius-sm: 8px;
+  --crz-radius-md: 12px;
+  --crz-radius-lg: 16px;
+  --crz-radius-xl: 22px;
+  --crz-radius-pill: 999px;
+
+  --crz-space-1: 4px;
+  --crz-space-2: 8px;
+  --crz-space-3: 12px;
+  --crz-space-4: 16px;
+  --crz-space-5: 20px;
+  --crz-space-6: 24px;
+  --crz-space-8: 32px;
+  --crz-space-10: 40px;
+  --crz-space-12: 48px;
+
+  --crz-font-display: var(--font-orbitron), Arial, sans-serif;
+  --crz-font-body: var(--font-inter), Arial, sans-serif;
+  --crz-font-ui: var(--font-poppins), var(--font-inter), Arial, sans-serif;
+
+  --crz-font-xs: 11px;
+  --crz-font-sm: 12px;
+  --crz-font-md: 14px;
+  --crz-font-lg: 16px;
+  --crz-font-xl: 20px;
+  --crz-font-2xl: 26px;
+
+  --crz-duration-fast: 140ms;
+  --crz-duration-base: 190ms;
+  --crz-duration-slow: 280ms;
+  --crz-ease: cubic-bezier(.2,.72,.2,1);
+
+  --crz-z-dropdown: 200;
+  --crz-z-sticky: 300;
+  --crz-z-overlay: 900;
+  --crz-z-modal: 1000;
+
+  --crz-container: 1420px;
+  --crz-breakpoint-mobile: 767px;
+  --crz-breakpoint-tablet: 1023px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --crz-duration-fast: 0ms;
+    --crz-duration-base: 0ms;
+    --crz-duration-slow: 0ms;
+  }
+}

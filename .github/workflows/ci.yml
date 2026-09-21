@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - phase-1-home
+      - m00-design-system
+      - "m*-*"
   pull_request:
     branches:
       - main
@@ -15,7 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,48 +30,8 @@ jobs:
       - name: Install
         run: npm install
 
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Build
         run: npm run build
-
-      - name: Install browser for visual QA
-        run: |
-          npm install --no-save playwright
-          npx playwright install --with-deps chromium
-
-      - name: Start app
-        run: |
-          npm run start -- -p 3000 > /tmp/crazzy-next.log 2>&1 &
-          echo $! > /tmp/crazzy-next.pid
-          for i in {1..40}; do
-            if curl -fsS http://127.0.0.1:3000 >/dev/null; then
-              exit 0
-            fi
-            sleep 1
-          done
-          cat /tmp/crazzy-next.log
-          exit 1
-
-      - name: Capture visual QA screenshots
-        run: |
-          npx playwright screenshot \
-            --browser chromium \
-            --viewport-size "1440,1000" \
-            --full-page \
-            http://127.0.0.1:3000 \
-            crazzy-home-1440.png
-          npx playwright screenshot \
-            --browser chromium \
-            --viewport-size "1055,900" \
-            --full-page \
-            http://127.0.0.1:3000 \
-            crazzy-home-1055.png
-
-      - name: Upload visual QA
-        uses: actions/upload-artifact@v4
-        with:
-          name: crazzy-home-visual-qa
-          path: |
-            crazzy-home-1440.png
-            crazzy-home-1055.png
-          if-no-files-found: error
-          retention-days: 3

@@ -1,16 +1,19 @@
 @import "tailwindcss";
+@import "../core/design-system/styles/tokens.css";
+@import "../core/design-system/styles/primitives.css";
 
 :root {
-  --bg-0: #02050a;
-  --bg-1: #050912;
+  /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
+  --bg-0: var(--crz-color-black);
+  --bg-1: var(--crz-color-navy-950);
   --panel: rgba(5, 11, 21, 0.88);
   --panel-strong: rgba(7, 14, 27, 0.94);
-  --line: rgba(68, 125, 255, 0.23);
-  --line-strong: rgba(65, 136, 255, 0.42);
-  --text: #ffffff;
-  --muted: #9ba8ba;
-  --blue-0: #00a8ff;
-  --blue-1: #087cff;
+  --line: var(--crz-color-line);
+  --line-strong: var(--crz-color-line-strong);
+  --text: var(--crz-color-text);
+  --muted: var(--crz-color-muted);
+  --blue-0: var(--crz-color-cyan);
+  --blue-1: var(--crz-color-blue-2);
   --blue-2: #0066ff;
   --blue-glow: rgba(0, 102, 255, 0.48);
 }
