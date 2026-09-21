@@ -1,4 +1,5 @@
 import type {
+  AccountCosmetic,
   AccountsMarketGame,
   AccountsMarketItem,
   AccountsMarketPageData,
@@ -16,6 +17,13 @@ const valorantRanks: Record<number, string> = {
   21: "Ascendant 1", 22: "Ascendant 2", 23: "Ascendant 3",
   24: "Immortal 1", 25: "Immortal 2", 26: "Immortal 3",
   27: "Radiant",
+};
+
+const gameArt: Record<AccountsMarketGame, string> = {
+  valorant: "/products/valorant.jpg",
+  lol: "/products/valorant.jpg",
+  fortnite: "/products/fortnite.jpg",
+  minecraft: "/products/gta.jpg",
 };
 
 function asRecord(value: unknown): AnyRecord {
@@ -60,33 +68,51 @@ function detectGame(
 ): AccountsMarketGame | "unknown" {
   if (fallback) return fallback;
   const game = String(firstValue(source, ["game", "category"]) ?? "").toLowerCase();
-  if (game.includes("valorant")) return "valorant";
+  if (game.includes("valorant") || game === "riot") return "valorant";
   if (game === "lol" || game.includes("league")) return "lol";
   if (game.includes("fortnite")) return "fortnite";
   if (game.includes("minecraft")) return "minecraft";
   return "unknown";
 }
 
-export function normalizeLztItem(
+function normalizeCosmetics(value: unknown): AccountCosmetic[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) => {
+      const source = asRecord(entry);
+      const name = toStringValue(firstValue(source, ["name", "title"])) ?? "Item";
+      return {
+        name,
+        category: toStringValue(firstValue(source, ["category", "type"])),
+        rarity: toStringValue(firstValue(source, ["rarity", "tier"])),
+        imagePath: toStringValue(firstValue(source, ["imagePath", "image_path"])),
+      } satisfies AccountCosmetic;
+    })
+    .slice(0, 24);
+}
+
+export function normalizeAccountItem(
   input: unknown,
   fallbackGame?: AccountsMarketGame
 ): AccountsMarketItem {
   const source = asRecord(input);
   const id = toStringValue(firstValue(source, ["id", "item_id", "itemId"])) ?? "unknown";
   const game = detectGame(source, fallbackGame);
-  const rankValue = toNumberValue(firstValue(source, ["rankValue", "valorant_rank", "rank"]));
+  const rankValue = toNumberValue(firstValue(source, ["rankValue", "rank_value", "valorant_rank", "rank"]));
 
   let rank = toStringValue(firstValue(source, ["rank", "rank_name", "valorant_rank_name"]));
   if (game === "valorant" && rankValue != null && (!rank || /^\d+$/.test(rank))) {
     rank = valorantRanks[Math.round(rankValue)] ?? rank;
   }
 
+  const safeGame = game === "unknown" ? (fallbackGame ?? "valorant") : game;
+  const localImage = toStringValue(firstValue(source, ["imageUrl", "image_url"]));
+
   return {
     id,
     title: toStringValue(firstValue(source, ["title", "account_title", "name"])) ?? "Conta #" + id,
     game,
-    providerPrice: toNumberValue(firstValue(source, ["providerPrice", "price"])),
-    providerCurrency: toStringValue(firstValue(source, ["providerCurrency", "currency"])),
+    price: toNumberValue(firstValue(source, ["price", "commercialPrice", "commercial_price"])),
     region: toStringValue(firstValue(source, ["region"])),
     rank,
     rankValue,
@@ -107,11 +133,12 @@ export function normalizeLztItem(
     bedrock: toBooleanValue(firstValue(source, ["bedrock"])),
     dungeons: toBooleanValue(firstValue(source, ["dungeons"])),
     legends: toBooleanValue(firstValue(source, ["legends"])),
-    imageUrl: null,
+    imageUrl: localImage?.startsWith("/") ? localImage : gameArt[safeGame],
+    cosmetics: normalizeCosmetics(source.cosmetics),
   };
 }
 
-export function normalizeLztPage(
+export function normalizeAccountPage(
   input: unknown,
   game: AccountsMarketGame
 ): AccountsMarketPageData {
@@ -123,7 +150,7 @@ export function normalizeLztPage(
 
   return {
     items: rawItems
-      .map((item) => normalizeLztItem(item, game))
+      .map((item) => normalizeAccountItem(item, game))
       .filter((item) => item.id !== "unknown" && item.id !== ""),
     currentPage,
     totalPages: Math.max(currentPage, totalPages),
@@ -132,9 +159,6 @@ export function normalizeLztPage(
       typeof source.hasNextPage === "boolean"
         ? source.hasNextPage
         : currentPage < totalPages,
-    source: "lzt",
     game,
-    credentialReady: true,
-    commercialPriceReady: false,
   };
 }
