@@ -166,14 +166,38 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [ ] habilitar payment_settings após testes
 - [ ] sessão real fornecida pelo M09
 
-## ❌ M09 — CRAZZY AUTH
-- [ ] Discord OAuth/link
-- [ ] Discord user id
-- [ ] guild status
-- [ ] Google opcional
-- [ ] sessão segura
-- [ ] recuperação
-- [ ] roles
+## ✅ M09 — CRAZZY AUTH — ESTRUTURA CONCLUÍDA
+- [x] /login
+- [x] /cadastro compatível com login social
+- [x] /reset-password adaptado para recuperação social
+- [x] Discord OAuth
+- [x] Discord identity linking
+- [x] Discord user id persistido server-side
+- [x] guild status verificado via scope guilds
+- [x] guild membership não bloqueia navegação pública
+- [x] Google opcional por feature flag
+- [x] sessão SSR com cookies
+- [x] refresh de sessão via middleware
+- [x] getClaims para proteção de rotas
+- [x] getUser para identidade atual
+- [x] roles user/moderator/admin
+- [x] novos usuários recebem role user
+- [x] header reage à sessão/role
+- [x] logout real
+- [x] checkout M08 conectado ao access token real
+- [x] Discord provider token não é persistido
+- [x] RLS discord_identities
+- [x] profiles restrito ao dono/admin
+- [x] trigger SECURITY DEFINER endurecido
+- [x] package versions pinadas
+- [x] package-lock commitado
+- [x] auth-discord-sync versionada
+- [x] migration M09 aplicada/versionada
+- [x] Security Advisor Supabase sem lints
+- [ ] configurar Discord Client ID/Secret no Supabase Auth
+- [ ] configurar Site URL + redirect allowlist
+- [ ] preencher DISCORD_GUILD_ID
+- [ ] habilitar Google somente se desejado
 
 ## ❌ M10 — CRAZZY CLIENT HUB
 - [ ] overview
@@ -559,4 +583,7 @@ Fonte visual: Pink.
 - [x] mergear PR #7 Architecture V2
 - [x] criar branch m06-accounts-market
 - [x] construir adapter oficial LZT multijogo\n- [ ] configurar primeiro token LZT do usuário e validar provider
-- [ ] seguir M07 -> M08 -> M09...
+- [x] M07 concluído
+- [x] M08 concluído estruturalmente
+- [x] M09 concluído estruturalmente
+- [ ] seguir M10 — CRAZZY CLIENT HUB

@@ -1,5 +1,5 @@
-import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
+import { getVerifiedAccessToken } from "@/lib/supabase/server";
 
 const DEFAULT_SUPABASE_URL = "https://nnmglkdpmffmaiuwbcct.supabase.co";
 
@@ -14,12 +14,7 @@ export async function checkoutAuthHeader(request: NextRequest) {
   const direct = request.headers.get("authorization");
   if (direct?.startsWith("Bearer ")) return direct;
 
-  const jar = await cookies();
-  const token =
-    jar.get("crazzy_access_token")?.value ||
-    jar.get("sb-access-token")?.value ||
-    "";
-
+  const token = await getVerifiedAccessToken();
   return token ? "Bearer " + token : "";
 }
 

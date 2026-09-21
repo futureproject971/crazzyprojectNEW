@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron, Poppins } from "next/font/google";
+import { AuthProvider } from "@/modules/auth/AuthProvider";
 import { CartProvider } from "@/modules/cart/CartProvider";
 import "./globals.css";
 
@@ -36,7 +37,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} ${orbitron.variable} ${poppins.variable}`}>
-        <CartProvider>{children}</CartProvider>
+        <AuthProvider>
+          <CartProvider>{children}</CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );
