@@ -250,3 +250,35 @@ Próximo passo exato:
 7. squash merge;
 8. validar phase-1-home pós-merge;
 9. iniciar M15 CRAZZY REVIEWS.
+
+
+## CHECKPOINT — QA M14 VERDE
+
+CI de código:
+- run 35620568502
+- npm ci PASS
+- TypeScript PASS
+- production build PASS
+- M14 Community security smoke PASS
+
+Smoke comprovou:
+- anon bloqueado de community_channels;
+- anon bloqueado de community_messages;
+- anon bloqueado de community_reactions;
+- anon bloqueado de community_attachments;
+- snapshot Community exige auth;
+- envio de mensagem exige auth;
+- reação exige auth;
+- bucket community-media sem acesso público;
+- catálogo público continua público.
+
+Supabase:
+- Security Advisor: 0 lints;
+- authenticated sem INSERT direto em messages/reactions/attachments;
+- bucket public=false.
+
+Próximo:
+1. PR M14;
+2. squash merge;
+3. validar phase-1-home;
+4. iniciar M15 CRAZZY REVIEWS.
