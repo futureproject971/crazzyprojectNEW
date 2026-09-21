@@ -622,6 +622,70 @@ Módulo técnico da incorporação da aplicação MT Sounds.
 A experiência pública aparece em M23.1 e como última aba.
 Este módulo técnico cuida da migração do source e isolamento do app parceiro.
 
+### M47 — CRAZZY SECURITY SENTINEL
+Módulo central de auditoria, detecção de abuso e alertas de segurança.
+
+Objetivo:
+registrar eventos críticos, bugs e sinais de tentativa de acesso indevido, enviando alertas seguros pelo bot Discord.
+
+Inclui:
+- bugs críticos e erros 5xx;
+- falhas repetidas de API;
+- tentativas de acessar rotas/admin sem permissão;
+- tentativas de consultar estoque/keys sem autorização;
+- tentativa de forçar endpoints administrativos;
+- manipulação suspeita de payload/preço/quantidade;
+- assinatura de webhook inválida;
+- replay/webhook duplicado suspeito;
+- tentativas repetidas de login;
+- rate limit excedido;
+- enumeração de IDs/recursos;
+- tentativa de escalada de privilégio;
+- falha de Discord role sync;
+- falha de Fulfillment;
+- erro de reserva/consumo de key;
+- divergência de estoque;
+- eventos sensíveis de refund/chargeback;
+- eventos de segurança M06/LZT;
+- eventos de segurança M08/PurinCash;
+- eventos do M43 Fulfillment;
+- eventos do M44 Discord Bridge;
+- auditoria de ações administrativas críticas.
+
+Saídas:
+- log estruturado em banco;
+- severidade INFO / WARN / HIGH / CRITICAL;
+- request/session/user correlation id;
+- painel de auditoria;
+- alerta Discord;
+- agregação/cooldown para evitar spam;
+- deduplicação;
+- acknowledge/resolution;
+- trilha de auditoria para ações críticas.
+
+Integrações:
+- M24 Control Center;
+- M27 Stock;
+- M28 Sales;
+- M29 Payments;
+- M31 Customer 360;
+- M40 Settings & Integrations;
+- M41 Notify;
+- M43 Fulfillment;
+- M44 Discord Bridge.
+
+Regras:
+- não prometer detectar toda invasão;
+- não expor API keys, tokens, senhas, keys/licenças ou conteúdo entregue em logs/Discord;
+- mascarar IP/dados sensíveis quando apropriado;
+- falha do Discord não pode derrubar checkout/auth/fulfillment;
+- alertas críticos podem mencionar cargo de segurança configurável;
+- painel completo somente para admins autorizados.
+
+Status:
+PLANEJADO.
+
+
 ---
 
 # REGRA DE DIREITOS
