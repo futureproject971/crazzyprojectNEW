@@ -4,32 +4,58 @@
 GRUPO 01 — EXPERIÊNCIA PÚBLICA
 
 ## Responsabilidade
-Descoberta pública: busca, categorias, destaques e novidades.
+Descoberta e navegação pública da loja.
 
-## Rota inicial
-`/novidades`
+## Rotas
+- `/novidades`
+- `/categorias`
+- `/destaques`
 
-## Inclui
-- busca client-side mock
+## Implementado
+- busca global visual/mock
+- categorias
 - filtros por categoria
-- seleção "Em alta agora"
-- grid de descoberta
-- cards de novidades
-- empty state de busca
-- responsividade desktop/tablet/mobile
-- integração com AppShell M01
-- tokens/componentes M00
+- tags/tendências
+- novidades
+- mais vendidos
+- destaques
+- lançamentos
+- pesquisa client-side
+- contador de resultados
+- empty state
+- loading state
+- error state
+- rotas com experiências adaptadas
+- CTA da Home conectado a `/categorias`
+- navegação global conectada a `/novidades`
+- desktop / tablet / mobile
+- hover / focus / reduced motion
+- MOCK DATA separado em `src/modules/discovery/data.ts`
 
-## Não inclui
-- catálogo completo M04
-- página de produto M05
+## Preservação
+- M00 reutilizado sem redesenho.
+- M01 reutilizado sem redesenho.
+- M02 preservado; somente o CTA de categorias recebeu integração mínima com M03.
+
+## Fora do escopo
+- página completa de produto
+- catálogo comercial completo
+- carrinho
+- checkout
 - busca backend
-- recomendação algorítmica
-- autenticação
 - Supabase
+- recomendação algorítmica real
 
-## Dados
-Mock data local no módulo.
+## QA técnico
+- TypeScript / typecheck: PASS
+- Next.js build: PASS
+- GitHub Actions: PASS
 
 ## Status
-EM IMPLEMENTAÇÃO / QA.
+**CONCLUÍDO TECNICAMENTE / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+
+## Próximo módulo após aprovação
+**M04 — CRAZZY CATALOG**
+
+Rota:
+`/produtos`
