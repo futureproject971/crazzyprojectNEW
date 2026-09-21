@@ -10,7 +10,7 @@
 - [x] M03 — CRAZZY DISCOVERY
 - [x] M04 — CRAZZY CATALOG
 
-## 🟡 PRONTO / AGUARDANDO MERGE
+## ✅ M05 INTEGRADO
 
 ### M05 — CRAZZY PRODUCT VIEW
 - [x] /produto/[slug]
@@ -36,7 +36,7 @@
 - [x] typecheck
 - [x] build
 - [x] CI
-- [ ] merge PR #6
+- [x] merge PR #6
 
 ## 🟦 ARQUITETURA V2 DOCUMENTADA / PR #7
 
@@ -56,11 +56,11 @@
 - [x] Security Sentinel
 - [x] matriz migrar vs recriar
 - [x] handoff próxima conversa
-- [ ] merge PR #7
+- [x] merge PR #7
 
 ---
 
-## ❌ M06 — CRAZZY ACCOUNTS MARKET
+## 🟡 M06 — CRAZZY ACCOUNTS MARKET — INÍCIO LIBERADO
 Fonte: FortuneECrazzy + LZT.
 
 - [ ] migrar listagem
@@ -474,26 +474,26 @@ Fonte visual: Pink.
 
 ---
 
-# DECISÕES PENDENTES
+# DECISÕES D01-D10 APROVADAS
 
-- [ ] D01 Keys: interno / PurinCash supplier / híbrido
-- [ ] D02 Nome das roles Discord
-- [ ] D03 Expiração de cargo/tutorial/key
-- [ ] D04 Bot Discord atual vs separado
-- [x] D05 PurinCash como gateway, site como fonte de verdade
-- [ ] D06 Tutorial por produto/plano + política de expiração + vídeo
-- [ ] D07 Source/repo MT Sounds
-- [ ] D08 Refund/dispute revogações
+- [x] D01 Keys híbridas; internal_stock padrão
+- [x] D02 Roles no formato emoji | PRODUTO
+- [x] D03 Cargo expira; histórico/key entregue permanece; tutorial permanece após expiração normal
+- [x] D04 Reaproveitar bot CRAZZY saudável com serviço de sync isolado
+- [x] D05 PurinCash como gateway; site como fonte de verdade
+- [x] D06 Tutorial por produto/plano; upload + link/embed; permanece após expiração normal
+- [x] D07 Estratégia MT Sounds fechada; source/repo continua dependência do M46
+- [x] D08 Refund/dispute revoga entitlement/cargo/novos acessos e mantém evidências
 - [x] D09 Cor do nick = maior role visível
-- [ ] D10 Security Sentinel: canal Discord e cargo a mencionar em CRITICAL
+- [x] D10 #security-logs privado; ping somente role configurada em CRITICAL
 
 ---
 
 # PRÓXIMA SEQUÊNCIA
 
-- [ ] fechar decisões pendentes
-- [ ] mergear PR #6 M05
-- [ ] mergear PR #7 Architecture V2
+- [x] fechar decisões D01-D10
+- [x] mergear PR #6 M05
+- [x] mergear PR #7 Architecture V2
 - [ ] criar branch m06-accounts-market
 - [ ] migrar Fortune/LZT
 - [ ] seguir M07 -> M08 -> M09...
