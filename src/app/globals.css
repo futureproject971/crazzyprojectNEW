@@ -25,6 +25,7 @@
 @import "../modules/status/styles.css";
 @import "../modules/academy/styles.css";
 @import "../modules/help/styles.css";
+@import "../modules/mtsounds/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
