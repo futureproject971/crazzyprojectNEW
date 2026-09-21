@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Drawer, LineIcon } from "@/core/design-system";
+import { Drawer, Dropdown, LineIcon } from "@/core/design-system";
 import { getNavigation } from "./navigation";
 import type { ShellMode, ShellNavItem } from "./types";
 
@@ -58,6 +58,27 @@ function NavLinks({
   );
 }
 
+const clientAccountItems = [
+  "Painel do Cliente",
+  "Minhas Compras",
+  "Meus Tickets",
+  "CRAZZY CLUB",
+  "Meus Cupons",
+  "Tutorial",
+  "Meu Perfil",
+  "Notificações",
+  "Sair",
+];
+
+const adminAccountItems = [
+  "Dashboard",
+  "Produtos",
+  "Pedidos",
+  "Usuários",
+  "Configurações",
+  "Sair",
+];
+
 export function AppHeader({
   mode = "visitor",
   activeNav = "home",
@@ -71,6 +92,11 @@ export function AppHeader({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const items = getNavigation(mode);
+  const accountItems = (mode === "admin" ? adminAccountItems : clientAccountItems).map((label, index, all) => ({
+    id: `${mode}-account-${index}`,
+    label,
+    danger: index === all.length - 1,
+  }));
 
   return (
     <>
@@ -81,6 +107,12 @@ export function AppHeader({
           </a>
 
           <NavLinks items={items} activeNav={activeNav} cartCount={cartCount} />
+
+          {mode !== "visitor" && (
+            <button type="button" className="crz-shell-search" aria-label="Pesquisar">
+              <ShellIcon src="/icons/search.svg" />
+            </button>
+          )}
         </div>
 
         <div className="crz-shell-header__account" aria-label="Conta e acesso">
@@ -100,11 +132,16 @@ export function AppHeader({
               </button>
             </>
           ) : (
-            <button type="button" className="crz-shell-user">
-              <span className="crz-shell-user__avatar" aria-hidden="true" />
-              <span>{userName}</span>
-              <LineIcon name="user" size={14} />
-            </button>
+            <Dropdown
+              items={accountItems}
+              trigger={
+                <span className="crz-shell-user">
+                  <span className="crz-shell-user__avatar" aria-hidden="true" />
+                  <span>{userName}</span>
+                  <LineIcon name="user" size={14} />
+                </span>
+              }
+            />
           )}
         </div>
 
