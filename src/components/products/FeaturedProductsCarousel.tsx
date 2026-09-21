@@ -74,7 +74,7 @@ export function FeaturedProductsCarousel() {
                 <div className="product-info">
                   <strong>{product.name}</strong>
                   <span>{product.subtitle}</span>
-                  {isActive && <button type="button">Ver Produto</button>}
+                  {isActive && <a className="product-view-link" href={"/produto/" + product.slug}>Ver Produto</a>}
                 </div>
               </article>
             );
