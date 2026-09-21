@@ -320,3 +320,30 @@ Próximo passo exato:
 5. squash merge;
 6. validar phase-1-home pós-merge;
 7. iniciar M14 CRAZZY COMMUNITY.
+
+
+## CHECKPOINT — QA M13 VERDE
+
+CI oficial da branch `m13-support`:
+- npm ci: PASS
+- TypeScript: PASS
+- production build: PASS
+- M13 Support security smoke: PASS
+- GitHub Actions run: 35617153952
+- Supabase Security Advisor: 0 lints
+
+Smoke comprovou:
+- anon bloqueado de support_tickets;
+- anon bloqueado de support_messages;
+- anon bloqueado de support_attachments;
+- anon bloqueado de support_ticket_events;
+- Support snapshot exige autenticação;
+- criação de ticket exige autenticação;
+- bucket Support sem acesso público;
+- catálogo público continua acessível.
+
+Falta:
+1. PR M13;
+2. squash merge;
+3. validar phase-1-home pós-merge;
+4. iniciar M14 CRAZZY COMMUNITY.
