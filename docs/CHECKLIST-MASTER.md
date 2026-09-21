@@ -164,7 +164,7 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] gate de autenticação preparado para M09
 - [ ] ativar secrets PurinCash na etapa de integrações/SQL
 - [ ] habilitar payment_settings após testes
-- [ ] sessão real fornecida pelo M09
+- [x] sessão real fornecida pelo M09
 
 ## ✅ M09 — CRAZZY AUTH — ESTRUTURA CONCLUÍDA
 - [x] /login
@@ -199,15 +199,32 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [ ] preencher DISCORD_GUILD_ID
 - [ ] habilitar Google somente se desejado
 
-## ❌ M10 — CRAZZY CLIENT HUB
-- [ ] overview
-- [ ] pedidos
-- [ ] produtos ativos
-- [ ] entitlements
-- [ ] cargos
-- [ ] tutoriais liberados
-- [ ] entregas
-- [ ] sync Discord
+## ✅ M10 — CRAZZY CLIENT HUB — CONCLUÍDO
+- [x] overview
+- [x] /painel
+- [x] /painel/pedidos
+- [x] /painel/produtos
+- [x] /painel/tutoriais
+- [x] /painel/entregas
+- [x] /painel/discord
+- [x] snapshot API privado
+- [x] pedidos
+- [x] pagamentos
+- [x] produtos ativos
+- [x] entitlements
+- [x] tabela entitlements com RLS
+- [x] cargos/app roles
+- [x] tabela discord_role_grants com RLS
+- [x] tutoriais liberados sem expor conteúdo protegido
+- [x] entregas sem expor keys/links/conteúdo sensível
+- [x] sync/reconnect Discord
+- [x] guild status
+- [x] loading/error/empty
+- [x] desktop/tablet/mobile
+- [x] Security Advisor sem lints
+- [x] smoke anon bloqueado de entitlements/grants
+- [x] catálogo público continua público
+- [x] boundaries M11/M22/M43/M44 preservadas
 
 ## ❌ M11 — CRAZZY LIBRARY
 - [ ] keys
@@ -586,4 +603,5 @@ Fonte visual: Pink.
 - [x] M07 concluído
 - [x] M08 concluído estruturalmente
 - [x] M09 concluído estruturalmente
-- [ ] seguir M10 — CRAZZY CLIENT HUB
+- [x] M10 concluído
+- [ ] seguir M11 — CRAZZY LIBRARY
