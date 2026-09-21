@@ -373,10 +373,10 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] authenticated sem escrita direta nas tabelas Support
 - [x] bucket public=false
 - [x] índices de contexto/attachments/eventos
-- [ ] smoke M13 PASS
-- [ ] TypeScript PASS
-- [ ] production build PASS
-- [ ] GitHub Actions PASS
+- [x] smoke M13 PASS
+- [x] TypeScript PASS
+- [x] production build PASS
+- [x] GitHub Actions PASS
 - [ ] PR M13
 - [ ] merge M13
 
