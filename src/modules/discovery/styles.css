@@ -223,7 +223,6 @@
 
 .crz-discovery-feature:first-child {
   min-height: 235px;
-  grid-row: span 2;
 }
 
 .crz-discovery-feature > img {
@@ -488,7 +487,6 @@
 
   .crz-discovery-feature:first-child {
     grid-column: 1 / -1;
-    grid-row: auto;
   }
 }
 
