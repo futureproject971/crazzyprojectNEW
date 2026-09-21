@@ -25,9 +25,9 @@ function cartPayload(items: ReturnType<typeof useCart>["items"]) {
     productId: item.productId,
     planId: item.planId,
     quantity: item.quantity,
-    type: item.kind === "lzt-account" ? "lzt-account" : undefined,
-    lztItemId: item.lztItemId,
-    lztGame: item.lztGame,
+    type: item.kind === "account" ? "account" : undefined,
+    accountId: item.accountId,
+    accountGame: item.accountGame,
     productName: item.name,
     productImage: item.image,
     planName: item.planName,
@@ -42,7 +42,7 @@ function methodName(method: CheckoutMethod) {
 
 function methodCopy(method: CheckoutMethod) {
   if (method === "pix") return "QR Code + copia e cola. Confirmação automática.";
-  if (method === "card") return "Checkout hospedado pela PurinCash. Dados do cartão não passam pelo site.";
+  if (method === "card") return "Pagamento por cartão em ambiente seguro.";
   return "Pagamento em LTC com valor exato e confirmação pela rede.";
 }
 
@@ -231,7 +231,7 @@ export function CheckoutPage() {
           <PageHeader
             eyebrow="M08 • CRAZZY CHECKOUT"
             title="Finalizar compra"
-            description="Preço, desconto e pagamento são recalculados no servidor antes de qualquer cobrança."
+            description="Revise seu pedido, escolha a forma de pagamento e finalize com segurança."
             actions={<Badge tone="green">CHECKOUT PROTEGIDO</Badge>}
           />
         </div>
@@ -289,7 +289,7 @@ export function CheckoutPage() {
                 <NeonIcon name="shield" size={26} />
                 <div>
                   <strong>Gateway preparado, ativação pendente</strong>
-                  <span>As credenciais e métodos PurinCash serão ativados na etapa de integrações/SQL. Nenhuma cobrança pode ser criada enquanto isso.</span>
+                  <span>Este método de pagamento está temporariamente indisponível. Escolha outra opção ou tente novamente mais tarde.</span>
                 </div>
               </div>
             )}
@@ -299,9 +299,9 @@ export function CheckoutPage() {
                 <NeonIcon name="verified" size={30} />
                 <div>
                   <strong>Login necessário</strong>
-                  <span>O checkout aceita somente usuário autenticado. O M09 vai conectar Discord/Google e fornecer esta sessão.</span>
+                  <span>Entre na sua conta para continuar com a compra.</span>
                 </div>
-                <button type="button" disabled>Login entra no M09</button>
+                <a className="crz-button crz-button--primary crz-button--sm" href="/login">Entrar</a>
               </div>
             )}
 
@@ -329,7 +329,7 @@ export function CheckoutPage() {
               >
                 Copiar código PIX
               </Button>
-              <small>O produto só é liberado depois da confirmação assinada do gateway.</small>
+              <small>O produto é liberado após a confirmação do pagamento.</small>
             </Panel>
           )}
 
@@ -425,7 +425,7 @@ export function CheckoutPage() {
 
             <div className="crz-checkout-security">
               <NeonIcon name="shield" size={22} />
-              <span>Idempotência, HMAC, value check e entrega idempotente ativos no backend.</span>
+              <span>Pagamento protegido e entrega vinculada ao seu pedido.</span>
             </div>
 
             <a href="/carrinho">← Voltar ao carrinho</a>

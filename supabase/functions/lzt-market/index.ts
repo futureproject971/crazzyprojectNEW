@@ -6,6 +6,94 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+
+type CosmeticAsset = {
+  name: string;
+  category: string | null;
+  rarity: string | null;
+  imageUrl: string | null;
+};
+
+function textValue(value: unknown): string | null {
+  if (typeof value === "string" && value.trim()) return value.trim();
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return null;
+}
+
+function pickText(source: any, keys: string[]): string | null {
+  if (!source || typeof source !== "object") return null;
+  for (const key of keys) {
+    const value = textValue(source[key]);
+    if (value) return value;
+  }
+  return null;
+}
+
+function asEntries(value: any): any[] {
+  if (Array.isArray(value)) return value;
+  if (value && typeof value === "object") return Object.values(value);
+  return value == null ? [] : [value];
+}
+
+function cosmeticAssets(item: any): CosmeticAsset[] {
+  const groups: Array<[string, string]> = [
+    ["valorant_skins", "Skin"],
+    ["weaponSkins", "Skin"],
+    ["weapon_skins", "Skin"],
+    ["skins", "Skin"],
+    ["fortnite_skins", "Skin"],
+    ["lol_skins", "Skin"],
+    ["valorant_knives", "Faca"],
+    ["knives", "Faca"],
+    ["capes", "Capa"],
+    ["inventory", "Inventário"],
+    ["inventory_items", "Inventário"],
+  ];
+
+  const assets: CosmeticAsset[] = [];
+  const seen = new Set<string>();
+
+  for (const [key, category] of groups) {
+    for (const raw of asEntries(item?.[key])) {
+      const source = raw && typeof raw === "object" ? raw : { name: raw };
+      const name =
+        pickText(source, ["displayName", "display_name", "name", "title", "skin_name", "item_name"]) ||
+        textValue(raw) ||
+        category;
+      const rarity = pickText(source, ["rarity", "tier", "rarity_name", "quality"]);
+      const imageUrl = pickText(source, [
+        "displayIcon", "display_icon", "image", "image_url", "icon", "icon_url",
+        "thumbnail", "thumbnail_url", "splash", "splash_url", "picture", "picture_url",
+      ]);
+      const signature = category + "|" + name + "|" + (imageUrl || "");
+      if (seen.has(signature)) continue;
+      seen.add(signature);
+      assets.push({ name: name.slice(0, 120), category, rarity, imageUrl });
+      if (assets.length >= 24) return assets;
+    }
+  }
+
+  return assets;
+}
+
+function safeRemoteImageUrl(value: string | null): string | null {
+  if (!value) return null;
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "https:") return null;
+    const host = parsed.hostname.toLowerCase();
+    if (
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "::1" ||
+      host.endsWith(".local")
+    ) return null;
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -245,6 +333,48 @@ Deno.serve(async (req) => {
       });
     }
 
+    // CRAZZY account media proxy. The browser receives only CRAZZY URLs.
+    if (action === "preview-media-v2") {
+      if (req.method !== "GET") {
+        return new Response(null, { status: 405, headers: corsHeaders });
+      }
+
+      const previewItemId = url.searchParams.get("item_id") || "";
+      const mediaIndex = Number(url.searchParams.get("index") || "0");
+      if (!/^\d{1,30}$/.test(previewItemId) || !Number.isInteger(mediaIndex) || mediaIndex < 0 || mediaIndex > 23) {
+        return new Response(null, { status: 404, headers: corsHeaders });
+      }
+
+      const providerResponse = await fetch(
+        `https://api.lzt.market/${encodeURIComponent(previewItemId)}?currency=brl`,
+        { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } },
+      );
+      if (!providerResponse.ok) {
+        return new Response(null, { status: 404, headers: corsHeaders });
+      }
+
+      const providerData = await providerResponse.json().catch(() => null);
+      const providerItem = providerData?.item ?? providerData;
+      const asset = cosmeticAssets(providerItem)[mediaIndex];
+      const assetUrl = safeRemoteImageUrl(asset?.imageUrl || null);
+      if (!assetUrl) return new Response(null, { status: 404, headers: corsHeaders });
+
+      const imageResponse = await fetch(assetUrl, {
+        headers: { Accept: "image/avif,image/webp,image/png,image/jpeg,image/*" },
+      });
+      if (!imageResponse.ok) return new Response(null, { status: 404, headers: corsHeaders });
+
+      const imageData = await imageResponse.arrayBuffer();
+      return new Response(imageData, {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": imageResponse.headers.get("Content-Type") || "image/jpeg",
+          "Cache-Control": "public, max-age=3600",
+        },
+      });
+    }
+
     // M06 PREVIEW DETAIL V2: isolated, GET-only and sanitized.
     if (action === "preview-detail-v2") {
       if (req.method !== "GET") {
@@ -267,7 +397,7 @@ Deno.serve(async (req) => {
       const safeGame = allowedGames.has(requestedGame) ? requestedGame : "unknown";
 
       const providerResponse = await fetch(
-        `https://api.lzt.market/${encodeURIComponent(previewItemId)}`,
+        `https://api.lzt.market/${encodeURIComponent(previewItemId)}?currency=brl`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -292,7 +422,8 @@ Deno.serve(async (req) => {
       const providerText = await providerResponse.text();
       let item: any;
       try {
-        item = JSON.parse(providerText);
+        const parsedItem = JSON.parse(providerText);
+        item = parsedItem?.item ?? parsedItem;
       } catch {
         return new Response(JSON.stringify({ error: "Provider returned invalid JSON" }), {
           status: 502,
@@ -315,10 +446,52 @@ Deno.serve(async (req) => {
         return Number.isFinite(numeric) ? numeric : null;
       };
 
+      let serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+      if (!serviceRoleKey) {
+        try {
+          const secretKeys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}");
+          serviceRoleKey = secretKeys?.default || "";
+        } catch {
+          serviceRoleKey = "";
+        }
+      }
+
+      let markup = 1.5;
+      if (serviceRoleKey) {
+        const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+        const { data: config } = await supabaseAdmin
+          .from("lzt_config")
+          .select("markup_multiplier, markup_valorant, markup_lol, markup_fortnite, markup_minecraft")
+          .limit(1)
+          .maybeSingle();
+        const selected =
+          safeGame === "valorant" ? config?.markup_valorant :
+          safeGame === "lol" ? config?.markup_lol :
+          safeGame === "fortnite" ? config?.markup_fortnite :
+          safeGame === "minecraft" ? config?.markup_minecraft :
+          config?.markup_multiplier;
+        const parsedMarkup = Number(selected ?? config?.markup_multiplier ?? 1.5);
+        if (Number.isFinite(parsedMarkup) && parsedMarkup > 0) markup = parsedMarkup;
+      }
+
+      const basePrice = Number(first(["price", "price_value", "item_price"]) || 0);
+      const commercialPrice =
+        Number.isFinite(basePrice) && basePrice > 0
+          ? Math.round(basePrice * markup * 100) / 100
+          : null;
+      const publicCosmetics = cosmeticAssets(item).map((asset, index) => ({
+        name: asset.name,
+        category: asset.category,
+        rarity: asset.rarity,
+        mediaIndex: asset.imageUrl ? index : null,
+      }));
+
       const safeItem = {
         id: String(first(["item_id", "itemId", "id"]) ?? previewItemId),
         title: String(first(["title", "title_en", "name"]) ?? `Conta #${previewItemId}`),
         game: safeGame,
+        price: commercialPrice,
+        cosmetics: publicCosmetics,
         region: first([
           "valorant_region", "lol_region", "region", "fortnite_region", "country",
         ]),
@@ -356,11 +529,7 @@ Deno.serve(async (req) => {
         legends: first(["legends", "minecraft_legends"]),
       };
 
-      return new Response(JSON.stringify({
-        item: safeItem,
-        source: "lzt",
-        preview: true,
-      }), {
+      return new Response(JSON.stringify({ item: safeItem }), {
         headers: {
           ...corsHeaders,
           "Content-Type": "application/json",
@@ -494,7 +663,7 @@ Deno.serve(async (req) => {
       const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
       const { data: lztConfig } = await supabaseAdmin
         .from("lzt_config")
-        .select("max_fetch_price, currency")
+        .select("max_fetch_price, currency, markup_multiplier, markup_valorant, markup_lol, markup_fortnite, markup_minecraft")
         .limit(1)
         .maybeSingle();
 
@@ -636,8 +805,26 @@ Deno.serve(async (req) => {
         vbucks: first(item, ["vbucks", "v_bucks", "fortnite_vbucks"]),
         minecoins: first(item, ["minecoins", "minecraft_minecoins"]),
         capesCount: safeCount(first(item, ["capes", "cape_count", "capes_count"])),
-        providerPrice: first(item, ["price", "price_value", "item_price"]),
-        providerCurrency,
+        price: (() => {
+          const base = Number(first(item, ["price", "price_value", "item_price"]) || 0);
+          const game = url.searchParams.get("game") || "";
+          const selected =
+            game === "valorant" ? lztConfig?.markup_valorant :
+            game === "lol" ? lztConfig?.markup_lol :
+            game === "fortnite" ? lztConfig?.markup_fortnite :
+            game === "minecraft" ? lztConfig?.markup_minecraft :
+            lztConfig?.markup_multiplier;
+          const multiplier = Number(selected ?? lztConfig?.markup_multiplier ?? 1.5);
+          return Number.isFinite(base) && base > 0 && Number.isFinite(multiplier) && multiplier > 0
+            ? Math.round(base * multiplier * 100) / 100
+            : null;
+        })(),
+        cosmetics: cosmeticAssets(item).slice(0, 4).map((asset) => ({
+          name: asset.name,
+          category: asset.category,
+          rarity: asset.rarity,
+          mediaIndex: null,
+        })),
       }));
 
       const currentPage = Number(providerData?.currentPage ?? providerData?.current_page ?? 1) || 1;
@@ -653,9 +840,7 @@ Deno.serve(async (req) => {
           typeof providerData?.hasNextPage === "boolean"
             ? providerData.hasNextPage
             : currentPage < totalPages,
-        source: "lzt",
-        category,
-        preview: true,
+        game: url.searchParams.get("game") || category,
       };
 
       if (url.searchParams.get("schema") === "1") {

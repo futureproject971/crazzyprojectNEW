@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkoutAuthHeader, checkoutEdgeUrl, proxyJson } from "../_shared";
+import { checkoutAuthHeader, checkoutEdgeUrl, internalizeCartSnapshot, proxyJson } from "../_shared";
 
 const actions = {
   pix: "create",
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       Authorization: authorization,
     },
     body: JSON.stringify({
-      cart_snapshot: body.cart_snapshot,
+      cart_snapshot: internalizeCartSnapshot(body.cart_snapshot),
       coupon_code: body.coupon_code || "",
       description: "Compra CRAZZY PROJECT",
       idempotency_key: body.idempotency_key,
