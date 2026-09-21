@@ -247,7 +247,7 @@ export function AccountsMarketPage() {
               <p>Filtros já suportados pela integração LZT existente.</p>
             </header>
 
-            <label className="crz-accounts-field">
+            <div className="crz-accounts-field">
               <span>Buscar no título</span>
               <SearchInput
                 value={draft.query}
@@ -255,10 +255,10 @@ export function AccountsMarketPage() {
                 placeholder="Ex: skins, rank..."
                 aria-label="Buscar conta pelo título"
               />
-            </label>
+            </div>
 
             <div className="crz-accounts-filter-grid">
-              <label className="crz-accounts-field">
+              <div className="crz-accounts-field">
                 <span>Rank mínimo</span>
                 <Select
                   value={draft.rankMin}
@@ -270,9 +270,9 @@ export function AccountsMarketPage() {
                     <option key={value} value={value}>{label}</option>
                   ))}
                 </Select>
-              </label>
+              </div>
 
-              <label className="crz-accounts-field">
+              <div className="crz-accounts-field">
                 <span>Rank máximo</span>
                 <Select
                   value={draft.rankMax}
@@ -284,7 +284,7 @@ export function AccountsMarketPage() {
                     <option key={value} value={value}>{label}</option>
                   ))}
                 </Select>
-              </label>
+              </div>
             </div>
 
             <div className="crz-accounts-filter-grid">
@@ -344,7 +344,7 @@ export function AccountsMarketPage() {
               />
             </label>
 
-            <label className="crz-accounts-field">
+            <div className="crz-accounts-field">
               <span>Ordenar</span>
               <Select
                 value={draft.orderBy}
@@ -357,7 +357,7 @@ export function AccountsMarketPage() {
                 <option value="price_to_up">Menor preço do provedor</option>
                 <option value="price_to_down">Maior preço do provedor</option>
               </Select>
-            </label>
+            </div>
 
             <div className="crz-accounts-filter-actions">
               <Button onClick={applyFilters}>Aplicar filtros</Button>
