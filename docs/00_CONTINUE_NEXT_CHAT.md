@@ -355,3 +355,42 @@ D10 aprovado:
 
 ### Próximo módulo
 M08 — CRAZZY CHECKOUT.
+
+
+---
+
+## M08 — CRAZZY CHECKOUT
+
+### M08 CRAZZY CHECKOUT
+- branch: `m08-checkout`
+- frontend: `/checkout`
+- API proxy:
+  - /api/checkout/config
+  - /api/checkout/quote
+  - /api/checkout/create
+  - /api/checkout/status
+- PurinCash Edge Function atual: v5
+- PIX/cartão/LTC estruturados
+- métodos continuam disabled até secrets/configuração operacional
+- checkout exige autenticação; M09 fornece a sessão
+- combo e cupom recalculados server-side
+- aplica somente o maior benefício válido
+- criação protegida por idempotency_key
+- webhook HMAC + reconciliação + value check
+- entrega protegida por claim idempotente
+- LZT não usa mais RUB_TO_BRL fixo
+- payments RLS: cliente lê apenas os próprios e não pode alterar dados comerciais
+- migration: `m08_checkout_policy_and_idempotency`
+- regras: `docs/M08-CHECKOUT-RULES.md`
+
+### Ativação adiada
+Na etapa de integrações/SQL:
+- PURINCASH_API_KEY
+- PURINCASH_WEBHOOK_SECRET
+- CHECKOUT_SIGNING_SECRET
+- PUBLIC_SITE_URL
+- ENABLE_CARD_CHECKOUT
+- payment_settings pix/card/crypto
+
+### Próximo módulo
+M09 — CRAZZY AUTH.
