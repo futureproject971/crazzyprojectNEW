@@ -105,8 +105,6 @@ as $$
       c.active,
       c.expires_at,
       c.origin,
-      c.source_reference,
-      c.metadata,
       c.created_at,
       exists (
         select 1
@@ -146,8 +144,6 @@ as $$
         'active',m.active,
         'expires_at',m.expires_at,
         'origin',m.origin,
-        'source_reference',m.source_reference,
-        'metadata',m.metadata,
         'created_at',m.created_at,
         'products',m.products,
         'status',case
