@@ -16,7 +16,7 @@ export function StoreShowcase() {
             <p>Tudo que um gamer precisa, em um só lugar.</p>
           </div>
         </div>
-        <a href="#loja" className="section-link">Ver todas as categorias →</a>
+        <a href="/categorias" className="section-link">Ver todas as categorias →</a>
       </div>
 
       <div className="store-grid">
