@@ -14,6 +14,7 @@ const footerLinks = [
   { label: "Suporte", href: "/tickets" },
   { label: "Status", href: "/status" },
   { label: "Academy", href: "/academy" },
+  { label: "Ajuda", href: "/help" },
 ];
 
 export function AppFooter() {
