@@ -117,6 +117,20 @@ function displayBoolean(value: boolean | null) {
   return value ? "Sim" : "Não";
 }
 
+function activityRisk(days: number | null) {
+  if (days == null) return { label: "Sem dado", level: "unknown" as const };
+  if (days >= 90) return { label: "Baixo", level: "low" as const };
+  if (days >= 30) return { label: "Médio", level: "medium" as const };
+  return { label: "Alto", level: "high" as const };
+}
+
+function offlineLabel(days: number | null) {
+  if (days == null) return "Inatividade não informada";
+  if (days === 0) return "Ativa recentemente";
+  if (days === 1) return "Inativa há 1 dia";
+  return "Inativa há " + days + " dias";
+}
+
 function cardStats(item: AccountsMarketItem) {
   if (item.game === "lol") {
     return [
@@ -226,6 +240,7 @@ function AccountCard({
     .slice(0, 6);
   const rankImage = valorantRankImage(item.rankValue);
   const hasKnife = (item.knivesCount ?? 0) > 0;
+  const risk = activityRisk(item.offlineDays);
 
   return (
     <article className="crz-account-card crz-account-card--legacy">
@@ -263,6 +278,19 @@ function AccountCard({
             <strong>{item.rank ?? (game === "valorant" ? "Sem rank" : item.title)}</strong>
           </div>
           <span>{item.skinsCount ?? 0} skins</span>
+        </div>
+
+        <div className="crz-account-card__activity">
+          <div>
+            <small>ÚLTIMA ATIVIDADE</small>
+            <strong>{offlineLabel(item.offlineDays)}</strong>
+          </div>
+          <span
+            className={"crz-account-risk crz-account-risk--" + risk.level}
+            title="Estimativa baseada somente no tempo de inatividade informado pelo catálogo."
+          >
+            Risco estimado: {risk.label}
+          </span>
         </div>
 
         <div className="crz-account-card__legacy-benefits">
@@ -390,9 +418,16 @@ export function AccountsMarketPage() {
   )?.id ?? "todos";
 
   const isLive = Boolean(data && !error && !loading);
+  const activeTheme = gameTabs.find((tab) => tab.id === game) ?? gameTabs[0];
 
   return (
-    <main className="crz-accounts-market">
+    <main
+      className={"crz-accounts-market crz-accounts-market--" + game}
+      style={{
+        "--account-accent": activeTheme.accent,
+        "--account-accent-soft": activeTheme.accentSoft,
+      } as React.CSSProperties}
+    >
       <section className="crz-accounts-hero">
         <div className="crz-container">
           <PageHeader
