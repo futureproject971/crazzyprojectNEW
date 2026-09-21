@@ -383,31 +383,31 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 ## 🟡 M14 — CRAZZY COMMUNITY — EM ANDAMENTO
 - [x] branch `m14-community` criada
 - [x] M13 mergeado e CI pós-merge verde
-- [ ] schema Community
-- [ ] chat real
-- [ ] canais/sala principal
-- [ ] mensagens
-- [ ] respostas/thread reply
-- [ ] reações emoji
-- [ ] perfil clicável
-- [ ] avatar
-- [ ] cargos CRAZZY
-- [ ] cargos Discord
-- [ ] cor do cargo principal
-- [ ] badges
-- [ ] sync Discord
-- [ ] mídia imagem
-- [ ] mídia vídeo
-- [ ] mídia áudio
-- [ ] bucket privado Community
-- [ ] upload assinado
-- [ ] polling/Reatime seguro
-- [ ] rate limit
-- [ ] moderação básica de própria mensagem
-- [ ] sem secrets/keys no chat automático
-- [ ] desktop/tablet/mobile
-- [ ] loading/error/empty
-- [ ] Security Advisor
+- [x] schema Community
+- [x] chat real
+- [x] canais/sala principal
+- [x] mensagens
+- [x] respostas/thread reply
+- [x] reações emoji
+- [x] perfil clicável
+- [x] avatar
+- [x] cargos CRAZZY
+- [x] cargos Discord
+- [x] cor do cargo principal
+- [x] badges
+- [x] leitura do estado Discord já sincronizado; M44 fará sync autoritativo
+- [x] mídia imagem
+- [x] mídia vídeo
+- [x] mídia áudio
+- [x] bucket privado Community
+- [x] upload assinado
+- [x] polling seguro com aba visível; Realtime adiado sem perda de arquitetura
+- [x] rate limit
+- [x] moderação básica de própria mensagem
+- [x] sem secrets/keys no chat automático
+- [x] desktop/tablet/mobile
+- [x] loading/error/empty
+- [x] Security Advisor: 0 lints
 - [ ] smoke M14
 - [ ] TypeScript
 - [ ] production build
