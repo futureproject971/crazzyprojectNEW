@@ -10,9 +10,10 @@ export function AppShell({
   cartCount = 0,
   userName,
   className,
+  showFooter = mode !== "admin",
 }: AppShellProps) {
   return (
-    <div className={cn("crz-app-shell", className)}>
+    <div className={cn("crz-app-shell", `crz-app-shell--${mode}`, className)}>
       <AppHeader
         mode={mode}
         activeNav={activeNav}
@@ -20,7 +21,7 @@ export function AppShell({
         userName={userName}
       />
       <div className="crz-app-shell__content">{children}</div>
-      <AppFooter />
+      {showFooter && <AppFooter />}
     </div>
   );
 }
