@@ -14,7 +14,7 @@ export function HeroSection() {
       <div className="crz-home-hero__content">
         <img
           className="crz-home-hero__logo"
-          src="/brand/crazzy-logo-navbar.png"
+          src="/brand/crazzy-logo-hero.png"
           alt="CRAZZY PROJECT"
         />
 
