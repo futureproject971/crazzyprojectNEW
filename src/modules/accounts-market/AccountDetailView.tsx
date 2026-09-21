@@ -74,6 +74,17 @@ function offlineLabel(days: number | null) {
   return days + " dias";
 }
 
+const factGroupOrder = ["Geral", "Acesso", "Jogo", "Inventário", "Atividade", "Segurança"] as const;
+
+function groupedFacts(item: AccountsMarketItem) {
+  return factGroupOrder
+    .map((group) => ({
+      group,
+      items: item.facts.filter((fact) => fact.group === group),
+    }))
+    .filter((section) => section.items.length > 0);
+}
+
 function detailsFor(item: AccountsMarketItem) {
   if (item.game === "lol") {
     return [
@@ -254,6 +265,7 @@ export function AccountDetailView({
   }, [item]);
 
   const details = useMemo(() => item ? detailsFor(item) : [], [item]);
+  const factSections = useMemo(() => item ? groupedFacts(item) : [], [item]);
   const activeItems = inventory[activeTab];
   const featuredItems = inventory.skins.length ? inventory.skins : activeItems;
   const selectedItem = featuredItems[selectedIndex] ?? null;
@@ -461,6 +473,40 @@ export function AccountDetailView({
             </div>
           </aside>
         </div>
+
+        {factSections.length > 0 && (
+          <section className="crz-account-detail__facts-panel">
+            <header>
+              <div>
+                <span>INFORMAÇÕES COMPLETAS</span>
+                <h2>Dados informados da conta</h2>
+                <p>Exibimos os dados disponíveis da conta para você avaliar a compra com clareza.</p>
+              </div>
+              <b>{item.facts.length} dados</b>
+            </header>
+
+            <div className="crz-account-detail__facts-sections">
+              {factSections.map((section) => (
+                <article key={section.group} className="crz-account-detail__facts-section">
+                  <h3>{section.group}</h3>
+                  <div className="crz-account-detail__facts-grid">
+                    {section.items.map((fact) => (
+                      <div className="crz-account-detail__fact" key={fact.key}>
+                        <span>{fact.label}</span>
+                        <strong>{fact.value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <footer>
+              <NeonIcon name="verified" size={22} />
+              <span>Informações exibidas conforme os dados disponíveis desta conta no momento da consulta.</span>
+            </footer>
+          </section>
+        )}
 
         {item.game === "valorant" && (
           <section className="crz-account-detail__inventory-legacy">
