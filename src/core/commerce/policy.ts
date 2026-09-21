@@ -37,3 +37,16 @@ export function getNextComboTier(uniqueProducts: number) {
 export function isComboPlan(code: string): code is ComboPlanFamily {
   return code === "30d" || code === "lifetime";
 }
+
+
+export function shouldShowPlanToCustomer(
+  stockCount: number | null | undefined,
+  showWhenOutOfStock = false
+) {
+  if (stockCount == null) return true;
+  return stockCount > 0 || showWhenOutOfStock;
+}
+
+export function isPlanPurchasable(stockCount: number | null | undefined) {
+  return stockCount == null || stockCount > 0;
+}
