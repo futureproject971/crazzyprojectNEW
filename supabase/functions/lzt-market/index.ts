@@ -478,7 +478,7 @@ Deno.serve(async (req) => {
       const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
       const { data: lztConfig } = await supabaseAdmin
         .from("lzt_config")
-        .select("max_fetch_price")
+        .select("max_fetch_price, currency")
         .limit(1)
         .maybeSingle();
 
@@ -491,8 +491,16 @@ Deno.serve(async (req) => {
         maxFetchPrice
       );
 
+      const supportedCurrencies = new Set([
+        "rub", "uah", "kzt", "byn", "usd", "eur", "gbp", "cny", "try", "jpy", "brl",
+      ]);
+      const configuredCurrency = String(lztConfig?.currency || "BRL").toLowerCase();
+      const providerCurrency = supportedCurrencies.has(configuredCurrency)
+        ? configuredCurrency
+        : "brl";
+
       params.set("pmax", String(Math.round(effectivePmax)));
-      params.set("currency", "rub");
+      params.set("currency", providerCurrency);
       if (!params.has("page")) params.set("page", "1");
       if (!params.has("order_by")) params.set("order_by", "pdate_to_down");
 
@@ -582,6 +590,8 @@ Deno.serve(async (req) => {
         vbucks: first(item, ["vbucks", "v_bucks", "fortnite_vbucks"]),
         minecoins: first(item, ["minecoins", "minecraft_minecoins"]),
         capesCount: safeCount(first(item, ["capes", "cape_count", "capes_count"])),
+        providerPrice: first(item, ["price", "price_value", "item_price"]),
+        providerCurrency,
       }));
 
       const currentPage = Number(providerData?.currentPage ?? providerData?.current_page ?? 1) || 1;
