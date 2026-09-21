@@ -1,0 +1,151 @@
+.crz-club-page {
+  min-height: 100vh;
+  padding: 92px 0 44px;
+  background:
+    radial-gradient(circle at 50% -6%, rgba(0,100,255,.13), transparent 33%),
+    linear-gradient(180deg,#02070f,#02050a);
+}
+
+.crz-club-hero-card {
+  position:relative;
+  min-height:210px;
+  overflow:hidden;
+  border:1px solid rgba(55,137,255,.28);
+  border-radius:16px;
+  padding:24px;
+  background:
+    radial-gradient(circle at 80% 35%, rgba(0,120,255,.18), transparent 32%),
+    linear-gradient(135deg,rgba(7,17,33,.98),rgba(3,10,19,.99));
+  box-shadow:0 18px 42px rgba(0,0,0,.28),0 0 30px rgba(0,102,255,.09);
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:22px;
+}
+
+.crz-club-hero-card__glow {
+  position:absolute;
+  width:320px;
+  height:320px;
+  border-radius:50%;
+  right:-80px;
+  top:-120px;
+  background:rgba(0,110,255,.15);
+  filter:blur(28px);
+  pointer-events:none;
+}
+
+.crz-club-hero-card__copy { position:relative; z-index:1; max-width:760px; }
+.crz-club-hero-card__copy > span {
+  color:#23baff;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.13em;
+}
+.crz-club-hero-card__copy h2 {
+  margin:7px 0 8px;
+  color:#fff;
+  font-family:var(--crz-font-display);
+  font-size:clamp(22px,3vw,38px);
+}
+.crz-club-hero-card__copy p {
+  max-width:650px;
+  margin:0;
+  color:#8fa1b7;
+  font-size:10px;
+  line-height:1.6;
+}
+.crz-club-hero-card__mark {
+  position:relative;
+  z-index:1;
+  width:130px;
+  height:130px;
+  border:1px solid rgba(54,143,255,.28);
+  border-radius:28px;
+  display:grid;
+  place-items:center;
+  background:rgba(0,79,180,.12);
+  box-shadow:0 0 36px rgba(0,106,255,.16);
+}
+
+.crz-club-grid {
+  margin-top:16px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.crz-club-card {
+  position:relative;
+  min-height:150px;
+  border:1px solid rgba(75,128,201,.18);
+  border-radius:13px;
+  padding:16px;
+  overflow:hidden;
+  background:linear-gradient(180deg,rgba(7,15,27,.97),rgba(3,9,17,.99));
+  display:grid;
+  grid-template-columns:52px minmax(0,1fr) auto;
+  gap:13px;
+  align-items:center;
+  transition:180ms ease;
+}
+.crz-club-card:hover {
+  transform:translateY(-3px);
+  border-color:rgba(48,142,255,.5);
+  box-shadow:0 16px 36px rgba(0,0,0,.25),0 0 22px rgba(0,110,255,.12);
+}
+.crz-club-card__icon {
+  width:50px;
+  height:50px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  background:rgba(0,95,220,.12);
+  border:1px solid rgba(58,142,255,.2);
+}
+.crz-club-card small {
+  color:#5f9fe9;
+  font-size:7px;
+  font-weight:800;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+.crz-club-card h3 { margin:4px 0 4px; color:#edf5ff; font-size:14px; }
+.crz-club-card p { margin:0; color:#7f90a6; font-size:8px; line-height:1.45; }
+.crz-club-card__arrow { color:#8abfff; font-size:22px; }
+.crz-club-card--pink:hover { border-color:rgba(255,61,159,.48); box-shadow:0 16px 36px rgba(0,0,0,.25),0 0 22px rgba(255,47,155,.11); }
+.crz-club-card--gold:hover { border-color:rgba(255,195,61,.48); box-shadow:0 16px 36px rgba(0,0,0,.25),0 0 22px rgba(255,195,61,.11); }
+.crz-club-card--green:hover { border-color:rgba(24,229,154,.44); box-shadow:0 16px 36px rgba(0,0,0,.25),0 0 22px rgba(24,229,154,.10); }
+
+.crz-club-security {
+  margin-top:12px;
+  border:1px solid rgba(71,129,208,.17);
+  border-radius:11px;
+  padding:12px 14px;
+  background:rgba(5,14,25,.8);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.crz-club-security > div { display:grid; gap:2px; }
+.crz-club-security strong { color:#dceaff; font-size:10px; }
+.crz-club-security span { color:#75879d; font-size:8px; }
+
+html[data-theme="light"] .crz-club-page { background:#eef4fb; }
+html[data-theme="light"] .crz-club-hero-card,
+html[data-theme="light"] .crz-club-card,
+html[data-theme="light"] .crz-club-security {
+  background:rgba(255,255,255,.93);
+  border-color:rgba(31,92,174,.18);
+  box-shadow:0 14px 34px rgba(26,54,92,.08);
+}
+html[data-theme="light"] .crz-club-hero-card__copy h2,
+html[data-theme="light"] .crz-club-card h3,
+html[data-theme="light"] .crz-club-security strong { color:#102033; }
+html[data-theme="light"] .crz-club-card p,
+html[data-theme="light"] .crz-club-security span { color:#63758c; }
+
+@media (max-width:760px) {
+  .crz-club-grid { grid-template-columns:1fr; }
+  .crz-club-hero-card { grid-template-columns:1fr; }
+  .crz-club-hero-card__mark { display:none; }
+}
