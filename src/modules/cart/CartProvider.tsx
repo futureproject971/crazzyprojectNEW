@@ -26,6 +26,10 @@ type CartContextValue = {
   addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
   removeItem: (key: string) => void;
   setQuantity: (key: string, quantity: number) => void;
+  changePlan: (
+    key: string,
+    plan: Pick<CartItem, "planId" | "planCode" | "planName" | "durationLabel" | "price" | "priceLabel">
+  ) => void;
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
@@ -109,6 +113,32 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const changePlan = useCallback((
+    key: string,
+    plan: Pick<CartItem, "planId" | "planCode" | "planName" | "durationLabel" | "price" | "priceLabel">
+  ) => {
+    setItems((current) => {
+      const source = current.find((item) => item.key === key);
+      if (!source || source.kind !== "product") return current;
+
+      const nextKey = source.kind + ":" + source.productId + ":" + plan.planId;
+      const nextItem = { ...source, ...plan, key: nextKey };
+      const duplicate = current.find((item) => item.key === nextKey && item.key !== key);
+
+      if (duplicate) {
+        return current
+          .filter((item) => item.key !== key)
+          .map((item) =>
+            item.key === nextKey
+              ? { ...item, quantity: Math.min(MAX_QUANTITY, item.quantity + source.quantity) }
+              : item
+          );
+      }
+
+      return current.map((item) => item.key === key ? nextItem : item);
+    });
+  }, []);
+
   const clearCart = useCallback(() => {
     setItems([]);
     setCouponCodeState("");
@@ -131,6 +161,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       addItem,
       removeItem,
       setQuantity,
+      changePlan,
       clearCart,
       openCart: () => setDrawerOpen(true),
       closeCart: () => setDrawerOpen(false),
@@ -146,6 +177,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       addItem,
       removeItem,
       setQuantity,
+      changePlan,
       clearCart,
     ]
   );
