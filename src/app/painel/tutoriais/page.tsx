@@ -1,10 +1,10 @@
 import { AppShell } from "@/core/app-shell";
-import { ClientHubPage } from "@/modules/client-hub";
+import { AcademyPage } from "@/modules/academy";
 
 export default function ClientTutorialsRoute() {
   return (
     <AppShell mode="client">
-      <ClientHubPage initialTab="tutorials" />
+      <AcademyPage onlyUnlocked />
     </AppShell>
   );
 }
