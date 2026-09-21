@@ -169,4 +169,5 @@ as $$
 $$;
 
 revoke all on function public.get_my_coupons() from public;
+revoke execute on function public.get_my_coupons() from anon;
 grant execute on function public.get_my_coupons() to authenticated;
