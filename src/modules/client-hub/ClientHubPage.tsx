@@ -341,7 +341,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                         {!snapshot.discord.connected
                           ? "Conecte para sincronizar identidade e cargos."
                           : !snapshot.discord.guildConfigured
-                            ? "Servidor oficial ainda não configurado no backend."
+                            ? "Servidor oficial ainda não configurado."
                             : snapshot.discord.guildMember
                               ? "Membro do servidor oficial verificado."
                               : "Conta conectada, fora do servidor no último sync."}
