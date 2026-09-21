@@ -308,6 +308,9 @@ export function CartPage() {
                 <Button
                   size="lg"
                   disabled={checkoutBlocked}
+                  onClick={() => {
+                    if (!checkoutBlocked) window.location.assign("/checkout");
+                  }}
                   leadingIcon={<NeonIcon name="lightning" size={20} />}
                 >
                   {totals.hasUnpricedItems ? "Aguardando preços" : "Ir para checkout"}
