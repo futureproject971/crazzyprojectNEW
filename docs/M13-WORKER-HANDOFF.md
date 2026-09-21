@@ -279,3 +279,44 @@ Próximo passo exato:
 2. ações: snapshot/create/thread/message/close/reopen/upload-url/finalize-attachment;
 3. depois Next API proxies;
 4. depois UI /tickets.
+
+
+## CHECKPOINT — M13 IMPLEMENTADO
+
+Implementado e versionado:
+- schema Support compatível com skeleton pré-existente;
+- bucket privado support-attachments;
+- Edge Function `support` v1 ativa;
+- APIs Next:
+  - /api/support
+  - /api/support/[id]
+  - /api/support/[id]/messages
+  - /api/support/[id]/status
+  - /api/support/[id]/attachments/upload-url
+  - /api/support/attachments/[id]/finalize
+- UI:
+  - /tickets
+  - /tickets/novo
+  - /tickets/[id]
+- contexto opcional de entitlement/order/Library;
+- thread estilo chat;
+- polling seguro 6s quando aba visível;
+- anexos via signed upload URL;
+- preview privado de imagem/vídeo/áudio;
+- PDF/TXT por signed URL;
+- fechar/reabrir;
+- eventos de auditoria;
+- App Shell Support aponta para /tickets;
+- Security Advisor: 0 lints;
+- performance indexes M13 aplicados;
+- smoke M13 adicionado ao CI;
+- regras: docs/M13-SUPPORT-RULES.md.
+
+Próximo passo exato:
+1. rodar CI do head atual;
+2. corrigir qualquer erro TypeScript/build/smoke;
+3. atualizar checklist;
+4. PR M13;
+5. squash merge;
+6. validar phase-1-home pós-merge;
+7. iniciar M14 CRAZZY COMMUNITY.
