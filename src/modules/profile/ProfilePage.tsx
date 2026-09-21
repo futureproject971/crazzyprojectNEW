@@ -408,6 +408,31 @@ export function ProfilePage() {
                   ))}
                 </div>
 
+                {snapshot.rank && (
+                  <Panel
+                    className="crz-profile-rank"
+                    style={{ "--profile-rank-color": snapshot.rank.current.color } as CSSProperties}
+                  >
+                    <div className="crz-profile-rank__icon">
+                      <NeonIcon name="crown" size={28} />
+                    </div>
+                    <div className="crz-profile-rank__main">
+                      <small>CRAZZY RANK</small>
+                      <strong>{snapshot.rank.current.label}</strong>
+                      <span>{new Intl.NumberFormat("pt-BR").format(snapshot.rank.points)} XP</span>
+                      <div className="crz-profile-rank__track">
+                        <i style={{ width: Math.max(2, snapshot.rank.progressPercent) + "%" }} />
+                      </div>
+                      <em>
+                        {snapshot.rank.next
+                          ? new Intl.NumberFormat("pt-BR").format(snapshot.rank.next.pointsNeeded) + " XP para " + snapshot.rank.next.label
+                          : "Rank máximo alcançado"}
+                      </em>
+                    </div>
+                    <a href="/club/rank">Ver rank →</a>
+                  </Panel>
+                )}
+
                 <Panel className="crz-profile-panel">
                   <header>
                     <div>
