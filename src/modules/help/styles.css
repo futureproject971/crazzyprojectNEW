@@ -1,0 +1,241 @@
+.crz-help-page {
+  min-height:100vh;
+  padding:92px 0 46px;
+  background:
+    radial-gradient(circle at 50% -8%,rgba(0,105,255,.13),transparent 34%),
+    linear-gradient(180deg,#02070f,#02050a);
+}
+.crz-help-search-hero {
+  border:1px solid rgba(69,128,205,.2);
+  border-radius:15px;
+  padding:17px;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(0,112,255,.12),transparent 60%),
+    linear-gradient(180deg,#081421,#040a12);
+  box-shadow:0 16px 36px rgba(0,0,0,.22);
+}
+.crz-help-search-box {
+  min-height:56px;
+  border:1px solid rgba(59,148,255,.34);
+  border-radius:11px;
+  padding:0 13px;
+  background:#06101b;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  box-shadow:0 0 22px rgba(0,110,255,.08);
+}
+.crz-help-search-box input {
+  min-width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#ecf6ff;
+  font-size:10px;
+}
+.crz-help-search-box input::placeholder {color:#58708a}
+.crz-help-search-box button {
+  width:30px;height:30px;border:0;border-radius:7px;
+  color:#8094aa;background:#0b1725;cursor:pointer;font-size:15px
+}
+.crz-help-quick-search {
+  margin-top:10px;
+  display:grid;
+  gap:5px;
+}
+.crz-help-quick-search > span {
+  color:#617990;font-size:6.5px;font-weight:850;letter-spacing:.09em
+}
+.crz-help-quick-search > div {display:flex;gap:5px;flex-wrap:wrap}
+.crz-help-quick-search button {
+  min-height:27px;border:1px solid rgba(72,127,201,.17);border-radius:999px;padding:0 9px;
+  color:#7891a9;background:#07111c;font-size:6.5px;cursor:pointer
+}
+.crz-help-quick-search button:hover {color:#b9ddf7;border-color:rgba(42,146,255,.42)}
+
+.crz-help-state,.crz-help-empty {
+  margin-top:13px;
+  min-height:260px;
+  border:1px solid rgba(68,127,204,.18);
+  border-radius:13px;
+  background:rgba(6,14,25,.78);
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:8px;
+  text-align:center;
+}
+.crz-help-state strong,.crz-help-empty strong {color:#e8f3ff;font-size:12px}
+.crz-help-state p,.crz-help-empty p {max-width:480px;margin:0;color:#71859c;font-size:8px;line-height:1.5}
+
+.crz-help-overview {
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+.crz-help-overview > div {
+  min-height:75px;
+  border:1px solid rgba(70,127,202,.16);
+  border-radius:10px;
+  padding:10px;
+  background:rgba(6,14,25,.72);
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:1px;
+}
+.crz-help-overview small {color:#647a92;font-size:6.5px;font-weight:850}
+.crz-help-overview strong {color:#eaf5ff;font-size:19px;font-family:var(--crz-font-display)}
+.crz-help-overview span {color:#6d8198;font-size:6.5px}
+
+.crz-help-layout {
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);
+  gap:12px;
+  align-items:start;
+}
+.crz-help-faqs,.crz-help-tutorials {
+  border:1px solid rgba(68,127,204,.18);
+  border-radius:13px;
+  padding:14px;
+  background:linear-gradient(180deg,rgba(7,15,27,.97),rgba(3,9,17,.99));
+  box-shadow:0 14px 34px rgba(0,0,0,.18)
+}
+.crz-help-faqs > header {
+  display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:9px
+}
+.crz-help-faqs header > div,.crz-help-tutorials header {display:grid;gap:2px}
+.crz-help-faqs small,.crz-help-tutorials header small {color:#20adff;font-size:6.5px;font-weight:900;letter-spacing:.1em}
+.crz-help-faqs h2,.crz-help-tutorials h2 {margin:0;color:#edf5ff;font-size:16px}
+.crz-help-faqs > header > span {color:#62778f;font-size:6px}
+
+.crz-help-faq-list {display:grid;gap:5px}
+.crz-help-faq-list details {
+  border:1px solid rgba(71,126,198,.14);
+  border-radius:8px;
+  background:rgba(6,14,25,.7);
+  overflow:hidden;
+}
+.crz-help-faq-list summary {
+  min-height:48px;
+  padding:0 10px;
+  list-style:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  color:#dce8f6;
+  cursor:pointer;
+  font-size:8px;
+  font-weight:700
+}
+.crz-help-faq-list summary::-webkit-details-marker {display:none}
+.crz-help-faq-list summary b {
+  width:23px;height:23px;border:1px solid rgba(72,130,205,.17);border-radius:6px;
+  display:grid;place-items:center;color:#62baff;background:#091523;font-size:11px
+}
+.crz-help-faq-list details[open] summary b {transform:rotate(45deg)}
+.crz-help-faq-list details > div {
+  border-top:1px solid rgba(71,126,198,.11);
+  padding:9px 10px 11px;
+}
+.crz-help-faq-list details small {color:#5caeff;font-size:6px}
+.crz-help-faq-list details p {margin:4px 0 0;color:#8397ad;font-size:7.5px;line-height:1.55}
+
+.crz-help-tutorials {position:sticky;top:85px}
+.crz-help-tutorial-list {margin-top:9px;display:grid;gap:6px}
+.crz-help-tutorial-list > a {
+  min-height:82px;
+  border:1px solid rgba(70,126,199,.14);
+  border-radius:9px;
+  padding:7px;
+  background:#06101b;
+  display:grid;
+  grid-template-columns:62px minmax(0,1fr) auto;
+  gap:8px;
+  align-items:center
+}
+.crz-help-tutorial-list > a > div {
+  width:62px;height:62px;border-radius:8px;overflow:hidden;
+  display:grid;place-items:center;color:#5cb9ff;background:#0a1726
+}
+.crz-help-tutorial-list img {width:100%;height:100%;object-fit:cover}
+.crz-help-tutorial-list > a > span {min-width:0;display:grid;gap:2px}
+.crz-help-tutorial-list small {color:#5daeff;font-size:5.8px}
+.crz-help-tutorial-list strong {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#dce9f6;font-size:8px}
+.crz-help-tutorial-list p {margin:0;color:#687e95;font-size:6.3px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.crz-help-tutorial-list em {color:#62768d;font-size:5.8px;font-style:normal}
+.crz-help-tutorials > .crz-button {width:100%;margin-top:10px}
+.crz-help-tutorials__empty {
+  min-height:170px;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:7px;
+  color:#71849a;
+  text-align:center;
+  font-size:7px
+}
+.crz-help-support {
+  margin-top:12px;
+  min-height:84px;
+  border:1px solid rgba(68,127,204,.18);
+  border-radius:11px;
+  padding:11px 13px;
+  background:rgba(6,14,25,.78);
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center
+}
+.crz-help-support > div {display:grid;gap:2px}
+.crz-help-support strong {color:#e4effb;font-size:8.5px}
+.crz-help-support span {color:#6f8299;font-size:7px}
+.crz-help-preview-state {
+  min-height:100px;
+  border:1px dashed rgba(71,127,199,.18);
+  border-radius:8px;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:4px;
+  color:#71859b;
+  font-size:7px;
+  text-align:center
+}
+.crz-help-preview-state a {color:#5ebaff}
+
+html[data-theme="light"] .crz-help-page {background:#eef4fb}
+html[data-theme="light"] .crz-help-search-hero,
+html[data-theme="light"] .crz-help-faqs,
+html[data-theme="light"] .crz-help-tutorials,
+html[data-theme="light"] .crz-help-state,
+html[data-theme="light"] .crz-help-empty,
+html[data-theme="light"] .crz-help-support {
+  background:rgba(255,255,255,.95);
+  border-color:rgba(31,91,170,.16);
+  box-shadow:0 14px 34px rgba(25,55,95,.07)
+}
+html[data-theme="light"] .crz-help-faqs h2,
+html[data-theme="light"] .crz-help-tutorials h2,
+html[data-theme="light"] .crz-help-overview strong,
+html[data-theme="light"] .crz-help-faq-list summary,
+html[data-theme="light"] .crz-help-tutorial-list strong,
+html[data-theme="light"] .crz-help-support strong {color:#102033}
+html[data-theme="light"] .crz-help-faq-list details,
+html[data-theme="light"] .crz-help-tutorial-list > a,
+html[data-theme="light"] .crz-help-overview > div {background:#f7fbff}
+html[data-theme="light"] .crz-help-search-box {background:#fff}
+
+@media(max-width:900px){
+  .crz-help-layout {grid-template-columns:1fr}
+  .crz-help-tutorials {position:static}
+}
+@media(max-width:600px){
+  .crz-help-overview {grid-template-columns:1fr}
+  .crz-help-support {grid-template-columns:auto 1fr}
+  .crz-help-support > a {grid-column:2;justify-self:start}
+}
