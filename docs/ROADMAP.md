@@ -590,6 +590,10 @@ Entitlement do site continua sendo a fonte de direito de acesso.
 ### M45 — CRAZZY TUTORIAL STUDIO
 Admin editor de tutoriais.
 
+Fonte parcial:
+Pink já possui tutorial por produto, texto, arquivo, upload de mídia e `sort_order`.
+Essas peças podem ser estudadas/migradas, mas o editor em blocos será uma evolução CRAZZY PROJECT.
+
 Rota:
 `/admin/tutorials`
 
