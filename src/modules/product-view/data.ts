@@ -1,13 +1,29 @@
 import { catalogProducts, type CatalogProduct } from "@/modules/catalog";
 
+export type ProductPlanCode = "1d" | "3d" | "7d" | "15d" | "30d" | "90d" | "lifetime" | "single" | "custom";
+
 export type ProductPlan = {
   id: string;
+  code: ProductPlanCode;
   name: string;
   duration: string;
   note: string;
+  price: number | null;
   priceLabel: string;
   featured?: boolean;
+  stockCount?: number | null;
+  showWhenOutOfStock?: boolean;
 };
+
+export const CRAZZY_STANDARD_PLAN_TEMPLATES = [
+  { code: "1d" as const, name: "Diário", duration: "1 dia", note: "Acesso por 24 horas." },
+  { code: "3d" as const, name: "3 Dias", duration: "3 dias", note: "Acesso por 3 dias." },
+  { code: "7d" as const, name: "7 Dias", duration: "7 dias", note: "Acesso por 7 dias." },
+  { code: "15d" as const, name: "15 Dias", duration: "15 dias", note: "Acesso por 15 dias." },
+  { code: "30d" as const, name: "Mensal", duration: "30 dias", note: "Elegível ao Combo Mensal.", featured: true },
+  { code: "90d" as const, name: "90 Dias", duration: "90 dias", note: "Acesso por 90 dias." },
+  { code: "lifetime" as const, name: "Lifetime", duration: "Vitalício", note: "Elegível ao Combo Lifetime." },
+];
 
 export type ProductReview = {
   id: string;
@@ -118,28 +134,43 @@ function categoryCopy(product: CatalogProduct) {
   };
 }
 
+function planIsCustomerVisible(plan: ProductPlan) {
+  if (plan.stockCount == null) return true;
+  if (plan.stockCount > 0) return true;
+  return plan.showWhenOutOfStock === true;
+}
+
 function defaultPlans(product: CatalogProduct): ProductPlan[] {
   if (product.category === "services") {
     return [
-      { id: "basic", name: "Base", duration: "Escopo inicial", note: "Para demandas objetivas e de menor complexidade.", priceLabel: "Consultar" },
-      { id: "plus", name: "Plus", duration: "Escopo ampliado", note: "Mais etapas e personalização.", priceLabel: "Consultar", featured: true },
-      { id: "custom", name: "Custom", duration: "Sob medida", note: "Briefing e orçamento personalizados.", priceLabel: "Consultar" },
+      { id: "basic", code: "custom", name: "Base", duration: "Escopo inicial", note: "Para demandas objetivas e de menor complexidade.", price: null, priceLabel: "Consultar" },
+      { id: "plus", code: "custom", name: "Plus", duration: "Escopo ampliado", note: "Mais etapas e personalização.", price: null, priceLabel: "Consultar", featured: true },
+      { id: "custom", code: "custom", name: "Custom", duration: "Sob medida", note: "Briefing e orçamento personalizados.", price: null, priceLabel: "Consultar" },
     ];
   }
 
   if (product.category === "accounts") {
     return [
-      { id: "standard", name: "Standard", duration: "Entrega única", note: "Opção de entrada para este produto.", priceLabel: "Consultar" },
-      { id: "premium", name: "Premium", duration: "Entrega única", note: "Versão destacada conforme disponibilidade.", priceLabel: "Consultar", featured: true },
-      { id: "bundle", name: "Bundle", duration: "Pacote", note: "Combinação de benefícios quando disponível.", priceLabel: "Consultar" },
+      { id: "single", code: "single", name: "Conta", duration: "Entrega única", note: "Conta individual conforme anúncio e disponibilidade.", price: null, priceLabel: "Consultar", featured: true },
     ];
   }
 
-  return [
-    { id: "daily", name: "24 Horas", duration: "1 dia", note: "Ideal para testar a experiência.", priceLabel: "Consultar" },
-    { id: "weekly", name: "7 Dias", duration: "1 semana", note: "Equilíbrio entre tempo e flexibilidade.", priceLabel: "Consultar", featured: true },
-    { id: "monthly", name: "30 Dias", duration: "1 mês", note: "Maior período de acesso.", priceLabel: "Consultar" },
-  ];
+  return CRAZZY_STANDARD_PLAN_TEMPLATES.map((template) => ({
+    id: product.id + "-" + template.code,
+    code: template.code,
+    name: template.name,
+    duration: template.duration,
+    note: template.note,
+    price: null,
+    priceLabel: "Consultar",
+    featured: "featured" in template ? template.featured : false,
+    // Quando o backend estiver conectado:
+    // stockCount 0 = oculto por padrão;
+    // showWhenOutOfStock true = exibe como esgotado;
+    // stockCount > 0 = plano vendável.
+    stockCount: null,
+    showWhenOutOfStock: false,
+  })).filter(planIsCustomerVisible);
 }
 
 function galleryFor(product: CatalogProduct): ProductGalleryItem[] {
