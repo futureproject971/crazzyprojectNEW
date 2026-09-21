@@ -547,6 +547,8 @@ Deno.serve(async (req) => {
         dungeons: first(["minecraft_dungeons", "dungeons"]),
         legends: first(["minecraft_legends", "legends"]),
         skinIds: safeStringList(item?.valorantInventory?.WeaponSkins),
+        agentIds: safeStringList(item?.valorantInventory?.Agent),
+        buddyIds: safeStringList(item?.valorantInventory?.Buddy),
       };
 
       return new Response(JSON.stringify({ item: safeItem }), {
@@ -838,6 +840,8 @@ Deno.serve(async (req) => {
         dungeons: first(item, ["minecraft_dungeons", "dungeons"]),
         legends: first(item, ["minecraft_legends", "legends"]),
         skinIds: safeStringList(item?.valorantInventory?.WeaponSkins),
+        agentIds: safeStringList(item?.valorantInventory?.Agent),
+        buddyIds: safeStringList(item?.valorantInventory?.Buddy),
         price: (() => {
           const base = Number(first(item, ["price", "price_value", "item_price"]) || 0);
           const game = url.searchParams.get("game") || "";
