@@ -19,6 +19,7 @@
 @import "../modules/club/styles.css";
 @import "../modules/rewards/styles.css";
 @import "../modules/luck/styles.css";
+@import "../modules/interactive-demo/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
