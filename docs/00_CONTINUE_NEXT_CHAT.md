@@ -20,15 +20,13 @@ Este arquivo existe para retomar o projeto imediatamente em uma nova conversa/Wo
 - M04 CRAZZY CATALOG
 
 ### M05 CRAZZY PRODUCT VIEW
-- tecnicamente concluído
-- branch: m05-product-view
-- PR #6 aberto
+- INTEGRADO
+- PR #6 mergeado em 2026-09-21
 - QA: typecheck PASS / build PASS / GitHub Actions PASS
-- ainda NÃO mergeado porque a conversa desviou para auditoria/arquitetura
 
 ### Arquitetura V2
-- branch: architecture-v2-integrations
-- PR #7 aberto
+- INTEGRADA
+- PR #7 mergeado em 2026-09-21
 - inclui atualização completa para:
   - PurinCash
   - Discord Bridge
@@ -237,53 +235,18 @@ Na branch architecture-v2-integrations:
 - docs/DECISIONS-BEFORE-M06.md
 - docs/CHECKLIST-MASTER.md
 
-## PERGUNTAS PENDENTES DO USUÁRIO
+## DECISÕES D01-D10 APROVADAS
 
-Antes do backend definitivo fechar:
-
-1. Keys:
-   - interno Supabase?
-   - PurinCash supplier?
-   - híbrido?
-   Recomendação: híbrido, internal_stock como padrão.
-
-2. Nome das roles:
-   - "Cliente • PRODUTO • emoji"
-   - ou "emoji | PRODUTO"
-   Recomendação: "emoji | PRODUTO".
-
-3. Plano expirou:
-   - remover cargo Discord?
-   Recomendação: sim.
-
-4. Tutorial depois da expiração:
-   - perde acesso ou mantém?
-   Recomendação atual: manter tutorial, produto/licença expira.
-
-5. Refund/chargeback:
-   Recomendação:
-   - revogar entitlement
-   - remover cargo
-   - bloquear novos downloads protegidos
-   - manter histórico/logs
-
-6. Discord bot:
-   - reaproveitar bot CRAZZY atual?
-   - ou bot separado?
-   Recomendação: reaproveitar se código estiver saudável, mantendo serviço de sync isolado.
-
-7. MT Sounds:
-   - ainda falta source/repo.
-
-8. Vídeo em tutorial:
-   - upload direto?
-   - YouTube/link?
-   Recomendação: ambos.
-
-9. Security Sentinel:
-   - qual canal Discord recebe alertas?
-   - qual cargo pode ser mencionado em CRITICAL?
-   Recomendação: canal privado #security-logs e mencionar somente cargo de segurança/admin em CRITICAL.
+- D01: keys híbridas; internal_stock padrão.
+- D02: roles Discord no formato `emoji | PRODUTO`.
+- D03: cargo expira; histórico/key entregue permanece; tutorial permanece após expiração normal.
+- D04: reaproveitar bot CRAZZY se saudável, com sync isolado.
+- D05: PurinCash é gateway; CRAZZY é fonte de verdade.
+- D06: tutorial por produto/plano; vídeo por upload + link/embed; mantém acesso após expiração normal.
+- D07: MT Sounds será portado para Next.js; source/repo continua dependência futura do M46.
+- D08: refund/dispute revoga entitlement/cargo/novos acessos e mantém logs/evidências.
+- D09: cor do nick = maior role visível.
+- D10: canal padrão `#security-logs`; CRITICAL pode pingar somente role admin/security configurada.
 
 ## REGRA DO USUÁRIO SOBRE MIGRAÇÃO
 
@@ -296,23 +259,22 @@ Sempre que houver dúvida entre criar do zero ou migrar:
 Pensar assim:
 "os sites antigos vendiam a mesma coisa; se o recurso era útil antes, auditar antes de descartar."
 
-## PRs ABERTOS
+## PRs MERGEADOS
 
-- PR #6 — M05 CRAZZY PRODUCT VIEW
-- PR #7 — Architecture V2 — PurinCash, Discord, Tutorials, Fulfillment & MT Sounds
+- PR #6 — M05 CRAZZY PRODUCT VIEW — MERGEADO
+- PR #7 — Architecture V2 — MERGEADO
 
 ## PRÓXIMO PASSO CORRETO
 
-NÃO começar M06 imediatamente.
+M06 está LIBERADO.
 
-Primeiro:
-1. ler este arquivo e docs da Architecture V2
-2. confirmar estado dos PRs #6 e #7
-3. fechar as perguntas pendentes com o usuário
-4. obter source/repo MT Sounds quando possível
-5. após aprovação, mergear M05 e Architecture V2 na ordem segura
-6. criar branch m06-accounts-market
-7. migrar Fortune/LZT para CRAZZY PROJECT sem recriar do zero
+1. criar branch `m06-accounts-market` a partir de `phase-1-home`
+2. localizar/auditar a fonte FortuneECrazzy/LZT já existente
+3. migrar listagem, filtros, markup e detalhes
+4. adaptar para Next.js/App Router e CRAZZY DESIGN SYSTEM
+5. não recriar LZT do zero
+6. não misturar M06 com checkout/PurinCash
+7. manter source/repo MT Sounds como dependência separada do M46
 
 ## PROMPT CURTO PARA NOVA CONVERSA
 
@@ -346,5 +308,9 @@ Regras:
 - Discord offline não bloqueia o sistema;
 - painel de auditoria admin.
 
-Decisão pendente D10:
-definir canal Discord de segurança e cargo a mencionar em CRITICAL.
+D10 aprovado:
+- canal padrão privado: #security-logs;
+- INFO/WARN sem ping;
+- HIGH normalmente sem ping;
+- CRITICAL pode mencionar somente role admin/security configurada;
+- cooldown/agregação/deduplicação obrigatórios.
