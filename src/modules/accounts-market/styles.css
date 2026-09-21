@@ -2167,3 +2167,21 @@
     padding-top: 78px;
   }
 }
+
+
+.crz-account-game-logo {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  color: currentColor;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.crz-accounts-games button:hover .crz-account-game-logo,
+.crz-accounts-games button.is-active .crz-account-game-logo {
+  transform: scale(1.06);
+}
+
+.crz-accounts-games button .crz-account-game-logo {
+  transition: transform 160ms ease, filter 160ms ease;
+}
