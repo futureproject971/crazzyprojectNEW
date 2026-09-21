@@ -308,3 +308,50 @@ D10 aprovado:
 - HIGH normalmente sem ping;
 - CRITICAL pode mencionar somente role admin/security configurada;
 - cooldown/agregação/deduplicação obrigatórios.
+
+
+---
+
+## M07 — CRAZZY CART
+
+### M07 CRAZZY CART
+- branch: `m07-cart`
+- status: CONCLUÍDO tecnicamente
+- rotas:
+  - `/carrinho`
+  - `/combo`
+- carrinho global persistente em localStorage
+- quick cart via Drawer
+- badge real no App Shell
+- produto + plano + quantidade
+- conta LZT pode ser preservada no carrinho sem inventar preço
+- alteração de plano dentro do carrinho
+- cupom salvo para validação server-side no M08
+- checkout bloqueado se preço autoritativo não existir
+- planos padrão CRAZZY:
+  - 1 dia
+  - 3 dias
+  - 7 dias
+  - 15 dias
+  - 30 dias / Mensal
+  - 90 dias
+  - Lifetime
+- produto é cadastrado uma vez; variações usam códigos fixos do sistema
+- stock 0: oculto por padrão
+- override futuro: mostrar como esgotado
+- Combo Mensal e Combo Lifetime:
+  - 2 produtos diferentes = 10%
+  - 3 = 15%
+  - 4 = 20%
+  - 5 = 25%
+  - 6 = 30%
+  - 7+ = 35% teto
+- quantidade repetida não sobe faixa
+- Mensal/Lifetime são calculados separadamente
+- cupom + combo não acumulam; M08 deve usar o benefício válido mais vantajoso
+- política central: `src/core/commerce/policy.ts`
+- regras documentadas: `docs/M07-CART-COMBO-RULES.md`
+- QA: typecheck PASS / build PASS / GitHub Actions PASS
+
+### Próximo módulo
+M08 — CRAZZY CHECKOUT.
