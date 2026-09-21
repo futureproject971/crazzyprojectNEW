@@ -37,8 +37,6 @@ export type HubTutorial = {
   entitlementId: string;
   productName: string;
   productImage: string | null;
-  tutorialText: string | null;
-  tutorialFileUrl: string | null;
   entitlementStatus: string;
   expiresAt: string | null;
 };
