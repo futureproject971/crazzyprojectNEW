@@ -12,6 +12,7 @@
 @import "../modules/auth/styles.css";
 @import "../modules/client-hub/styles.css";
 @import "../modules/library/styles.css";
+@import "../modules/profile/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
