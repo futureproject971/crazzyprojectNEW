@@ -1,6 +1,7 @@
+import { CRAZZY_STANDARD_PLANS, type StandardPlanCode } from "@/core/commerce/policy";
 import { catalogProducts, type CatalogProduct } from "@/modules/catalog";
 
-export type ProductPlanCode = "1d" | "3d" | "7d" | "15d" | "30d" | "90d" | "lifetime" | "single" | "custom";
+export type ProductPlanCode = StandardPlanCode | "single" | "custom";
 
 export type ProductPlan = {
   id: string;
@@ -155,7 +156,7 @@ function defaultPlans(product: CatalogProduct): ProductPlan[] {
     ];
   }
 
-  return CRAZZY_STANDARD_PLAN_TEMPLATES.map((template) => ({
+  return CRAZZY_STANDARD_PLANS.map((template) => ({
     id: product.id + "-" + template.code,
     code: template.code,
     name: template.name,
