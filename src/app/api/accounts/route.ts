@@ -38,6 +38,8 @@ export async function GET(request: NextRequest) {
   copyIfPresent(incoming, params, "page", "page");
   copyIfPresent(incoming, params, "query", "title");
   copyIfPresent(incoming, params, "orderBy", "order_by");
+  copyIfPresent(incoming, params, "priceMin", "pmin");
+  copyIfPresent(incoming, params, "priceMax", "pmax");
 
   if (game === "valorant") {
     copyIfPresent(incoming, params, "rankMin", "rmin");
@@ -46,6 +48,11 @@ export async function GET(request: NextRequest) {
     copyIfPresent(incoming, params, "levelMax", "valorant_level_max");
     copyIfPresent(incoming, params, "skinsMin", "valorant_smin");
     copyIfPresent(incoming, params, "knivesMin", "valorant_knife_min");
+    copyIfPresent(incoming, params, "inventoryMin", "inv_min");
+    copyIfPresent(incoming, params, "inventoryMax", "inv_max");
+    if (incoming.get("onlyKnife") === "true") params.set("knife", "true");
+    const weapon = incoming.get("weapon");
+    if (weapon && weapon !== "todos" && !params.has("title")) params.set("title", weapon);
     const region = incoming.get("region");
     if (region?.trim()) params.append("valorant_region[]", region.trim());
   }
