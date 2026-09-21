@@ -47,6 +47,6 @@
 - [x] M02/M03/M04 preservados
 
 ## QA técnico
-- [ ] TypeScript / typecheck PASS no HEAD final
-- [ ] Next.js build PASS no HEAD final
-- [ ] GitHub Actions PASS no HEAD final
+- [x] TypeScript / typecheck PASS no HEAD final
+- [x] Next.js build PASS no HEAD final
+- [x] GitHub Actions PASS no HEAD final
