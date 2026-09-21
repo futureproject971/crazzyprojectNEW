@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Drawer, Dropdown, LineIcon } from "@/core/design-system";
+import { useAuth } from "@/modules/auth/AuthProvider";
 import { useCart } from "@/modules/cart/CartProvider";
 import { getNavigation } from "./navigation";
 import type { ShellMode, ShellNavItem } from "./types";
@@ -59,26 +60,9 @@ function NavLinks({
   );
 }
 
-const clientAccountItems = [
-  "Painel do Cliente",
-  "Minhas Compras",
-  "Meus Tickets",
-  "CRAZZY CLUB",
-  "Meus Cupons",
-  "Tutorial",
-  "Meu Perfil",
-  "Notificações",
-  "Sair",
-];
-
-const adminAccountItems = [
-  "Dashboard",
-  "Produtos",
-  "Pedidos",
-  "Usuários",
-  "Configurações",
-  "Sair",
-];
+function go(path: string) {
+  window.location.assign(path);
+}
 
 export function AppHeader({
   mode = "visitor",
@@ -93,13 +77,46 @@ export function AppHeader({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalQuantity, hydrated } = useCart();
+  const {
+    user,
+    loading: authLoading,
+    signIn,
+    signOut,
+    discordEnabled,
+    googleEnabled,
+  } = useAuth();
+
   const cartCount = hydrated ? totalQuantity : fallbackCartCount;
-  const items = getNavigation(mode);
-  const accountItems = (mode === "admin" ? adminAccountItems : clientAccountItems).map((label, index, all) => ({
-    id: `${mode}-account-${index}`,
-    label,
-    danger: index === all.length - 1,
-  }));
+  const effectiveMode: ShellMode = user
+    ? user.role === "admin"
+      ? "admin"
+      : "client"
+    : mode === "admin"
+      ? "visitor"
+      : mode;
+  const items = getNavigation(effectiveMode);
+  const displayName = user?.username || userName;
+
+  const accountItems =
+    effectiveMode === "admin"
+      ? [
+          { id: "admin-dashboard", label: "Dashboard", onSelect: () => go("/admin") },
+          { id: "admin-products", label: "Produtos", onSelect: () => go("/admin/produtos") },
+          { id: "admin-orders", label: "Pedidos", onSelect: () => go("/admin/pedidos") },
+          { id: "admin-users", label: "Usuários", onSelect: () => go("/admin/usuarios") },
+          { id: "admin-settings", label: "Configurações", onSelect: () => go("/admin/configuracoes") },
+          { id: "admin-signout", label: "Sair", danger: true, onSelect: () => void signOut() },
+        ]
+      : [
+          { id: "client-dashboard", label: "Painel do Cliente", onSelect: () => go("/painel") },
+          { id: "client-orders", label: "Minhas Compras", onSelect: () => go("/painel/pedidos") },
+          { id: "client-tickets", label: "Meus Tickets", onSelect: () => go("/tickets") },
+          { id: "client-club", label: "CRAZZY CLUB", onSelect: () => go("/club") },
+          { id: "client-coupons", label: "Meus Cupons", onSelect: () => go("/painel/cupons") },
+          { id: "client-tutorial", label: "Tutorial", onSelect: () => go("/academy") },
+          { id: "client-profile", label: "Meu Perfil", onSelect: () => go("/perfil") },
+          { id: "client-signout", label: "Sair", danger: true, onSelect: () => void signOut() },
+        ];
 
   return (
     <>
@@ -111,7 +128,7 @@ export function AppHeader({
 
           <NavLinks items={items} activeNav={activeNav} cartCount={cartCount} />
 
-          {mode !== "visitor" && (
+          {effectiveMode !== "visitor" && (
             <button type="button" className="crz-shell-search" aria-label="Pesquisar">
               <ShellIcon src="/icons/search.svg" />
             </button>
@@ -119,28 +136,46 @@ export function AppHeader({
         </div>
 
         <div className="crz-shell-header__account" aria-label="Conta e acesso">
-          {mode === "visitor" ? (
+          {!user ? (
             <>
-              <button type="button" className="crz-shell-auth crz-shell-auth--compact">
+              <a href="/login" className="crz-shell-auth crz-shell-auth--compact">
                 <LineIcon name="user" size={14} />
-                <span>Login</span>
-              </button>
-              <button type="button" className="crz-shell-auth">
-                <img src="/icons/brand-google.svg" alt="" aria-hidden="true" />
-                <span>Login com Google</span>
-              </button>
-              <button type="button" className="crz-shell-auth">
-                <img src="/icons/brand-discord.svg" alt="" aria-hidden="true" />
-                <span>Login com Discord</span>
-              </button>
+                <span>{authLoading ? "Verificando..." : "Login"}</span>
+              </a>
+
+              {googleEnabled && (
+                <button
+                  type="button"
+                  className="crz-shell-auth"
+                  disabled={authLoading}
+                  onClick={() => void signIn("google", window.location.pathname)}
+                >
+                  <img src="/icons/brand-google.svg" alt="" aria-hidden="true" />
+                  <span>Login com Google</span>
+                </button>
+              )}
+
+              {discordEnabled && (
+                <button
+                  type="button"
+                  className="crz-shell-auth"
+                  disabled={authLoading}
+                  onClick={() => void signIn("discord", window.location.pathname)}
+                >
+                  <img src="/icons/brand-discord.svg" alt="" aria-hidden="true" />
+                  <span>Login com Discord</span>
+                </button>
+              )}
             </>
           ) : (
             <Dropdown
               items={accountItems}
               trigger={
                 <span className="crz-shell-user">
-                  <span className="crz-shell-user__avatar" aria-hidden="true" />
-                  <span>{userName}</span>
+                  <span className="crz-shell-user__avatar" aria-hidden="true">
+                    {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : null}
+                  </span>
+                  <span>{displayName}</span>
                   <LineIcon name="user" size={14} />
                 </span>
               }
@@ -174,13 +209,34 @@ export function AppHeader({
           />
 
           <div className="crz-shell-mobile__account">
-            {mode === "visitor" ? (
+            {!user ? (
               <>
-                <button type="button" className="crz-button crz-button--primary crz-button--md">Entrar</button>
-                <button type="button" className="crz-button crz-button--secondary crz-button--md">Discord</button>
+                <a className="crz-button crz-button--primary crz-button--md" href="/login">
+                  Entrar
+                </a>
+                {discordEnabled && (
+                  <button
+                    type="button"
+                    className="crz-button crz-button--secondary crz-button--md"
+                    onClick={() => void signIn("discord", window.location.pathname)}
+                  >
+                    Discord
+                  </button>
+                )}
               </>
             ) : (
-              <button type="button" className="crz-button crz-button--secondary crz-button--md">{userName}</button>
+              <>
+                <a className="crz-button crz-button--secondary crz-button--md" href="/painel">
+                  {displayName}
+                </a>
+                <button
+                  type="button"
+                  className="crz-button crz-button--ghost crz-button--md"
+                  onClick={() => void signOut()}
+                >
+                  Sair
+                </button>
+              </>
             )}
           </div>
         </div>
