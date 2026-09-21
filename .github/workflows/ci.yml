@@ -75,3 +75,7 @@ jobs:
       - name: Test M18 Luck security
         if: github.ref_name == 'm18-luck'
         run: node scripts/test-m18-luck.mjs
+
+      - name: Test M19 Coupons security
+        if: github.ref_name == 'm19-coupons-clean'
+        run: node scripts/test-m19-coupons.mjs
