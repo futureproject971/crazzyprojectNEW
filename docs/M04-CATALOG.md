@@ -50,5 +50,16 @@ Mock data separado no módulo.
 M00, M01, M02 e M03 são considerados módulos anteriores e não devem ser redesenhados.
 Integrações devem ser mínimas.
 
+## QA técnico
+- TypeScript / typecheck: PASS
+- Next.js build: PASS
+- GitHub Actions: PASS
+
 ## Status
-EM IMPLEMENTAÇÃO / QA.
+**CONCLUÍDO TECNICAMENTE / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+
+## Próximo módulo após aprovação
+**M05 — CRAZZY PRODUCT VIEW**
+
+Rota:
+`/produto/[slug]`
