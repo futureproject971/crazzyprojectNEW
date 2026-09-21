@@ -221,6 +221,11 @@ function publicAccountFacts(item: any, game: string): PublicFact[] {
     addFact(facts, item, "lol_champion_count", "Campeões", ["riot_lol_champion_count", "lol_champion_count"], "Inventário", number);
     addFact(facts, item, "lol_blue_essence", "Essência Azul", ["riot_lol_wallet_blue", "lol_wallet_blue"], "Inventário", number);
     addFact(facts, item, "lol_orange_essence", "Essência Laranja", ["riot_lol_wallet_orange", "lol_wallet_orange"], "Inventário", number);
+    addFact(facts, item, "lol_mythic_essence", "Essência Mítica", ["riot_lol_wallet_mythic", "lol_wallet_mythic"], "Inventário", number);
+    addFact(facts, item, "riot_points", "Riot Points", ["riot_lol_wallet_riot", "lol_wallet_riot"], "Inventário", number);
+    addFact(facts, item, "linked_email", "E-mail vinculado", ["email"], "Acesso");
+    addFact(facts, item, "linked_mobile", "Celular vinculado", ["tel"], "Acesso");
+    addFact(facts, item, "valorant_free_agents", "Agentes gratuitos disponíveis", ["riot_valorant_free_agents", "valorant_free_agents"], "Inventário", number);
     addFact(facts, item, "lol_win_rate", "Win rate ranqueada", ["riot_lol_rank_win_rate", "lol_rank_win_rate"], "Jogo", (value) => {
       const parsed = Number(value);
       return Number.isFinite(parsed) ? parsed.toLocaleString("pt-BR", { maximumFractionDigits: 2 }) + "%" : value;
@@ -254,6 +259,10 @@ function publicAccountFacts(item: any, game: string): PublicFact[] {
     addFact(facts, item, "minecraft_dungeons", "Minecraft Dungeons", ["minecraft_dungeons", "dungeons"], "Jogo");
     addFact(facts, item, "minecraft_legends", "Minecraft Legends", ["minecraft_legends", "legends"], "Jogo");
     addFact(facts, item, "change_nickname", "Pode alterar nickname", ["change_nickname"], "Acesso");
+    addFact(facts, item, "subscription", "Assinatura", ["subscription"], "Acesso");
+    addFact(facts, item, "subscription_length", "Duração da assinatura", ["subscription_length"], "Acesso", number);
+    addFact(facts, item, "subscription_period", "Unidade da assinatura", ["subscription_period"], "Acesso");
+    addFact(facts, item, "autorenewal", "Renovação automática", ["autorenewal"], "Acesso");
     addFact(facts, item, "hypixel_rank", "Rank Hypixel", ["minecraft_hypixel_rank", "rank_hypixel"], "Jogo");
     addFact(facts, item, "hypixel_level", "Nível Hypixel", ["minecraft_hypixel_level", "level_hypixel"], "Jogo", number);
     addFact(facts, item, "hypixel_achievement", "Achievement Hypixel", ["achievement_hypixel"], "Jogo", number);
@@ -265,6 +274,43 @@ function publicAccountFacts(item: any, game: string): PublicFact[] {
     addFact(facts, item, "minecoins", "Minecoins", ["minecraft_minecoins", "minecoins"], "Inventário", number);
     addFact(facts, item, "last_login_hypixel", "Tempo desde último login Hypixel", ["last_login_hypixel", "minecraft_last_login_hypixel"], "Atividade", number);
     addFact(facts, item, "last_login_hypixel_period", "Unidade do último login Hypixel", ["last_login_hypixel_period", "minecraft_last_login_hypixel_period"], "Atividade");
+  }
+
+  const existing = new Set(facts.map((fact) => fact.key));
+  const sensitive = /(password|passwd|pass_|token|secret|cookie|authorization|credential|seller|owner|provider|source|origin|market|raw|login_data|email_address|email_login|email_password|user_id|buyer|purchase)/i;
+  const allowedPrefix =
+    game === "valorant" || game === "lol"
+      ? /^(riot_|valorant_|lol_)/
+      : game === "fortnite"
+        ? /^fortnite_/
+        : game === "minecraft"
+          ? /^minecraft_/
+          : /^$/;
+
+  for (const [key, raw] of Object.entries(item || {})) {
+    if (!allowedPrefix.test(key) || sensitive.test(key) || existing.has(key)) continue;
+    const value = displayScalar(raw);
+    if (value === null) continue;
+
+    const label = key
+      .replace(/^(riot_|valorant_|lol_|fortnite_|minecraft_)/, "")
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+    facts.push({
+      key,
+      label,
+      value,
+      group: /wallet|balance|skin|knife|agent|champion|cape|coin|inventory|pickaxe|dance|glider/i.test(key)
+        ? "Inventário"
+        : /ban|guarantee|risk/i.test(key)
+          ? "Segurança"
+          : /daybreak|last_|reg_|date/i.test(key)
+            ? "Atividade"
+            : "Jogo",
+    });
+
+    if (facts.length >= 80) break;
   }
 
   return facts.slice(0, 80);
