@@ -70,9 +70,10 @@ export async function GET() {
       .order("created_at", { ascending: false })
       .limit(30),
     supabase
-      .from("reward_deliveries")
-      .select("id,delivery_mode,delivered_at,expires_at")
+      .from("library_deliveries")
+      .select("id,metadata,delivered_at,expires_at")
       .eq("user_id", user.id)
+      .eq("delivery_type", "reward")
       .order("delivered_at", { ascending: false })
       .limit(20),
   ]);
@@ -189,7 +190,7 @@ export async function GET() {
     })),
     rewardDeliveries: (rewardDeliveriesResult.data || []).map((row) => ({
       id: row.id,
-      mode: row.delivery_mode,
+      mode: String(row.metadata?.delivery_mode || "reward"),
       deliveredAt: row.delivered_at,
       expiresAt: row.expires_at,
     })),

@@ -472,14 +472,14 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                   <small>FULFILLMENT</small>
                   <h2>Entregas</h2>
                 </div>
-                <span>Library entra no M11</span>
+                <a href="/biblioteca">Abrir Biblioteca →</a>
               </header>
 
               {!snapshot.orders.length && !snapshot.rewardDeliveries.length ? (
                 <EmptyState
                   icon={<NeonIcon name="shield" size={38} />}
                   title="Nenhuma entrega registrada"
-                  description="O M10 mostra apenas status. Keys, contas e links sensíveis serão revelados no M11 Library."
+                  description="Quando uma entrega for concluída, você poderá revelá-la com segurança na CRAZZY LIBRARY."
                 />
               ) : (
                 <div className="crz-hub-delivery-list">
@@ -508,7 +508,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
 
               <div className="crz-hub-sensitive-note">
                 <NeonIcon name="shield" size={23} />
-                <span>Conteúdo sensível de entrega nunca é retornado pelo Client Hub. O M11 fará revelação/cópia com proteção própria.</span>
+                <span>Conteúdo sensível nunca é retornado pelo Client Hub. Use a CRAZZY LIBRARY para revelar ou copiar com auditoria.</span>
               </div>
             </Panel>
           )}

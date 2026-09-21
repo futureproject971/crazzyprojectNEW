@@ -477,3 +477,36 @@ M10 — CRAZZY CLIENT HUB.
 
 ### Próximo módulo
 M11 — CRAZZY LIBRARY.
+
+
+---
+
+## M11 — CRAZZY LIBRARY — CONCLUÍDO TECNICAMENTE
+
+Branch:
+- `m11-library`
+
+Implementado:
+- metadata segura em `library_deliveries`
+- payload server-only em `private.library_delivery_secrets`
+- auditoria em `library_reveal_events`
+- reveal/copy via backend autenticado
+- /biblioteca
+- alias /painel/biblioteca
+- integração Client Hub + menu
+- rewards v5 sem plaintext
+- purincash-payment v6 sem credenciais LZT em ticket
+- stock/reward plaintext removido do acesso normal do cliente
+- Security Advisor: 0 lints
+- npm ci/typecheck/build/smoke: PASS
+- validação isolada GitHub Actions: PASS
+
+Falta:
+1. CI oficial no head final
+2. PR M11
+3. merge M11
+4. iniciar M12 — CRAZZY PROFILE
+
+Regras completas:
+- `docs/M11-LIBRARY-RULES.md`
+- `docs/M11-WORKER-HANDOFF.md`

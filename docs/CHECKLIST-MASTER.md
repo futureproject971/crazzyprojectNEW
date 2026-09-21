@@ -226,15 +226,76 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] catálogo público continua público
 - [x] boundaries M11/M22/M43/M44 preservadas
 
-## ❌ M11 — CRAZZY LIBRARY
-- [ ] keys
-- [ ] contas
-- [ ] links
-- [ ] revelar/copiar
-- [ ] histórico
-- [ ] tutorial associado
-- [ ] status cargo
-- [ ] reconsulta segura
+## ✅ M11 — CRAZZY LIBRARY — CONCLUÍDO
+
+### Segurança / arquitetura
+- [x] branch `m11-library`
+- [x] auditoria integral de `claim_paid_delivery`
+- [x] `FOR UPDATE SKIP LOCKED` e idempotência preservados
+- [x] GRANTs/RLS de stock/reward/order/trial auditados
+- [x] migration `m11_library_secure_reveal`
+- [x] migration `m11_library_account_payload_format`
+- [x] `public.library_deliveries`
+- [x] `private.library_delivery_secrets`
+- [x] `public.library_reveal_events`
+- [x] stock plaintext removido do acesso do cliente
+- [x] reward plaintext removido do acesso do cliente
+- [x] secrets server-only
+- [x] authenticated sem SELECT em secret table
+- [x] reveal/copy RPCs service-role only
+- [x] snapshot sem key/login/senha/token/link privado
+- [x] reveal valida sessão + ownership + status + expiração + entitlement
+- [x] reveal registra auditoria
+- [x] copy registra evento sem reenviar o segredo
+- [x] nenhum secret em localStorage/sessionStorage/cookie/URL
+- [x] plaintext existe apenas temporariamente em React state
+- [x] rate limit de reveal
+- [x] usuário banido bloqueado no backend
+
+### Writers legados alinhados
+- [x] `rewards` v5 não retorna mais `content` no status
+- [x] `purincash-payment` v6 não envia credenciais LZT em ticket
+- [x] tutorial sensível não é mais publicado em ticket
+- [x] ticket de produto entregue aponta para CRAZZY LIBRARY
+- [x] Client Hub lê metadata segura da Library
+
+### Library UI
+- [x] `/biblioteca`
+- [x] alias `/painel/biblioteca`
+- [x] Minhas Keys
+- [x] Minhas Contas
+- [x] Links / Downloads
+- [x] Trials / Recompensas
+- [x] revelar
+- [x] copiar
+- [x] ocultar / mascarar novamente
+- [x] histórico de revelações e cópias
+- [x] produto/plano/status
+- [x] entitlement/status
+- [x] expiração
+- [x] tutorial associado sem expor conteúdo M22
+- [x] status cargo Discord sem invadir M44
+- [x] loading/error/empty
+- [x] desktop/tablet/mobile
+- [x] link no menu da conta
+- [x] Client Hub → Library
+
+### QA M11
+- [x] anon bloqueado de stock/reward/library/events
+- [x] private secret schema não exposto
+- [x] Library snapshot exige autenticação
+- [x] Library reveal exige autenticação
+- [x] catálogo público continua público
+- [x] authenticated sem EXECUTE direto de reveal/copy RPC
+- [x] Security Advisor Supabase: 0 lints
+- [x] npm ci PASS
+- [x] TypeScript PASS
+- [x] production build PASS
+- [x] smoke M11 PASS
+- [x] validação isolada GitHub Actions PASS
+- [ ] CI oficial no head final
+- [ ] PR M11
+- [ ] merge M11
 
 ## ❌ M12 — CRAZZY PROFILE
 - [ ] avatar
@@ -604,4 +665,6 @@ Fonte visual: Pink.
 - [x] M08 concluído estruturalmente
 - [x] M09 concluído estruturalmente
 - [x] M10 concluído
-- [ ] seguir M11 — CRAZZY LIBRARY
+- [x] M11 concluído tecnicamente
+- [ ] mergear M11 — CRAZZY LIBRARY
+- [ ] iniciar M12 — CRAZZY PROFILE

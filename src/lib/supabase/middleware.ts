@@ -4,6 +4,7 @@ import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "./config";
 
 const protectedPrefixes = [
   "/checkout",
+  "/biblioteca",
   "/painel",
   "/cliente",
   "/perfil",
