@@ -1,9 +1,9 @@
-const base = "https://nnmglkdpmffmaiuwbcct.supabase.co/functions/v1/lzt-market-v2-preview";
+const base = "https://nnmglkdpmffmaiuwbcct.supabase.co/functions/v1/lzt-market";
 
 const cases = [
-  { name: "Riot / LoL", query: "category=riot&game=lol&page=1&schema=1", category: "riot" },
-  { name: "Fortnite", query: "category=fortnite&page=1&schema=1", category: "fortnite" },
-  { name: "Minecraft", query: "category=minecraft&page=1&schema=1", category: "minecraft" },
+  { name: "Riot / LoL", query: "action=preview-v2&category=riot&game=lol&page=1&schema=1", category: "riot" },
+  { name: "Fortnite", query: "action=preview-v2&category=fortnite&page=1&schema=1", category: "fortnite" },
+  { name: "Minecraft", query: "action=preview-v2&category=minecraft&page=1&schema=1", category: "minecraft" },
 ];
 
 let failed = false;
