@@ -408,10 +408,10 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] desktop/tablet/mobile
 - [x] loading/error/empty
 - [x] Security Advisor: 0 lints
-- [ ] smoke M14
-- [ ] TypeScript
-- [ ] production build
-- [ ] GitHub Actions
+- [x] smoke M14 PASS
+- [x] TypeScript PASS
+- [x] production build PASS
+- [x] GitHub Actions PASS
 - [ ] PR M14
 - [ ] merge M14
 
