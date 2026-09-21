@@ -13,6 +13,7 @@ import {
   SearchInput,
   Select,
 } from "@/core/design-system";
+import { formatBrl } from "@/modules/cart/pricing";
 import type {
   AccountsMarketFilters,
   AccountsMarketGame,
@@ -93,7 +94,6 @@ function cardStats(item: AccountsMarketItem) {
       ["Campeões", item.championsCount],
     ] as const;
   }
-
   if (item.game === "fortnite") {
     return [
       ["Região", item.region],
@@ -102,16 +102,14 @@ function cardStats(item: AccountsMarketItem) {
       ["V-Bucks", item.vbucks],
     ] as const;
   }
-
   if (item.game === "minecraft") {
     return [
-      ["Nível Hypixel", item.level],
+      ["Hypixel", item.level],
       ["Capas", item.capesCount],
       ["Minecoins", item.minecoins],
       ["Java", displayBoolean(item.java)],
     ] as const;
   }
-
   return [
     ["Região", item.region],
     ["Nível", item.level],
@@ -131,40 +129,52 @@ function Stat({ label, value }: { label: string; value: string | number | null }
 
 function AccountCard({ item }: { item: AccountsMarketItem }) {
   const stats = cardStats(item);
+  const preview = item.cosmetics.slice(0, 4);
+  const game = item.game === "unknown" ? "valorant" : item.game;
+
   return (
     <article className="crz-account-card">
-      <div className="crz-account-card__visual">
-        <div className="crz-account-card__grid" aria-hidden="true" />
-        <NeonIcon name="gamepad" size={72} />
-        <div className="crz-account-card__live">
-          <i aria-hidden="true" />
-          LZT LIVE
-        </div>
+      <a className="crz-account-card__visual" href={"/contas/" + encodeURIComponent(item.id) + "?game=" + game}>
+        {item.imageUrl ? <img src={item.imageUrl} alt="" /> : <NeonIcon name="gamepad" size={74} />}
+        <div className="crz-account-card__shade" />
+        <div className="crz-account-card__status"><i /> DISPONÍVEL</div>
         <Badge tone={item.rank ? "blue" : "neutral"}>
-          {item.rank ?? gameLabel(item.game === "unknown" ? "valorant" : item.game)}
+          {item.rank ?? gameLabel(game)}
         </Badge>
-      </div>
+      </a>
 
       <div className="crz-account-card__body">
         <div className="crz-account-card__title">
-          <small>{gameLabel(item.game === "unknown" ? "valorant" : item.game)} • #{item.id}</small>
+          <small>{gameLabel(game)} • CONTA #{item.id}</small>
           <h3>{item.title}</h3>
         </div>
 
         <div className="crz-account-card__stats">
-          {stats.map(([label, value]) => (
-            <Stat key={label} label={label} value={value} />
+          {stats.map(([label, value]) => <Stat key={label} label={label} value={value} />)}
+        </div>
+
+        <div className="crz-account-card__preview-row" aria-label="Destaques da conta">
+          {(preview.length ? preview : [
+            { name: "Skins", category: item.skinsCount ? String(item.skinsCount) : "Inventário", rarity: null, imagePath: null },
+            { name: "Rank", category: item.rank ?? "Sem rank", rarity: null, imagePath: null },
+            { name: "Nível", category: item.level != null ? String(item.level) : "—", rarity: null, imagePath: null },
+            { name: "Região", category: item.region ?? "Global", rarity: null, imagePath: null },
+          ]).map((cosmetic, index) => (
+            <div className="crz-account-card__preview" key={cosmetic.name + index}>
+              <span>{cosmetic.name.slice(0, 2).toUpperCase()}</span>
+              <small>{cosmetic.category || cosmetic.rarity || "Item"}</small>
+            </div>
           ))}
         </div>
 
         <div className="crz-account-card__footer">
           <div>
-            <small>VALOR CRAZZY</small>
-            <strong>Calculado com segurança</strong>
-            <span>Conversão e markup continuam server-side.</span>
+            <small>VALOR</small>
+            <strong>{item.price != null ? formatBrl(item.price) : "Consultar"}</strong>
+            <span>Entrega após confirmação do pagamento</span>
           </div>
-          <a href={"/contas/" + encodeURIComponent(item.id) + "?game=" + item.game}>
-            Ver detalhes <span aria-hidden="true">→</span>
+          <a href={"/contas/" + encodeURIComponent(item.id) + "?game=" + game}>
+            Ver conta <span aria-hidden="true">→</span>
           </a>
         </div>
       </div>
@@ -179,7 +189,6 @@ export function AccountsMarketPage() {
   const [data, setData] = useState<AccountsMarketPageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const label = useMemo(() => gameLabel(game), [game]);
 
@@ -187,7 +196,6 @@ export function AccountsMarketPage() {
     const controller = new AbortController();
     setLoading(true);
     setError(null);
-    setErrorCode(null);
 
     fetch("/api/accounts?" + buildSearchParams(game, applied).toString(), {
       signal: controller.signal,
@@ -195,19 +203,14 @@ export function AccountsMarketPage() {
     })
       .then(async (response) => {
         const payload = await response.json();
-        if (!response.ok) {
-          const err = new Error(payload?.error || "Falha ao carregar contas.") as Error & { code?: string };
-          err.code = payload?.code;
-          throw err;
-        }
+        if (!response.ok) throw new Error(payload?.error || "Não foi possível carregar as contas.");
         return payload as AccountsMarketPageData;
       })
-      .then((payload) => setData(payload))
-      .catch((requestError: Error & { code?: string }) => {
+      .then(setData)
+      .catch((requestError: Error) => {
         if (requestError.name !== "AbortError") {
           setData(null);
-          setError(requestError.message || "Falha ao carregar contas.");
-          setErrorCode(requestError.code ?? null);
+          setError(requestError.message || "Não foi possível carregar as contas.");
         }
       })
       .finally(() => {
@@ -236,7 +239,6 @@ export function AccountsMarketPage() {
     setData(null);
   };
 
-  const credentialMissing = errorCode === "LZT_CREDENTIAL_MISSING";
   const isLive = Boolean(data && !error && !loading);
 
   return (
@@ -244,16 +246,13 @@ export function AccountsMarketPage() {
       <section className="crz-accounts-hero">
         <div className="crz-container">
           <PageHeader
-            eyebrow="M06 • CRAZZY ACCOUNTS MARKET"
-            title="Contas de jogos"
-            description="Adapter LZT multijogo com leitura sanitizada, filtros por categoria e compra separada do catálogo."
+            eyebrow="CRAZZY ACCOUNTS"
+            title="Marketplace de contas"
+            description="Escolha o jogo, filtre o inventário e confira todos os detalhes antes de comprar."
             actions={
               <div className={"crz-accounts-source " + (isLive ? "is-live" : "is-pending")}>
-                <span>
-                  <i aria-hidden="true" />
-                  {isLive ? " PROVIDER ONLINE" : credentialMissing ? " CREDENCIAL PENDENTE" : " CONECTANDO"}
-                </span>
-                <strong>LZT MARKET</strong>
+                <span><i aria-hidden="true" /> {isLive ? "CATÁLOGO ONLINE" : "ATUALIZANDO"}</span>
+                <strong>CRAZZY MARKET</strong>
               </div>
             }
           />
@@ -270,7 +269,6 @@ export function AccountsMarketPage() {
               >
                 <NeonIcon name={tab.id === "valorant" ? "gamepad" : "cube"} size={25} />
                 <span>{tab.label}</span>
-                <small>ADAPTER V2</small>
               </button>
             ))}
           </div>
@@ -282,7 +280,7 @@ export function AccountsMarketPage() {
           <header>
             <span>REFINAR BUSCA</span>
             <h2>Filtros {label}</h2>
-            <p>Somente filtros mapeados para a categoria oficial do provider.</p>
+            <p>Encontre contas pelo rank, nível, skins, região e outros detalhes.</p>
           </header>
 
           <div className="crz-accounts-field">
@@ -351,7 +349,7 @@ export function AccountsMarketPage() {
           {(game === "valorant" || game === "lol") && (
             <label className="crz-accounts-field">
               <span>Região</span>
-              <input value={draft.region} onChange={(e) => setField("region", e.target.value)} placeholder="Código da região" />
+              <input value={draft.region} onChange={(e) => setField("region", e.target.value)} placeholder="Ex: BR, NA, EU" />
             </label>
           )}
 
@@ -363,7 +361,7 @@ export function AccountsMarketPage() {
               </label>
               <label className="crz-accounts-field">
                 <span>Plataforma</span>
-                <input value={draft.platform} onChange={(e) => setField("platform", e.target.value)} placeholder="Ex: epic, xbox, psn" />
+                <input value={draft.platform} onChange={(e) => setField("platform", e.target.value)} placeholder="Epic, Xbox, PSN..." />
               </label>
             </>
           )}
@@ -388,17 +386,13 @@ export function AccountsMarketPage() {
                 <div className="crz-accounts-field">
                   <span>Java</span>
                   <Select value={draft.javaEdition} onChange={(e) => setField("javaEdition", e.target.value)}>
-                    <option value="">Qualquer</option>
-                    <option value="1">Sim</option>
-                    <option value="0">Não</option>
+                    <option value="">Qualquer</option><option value="1">Sim</option><option value="0">Não</option>
                   </Select>
                 </div>
                 <div className="crz-accounts-field">
                   <span>Bedrock</span>
                   <Select value={draft.bedrockEdition} onChange={(e) => setField("bedrockEdition", e.target.value)}>
-                    <option value="">Qualquer</option>
-                    <option value="1">Sim</option>
-                    <option value="0">Não</option>
+                    <option value="">Qualquer</option><option value="1">Sim</option><option value="0">Não</option>
                   </Select>
                 </div>
               </div>
@@ -412,8 +406,8 @@ export function AccountsMarketPage() {
               onChange={(event) => setField("orderBy", event.target.value as AccountsMarketFilters["orderBy"])}
             >
               <option value="pdate_to_down">Mais recentes</option>
-              <option value="price_to_up">Menor custo do provider</option>
-              <option value="price_to_down">Maior custo do provider</option>
+              <option value="price_to_up">Menor preço</option>
+              <option value="price_to_down">Maior preço</option>
             </Select>
           </div>
 
@@ -425,8 +419,8 @@ export function AccountsMarketPage() {
           <div className="crz-accounts-security-note">
             <NeonIcon name="shield" size={28} />
             <div>
-              <strong>Preço e compra protegidos</strong>
-              <span>Sem preço inventado e sem fast-buy exposto ao navegador.</span>
+              <strong>Compra protegida</strong>
+              <span>Disponibilidade e valor são confirmados novamente antes da cobrança.</span>
             </div>
           </div>
         </aside>
@@ -434,8 +428,8 @@ export function AccountsMarketPage() {
         <section className="crz-accounts-results" aria-live="polite">
           <header className="crz-accounts-results__head">
             <div>
-              <span>{isLive ? "MARKET LIVE" : "ADAPTER MULTIJOGO"}</span>
-              <h2>Contas {label}</h2>
+              <span>CONTAS DISPONÍVEIS</span>
+              <h2>{label}</h2>
             </div>
             <div className="crz-accounts-results__count">
               <strong>{data?.totalItems ?? 0}</strong>
@@ -444,16 +438,12 @@ export function AccountsMarketPage() {
           </header>
 
           {loading ? (
-            <div className="crz-accounts-state">
-              <LoadingState label={"Consultando " + label + "..."} />
-            </div>
+            <div className="crz-accounts-state"><LoadingState label={"Buscando contas de " + label + "..."} /></div>
           ) : error ? (
             <div className="crz-accounts-state">
               <ErrorState
-                title={credentialMissing ? "Integração pronta, credencial pendente" : "Não foi possível carregar o market"}
-                description={credentialMissing
-                  ? "O módulo multijogo está montado e protegido. O provider só será consultado quando a credencial LZT for configurada no backend."
-                  : error}
+                title="Não foi possível carregar as contas"
+                description={error}
                 onRetry={() => setApplied((current) => ({ ...current }))}
               />
             </div>
@@ -462,7 +452,7 @@ export function AccountsMarketPage() {
               <EmptyState
                 icon={<NeonIcon name="gamepad" size={34} />}
                 title="Nenhuma conta encontrada"
-                description="Tente remover filtros ou alterar os limites da busca."
+                description="Tente remover alguns filtros ou alterar a busca."
                 action={<Button variant="secondary" onClick={clearFilters}>Limpar filtros</Button>}
               />
             </div>
@@ -476,10 +466,10 @@ export function AccountsMarketPage() {
                 <Pagination
                   page={data.currentPage}
                   totalPages={data.totalPages}
-                  onChange={(pageNumber) => {
-                    setDraft((current) => ({ ...current, page: pageNumber }));
-                    setApplied((current) => ({ ...current, page: pageNumber }));
-                    window.scrollTo({ top: 330, behavior: "smooth" });
+                  onChange={(page) => {
+                    setDraft((current) => ({ ...current, page }));
+                    setApplied((current) => ({ ...current, page }));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                 />
               </footer>
