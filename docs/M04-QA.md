@@ -58,6 +58,6 @@ Rota: `/produtos`
 - [x] nenhum Product View M05 foi construído
 
 ## QA técnico
-- [ ] TypeScript / typecheck PASS no HEAD final
-- [ ] Next.js build PASS no HEAD final
-- [ ] GitHub Actions PASS no HEAD final
+- [x] TypeScript / typecheck PASS no HEAD final
+- [x] Next.js build PASS no HEAD final
+- [x] GitHub Actions PASS no HEAD final
