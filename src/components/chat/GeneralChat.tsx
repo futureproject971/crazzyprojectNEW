@@ -35,17 +35,17 @@ export function GeneralChat() {
       </div>
 
       <div className="chat-compose">
-        <div className="chat-input-shell">
-          <button type="button" className="compose-mini" aria-label="Adicionar">⊙</button>
-          <input aria-label="Mensagem" placeholder="Digite sua mensagem..." />
-          <button type="button" className="compose-mini" aria-label="Emoji">☺</button>
-        </div>
-        <button type="button" className="send-button" aria-label="Enviar">
+        <a className="chat-input-shell chat-preview-link" href="/comunidade">
+          <span className="compose-mini" aria-hidden="true">⊙</span>
+          <span>Entrar no Chat Geral...</span>
+          <span className="compose-mini" aria-hidden="true">☺</span>
+        </a>
+        <a className="send-button chat-preview-send" href="/comunidade" aria-label="Abrir comunidade">
           <span
             className="send-icon"
             style={{ WebkitMaskImage: 'url("/icons/send.svg")', maskImage: 'url("/icons/send.svg")' }}
           />
-        </button>
+        </a>
       </div>
 
       <div className="chat-reactions" aria-hidden="true">
