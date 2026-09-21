@@ -297,32 +297,37 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] PR #13 M11
 - [x] merge M11 — d833cbef71175487bbf0c150217a8b32b2953ce1
 
-## 🟡 M12 — CRAZZY PROFILE — EM ANDAMENTO
-- [x] branch `m12-profile` criada
-- [ ] /perfil
-- [ ] snapshot privado do perfil
-- [ ] username
-- [ ] avatar CRAZZY
-- [ ] fallback avatar Discord
-- [ ] Discord conectado
-- [ ] guild membership/status
-- [ ] app roles
-- [ ] cargos Discord
-- [ ] badges
-- [ ] cor principal
-- [ ] bio curta
-- [ ] perfil estilo Discord
-- [ ] editar personalização própria
-- [ ] validação server-side de username/bio/cor
-- [ ] RLS owner/admin
-- [ ] sem alterar app role pelo cliente
-- [ ] sem criar Discord role manual pelo cliente
-- [ ] loading/error/empty
-- [ ] desktop/tablet/mobile
-- [ ] Security Advisor
-- [ ] TypeScript
-- [ ] production build
-- [ ] smoke M12
+## ✅ M12 — CRAZZY PROFILE — IMPLEMENTADO / QA FINAL
+- [x] branch `m12-profile`
+- [x] /perfil
+- [x] snapshot privado do perfil
+- [x] username protegido
+- [x] display name personalizável
+- [x] avatar CRAZZY
+- [x] fallback/avatar Discord
+- [x] avatar source auto/crazzy/discord
+- [x] Discord conectado
+- [x] guild membership/status
+- [x] app roles
+- [x] cargos Discord
+- [x] badges derivados de fatos reais
+- [x] cor principal
+- [x] bio curta
+- [x] perfil estilo Discord
+- [x] editar personalização própria
+- [x] validação server-side de nome/bio/cor/avatar source
+- [x] RLS owner/admin em profile_preferences
+- [x] profiles sensível sem UPDATE direto do cliente
+- [x] sem alterar app role pelo cliente
+- [x] sem criar Discord role manual pelo cliente
+- [x] Auth header usa display name/avatar source
+- [x] loading/error
+- [x] desktop/tablet/mobile
+- [x] Security Advisor: 0 lints
+- [ ] TypeScript PASS
+- [ ] production build PASS
+- [ ] smoke M12 PASS
+- [ ] GitHub Actions PASS
 - [ ] PR M12
 - [ ] merge M12
 
