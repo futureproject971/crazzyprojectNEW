@@ -326,7 +326,7 @@ M44 Discord Bridge:
 10. Production build.
 11. PR M11.
 12. Merge.
-13. Próximo módulo: M12 — CRAZZY COMMUNITY.
+13. Próximo módulo após merge do M11: M12 — CRAZZY PROFILE.
 
 ## NÃO FAZER
 - não colocar secret/key em localStorage;
@@ -345,3 +345,37 @@ M44 Discord Bridge:
 - M09 Auth: concluído estruturalmente
 - M10 Client Hub: concluído
 - M11 Library: INICIADO, PAROU NA AUDITORIA DE SEGURANÇA DO BANCO
+
+
+## CHECKLIST É A FONTE DE STATUS
+
+Antes de continuar, o Worker deve ler:
+1. `docs/CHECKLIST-MASTER.md`
+2. este arquivo `docs/M11-WORKER-HANDOFF.md`
+3. `docs/00_CONTINUE_NEXT_CHAT.md`
+
+O checklist master foi atualizado especificamente para o M11 e separa:
+- auditoria já concluída;
+- bloqueios críticos;
+- backend seguro;
+- Library UI;
+- QA obrigatório.
+
+Não marcar item como concluído sem executar/verificar.
+
+## REGRA DE CONTINUIDADE PARA O WORKER
+
+Começar EXATAMENTE no passo 1 dos próximos passos:
+- terminar auditoria de `claim_paid_delivery`;
+- depois conferir GRANTs;
+- só então criar migration de secrets/reveal.
+
+Não criar primeiro uma tela bonita e depois tentar proteger.
+Segurança do payload vem antes da UI.
+
+Quando M11 estiver 100% verde:
+- atualizar CHECKLIST-MASTER;
+- atualizar 00_CONTINUE_NEXT_CHAT;
+- abrir PR;
+- mergear;
+- iniciar M12 CRAZZY PROFILE apenas depois.
