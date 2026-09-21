@@ -241,8 +241,8 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] `payments` auditado
 - [x] função `claim_paid_delivery` identificada
 - [x] problema crítico de exposição direta de segredo identificado
-- [ ] terminar auditoria interna de `claim_paid_delivery`
-- [ ] conferir GRANTs diretos de stock/reward/order/trial
+- [x] terminar auditoria interna de `claim_paid_delivery`
+- [x] conferir GRANTs diretos de stock/reward/order/trial
 - [ ] migration de segurança M11
 - [ ] separar payload secreto de metadata/status
 - [ ] tabela `library_reveal_events`
@@ -274,8 +274,10 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [ ] desktop/tablet/mobile
 
 ### BLOQUEIO CRÍTICO M11 — NÃO CRIAR UI ANTES DE CORRIGIR
-- [ ] `stock_items.content` não pode mais ficar legível diretamente pelo cliente após delivery
-- [ ] `reward_deliveries.content` não pode mais ficar legível diretamente pela REST
+- [x] risco confirmado: `stock_items.content` fica legível diretamente pelo cliente após delivery
+- [ ] corrigir exposição direta de `stock_items.content`
+- [x] risco confirmado: `reward_deliveries.content` fica legível diretamente pela REST do owner
+- [ ] corrigir exposição direta de `reward_deliveries.content`
 - [ ] secrets devem ser server-only
 - [ ] listagem normal nunca retorna key/login/senha/token/link privado
 - [ ] reveal deve validar sessão + ownership + order/entitlement + status
