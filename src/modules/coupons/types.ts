@@ -11,8 +11,6 @@ export type CustomerCoupon = {
   active: boolean;
   expires_at: string | null;
   origin: "promotion" | "reward" | "wheel" | "scratch" | "drop" | "admin" | "manual" | "other";
-  source_reference: string | null;
-  metadata: Record<string, unknown>;
   created_at: string;
   status: CouponStatus;
   products: Array<{ id: string; name: string; image_url: string | null }>;
