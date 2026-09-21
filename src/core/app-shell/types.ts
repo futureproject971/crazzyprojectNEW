@@ -17,4 +17,5 @@ export type AppShellProps = {
   cartCount?: number;
   userName?: string;
   className?: string;
+  showFooter?: boolean;
 };
