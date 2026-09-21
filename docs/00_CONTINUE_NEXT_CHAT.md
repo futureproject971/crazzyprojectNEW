@@ -443,3 +443,37 @@ Na etapa de integrações:
 
 ### Próximo módulo
 M10 — CRAZZY CLIENT HUB.
+
+
+---
+
+## M10 — CRAZZY CLIENT HUB
+
+### M10 CRAZZY CLIENT HUB
+- branch: `m10-client-hub`
+- painel privado consolidado:
+  - /painel
+  - /painel/pedidos
+  - /painel/produtos
+  - /painel/tutoriais
+  - /painel/entregas
+  - /painel/discord
+- API: `/api/client-hub`
+- usa sessão Supabase/RLS do próprio usuário
+- NÃO usa service role para ler o painel
+- payments/order_tickets alimentam histórico
+- tabela `entitlements` criada e protegida
+- tabela `discord_role_grants` criada e protegida
+- M43 será escritor autoritativo de entitlements
+- M44 será escritor autoritativo de Discord role grants
+- tutorial aparece como direito liberado, mas conteúdo protegido não sai no M10
+- M22 será viewer protegido de tutorial
+- entrega aparece somente como status; key/conta/link não sai no M10
+- M11 será responsável por revelar/copiar conteúdo sensível
+- Discord mostra conexão/guild/last sync e permite reconnect
+- anon não pode SELECT em entitlements/discord_role_grants
+- Security Advisor: 0 lints
+- regras: `docs/M10-CLIENT-HUB-RULES.md`
+
+### Próximo módulo
+M11 — CRAZZY LIBRARY.
