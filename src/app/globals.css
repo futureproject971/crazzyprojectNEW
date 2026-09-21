@@ -15,6 +15,7 @@
 @import "../modules/profile/styles.css";
 @import "../modules/support/styles.css";
 @import "../modules/community/styles.css";
+@import "../modules/reviews/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
