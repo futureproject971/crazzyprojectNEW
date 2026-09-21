@@ -666,3 +666,14 @@
     flex-direction: column;
   }
 }
+
+
+.crz-hub-panel > header a {
+  color: #70b9ff;
+  font-size: 7.5px;
+  text-decoration: none;
+}
+
+.crz-hub-panel > header a:hover {
+  color: #fff;
+}
