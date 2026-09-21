@@ -5,7 +5,7 @@ import type { AccountsMarketGame } from "@/modules/accounts-market";
 
 export const metadata: Metadata = {
   title: "Detalhes da Conta | CRAZZY PROJECT",
-  description: "Detalhes de conta no CRAZZY ACCOUNTS MARKET.",
+  description: "Detalhes, inventário e compra de conta na CRAZZY PROJECT.",
 };
 
 const games = new Set<AccountsMarketGame>(["valorant", "lol", "fortnite", "minecraft"]);
