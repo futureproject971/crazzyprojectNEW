@@ -1,0 +1,96 @@
+.crz-product-manager-page {
+  min-height:100vh;
+  padding:92px 0 42px;
+  background:
+    radial-gradient(circle at 50% -8%,rgba(0,104,255,.12),transparent 34%),
+    linear-gradient(180deg,#02070f,#02050a);
+}
+.crz-pm-container {max-width:1600px}
+.crz-pm-state {display:grid;place-items:center;align-content:center;gap:8px;text-align:center;color:#71849b}
+.crz-pm-state strong {color:#e9f3ff}
+.crz-pm-notice {margin-bottom:10px;border:1px solid rgba(52,149,255,.25);border-radius:9px;padding:9px 11px;color:#9fd4ff;background:rgba(0,92,207,.09);font-size:7px}
+.crz-pm-layout {display:grid;grid-template-columns:300px minmax(0,1fr);gap:11px;align-items:start}
+.crz-pm-products,.crz-pm-editor {
+  border:1px solid rgba(70,127,203,.18);
+  border-radius:13px;
+  background:linear-gradient(180deg,rgba(7,15,27,.97),rgba(3,9,17,.99));
+  box-shadow:0 14px 34px rgba(0,0,0,.18)
+}
+.crz-pm-products {position:sticky;top:82px;padding:10px}
+.crz-pm-search {min-height:38px;border:1px solid rgba(71,128,203,.16);border-radius:8px;padding:0 9px;background:#07111c;display:grid;grid-template-columns:auto 1fr;gap:7px;align-items:center;color:#5eaaff}
+.crz-pm-search input {border:0;outline:0;color:#dbe8f6;background:transparent;font-size:7px}
+.crz-pm-products__list {margin-top:8px;display:grid;gap:5px;max-height:calc(100vh - 185px);overflow:auto}
+.crz-pm-products__list > button {min-height:59px;border:1px solid rgba(70,126,199,.12);border-radius:8px;padding:6px;color:#8094ab;background:#06101b;display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:7px;align-items:center;text-align:left;cursor:pointer}
+.crz-pm-products__list > button.is-active {border-color:rgba(40,143,255,.52);background:rgba(0,83,184,.12);box-shadow:0 0 14px rgba(0,105,255,.08)}
+.crz-pm-product-art {--accent:#1687ff;width:40px;height:40px;border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:8px;overflow:hidden;display:grid;place-items:center;color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,#07111d)}
+.crz-pm-product-art img {width:100%;height:100%;object-fit:cover}
+.crz-pm-products__list > button > span {display:grid;gap:2px;min-width:0}
+.crz-pm-products__list strong {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#dbe8f6;font-size:7.8px}
+.crz-pm-products__list small {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#647991;font-size:6px}
+
+.crz-pm-editor {padding:14px}
+.crz-pm-editor__header,.crz-pm-plans > header {display:flex;align-items:center;justify-content:space-between;gap:10px}
+.crz-pm-editor__header > div,.crz-pm-plans > header > div {display:grid;gap:2px}
+.crz-pm-editor__header small,.crz-pm-plans small,.crz-pm-tutorials small,.crz-pm-subsection small {color:#20adff;font-size:6.3px;font-weight:900;letter-spacing:.09em}
+.crz-pm-editor__header h2 {margin:0;color:#eef6ff;font-size:18px}
+.crz-pm-editor__header span {color:#6c8198;font-size:7px}
+
+.crz-pm-form-grid {margin-top:11px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.crz-pm-form-grid label {display:grid;gap:4px}
+.crz-pm-form-grid label.is-wide {grid-column:1/-1}
+.crz-pm-form-grid label > span {color:#72879e;font-size:6.5px}
+.crz-pm-form-grid input,.crz-pm-form-grid textarea,.crz-pm-form-grid select {
+  width:100%;
+  min-height:36px;
+  border:1px solid rgba(72,128,201,.16);
+  border-radius:7px;
+  padding:7px 9px;
+  outline:0;
+  color:#dce9f7;
+  background:#07111c;
+  font-size:7.2px;
+}
+.crz-pm-form-grid textarea {resize:vertical;line-height:1.5}
+.crz-pm-color {display:grid;grid-template-columns:38px 1fr;gap:5px}
+.crz-pm-color input[type=color] {padding:3px}
+
+.crz-pm-switch-row,.crz-pm-automation {margin-top:9px;display:flex;gap:6px;flex-wrap:wrap}
+.crz-pm-switch-row button,.crz-pm-automation button {
+  min-height:31px;border:1px solid rgba(72,127,200,.16);border-radius:7px;padding:0 8px;
+  color:#71869d;background:#07111c;display:flex;align-items:center;gap:6px;font-size:6.5px;cursor:pointer
+}
+.crz-pm-switch-row button i,.crz-pm-automation button i {width:7px;height:7px;border-radius:50%;background:#53657a}
+.crz-pm-switch-row button.is-on,.crz-pm-automation button.is-on {color:#9ed6ff;border-color:rgba(42,146,255,.36);background:rgba(0,91,204,.1)}
+.crz-pm-switch-row button.is-on i,.crz-pm-automation button.is-on i {background:#27d17f;box-shadow:0 0 7px rgba(39,209,127,.55)}
+
+.crz-pm-tutorials,.crz-pm-plans,.crz-pm-subsection {margin-top:11px;border-top:1px solid rgba(72,126,198,.12);padding-top:10px}
+.crz-pm-tutorials header {display:grid;gap:2px}
+.crz-pm-tutorials h3,.crz-pm-plans h3,.crz-pm-subsection strong {margin:0;color:#dce8f5;font-size:10px}
+.crz-pm-tutorials > div {margin-top:6px;display:flex;gap:5px;flex-wrap:wrap}
+.crz-pm-tutorials button {min-height:28px;border:1px solid rgba(72,127,199,.14);border-radius:7px;padding:0 8px;color:#748aa1;background:#07111c;font-size:6.3px;cursor:pointer}
+.crz-pm-tutorials button.is-active {color:#9fd7ff;border-color:rgba(42,147,255,.38);background:rgba(0,92,205,.1)}
+
+.crz-pm-plans > header > span {color:#62768e;font-size:6.5px}
+.crz-pm-plan-tabs {margin-top:7px;display:flex;gap:5px;overflow:auto;padding-bottom:2px}
+.crz-pm-plan-tabs button {min-width:145px;min-height:48px;border:1px solid rgba(70,126,199,.14);border-radius:8px;padding:7px;color:#72879e;background:#06101b;display:grid;gap:2px;text-align:left;cursor:pointer}
+.crz-pm-plan-tabs button strong {color:#d7e5f3;font-size:7.3px}.crz-pm-plan-tabs button small{font-size:5.9px}
+.crz-pm-plan-tabs button.is-active {border-color:rgba(42,146,255,.5);background:rgba(0,91,204,.1)}
+.crz-pm-plan-editor {margin-top:8px;border:1px solid rgba(70,126,199,.14);border-radius:10px;padding:10px;background:rgba(5,13,23,.7)}
+.crz-pm-subsection header {display:grid;gap:2px}
+.crz-pm-plan-footer {margin-top:10px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+
+html[data-theme="light"] .crz-product-manager-page {background:#eef4fb}
+html[data-theme="light"] .crz-pm-products,html[data-theme="light"] .crz-pm-editor {background:rgba(255,255,255,.96);border-color:rgba(31,91,170,.16);box-shadow:0 12px 30px rgba(24,52,87,.06)}
+html[data-theme="light"] .crz-pm-editor__header h2,html[data-theme="light"] .crz-pm-products__list strong,html[data-theme="light"] .crz-pm-tutorials h3,html[data-theme="light"] .crz-pm-plans h3 {color:#102033}
+html[data-theme="light"] .crz-pm-form-grid input,html[data-theme="light"] .crz-pm-form-grid textarea,html[data-theme="light"] .crz-pm-form-grid select,html[data-theme="light"] .crz-pm-search {background:#f7fbff;color:#102033}
+
+@media(max-width:950px){
+  .crz-pm-layout {grid-template-columns:1fr}
+  .crz-pm-products {position:static}
+  .crz-pm-products__list {max-height:320px}
+}
+@media(max-width:620px){
+  .crz-pm-form-grid {grid-template-columns:1fr}
+  .crz-pm-form-grid label.is-wide {grid-column:auto}
+  .crz-pm-plan-footer {align-items:stretch;flex-direction:column}
+}
