@@ -1,0 +1,344 @@
+/* M02 — CRAZZY HOME
+   Page-specific composition. CORE tokens/components remain owned by M00/M01. */
+
+.crz-home {
+  position: relative;
+}
+
+.crz-home-hero {
+  position: relative;
+  min-height: clamp(370px, 39vw, 550px);
+  width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  border-bottom: 1px solid rgba(52, 128, 255, .18);
+  background: #030813;
+}
+
+.crz-home-hero__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  background:
+    url("/backgrounds/hero-tokyo.webp") center 54% / cover no-repeat;
+  transform: scale(1.015);
+  filter: saturate(1.08) contrast(1.02);
+}
+
+.crz-home-hero__shade {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(0, 8, 24, .12) 0 17%, rgba(1, 6, 18, .56) 56%, rgba(1, 4, 11, .75) 100%),
+    linear-gradient(180deg, rgba(0, 5, 16, .16) 0%, rgba(0, 5, 14, .04) 52%, rgba(0, 6, 14, .58) 100%);
+}
+
+.crz-home-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 100px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(1, 6, 13, .8));
+}
+
+.crz-home-hero__content {
+  width: min(660px, 56vw);
+  margin: 0 auto;
+  padding-top: clamp(82px, 8.3vw, 124px);
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.crz-home-hero__logo {
+  display: block;
+  width: clamp(330px, 36vw, 545px);
+  height: auto;
+  object-fit: contain;
+  image-rendering: auto;
+  filter:
+    drop-shadow(0 0 10px rgba(0, 87, 255, .36))
+    drop-shadow(0 10px 30px rgba(0, 0, 0, .55));
+  transform: scale(1.08);
+}
+
+.crz-home-hero__tagline {
+  margin: 4px 0 12px;
+  color: #f5f8ff;
+  font-family: var(--crz-font-ui);
+  font-size: clamp(8px, .8vw, 11px);
+  font-weight: 700;
+  letter-spacing: .19em;
+  text-shadow: 0 2px 12px rgba(0,0,0,.9);
+}
+
+.crz-home-hero__pillars {
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 13px;
+}
+
+.crz-home-hero__pillar {
+  min-width: 108px;
+  min-height: 35px;
+  padding: 0 13px;
+  border-right: 1px solid rgba(182, 208, 244, .25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.crz-home-hero__pillar:last-child {
+  border-right: 0;
+}
+
+.crz-home-hero__pillar img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(0, 126, 255, .38));
+}
+
+.crz-home-hero__pillar span {
+  display: grid;
+  gap: 1px;
+  text-align: left;
+}
+
+.crz-home-hero__pillar strong,
+.crz-home-hero__pillar small {
+  color: #f6f9ff;
+  line-height: 1.05;
+  font-family: var(--crz-font-ui);
+}
+
+.crz-home-hero__pillar strong {
+  font-size: 7.5px;
+  letter-spacing: .045em;
+}
+
+.crz-home-hero__pillar small {
+  font-size: 6.2px;
+  opacity: .85;
+}
+
+.crz-home-hero__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+}
+
+.crz-home-hero__cta {
+  min-height: 42px;
+  border-radius: 8px;
+  padding: 0 17px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: white;
+  font-family: var(--crz-font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  transition:
+    transform var(--crz-duration-base) var(--crz-ease),
+    box-shadow var(--crz-duration-base) var(--crz-ease),
+    border-color var(--crz-duration-base) var(--crz-ease),
+    background var(--crz-duration-base) var(--crz-ease);
+}
+
+.crz-home-hero__cta:hover {
+  transform: translateY(-2px);
+}
+
+.crz-home-hero__cta--primary {
+  min-width: 145px;
+  border: 1px solid #3997ff;
+  background: var(--crz-gradient-brand);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.25),
+    0 0 22px rgba(0, 105, 255, .52);
+}
+
+.crz-home-hero__cta--primary:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.25),
+    0 0 30px rgba(0, 118, 255, .66);
+}
+
+.crz-home-hero__cta--secondary {
+  min-width: 174px;
+  border: 1px solid rgba(180, 205, 239, .43);
+  background: rgba(7, 14, 26, .84);
+  box-shadow: 0 10px 26px rgba(0,0,0,.28);
+  backdrop-filter: blur(8px);
+}
+
+.crz-home-hero__cta--secondary:hover {
+  border-color: rgba(75, 154, 255, .7);
+  background: rgba(10, 31, 59, .88);
+}
+
+.crz-home-hero__cta img {
+  width: 17px;
+  height: 17px;
+  filter: brightness(0) invert(1);
+}
+
+.crz-home-hero__graffiti {
+  position: absolute;
+  z-index: -1;
+  bottom: 30px;
+  color: rgba(215, 229, 255, .72);
+  font-family: var(--crz-font-display);
+  font-size: clamp(9px, .9vw, 13px);
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -.05em;
+  text-shadow:
+    0 0 9px rgba(0, 80, 255, .28),
+    0 3px 10px rgba(0,0,0,.8);
+  transform: rotate(-6deg);
+}
+
+.crz-home-hero__graffiti--left {
+  left: 3.2%;
+}
+
+.crz-home-hero__graffiti--right {
+  right: 4.5%;
+  bottom: 83px;
+  transform: rotate(-4deg);
+}
+
+@media (max-width: 980px) {
+  .crz-home-hero {
+    min-height: 420px;
+  }
+
+  .crz-home-hero__content {
+    width: min(660px, 74vw);
+    padding-top: 90px;
+  }
+
+  .crz-home-hero__logo {
+    width: min(490px, 58vw);
+  }
+
+  .crz-home-hero__pillar {
+    min-width: 92px;
+    padding-inline: 9px;
+  }
+
+  .crz-home-hero__graffiti {
+    opacity: .45;
+  }
+}
+
+@media (max-width: 680px) {
+  .crz-home-hero {
+    min-height: 515px;
+  }
+
+  .crz-home-hero__backdrop {
+    background-position: 47% center;
+    transform: scale(1.04);
+  }
+
+  .crz-home-hero__shade {
+    background:
+      radial-gradient(circle at 50% 38%, rgba(2, 9, 22, .15), rgba(1, 5, 14, .68) 64%),
+      linear-gradient(180deg, rgba(0,4,12,.22), rgba(0,4,12,.58));
+  }
+
+  .crz-home-hero__content {
+    width: calc(100% - 28px);
+    padding-top: 100px;
+  }
+
+  .crz-home-hero__logo {
+    width: min(430px, 88vw);
+  }
+
+  .crz-home-hero__tagline {
+    margin-top: 2px;
+    letter-spacing: .13em;
+  }
+
+  .crz-home-hero__pillars {
+    width: min(100%, 430px);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+  }
+
+  .crz-home-hero__pillar {
+    min-width: 0;
+    border: 1px solid rgba(93, 145, 220, .18);
+    border-radius: 7px;
+    background: rgba(3, 11, 22, .52);
+    padding: 6px 9px;
+  }
+
+  .crz-home-hero__pillar:last-child {
+    border-right: 1px solid rgba(93, 145, 220, .18);
+  }
+
+  .crz-home-hero__actions {
+    width: min(100%, 430px);
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: 4px;
+  }
+
+  .crz-home-hero__cta {
+    width: 100%;
+  }
+
+  .crz-home-hero__graffiti {
+    display: none;
+  }
+}
+
+/* M02 product art: use real repository crops instead of gradient-only placeholders. */
+.product-card .product-art {
+  background: #050a12;
+}
+
+.product-card .product-art::before {
+  background: none !important;
+}
+
+.product-card .product-art > img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-card .product-art-noise {
+  z-index: 1;
+  opacity: .16;
+}
+
+.product-card .product-art-brand {
+  z-index: 3;
+  font-size: 11px;
+  letter-spacing: .02em;
+  opacity: .92;
+}
+
+.product-card--gta .product-art-brand {
+  display: none;
+}
