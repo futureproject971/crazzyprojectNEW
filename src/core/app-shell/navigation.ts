@@ -2,7 +2,7 @@ import type { ShellMode, ShellNavItem } from "./types";
 
 export const visitorNavigation: ShellNavItem[] = [
   { id: "home", label: "Início", href: "/", icon: "/icons/home.svg" },
-  { id: "products", label: "Produtos", href: "/#produtos", icon: "/icons/shopping-bag.svg" },
+  { id: "products", label: "Produtos", href: "/produtos", icon: "/icons/shopping-bag.svg" },
   { id: "news", label: "Novidades", href: "/novidades", icon: "/icons/flame.svg" },
   { id: "feedbacks", label: "Feedbacks", href: "/#feedbacks", icon: "/icons/star.svg" },
   { id: "community", label: "Comunidade", href: "/#comunidade", icon: "/icons/users.svg" },
@@ -12,7 +12,7 @@ export const visitorNavigation: ShellNavItem[] = [
 
 export const clientNavigation: ShellNavItem[] = [
   { id: "home", label: "Início", href: "#inicio", icon: "/icons/home.svg" },
-  { id: "products", label: "Produtos", href: "#produtos", icon: "/icons/shopping-bag.svg" },
+  { id: "products", label: "Produtos", href: "/produtos", icon: "/icons/shopping-bag.svg" },
   { id: "community", label: "Comunidade", href: "#comunidade", icon: "/icons/users.svg" },
   { id: "support", label: "Suporte", href: "#ticket", icon: "/icons/headset.svg" },
   { id: "ticket", label: "Ticket", href: "#ticket", icon: "/icons/message-circle.svg" },

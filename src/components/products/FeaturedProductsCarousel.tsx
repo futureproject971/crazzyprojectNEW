@@ -41,7 +41,7 @@ export function FeaturedProductsCarousel() {
             <p>Selecionados especialmente para você.</p>
           </div>
         </div>
-        <a href="#loja" className="section-link">Ver todos os produtos →</a>
+        <a href="/produtos" className="section-link">Ver todos os produtos →</a>
       </div>
 
       <div className="coverflow-shell">

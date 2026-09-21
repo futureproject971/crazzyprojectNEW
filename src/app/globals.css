@@ -4,6 +4,7 @@
 @import "../core/app-shell/styles.css";
 @import "../modules/home/styles.css";
 @import "../modules/discovery/styles.css";
+@import "../modules/catalog/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
