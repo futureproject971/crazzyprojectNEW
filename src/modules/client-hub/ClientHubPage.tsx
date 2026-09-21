@@ -47,7 +47,7 @@ function date(value: string | null) {
 function entitlementTone(status: HubEntitlement["status"]) {
   if (status === "active") return "green" as const;
   if (status === "expired") return "neutral" as const;
-  if (status === "revoked" || status === "refunded" || status === "disputed") return "red" as const;
+  if (status === "revoked" || status === "refunded" || status === "disputed") return "pink" as const;
   return "neutral" as const;
 }
 
@@ -261,7 +261,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
               <strong>Precisa de ajuda?</strong>
               <span>Abra um ticket com contexto da sua compra.</span>
             </div>
-            <a href="/tickets">Abrir ticket →</a>
+            <span>Support Desk entra no M13</span>
           </div>
         </aside>
 
@@ -472,7 +472,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                   <small>FULFILLMENT</small>
                   <h2>Entregas</h2>
                 </div>
-                <a href="/biblioteca">Abrir biblioteca →</a>
+                <span>Library entra no M11</span>
               </header>
 
               {!snapshot.orders.length && !snapshot.rewardDeliveries.length ? (
@@ -593,7 +593,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                       <article key={role.id}>
                         <NeonIcon name="community" size={22} />
                         <strong>{role.roleName}</strong>
-                        <Badge tone={role.status === "granted" ? "green" : role.status === "failed" ? "red" : "gold"}>
+                        <Badge tone={role.status === "granted" ? "green" : role.status === "failed" ? "pink" : "gold"}>
                           {role.status.toUpperCase()}
                         </Badge>
                       </article>
