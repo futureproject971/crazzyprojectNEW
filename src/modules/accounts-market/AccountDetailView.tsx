@@ -315,7 +315,10 @@ export function AccountDetailView({
                   <button
                     type="button"
                     className="crz-account-detail__gallery-main"
-                    onClick={() => setLightboxIndex(selectedIndex)}
+                    onClick={() => {
+                      if (inventory.skins.length) setActiveTab("skins");
+                      setLightboxIndex(selectedIndex);
+                    }}
                     aria-label={"Ampliar " + selectedItem.name}
                   >
                     <img src={selectedItem.image} alt={selectedItem.name} />
