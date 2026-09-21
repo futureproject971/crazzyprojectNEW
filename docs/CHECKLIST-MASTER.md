@@ -293,17 +293,38 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] production build PASS
 - [x] smoke M11 PASS
 - [x] validação isolada GitHub Actions PASS
-- [ ] CI oficial no head final
-- [ ] PR M11
-- [ ] merge M11
+- [x] CI oficial pós-merge na phase-1-home PASS
+- [x] PR #13 M11
+- [x] merge M11 — d833cbef71175487bbf0c150217a8b32b2953ce1
 
-## ❌ M12 — CRAZZY PROFILE
-- [ ] avatar
+## 🟡 M12 — CRAZZY PROFILE — EM ANDAMENTO
+- [x] branch `m12-profile` criada
+- [ ] /perfil
+- [ ] snapshot privado do perfil
+- [ ] username
+- [ ] avatar CRAZZY
+- [ ] fallback avatar Discord
 - [ ] Discord conectado
-- [ ] cargos
+- [ ] guild membership/status
+- [ ] app roles
+- [ ] cargos Discord
 - [ ] badges
 - [ ] cor principal
+- [ ] bio curta
 - [ ] perfil estilo Discord
+- [ ] editar personalização própria
+- [ ] validação server-side de username/bio/cor
+- [ ] RLS owner/admin
+- [ ] sem alterar app role pelo cliente
+- [ ] sem criar Discord role manual pelo cliente
+- [ ] loading/error/empty
+- [ ] desktop/tablet/mobile
+- [ ] Security Advisor
+- [ ] TypeScript
+- [ ] production build
+- [ ] smoke M12
+- [ ] PR M12
+- [ ] merge M12
 
 ## ❌ M13 — CRAZZY SUPPORT
 - [ ] ticket real
@@ -665,6 +686,5 @@ Fonte visual: Pink.
 - [x] M08 concluído estruturalmente
 - [x] M09 concluído estruturalmente
 - [x] M10 concluído
-- [x] M11 concluído tecnicamente
-- [ ] mergear M11 — CRAZZY LIBRARY
-- [ ] iniciar M12 — CRAZZY PROFILE
+- [x] M11 concluído e mergeado
+- [x] iniciar M12 — CRAZZY PROFILE
