@@ -11,6 +11,7 @@ import {
   Select,
 } from "@/core/design-system";
 import { getProductDetail } from "@/modules/product-view";
+import { CouponQuickPicker } from "@/modules/coupons";
 import { formatBrl } from "./pricing";
 import { useCart } from "./CartProvider";
 import type { CartItem } from "./types";
@@ -266,6 +267,13 @@ export function CartPage() {
                     O código fica salvo no carrinho e será validado de forma autoritativa no checkout.
                     Cupom e combo não acumulam: será usado o benefício válido mais vantajoso.
                   </small>
+                  <CouponQuickPicker
+                    value={couponCode}
+                    onSelect={(code) => {
+                      setCouponCode(code);
+                      setCouponSaved(true);
+                    }}
+                  />
                 </div>
 
                 <div className="crz-cart-summary__lines">
