@@ -10,6 +10,7 @@ export const visitorNavigation: ShellNavItem[] = [
   { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
   { id: "club", label: "CLUB", href: "/club", icon: "/icons/crown.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
+  { id: "help", label: "Ajuda", href: "/help", icon: "/icons/book.svg" },
   { id: "ticket", label: "Ticket", href: "/tickets", icon: "/icons/headset.svg" },
 ];
 
@@ -19,6 +20,7 @@ export const clientNavigation: ShellNavItem[] = [
   { id: "combo", label: "Combo", href: "/combo", icon: "/icons/crown.svg" },
   { id: "accounts", label: "Contas", href: "/contas", icon: "/icons/package.svg" },
   { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
+  { id: "help", label: "Ajuda", href: "/help", icon: "/icons/book.svg" },
   { id: "support", label: "Suporte", href: "/tickets", icon: "/icons/headset.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
 ];

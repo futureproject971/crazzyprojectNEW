@@ -26,14 +26,6 @@ export const CRAZZY_STANDARD_PLAN_TEMPLATES = [
   { code: "lifetime" as const, name: "Lifetime", duration: "Vitalício", note: "Elegível ao Combo Lifetime." },
 ];
 
-export type ProductReview = {
-  id: string;
-  name: string;
-  rating: number;
-  time: string;
-  text: string;
-  verified?: boolean;
-};
 
 export type ProductGalleryItem = {
   id: string;
@@ -54,38 +46,10 @@ export type ProductDetail = {
   compatibility: string[];
   requirements: string[];
   highlights: string[];
-  reviews: ProductReview[];
   rating: number;
   ratingCount: number;
-  faq: Array<{ question: string; answer: string }>;
 };
 
-const reviews: ProductReview[] = [
-  {
-    id: "r1",
-    name: "Shadow77",
-    rating: 5,
-    time: "há 2 dias",
-    text: "Experiência bem organizada, entrega rápida e painel fácil de entender.",
-    verified: true,
-  },
-  {
-    id: "r2",
-    name: "Miyuki",
-    rating: 5,
-    time: "há 5 dias",
-    text: "Curti bastante a apresentação e o suporte. Voltaria a comprar.",
-    verified: true,
-  },
-  {
-    id: "r3",
-    name: "Zer0x",
-    rating: 4,
-    time: "há 1 semana",
-    text: "Tudo certo no meu pedido. Interface simples e informação direta.",
-    verified: true,
-  },
-];
 
 function categoryCopy(product: CatalogProduct) {
   if (product.category === "accounts") {
@@ -212,23 +176,8 @@ export function getProductDetail(slug: string): ProductDetail | undefined {
     compatibility: copy.compatibility,
     requirements: copy.requirements,
     highlights: copy.highlights,
-    reviews,
     rating: 4.8,
     ratingCount: 127,
-    faq: [
-      {
-        question: "Como recebo o produto?",
-        answer: "Nesta fase a entrega é apenas demonstrativa. O fluxo real será conectado aos módulos de carrinho, checkout e biblioteca.",
-      },
-      {
-        question: "Os valores já são reais?",
-        answer: "Não. O M05 preserva os valores como “Consultar” para não inventar preços antes da integração comercial.",
-      },
-      {
-        question: "O status de estoque é definitivo?",
-        answer: "Ainda não. O status exibido vem de mock data até o backend ser conectado.",
-      },
-    ],
   };
 }
 
