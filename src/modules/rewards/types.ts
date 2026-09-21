@@ -45,6 +45,8 @@ export type RewardSession = {
   requested_at?: string | null;
   delivered_at?: string | null;
   cooldown_until?: string | null;
+  created_at: string;
+  updated_at?: string | null;
 };
 
 export type RewardHistoryItem = RewardSession & {
