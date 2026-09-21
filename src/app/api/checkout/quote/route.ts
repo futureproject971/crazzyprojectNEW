@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkoutAuthHeader, checkoutEdgeUrl, proxyJson } from "../_shared";
+import { checkoutAuthHeader, checkoutEdgeUrl, internalizeCartSnapshot, proxyJson } from "../_shared";
 
 export async function POST(request: NextRequest) {
   const authorization = await checkoutAuthHeader(request);
@@ -20,7 +20,10 @@ export async function POST(request: NextRequest) {
       "Content-Type": "application/json",
       Authorization: authorization,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      ...body,
+      cart_snapshot: internalizeCartSnapshot(body.cart_snapshot),
+    }),
   });
   const proxied = await proxyJson(response);
   return NextResponse.json(proxied.body, { status: proxied.status });
