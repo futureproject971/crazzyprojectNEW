@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Badge,
   Button,
@@ -10,6 +10,7 @@ import {
   Panel,
   SectionTitle,
 } from "@/core/design-system";
+import { formatBrl } from "@/modules/cart/pricing";
 import { useCart } from "@/modules/cart/CartProvider";
 import type { AccountsMarketGame, AccountsMarketItem } from "./types";
 
@@ -62,18 +63,24 @@ function detailsFor(item: AccountsMarketItem) {
   }
   return [
     ["Rank atual", item.rank],
-    ["Valor do rank", item.rankValue],
     ["Região", item.region],
     ["Nível", item.level],
     ["Skins", item.skinsCount],
     ["Facas", item.knivesCount],
     ["Agentes", item.agentsCount],
-    ["Inventário", item.inventoryValue],
+    ["Valor do inventário", item.inventoryValue],
     ["Valorant Points", item.vp],
     ["Radiant Points", item.rp],
     ["Tipo de e-mail", item.emailType],
     ["País", item.country],
   ] as const;
+}
+
+function gameName(game: AccountsMarketItem["game"]) {
+  if (game === "lol") return "League of Legends";
+  if (game === "fortnite") return "Fortnite";
+  if (game === "minecraft") return "Minecraft";
+  return "VALORANT";
 }
 
 export function AccountDetailView({
@@ -87,65 +94,64 @@ export function AccountDetailView({
   const [item, setItem] = useState<AccountsMarketItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [credentialMissing, setCredentialMissing] = useState(false);
 
   const load = () => {
     setLoading(true);
     setError(null);
-    setCredentialMissing(false);
 
     fetch("/api/accounts/" + encodeURIComponent(id) + "?game=" + game, { cache: "no-store" })
       .then(async (response) => {
         const payload = await response.json();
-        if (!response.ok) {
-          setCredentialMissing(payload?.code === "LZT_CREDENTIAL_MISSING");
-          throw new Error(payload?.error || "Falha ao carregar conta.");
-        }
+        if (!response.ok) throw new Error(payload?.error || "Não foi possível carregar esta conta.");
         return payload.item as AccountsMarketItem;
       })
       .then(setItem)
-      .catch((requestError: Error) => setError(requestError.message || "Falha ao carregar conta."))
+      .catch((requestError: Error) => setError(requestError.message || "Não foi possível carregar esta conta."))
       .finally(() => setLoading(false));
   };
 
   useEffect(load, [id, game]);
 
+  const details = useMemo(() => item ? detailsFor(item) : [], [item]);
+
   if (loading) {
-    return <main className="crz-account-detail crz-account-detail--state"><LoadingState label="Carregando detalhes da conta..." /></main>;
+    return (
+      <main className="crz-account-detail crz-account-detail--state">
+        <LoadingState label="Carregando detalhes da conta..." />
+      </main>
+    );
   }
 
   if (error || !item) {
     return (
       <main className="crz-account-detail crz-account-detail--state">
         <ErrorState
-          title={credentialMissing ? "Credencial do provider pendente" : "A conta não carregou"}
-          description={credentialMissing ? "O detalhe seguro já está pronto, mas a consulta ao provider aguarda configuração da credencial LZT." : (error ?? "Conta não encontrada.")}
+          title="A conta não carregou"
+          description={error ?? "Esta conta não está mais disponível."}
           onRetry={load}
         />
       </main>
     );
   }
 
-  const details = detailsFor(item);
-
   const addAccountToCart = () => {
     addItem({
-      key: "lzt-account:" + item.game + ":" + item.id,
-      kind: "lzt-account",
-      productId: "lzt-" + item.game + "-" + item.id,
+      key: "account:" + item.game + ":" + item.id,
+      kind: "account",
+      productId: "account-" + item.game + "-" + item.id,
       name: item.title,
-      subtitle: "Conta " + item.game.toUpperCase() + " • #" + item.id,
+      subtitle: gameName(item.game) + " • Conta #" + item.id,
       image: item.imageUrl ?? null,
-      planId: "lzt-account",
-      planCode: "lzt-account",
+      planId: "account",
+      planCode: "account",
       planName: "Conta",
       durationLabel: "Entrega única",
-      price: null,
-      priceLabel: "Preço protegido",
-      category: "Accounts Market",
+      price: item.price,
+      priceLabel: item.price != null ? formatBrl(item.price) : "A confirmar",
+      category: "Contas",
       comboEligible: false,
-      lztItemId: item.id,
-      lztGame: item.game,
+      accountId: item.id,
+      accountGame: item.game,
     });
     openCart();
   };
@@ -159,42 +165,47 @@ export function AccountDetailView({
 
         <section className="crz-account-detail__hero">
           <div className="crz-account-detail__art">
-            <div className="crz-account-detail__orb" aria-hidden="true" />
-            <NeonIcon name="gamepad" size={118} />
-            <span>CRAZZY ACCOUNTS</span>
+            {item.imageUrl ? <img className="crz-account-detail__cover" src={item.imageUrl} alt="" /> : null}
+            <div className="crz-account-detail__art-overlay" />
+            <div className="crz-account-detail__art-copy">
+              <Badge tone="green">DISPONÍVEL</Badge>
+              <strong>{gameName(item.game)}</strong>
+              <span>Conta #{item.id}</span>
+            </div>
           </div>
 
           <div className="crz-account-detail__summary">
             <div className="crz-account-detail__badges">
-              <Badge tone="green">LZT LIVE</Badge>
-              <Badge tone={item.rank ? "blue" : "neutral"}>{item.rank ?? item.game.toUpperCase()}</Badge>
+              <Badge tone="green">PRONTA PARA COMPRA</Badge>
+              <Badge tone={item.rank ? "blue" : "neutral"}>{item.rank ?? gameName(item.game)}</Badge>
             </div>
-            <small>{item.game.toUpperCase()} • CONTA #{item.id}</small>
+            <small>{gameName(item.game).toUpperCase()} • CONTA #{item.id}</small>
             <h1>{item.title}</h1>
-            <p>Detalhe sanitizado pelo backend. O navegador não recebe token, credenciais da conta nem endpoint de compra.</p>
+            <p>Confira rank, nível, inventário e itens desta conta antes de adicionar ao carrinho.</p>
 
             <div className="crz-account-detail__quick">
               {details.slice(0, 4).map(([label, value]) => <Info key={label} label={label} value={value} />)}
             </div>
 
-            <div className="crz-account-detail__price-guard">
-              <NeonIcon name="shield" size={30} />
+            <div className="crz-account-detail__price-box">
               <div>
-                <small>VALOR COMERCIAL</small>
-                <strong>Preço final protegido</strong>
-                <span>O provider é consultado em BRL, mas o preço final continua server-side até o markup comercial ser validado.</span>
+                <small>VALOR</small>
+                <strong>{item.price != null ? formatBrl(item.price) : "Valor indisponível"}</strong>
+                <span>O valor e a disponibilidade são conferidos novamente antes do pagamento.</span>
               </div>
+              <NeonIcon name="shield" size={34} />
             </div>
 
             <div className="crz-account-detail__actions">
               <Button
                 size="lg"
+                disabled={item.price == null}
                 onClick={addAccountToCart}
                 leadingIcon={<NeonIcon name="lightning" size={20} />}
               >
                 Adicionar ao carrinho
               </Button>
-              <a href="/contas">← Voltar ao market</a>
+              <a href="/contas">← Voltar às contas</a>
             </div>
           </div>
         </section>
@@ -204,26 +215,54 @@ export function AccountDetailView({
             <SectionTitle
               icon={<NeonIcon name="verified" size={28} />}
               title="Detalhes da conta"
-              description="Somente campos explicitamente permitidos pelo adapter M06."
+              description="As principais informações reunidas em um só lugar."
             />
             <div className="crz-account-detail__info-grid">
               {details.map(([label, value]) => <Info key={label} label={label} value={value} />)}
             </div>
+
+            <div className="crz-account-detail__delivery">
+              <NeonIcon name="shield" size={28} />
+              <div>
+                <strong>Compra protegida</strong>
+                <span>A entrega acontece somente após a confirmação do pagamento e a conta fica vinculada ao seu pedido.</span>
+              </div>
+            </div>
           </Panel>
 
-          <Panel className="crz-account-detail__panel crz-account-detail__panel--security">
+          <Panel className="crz-account-detail__panel crz-account-detail__inventory">
             <SectionTitle
-              icon={<NeonIcon name="shield" size={28} />}
-              title="Regras de segurança"
-              description="M06 consulta e apresenta. Compra e entrega são módulos separados."
+              icon={<NeonIcon name="diamond" size={28} />}
+              title="Skins e inventário"
+              description={item.cosmetics.length ? item.cosmetics.length + " destaques encontrados" : "Resumo do inventário desta conta"}
             />
-            <ul>
-              <li>Token LZT permanece somente no backend.</li>
-              <li>Detalhe público usa action sanitizada e read-only.</li>
-              <li>O browser não recebe endpoint de fast-buy.</li>
-              <li>Preço comercial não é confiado ao payload do cliente.</li>
-              <li>Entrega só ocorrerá pelo Fulfillment Engine após pagamento confirmado.</li>
-            </ul>
+
+            {item.cosmetics.length ? (
+              <div className="crz-account-detail__cosmetics">
+                {item.cosmetics.map((cosmetic, index) => (
+                  <article className="crz-account-detail__cosmetic" key={cosmetic.name + index}>
+                    <div className="crz-account-detail__cosmetic-art">
+                      {cosmetic.imagePath ? (
+                        <img src={cosmetic.imagePath} alt={cosmetic.name} loading="lazy" />
+                      ) : (
+                        <NeonIcon name="diamond" size={28} />
+                      )}
+                    </div>
+                    <div>
+                      <strong>{cosmetic.name}</strong>
+                      <span>{cosmetic.category || "Item do inventário"}</span>
+                      {cosmetic.rarity && <small>{cosmetic.rarity}</small>}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="crz-account-detail__inventory-empty">
+                <NeonIcon name="cube" size={34} />
+                <strong>{item.skinsCount ?? 0} skins • {item.knivesCount ?? 0} facas</strong>
+                <span>Os itens disponíveis serão exibidos aqui quando houver prévia individual.</span>
+              </div>
+            )}
           </Panel>
         </section>
       </div>
