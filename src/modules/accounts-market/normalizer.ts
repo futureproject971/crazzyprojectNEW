@@ -8,15 +8,15 @@ import type {
 type AnyRecord = Record<string, unknown>;
 
 const valorantRanks: Record<number, string> = {
-  3: "Iron 1", 4: "Iron 2", 5: "Iron 3",
+  3: "Ferro 1", 4: "Ferro 2", 5: "Ferro 3",
   6: "Bronze 1", 7: "Bronze 2", 8: "Bronze 3",
-  9: "Silver 1", 10: "Silver 2", 11: "Silver 3",
-  12: "Gold 1", 13: "Gold 2", 14: "Gold 3",
-  15: "Platinum 1", 16: "Platinum 2", 17: "Platinum 3",
-  18: "Diamond 1", 19: "Diamond 2", 20: "Diamond 3",
-  21: "Ascendant 1", 22: "Ascendant 2", 23: "Ascendant 3",
-  24: "Immortal 1", 25: "Immortal 2", 26: "Immortal 3",
-  27: "Radiant",
+  9: "Prata 1", 10: "Prata 2", 11: "Prata 3",
+  12: "Ouro 1", 13: "Ouro 2", 14: "Ouro 3",
+  15: "Platina 1", 16: "Platina 2", 17: "Platina 3",
+  18: "Diamante 1", 19: "Diamante 2", 20: "Diamante 3",
+  21: "Ascendente 1", 22: "Ascendente 2", 23: "Ascendente 3",
+  24: "Imortal 1", 25: "Imortal 2", 26: "Imortal 3",
+  27: "Radiante",
 };
 
 const gameArt: Record<AccountsMarketGame, string> = {
@@ -57,9 +57,21 @@ function toNumberValue(value: unknown): number | null {
 
 function toBooleanValue(value: unknown): boolean | null {
   if (typeof value === "boolean") return value;
-  if (value === 1 || value === "1" || value === "true") return true;
-  if (value === 0 || value === "0" || value === "false") return false;
+  if (value === 1 || value === "1" || value === "true" || value === "yes") return true;
+  if (value === 0 || value === "0" || value === "false" || value === "no") return false;
   return null;
+}
+
+function toStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map(toStringValue).filter((item): item is string => Boolean(item));
+  }
+  if (value && typeof value === "object") {
+    return Object.values(value as AnyRecord)
+      .map(toStringValue)
+      .filter((item): item is string => Boolean(item));
+  }
+  return [];
 }
 
 function detectGame(
@@ -80,15 +92,14 @@ function normalizeCosmetics(value: unknown): AccountCosmetic[] {
   return value
     .map((entry) => {
       const source = asRecord(entry);
-      const name = toStringValue(firstValue(source, ["name", "title"])) ?? "Item";
       return {
-        name,
+        name: toStringValue(firstValue(source, ["name", "title"])) ?? "Item",
         category: toStringValue(firstValue(source, ["category", "type"])),
         rarity: toStringValue(firstValue(source, ["rarity", "tier"])),
         imagePath: toStringValue(firstValue(source, ["imagePath", "image_path"])),
       } satisfies AccountCosmetic;
     })
-    .slice(0, 24);
+    .slice(0, 48);
 }
 
 export function normalizeAccountItem(
@@ -98,10 +109,15 @@ export function normalizeAccountItem(
   const source = asRecord(input);
   const id = toStringValue(firstValue(source, ["id", "item_id", "itemId"])) ?? "unknown";
   const game = detectGame(source, fallbackGame);
-  const rankValue = toNumberValue(firstValue(source, ["rankValue", "rank_value", "valorant_rank", "rank"]));
 
-  let rank = toStringValue(firstValue(source, ["rank", "rank_name", "valorant_rank_name"]));
-  if (game === "valorant" && rankValue != null && (!rank || /^\d+$/.test(rank))) {
+  const rankValue = toNumberValue(firstValue(source, [
+    "rankValue", "rank_value", "riot_valorant_rank", "valorant_rank", "rank",
+  ]));
+
+  let rank = toStringValue(firstValue(source, [
+    "rank", "rank_name", "valorant_rank_name", "riot_lol_rank", "lol_rank",
+  ]));
+  if (game === "valorant" && rankValue != null) {
     rank = valorantRanks[Math.round(rankValue)] ?? rank;
   }
 
@@ -113,28 +129,45 @@ export function normalizeAccountItem(
     title: toStringValue(firstValue(source, ["title", "account_title", "name"])) ?? "Conta #" + id,
     game,
     price: toNumberValue(firstValue(source, ["price", "commercialPrice", "commercial_price"])),
-    region: toStringValue(firstValue(source, ["region"])),
+    region: toStringValue(firstValue(source, [
+      "region", "riot_valorant_region", "valorantRegionPhrase", "riot_lol_region", "lol_region",
+    ])),
     rank,
     rankValue,
-    level: toNumberValue(firstValue(source, ["level"])),
-    skinsCount: toNumberValue(firstValue(source, ["skinsCount", "skins_count"])),
-    knivesCount: toNumberValue(firstValue(source, ["knivesCount", "knives_count"])),
-    agentsCount: toNumberValue(firstValue(source, ["agentsCount", "agents_count"])),
-    championsCount: toNumberValue(firstValue(source, ["championsCount", "champions_count"])),
-    inventoryValue: toNumberValue(firstValue(source, ["inventoryValue", "inventory_value"])),
-    vp: toNumberValue(firstValue(source, ["vp"])),
-    rp: toNumberValue(firstValue(source, ["rp"])),
+    level: toNumberValue(firstValue(source, [
+      "level", "riot_valorant_level", "riot_lol_level", "fortnite_level", "minecraft_hypixel_level",
+    ])),
+    skinsCount: toNumberValue(firstValue(source, [
+      "skinsCount", "skins_count", "riot_valorant_skin_count", "riot_lol_skin_count", "fortnite_skin_count",
+    ])),
+    knivesCount: toNumberValue(firstValue(source, [
+      "knivesCount", "knives_count", "riot_valorant_knife_count", "riot_valorant_knife",
+    ])),
+    agentsCount: toNumberValue(firstValue(source, [
+      "agentsCount", "agents_count", "riot_valorant_agent_count",
+    ])),
+    championsCount: toNumberValue(firstValue(source, [
+      "championsCount", "champions_count", "riot_lol_champion_count",
+    ])),
+    inventoryValue: toNumberValue(firstValue(source, [
+      "inventoryValue", "inventory_value", "riot_valorant_inventory_value",
+    ])),
+    vp: toNumberValue(firstValue(source, ["vp", "riot_valorant_wallet_vp"])),
+    rp: toNumberValue(firstValue(source, ["rp", "riot_valorant_wallet_rp"])),
     emailType: toStringValue(firstValue(source, ["emailType", "email_type"])),
-    country: toStringValue(firstValue(source, ["country"])),
-    vbucks: toNumberValue(firstValue(source, ["vbucks"])),
-    minecoins: toNumberValue(firstValue(source, ["minecoins"])),
-    capesCount: toNumberValue(firstValue(source, ["capesCount", "capes_count"])),
-    java: toBooleanValue(firstValue(source, ["java"])),
-    bedrock: toBooleanValue(firstValue(source, ["bedrock"])),
-    dungeons: toBooleanValue(firstValue(source, ["dungeons"])),
-    legends: toBooleanValue(firstValue(source, ["legends"])),
+    country: toStringValue(firstValue(source, ["country", "riot_country"])),
+    vbucks: toNumberValue(firstValue(source, ["vbucks", "fortnite_vbucks"])),
+    minecoins: toNumberValue(firstValue(source, ["minecoins", "minecraft_minecoins"])),
+    capesCount: toNumberValue(firstValue(source, ["capesCount", "capes_count", "minecraft_capes_count"])),
+    java: toBooleanValue(firstValue(source, ["java", "minecraft_java"])),
+    bedrock: toBooleanValue(firstValue(source, ["bedrock", "minecraft_bedrock"])),
+    dungeons: toBooleanValue(firstValue(source, ["dungeons", "minecraft_dungeons"])),
+    legends: toBooleanValue(firstValue(source, ["legends", "minecraft_legends"])),
     imageUrl: localImage?.startsWith("/") ? localImage : gameArt[safeGame],
     cosmetics: normalizeCosmetics(source.cosmetics),
+    skinIds: toStringArray(firstValue(source, ["skinIds", "skin_ids"])),
+    agentIds: toStringArray(firstValue(source, ["agentIds", "agent_ids"])),
+    buddyIds: toStringArray(firstValue(source, ["buddyIds", "buddy_ids"])),
   };
 }
 

@@ -229,7 +229,7 @@ export function CheckoutPage() {
       <section className="crz-checkout-hero">
         <div className="crz-container">
           <PageHeader
-            eyebrow="M08 • CRAZZY CHECKOUT"
+            eyebrow="CRAZZY CHECKOUT"
             title="Finalizar compra"
             description="Revise seu pedido, escolha a forma de pagamento e finalize com segurança."
             actions={<Badge tone="green">CHECKOUT PROTEGIDO</Badge>}

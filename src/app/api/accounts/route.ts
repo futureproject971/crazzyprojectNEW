@@ -38,6 +38,8 @@ export async function GET(request: NextRequest) {
   copyIfPresent(incoming, params, "page", "page");
   copyIfPresent(incoming, params, "query", "title");
   copyIfPresent(incoming, params, "orderBy", "order_by");
+  copyIfPresent(incoming, params, "priceMin", "pmin");
+  copyIfPresent(incoming, params, "priceMax", "pmax");
 
   if (game === "valorant") {
     copyIfPresent(incoming, params, "rankMin", "rmin");
@@ -46,6 +48,11 @@ export async function GET(request: NextRequest) {
     copyIfPresent(incoming, params, "levelMax", "valorant_level_max");
     copyIfPresent(incoming, params, "skinsMin", "valorant_smin");
     copyIfPresent(incoming, params, "knivesMin", "valorant_knife_min");
+    copyIfPresent(incoming, params, "inventoryMin", "inv_min");
+    copyIfPresent(incoming, params, "inventoryMax", "inv_max");
+    if (incoming.get("onlyKnife") === "true") params.set("knife", "true");
+    const weapon = incoming.get("weapon");
+    if (weapon && weapon !== "todos" && !params.has("title")) params.set("title", weapon);
     const region = incoming.get("region");
     if (region?.trim()) params.append("valorant_region[]", region.trim());
   }
@@ -55,6 +62,12 @@ export async function GET(request: NextRequest) {
     copyIfPresent(incoming, params, "levelMax", "lol_level_max");
     copyIfPresent(incoming, params, "skinsMin", "lol_smin");
     copyIfPresent(incoming, params, "championsMin", "champion_min");
+    const lolRanks = incoming.get("rankMax");
+    if (lolRanks) {
+      for (const rank of lolRanks.split("|").map((value) => value.trim()).filter(Boolean)) {
+        params.append("lol_rank[]", rank);
+      }
+    }
     const region = incoming.get("region");
     if (region?.trim()) params.append("lol_region[]", region.trim());
   }
@@ -72,8 +85,10 @@ export async function GET(request: NextRequest) {
     copyIfPresent(incoming, params, "hypixelLevelMin", "level_hypixel_min");
     copyIfPresent(incoming, params, "capesMin", "capes_min");
     copyIfPresent(incoming, params, "minecoinsMin", "minecoins_min");
-    copyIfPresent(incoming, params, "javaEdition", "java");
-    copyIfPresent(incoming, params, "bedrockEdition", "bedrock");
+    const javaEdition = incoming.get("javaEdition");
+    const bedrockEdition = incoming.get("bedrockEdition");
+    if (javaEdition) params.set("java", javaEdition === "1" ? "yes" : javaEdition);
+    if (bedrockEdition) params.set("bedrock", bedrockEdition === "1" ? "yes" : bedrockEdition);
   }
 
   if (!params.has("page")) params.set("page", "1");

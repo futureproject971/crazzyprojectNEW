@@ -500,3 +500,52 @@
     margin-left: 4px;
   }
 }
+
+
+/* Global shell collision fixes */
+@media (max-width: 1280px) and (min-width: 981px) {
+  .crz-shell-header__account .crz-shell-auth:not(.crz-shell-auth--compact) {
+    width: 35px;
+    padding-inline: 0;
+  }
+
+  .crz-shell-header__account .crz-shell-auth:not(.crz-shell-auth--compact) > span {
+    display: none;
+  }
+
+  .crz-shell-header__account {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 980px) {
+  .crz-shell-header {
+    width: calc(100% - 18px);
+    grid-template-columns: 1fr auto;
+    gap: 7px;
+  }
+
+  .crz-shell-header__main {
+    min-width: 0;
+  }
+
+  .crz-shell-nav,
+  .crz-shell-header__account {
+    display: none;
+  }
+
+  .crz-shell-menu {
+    display: block;
+  }
+}
+
+@media (max-width: 980px) and (min-width: 821px) {
+  .crz-shell-brand {
+    width: 112px;
+    flex-basis: 112px;
+  }
+
+  .crz-shell-brand img {
+    width: 104px;
+  }
+}

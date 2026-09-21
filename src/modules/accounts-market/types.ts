@@ -34,6 +34,9 @@ export type AccountsMarketItem = {
   legends: boolean | null;
   imageUrl: string | null;
   cosmetics: AccountCosmetic[];
+  skinIds: string[];
+  agentIds: string[];
+  buddyIds: string[];
 };
 
 export type AccountsMarketPageData = {
@@ -64,4 +67,10 @@ export type AccountsMarketFilters = {
   hypixelLevelMin: string;
   javaEdition: string;
   bedrockEdition: string;
+  weapon: string;
+  onlyKnife: string;
+  priceMin: string;
+  priceMax: string;
+  inventoryMin: string;
+  inventoryMax: string;
 };

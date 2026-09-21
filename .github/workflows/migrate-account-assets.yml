@@ -1,0 +1,50 @@
+name: Migrate legacy account assets
+
+on:
+  push:
+    branches:
+      - m06-migrate-legacy-accounts
+    paths:
+      - .github/workflows/migrate-account-assets.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CRAZZY PROJECT NEW
+        uses: actions/checkout@v4
+        with:
+          ref: m06-migrate-legacy-accounts
+          fetch-depth: 0
+
+      - name: Checkout legacy CRAZZY PROJECT
+        uses: actions/checkout@v4
+        with:
+          repository: futureproject971/crazzyproject
+          ref: main
+          path: legacy-source
+
+      - name: Copy account assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public/accounts-assets
+          find legacy-source/src/assets -maxdepth 1 -type f \(             -name 'rank-*' -o             -name 'lol-rank-*' -o             -name 'weapon-*' -o             -name 'rarity-*'           \) -print0 | xargs -0 -I{} cp "{}" public/accounts-assets/
+          rm -rf legacy-source
+
+      - name: Commit migrated assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/accounts-assets
+          if git diff --cached --quiet; then
+            echo "Assets already synchronized."
+            exit 0
+          fi
+          git commit -m "assets(m06): migrate legacy account ranks weapons and rarities"
+          git push origin HEAD:m06-migrate-legacy-accounts

@@ -255,8 +255,8 @@ export function CatalogPage() {
           <div className="crz-catalog-filter-note">
             <NeonIcon name="shield" size={28} />
             <div>
-              <strong>Catálogo visual</strong>
-              <span>Dados mockados nesta fase. Compra real entra nos módulos de comércio seguintes.</span>
+              <strong>Compra simples e segura</strong>
+              <span>Escolha o produto e confira os detalhes antes de finalizar.</span>
             </div>
           </div>
         </aside>

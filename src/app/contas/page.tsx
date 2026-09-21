@@ -4,7 +4,7 @@ import { AccountsMarketPage } from "@/modules/accounts-market";
 
 export const metadata: Metadata = {
   title: "Contas de Jogos | CRAZZY PROJECT",
-  description: "CRAZZY ACCOUNTS MARKET com integração LZT.",
+  description: "Marketplace de contas de jogos da CRAZZY PROJECT.",
 };
 
 export default function AccountsPage() {
