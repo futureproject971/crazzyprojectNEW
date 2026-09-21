@@ -15,6 +15,14 @@ const eligibleProducts = catalogProducts.filter(
     product.category !== "accounts"
 );
 
+function planAvailableForCombo(productId: string, plan: ComboPlanFamily) {
+  const product = eligibleProducts.find((item) => item.id === productId);
+  if (!product) return false;
+  const detail = getProductDetail(product.slug);
+  const selectedPlan = detail?.plans.find((candidate) => candidate.code === plan);
+  return Boolean(selectedPlan && selectedPlan.stockCount !== 0);
+}
+
 export function ComboBuilderPage() {
   const { addItem, openCart } = useCart();
   const [plan, setPlan] = useState<ComboPlanFamily>("30d");
@@ -43,7 +51,7 @@ export function ComboBuilderPage() {
       if (!product) continue;
       const detail = getProductDetail(product.slug);
       const selectedPlan = detail?.plans.find((candidate) => candidate.code === plan);
-      if (!selectedPlan) continue;
+      if (!selectedPlan || selectedPlan.stockCount === 0) continue;
 
       addItem({
         key: "product:" + product.id + ":" + selectedPlan.id,
@@ -174,7 +182,9 @@ export function ComboBuilderPage() {
           </header>
 
           <div className="crz-combo-grid">
-            {eligibleProducts.map((product) => {
+            {eligibleProducts
+              .filter((product) => planAvailableForCombo(product.id, plan))
+              .map((product) => {
               const active = selected.includes(product.id);
               return (
                 <button
