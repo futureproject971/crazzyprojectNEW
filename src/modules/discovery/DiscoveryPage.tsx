@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { NeonIcon, LineIcon } from "@/core/design-system";
+import { NeonIcon } from "@/core/design-system";
 import { discoveryCategories, discoveryItems, discoveryNews } from "./data";
 
 export function DiscoveryPage() {
@@ -41,7 +41,14 @@ export function DiscoveryPage() {
           </p>
 
           <label className="crz-discovery-search">
-            <LineIcon name="message" size={20} />
+            <span
+              className="crz-discovery-search__icon"
+              aria-hidden="true"
+              style={{
+                WebkitMaskImage: 'url("/icons/search.svg")',
+                maskImage: 'url("/icons/search.svg")',
+              }}
+            />
             <input
               type="search"
               value={query}
