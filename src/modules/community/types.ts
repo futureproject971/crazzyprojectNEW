@@ -1,3 +1,11 @@
+export type CommunityRank = {
+  points: number;
+  code: string;
+  label: string;
+  color: string;
+  tone: "blue" | "green" | "gold" | "pink" | "neutral";
+};
+
 export type CommunityBadge = {
   id: string;
   label: string;
@@ -16,6 +24,7 @@ export type CommunityAuthor = {
   avatarUrl: string | null;
   primaryRole: CommunityPrimaryRole;
   badges: CommunityBadge[];
+  rank: CommunityRank | null;
   discordRoles: string[];
 };
 
@@ -85,6 +94,7 @@ export type CommunityProfile = {
   appRoles: string[];
   discordRoles: string[];
   badges: CommunityBadge[];
+  rank: CommunityRank | null;
   discord: {
     connected: boolean;
     guildMember: boolean;

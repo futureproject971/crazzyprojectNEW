@@ -1,7 +1,7 @@
 export type ProfileAvatarSource = "auto" | "crazzy" | "discord";
 
 export type ProfileBadge = {
-  id: "member" | "customer" | "discord_verified" | "admin" | "moderator" | "lifetime";
+  id: "member" | "customer" | "discord_verified" | "admin" | "moderator" | "lifetime" | "rank";
   label: string;
   tone: "blue" | "green" | "gold" | "pink" | "neutral";
 };
@@ -43,6 +43,22 @@ export type ProfileSnapshot = {
   appRoles: string[];
   discordRoles: ProfileDiscordRole[];
   badges: ProfileBadge[];
+  rank: {
+    points: number;
+    progressPercent: number;
+    current: {
+      code: string;
+      label: string;
+      color: string;
+      tone: "blue" | "green" | "gold" | "pink" | "neutral";
+    };
+    next: {
+      code: string;
+      label: string;
+      minPoints: number;
+      pointsNeeded: number;
+    } | null;
+  } | null;
   stats: {
     entitlements: number;
     activeEntitlements: number;
