@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Badge,
   Button,
@@ -96,6 +97,7 @@ export function CartPage() {
     removeItem,
     clearCart,
   } = useCart();
+  const [couponSaved, setCouponSaved] = useState(false);
 
   const checkoutBlocked = !items.length || totals.hasUnpricedItems;
 
@@ -245,14 +247,22 @@ export function CartPage() {
                     <input
                       id="cart-coupon"
                       value={couponCode}
-                      onChange={(event) => setCouponCode(event.target.value)}
+                      onChange={(event) => {
+                        setCouponCode(event.target.value);
+                        setCouponSaved(false);
+                      }}
                       placeholder="Ex: CRZ10"
                     />
-                    <button type="button" disabled={!couponCode}>
-                      Guardar
+                    <button
+                      type="button"
+                      disabled={!couponCode}
+                      onClick={() => setCouponSaved(Boolean(couponCode))}
+                    >
+                      {couponSaved ? "Salvo ✓" : "Guardar"}
                     </button>
                   </div>
                   <small>
+                    {couponSaved ? "Cupom guardado para o checkout. " : ""}
                     O código fica salvo no carrinho e será validado de forma autoritativa no checkout.
                     Cupom e combo não acumulam: será usado o benefício válido mais vantajoso.
                   </small>
