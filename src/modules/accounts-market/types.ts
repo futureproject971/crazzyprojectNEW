@@ -7,6 +7,13 @@ export type AccountCosmetic = {
   imagePath: string | null;
 };
 
+export type AccountFact = {
+  key: string;
+  label: string;
+  value: string;
+  group: "Geral" | "Acesso" | "Jogo" | "Inventário" | "Atividade" | "Segurança";
+};
+
 export type AccountsMarketItem = {
   id: string;
   title: string;
@@ -38,6 +45,7 @@ export type AccountsMarketItem = {
   agentIds: string[];
   buddyIds: string[];
   offlineDays: number | null;
+  facts: AccountFact[];
 };
 
 export type AccountsMarketPageData = {
