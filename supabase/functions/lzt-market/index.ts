@@ -474,7 +474,23 @@ Deno.serve(async (req) => {
         appendArrays(minecraftArrays);
       }
 
-      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      let serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+      if (!serviceRoleKey) {
+        try {
+          const secretKeys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}");
+          serviceRoleKey = secretKeys?.default || "";
+        } catch {
+          serviceRoleKey = "";
+        }
+      }
+
+      if (!serviceRoleKey) {
+        return new Response(JSON.stringify({ error: "Backend secret key unavailable" }), {
+          status: 503,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
       const { data: lztConfig } = await supabaseAdmin
         .from("lzt_config")
@@ -503,6 +519,36 @@ Deno.serve(async (req) => {
       params.set("currency", providerCurrency);
       if (!params.has("page")) params.set("page", "1");
       if (!params.has("order_by")) params.set("order_by", "pdate_to_down");
+
+      const { data: waitMsRaw, error: slotError } = await supabaseAdmin
+        .rpc("reserve_lzt_search_slot", { _spacing_ms: 3100 });
+
+      if (slotError) {
+        console.error("[lzt-market] rate slot failed");
+        return new Response(JSON.stringify({ error: "Search throttle unavailable" }), {
+          status: 503,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const waitMs = Math.max(0, Number(waitMsRaw || 0));
+      if (waitMs > 15000) {
+        return new Response(JSON.stringify({
+          error: "Search queue busy",
+          retry_after_ms: waitMs,
+        }), {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+            "Retry-After": String(Math.ceil(waitMs / 1000)),
+          },
+        });
+      }
+
+      if (waitMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      }
 
       const providerUrl = `https://api.lzt.market/${categoryPath}?${params.toString()}`;
       const providerResponse = await fetch(providerUrl, {
