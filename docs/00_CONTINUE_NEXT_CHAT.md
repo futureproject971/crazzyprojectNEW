@@ -477,3 +477,20 @@ M10 — CRAZZY CLIENT HUB.
 
 ### Próximo módulo
 M11 — CRAZZY LIBRARY.
+
+
+---
+
+## M11 — CRAZZY LIBRARY — EM ANDAMENTO
+
+A conversa foi interrompida durante a auditoria inicial do M11.
+
+Leia PRIMEIRO:
+- `docs/M11-WORKER-HANDOFF.md`
+
+Estado:
+- branch: `m11-library`
+- ainda sem implementação final do M11
+- problema crítico já identificado: `stock_items.content` e `reward_deliveries.content` podem ficar acessíveis diretamente por RLS/SELECT após entrega
+- prioridade nº 1: corrigir arquitetura de segredo/reveal antes de criar UI
+- não mergear M11 até concluir segurança + QA
