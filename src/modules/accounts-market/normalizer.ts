@@ -1,5 +1,6 @@
 import type {
   AccountCosmetic,
+  AccountFact,
   AccountsMarketGame,
   AccountsMarketItem,
   AccountsMarketPageData,
@@ -87,6 +88,28 @@ function detectGame(
   return "unknown";
 }
 
+function normalizeFacts(value: unknown): AccountFact[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) => {
+      const source = asRecord(entry);
+      const key = toStringValue(source.key);
+      const label = toStringValue(source.label);
+      const factValue = toStringValue(source.value);
+      const group = toStringValue(source.group) as AccountFact["group"] | null;
+      if (!key || !label || !factValue) return null;
+      const allowedGroups: AccountFact["group"][] = ["Geral", "Acesso", "Jogo", "Inventário", "Atividade", "Segurança"];
+      return {
+        key,
+        label,
+        value: factValue,
+        group: group && allowedGroups.includes(group) ? group : "Geral",
+      } satisfies AccountFact;
+    })
+    .filter((entry): entry is AccountFact => Boolean(entry))
+    .slice(0, 80);
+}
+
 function normalizeCosmetics(value: unknown): AccountCosmetic[] {
   if (!Array.isArray(value)) return [];
   return value
@@ -169,6 +192,7 @@ export function normalizeAccountItem(
     agentIds: toStringArray(firstValue(source, ["agentIds", "agent_ids"])),
     buddyIds: toStringArray(firstValue(source, ["buddyIds", "buddy_ids"])),
     offlineDays: toNumberValue(firstValue(source, ["offlineDays", "offline_days", "daybreak"])),
+    facts: normalizeFacts(source.facts),
   };
 }
 
