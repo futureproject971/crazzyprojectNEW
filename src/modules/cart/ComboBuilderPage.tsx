@@ -6,7 +6,7 @@ import { catalogCategories, catalogProducts } from "@/modules/catalog";
 import { getProductDetail } from "@/modules/product-view";
 import { comboDiscountPercent, comboNextTier } from "./pricing";
 import { useCart } from "./CartProvider";
-import type { ComboPlanFamily } from "./types";
+import type { ComboPlanFamily } from "@/core/commerce/policy";
 
 const eligibleProducts = catalogProducts.filter(
   (product) =>
