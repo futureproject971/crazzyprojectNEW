@@ -10,6 +10,7 @@ import {
   Panel,
   SectionTitle,
 } from "@/core/design-system";
+import { useCart } from "@/modules/cart/CartProvider";
 import type { AccountsMarketGame, AccountsMarketItem } from "./types";
 
 function Info({
@@ -82,6 +83,7 @@ export function AccountDetailView({
   id: string;
   game: AccountsMarketGame;
 }) {
+  const { addItem, openCart } = useCart();
   const [item, setItem] = useState<AccountsMarketItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,6 +128,28 @@ export function AccountDetailView({
 
   const details = detailsFor(item);
 
+  const addAccountToCart = () => {
+    addItem({
+      key: "lzt-account:" + item.game + ":" + item.id,
+      kind: "lzt-account",
+      productId: "lzt-" + item.game + "-" + item.id,
+      name: item.title,
+      subtitle: "Conta " + item.game.toUpperCase() + " • #" + item.id,
+      image: item.imageUrl ?? null,
+      planId: "lzt-account",
+      planCode: "lzt-account",
+      planName: "Conta",
+      durationLabel: "Entrega única",
+      price: null,
+      priceLabel: "Preço protegido",
+      category: "Accounts Market",
+      comboEligible: false,
+      lztItemId: item.id,
+      lztGame: item.game,
+    });
+    openCart();
+  };
+
   return (
     <main className="crz-account-detail">
       <div className="crz-container">
@@ -158,12 +182,18 @@ export function AccountDetailView({
               <div>
                 <small>VALOR COMERCIAL</small>
                 <strong>Preço final protegido</strong>
-                <span>Conversão RUB → BRL e markup não serão inventados. Compra entra depois em M07/M08 e entrega no M43.</span>
+                <span>O provider é consultado em BRL, mas o preço final continua server-side até o markup comercial ser validado.</span>
               </div>
             </div>
 
             <div className="crz-account-detail__actions">
-              <Button size="lg" disabled leadingIcon={<NeonIcon name="lightning" size={20} />}>Compra ainda não liberada</Button>
+              <Button
+                size="lg"
+                onClick={addAccountToCart}
+                leadingIcon={<NeonIcon name="lightning" size={20} />}
+              >
+                Adicionar ao carrinho
+              </Button>
               <a href="/contas">← Voltar ao market</a>
             </div>
           </div>

@@ -12,6 +12,7 @@ import {
   Toast,
 } from "@/core/design-system";
 import { catalogCategories } from "@/modules/catalog";
+import { useCart } from "@/modules/cart/CartProvider";
 import {
   getRelatedProducts,
   type ProductDetail,
@@ -54,6 +55,7 @@ function GalleryVisual({ item, productName }: { item: ProductGalleryItem; produc
 
 export function ProductView({ detail }: { detail: ProductDetail }) {
   const { product } = detail;
+  const { addItem, openCart } = useCart();
   const [activeGallery, setActiveGallery] = useState(detail.gallery[0].id);
   const [zoomOpen, setZoomOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(
@@ -73,11 +75,31 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
     product.stock === "available" ? "green" : product.stock === "limited" ? "gold" : "neutral";
 
   const handlePurchase = () => {
-    setNotice(
-      product.stock === "out"
-        ? "Este produto está indisponível no mock atual."
-        : selectedPlanData.name + " selecionado. O carrinho real será conectado no M07."
-    );
+    if (product.stock === "out" || selectedPlanData.stockCount === 0) {
+      setNotice("Este plano está esgotado no momento.");
+      return;
+    }
+
+    addItem({
+      key: "product:" + product.id + ":" + selectedPlanData.id,
+      kind: "product",
+      productId: product.id,
+      slug: product.slug,
+      name: product.name,
+      subtitle: product.subtitle,
+      image: product.image ?? null,
+      planId: selectedPlanData.id,
+      planCode: selectedPlanData.code,
+      planName: selectedPlanData.name,
+      durationLabel: selectedPlanData.duration,
+      price: selectedPlanData.price,
+      priceLabel: selectedPlanData.priceLabel,
+      category: catalogCategories.find((category) => category.id === product.category)?.label,
+      comboEligible: selectedPlanData.code === "30d" || selectedPlanData.code === "lifetime",
+    });
+
+    setNotice(selectedPlanData.name + " adicionado ao carrinho.");
+    openCart();
   };
 
   return (
@@ -178,12 +200,13 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
                     key={plan.id}
                     className={plan.id === selectedPlan ? "is-selected" : ""}
                     aria-pressed={plan.id === selectedPlan}
+                    disabled={plan.stockCount === 0}
                     onClick={() => setSelectedPlan(plan.id)}
                   >
                     {plan.featured && <b>RECOMENDADO</b>}
                     <strong>{plan.name}</strong>
                     <span>{plan.duration}</span>
-                    <small>{plan.note}</small>
+                    <small>{plan.stockCount === 0 ? "ESGOTADO" : plan.note}</small>
                     <em>{plan.priceLabel}</em>
                   </button>
                 ))}
@@ -199,15 +222,17 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
 
               <Button
                 size="lg"
-                disabled={product.stock === "out"}
+                disabled={product.stock === "out" || selectedPlanData.stockCount === 0}
                 onClick={handlePurchase}
                 leadingIcon={<NeonIcon name="lightning" size={20} />}
               >
-                {product.stock === "out" ? "Indisponível" : "Continuar compra"}
+                {product.stock === "out" || selectedPlanData.stockCount === 0
+                  ? "Plano esgotado"
+                  : "Adicionar ao carrinho"}
               </Button>
 
               <p>
-                Checkout e pagamento reais entram nos módulos de comércio posteriores.
+                O carrinho preserva o plano escolhido. Checkout e pagamento entram no M08.
               </p>
             </div>
 

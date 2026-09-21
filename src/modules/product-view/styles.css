@@ -1003,3 +1003,15 @@
     transition-duration: 0ms !important;
   }
 }
+
+
+.crz-product-plans button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+}
+
+.crz-product-plans button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}

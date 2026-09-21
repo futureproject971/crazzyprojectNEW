@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Drawer, Dropdown, LineIcon } from "@/core/design-system";
+import { useCart } from "@/modules/cart/CartProvider";
 import { getNavigation } from "./navigation";
 import type { ShellMode, ShellNavItem } from "./types";
 
@@ -82,7 +83,7 @@ const adminAccountItems = [
 export function AppHeader({
   mode = "visitor",
   activeNav = "home",
-  cartCount = 0,
+  cartCount: fallbackCartCount = 0,
   userName = "Meu Painel",
 }: {
   mode?: ShellMode;
@@ -91,6 +92,8 @@ export function AppHeader({
   userName?: string;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { totalQuantity, hydrated } = useCart();
+  const cartCount = hydrated ? totalQuantity : fallbackCartCount;
   const items = getNavigation(mode);
   const accountItems = (mode === "admin" ? adminAccountItems : clientAccountItems).map((label, index, all) => ({
     id: `${mode}-account-${index}`,
@@ -102,7 +105,7 @@ export function AppHeader({
     <>
       <header className="crz-shell-header">
         <div className="crz-shell-header__main">
-          <a className="crz-shell-brand" href="#inicio" aria-label="CRAZZY PROJECT, início">
+          <a className="crz-shell-brand" href="/" aria-label="CRAZZY PROJECT, início">
             <img src="/brand/crazzy-logo-navbar.png" alt="CRAZZY PROJECT" />
           </a>
 
