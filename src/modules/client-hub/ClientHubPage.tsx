@@ -67,7 +67,7 @@ function paymentStatus(status: string) {
   if (value === "COMPLETED") return { label: "PAGO", tone: "green" as const };
   if (value === "ACTIVE" || value === "CREATING") return { label: "PENDENTE", tone: "gold" as const };
   if (value === "EXPIRED") return { label: "EXPIRADO", tone: "neutral" as const };
-  return { label: value, tone: "red" as const };
+  return { label: value, tone: "pink" as const };
 }
 
 function methodLabel(method: string | null) {
