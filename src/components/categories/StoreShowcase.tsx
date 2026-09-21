@@ -21,7 +21,7 @@ export function StoreShowcase() {
 
       <div className="store-grid">
         {storeCategories.map((item) => (
-          <a href="#produtos" className={`store-card store-card--${item.art}`} key={item.id}>
+          <a href="/produtos" className={`store-card store-card--${item.art}`} key={item.id}>
             <div className="store-card-art" />
             <div className="store-card-footer">
               <CategoryIcon src={item.icon} tone={item.tone} />
