@@ -147,6 +147,7 @@ async function buildIdentityMap(admin: any, userIds: string[]) {
     { data: roles },
     { data: grants },
     { data: entitlements },
+    { data: rankSummaries },
   ] = await Promise.all([
     admin
       .from("profiles")
@@ -175,11 +176,15 @@ async function buildIdentityMap(admin: any, userIds: string[]) {
       .select("user_id,status,product_plans(plan_code)")
       .in("user_id", uniqueIds)
       .limit(1000),
+    admin.rpc("get_rank_summaries", { p_user_ids: uniqueIds }),
   ]);
 
   const profileMap = new Map((profiles || []).map((item: any) => [item.user_id, item]));
   const preferenceMap = new Map((preferences || []).map((item: any) => [item.user_id, item]));
   const discordMap = new Map((discord || []).map((item: any) => [item.user_id, item]));
+  const rankMap = new Map(
+    (Array.isArray(rankSummaries) ? rankSummaries : []).map((item: any) => [item.user_id, item])
+  );
 
   const roleMap = new Map<string, string[]>();
   for (const item of roles || []) {
@@ -256,6 +261,18 @@ async function buildIdentityMap(admin: any, userIds: string[]) {
       badges.push({ id: "lifetime", label: "LIFETIME", tone: "gold" });
     }
 
+    const rank = rankMap.get(userId) || null;
+    if (rank?.label) {
+      const rankTone = ["blue","green","gold","pink","neutral"].includes(String(rank.tone))
+        ? rank.tone
+        : "blue";
+      badges.push({
+        id: "rank",
+        label: String(rank.label).toUpperCase(),
+        tone: rankTone,
+      });
+    }
+
     identities.set(userId, {
       key: userId,
       name: username,
@@ -265,6 +282,13 @@ async function buildIdentityMap(admin: any, userIds: string[]) {
       appRoles,
       discordRoles,
       badges,
+      rank: rank ? {
+        points: Number(rank.points || 0),
+        code: String(rank.code || "member"),
+        label: String(rank.label || "Member"),
+        color: String(rank.color || "#2AA8FF"),
+        tone: String(rank.tone || "blue"),
+      } : null,
       discord: {
         connected: Boolean(discordIdentity),
         guildMember: Boolean(discordIdentity?.guild_member),
@@ -505,6 +529,7 @@ Deno.serve(async (req) => {
         appRoles: identity.appRoles,
         discordRoles: identity.discordRoles,
         badges: identity.badges,
+        rank: identity.rank,
         discord: identity.discord,
         stats: identity.stats,
       },
