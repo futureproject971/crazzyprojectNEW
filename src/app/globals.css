@@ -21,6 +21,7 @@
 @import "../modules/luck/styles.css";
 @import "../modules/interactive-demo/styles.css";
 @import "../modules/coupons/styles.css";
+@import "../modules/rank/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
