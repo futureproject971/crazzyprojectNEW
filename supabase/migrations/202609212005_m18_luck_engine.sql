@@ -76,6 +76,11 @@ alter table public.luck_prizes enable row level security;
 alter table public.luck_plays enable row level security;
 alter table public.luck_awards enable row level security;
 
+revoke all on table public.luck_plays from anon;
+revoke all on table public.luck_awards from anon;
+revoke insert, update, delete on table public.luck_plays from authenticated;
+revoke insert, update, delete on table public.luck_awards from authenticated;
+
 drop policy if exists "Public active luck campaigns" on public.luck_campaigns;
 create policy "Public active luck campaigns"
 on public.luck_campaigns for select to anon, authenticated
