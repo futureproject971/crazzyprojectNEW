@@ -166,6 +166,8 @@ export function normalizeAccountItem(
     imageUrl: localImage?.startsWith("/") ? localImage : gameArt[safeGame],
     cosmetics: normalizeCosmetics(source.cosmetics),
     skinIds: toStringArray(firstValue(source, ["skinIds", "skin_ids"])),
+    agentIds: toStringArray(firstValue(source, ["agentIds", "agent_ids"])),
+    buddyIds: toStringArray(firstValue(source, ["buddyIds", "buddy_ids"])),
   };
 }
 
