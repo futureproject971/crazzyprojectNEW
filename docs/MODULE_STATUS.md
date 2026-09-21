@@ -18,21 +18,28 @@ QA:
 ## M01
 **GRUPO 00 — CORE DA PLATAFORMA**  
 **M01 — CRAZZY APP SHELL**  
-Status: **EM IMPLEMENTAÇÃO / QA**
+Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
 
 Branch:
 `m01-app-shell`
 
-Responsabilidade:
+QA:
+- typecheck: PASS
+- build: PASS
+- GitHub Actions: PASS
+
+Implementado:
 - AppShell
 - Header/Navbar
-- visitor/client/admin shell modes
-- account area
-- responsive mobile navigation
-- mobile Drawer
+- visitor/client/admin modes
+- account menus mock
+- responsive mobile Drawer
+- shell search visual
 - global Footer
-- structural layout boundaries
-- compatibility wrappers for legacy Navbar/Footer
+- social fallback icons
+- compatibility wrappers
+- Home provisória consumindo AppShell
+- compile fixture dos três modos
 
 Não inclui:
 - Auth real
@@ -41,5 +48,13 @@ Não inclui:
 - Product/Cart/Ticket business logic
 - backend/Supabase
 
-Próximo módulo após aprovação do M01:
+**NÃO iniciar M02 automaticamente.**
+
+Próximo módulo previsto, após autorização:
 **M02 — CRAZZY HOME**
+
+Prioridade do M02:
+- corrigir wallpaper do Hero;
+- inserir logo grande oficial separada;
+- reconstruir Hero em camadas reais;
+- continuar fidelidade pixel-level à referência.
