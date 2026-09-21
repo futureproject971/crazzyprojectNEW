@@ -2,7 +2,7 @@ import type { ComboPlanFamily, StandardPlanCode } from "@/core/commerce/policy";
 
 export type CartPlanCode = StandardPlanCode;
 
-export type CartItemKind = "product" | "lzt-account";
+export type CartItemKind = "product" | "account";
 
 export type CartItem = {
   key: string;
@@ -13,7 +13,7 @@ export type CartItem = {
   subtitle?: string;
   image?: string | null;
   planId: string;
-  planCode: CartPlanCode | "single" | "custom" | "lzt-account";
+  planCode: CartPlanCode | "single" | "custom" | "account";
   planName: string;
   durationLabel: string;
   price: number | null;
@@ -21,8 +21,8 @@ export type CartItem = {
   quantity: number;
   category?: string;
   comboEligible?: boolean;
-  lztItemId?: string;
-  lztGame?: string;
+  accountId?: string;
+  accountGame?: string;
 };
 
 export type ComboGroupSummary = {
