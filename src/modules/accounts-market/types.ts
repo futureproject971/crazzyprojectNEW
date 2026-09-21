@@ -1,11 +1,17 @@
 export type AccountsMarketGame = "valorant" | "lol" | "fortnite" | "minecraft";
 
+export type AccountCosmetic = {
+  name: string;
+  category: string | null;
+  rarity: string | null;
+  imagePath: string | null;
+};
+
 export type AccountsMarketItem = {
   id: string;
   title: string;
   game: AccountsMarketGame | "unknown";
-  providerPrice: number | null;
-  providerCurrency: string | null;
+  price: number | null;
   region: string | null;
   rank: string | null;
   rankValue: number | null;
@@ -27,6 +33,7 @@ export type AccountsMarketItem = {
   dungeons: boolean | null;
   legends: boolean | null;
   imageUrl: string | null;
+  cosmetics: AccountCosmetic[];
 };
 
 export type AccountsMarketPageData = {
@@ -35,10 +42,7 @@ export type AccountsMarketPageData = {
   totalPages: number;
   totalItems: number;
   hasNextPage: boolean;
-  source: "lzt";
   game: AccountsMarketGame;
-  credentialReady: true;
-  commercialPriceReady: false;
 };
 
 export type AccountsMarketFilters = {
