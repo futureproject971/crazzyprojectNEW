@@ -1,0 +1,33 @@
+name: M11 Isolated Validation
+
+on:
+  push:
+    branches:
+      - m11-library
+    paths:
+      - ".github/workflows/m11-validate.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Test M11 Library security
+        run: node scripts/test-m11-library.mjs
