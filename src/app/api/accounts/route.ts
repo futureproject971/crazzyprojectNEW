@@ -62,6 +62,12 @@ export async function GET(request: NextRequest) {
     copyIfPresent(incoming, params, "levelMax", "lol_level_max");
     copyIfPresent(incoming, params, "skinsMin", "lol_smin");
     copyIfPresent(incoming, params, "championsMin", "champion_min");
+    const lolRanks = incoming.get("rankMax");
+    if (lolRanks) {
+      for (const rank of lolRanks.split("|").map((value) => value.trim()).filter(Boolean)) {
+        params.append("lol_rank[]", rank);
+      }
+    }
     const region = incoming.get("region");
     if (region?.trim()) params.append("lol_region[]", region.trim());
   }
@@ -79,8 +85,10 @@ export async function GET(request: NextRequest) {
     copyIfPresent(incoming, params, "hypixelLevelMin", "level_hypixel_min");
     copyIfPresent(incoming, params, "capesMin", "capes_min");
     copyIfPresent(incoming, params, "minecoinsMin", "minecoins_min");
-    copyIfPresent(incoming, params, "javaEdition", "java");
-    copyIfPresent(incoming, params, "bedrockEdition", "bedrock");
+    const javaEdition = incoming.get("javaEdition");
+    const bedrockEdition = incoming.get("bedrockEdition");
+    if (javaEdition) params.set("java", javaEdition === "1" ? "yes" : javaEdition);
+    if (bedrockEdition) params.set("bedrock", bedrockEdition === "1" ? "yes" : bedrockEdition);
   }
 
   if (!params.has("page")) params.set("page", "1");
