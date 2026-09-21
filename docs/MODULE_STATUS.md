@@ -63,3 +63,42 @@ QA técnico:
 
 Próximo módulo após M02:
 **M03 — CRAZZY DISCOVERY**
+
+
+---
+
+## M03 — CRAZZY DISCOVERY
+**GRUPO 01 — EXPERIÊNCIA PÚBLICA**
+
+Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+
+Branch:
+`m03-discovery`
+
+Rotas:
+- `/novidades`
+- `/categorias`
+- `/destaques`
+
+QA:
+- typecheck: PASS
+- build: PASS
+- GitHub Actions: PASS
+
+Implementado:
+- busca mock
+- categorias
+- filtros
+- tags
+- novidades
+- mais vendidos
+- destaques
+- lançamentos
+- loading
+- empty
+- error
+- responsividade
+- integração mínima com Home/AppShell
+
+Próximo módulo previsto após aprovação:
+**M04 — CRAZZY CATALOG**
