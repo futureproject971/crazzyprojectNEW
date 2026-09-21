@@ -17,7 +17,7 @@ export const clientNavigation: ShellNavItem[] = [
   { id: "products", label: "Produtos", href: "/produtos", icon: "/icons/shopping-bag.svg" },
   { id: "combo", label: "Combo", href: "/combo", icon: "/icons/crown.svg" },
   { id: "accounts", label: "Contas", href: "/contas", icon: "/icons/package.svg" },
-  { id: "community", label: "Comunidade", href: "/#comunidade", icon: "/icons/users.svg" },
+  { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
   { id: "support", label: "Suporte", href: "/tickets", icon: "/icons/headset.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
 ];
