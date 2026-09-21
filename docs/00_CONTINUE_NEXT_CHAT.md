@@ -37,7 +37,7 @@ Este arquivo existe para retomar o projeto imediatamente em uma nova conversa/Wo
   - Tutorial Studio
   - Pink/Fortune/IFOOD migration matrix
   - MT Sounds parceiro
-  - novos módulos M43-M46
+  - novos módulos M43-M47
 
 ### M06
 - NÃO iniciado
@@ -235,6 +235,7 @@ Na branch architecture-v2-integrations:
 - docs/SOURCE-MIGRATION-MATRIX.md
 - docs/M06-PREFLIGHT.md
 - docs/DECISIONS-BEFORE-M06.md
+- docs/CHECKLIST-MASTER.md
 
 ## PERGUNTAS PENDENTES DO USUÁRIO
 
@@ -279,6 +280,11 @@ Antes do backend definitivo fechar:
    - YouTube/link?
    Recomendação: ambos.
 
+9. Security Sentinel:
+   - qual canal Discord recebe alertas?
+   - qual cargo pode ser mencionado em CRITICAL?
+   Recomendação: canal privado #security-logs e mencionar somente cargo de segurança/admin em CRITICAL.
+
 ## REGRA DO USUÁRIO SOBRE MIGRAÇÃO
 
 Sempre que houver dúvida entre criar do zero ou migrar:
@@ -310,4 +316,35 @@ Primeiro:
 
 ## PROMPT CURTO PARA NOVA CONVERSA
 
-"Abra o repo futureproject971/crazzyprojectNEW. Leia primeiro docs/00_CONTINUE_NEXT_CHAT.md na branch architecture-v2-integrations, depois docs/ROADMAP.md, docs/ARCHITECTURE-INTEGRATIONS.md, docs/SOURCE-MIGRATION-MATRIX.md, docs/M06-PREFLIGHT.md e docs/DECISIONS-BEFORE-M06.md. Verifique os PRs #6 e #7. Continue exatamente de onde paramos, sem recriar sistemas existentes e sem iniciar M06 antes de fechar as decisões pendentes comigo."
+"Abra o repo futureproject971/crazzyprojectNEW. Leia PRIMEIRO docs/00_CONTINUE_NEXT_CHAT.md na branch architecture-v2-integrations. Depois leia SEM PULAR: docs/ROADMAP.md, docs/CHECKLIST-MASTER.md, docs/ARCHITECTURE-INTEGRATIONS.md, docs/SOURCE-MIGRATION-MATRIX.md, docs/M06-PREFLIGHT.md e docs/DECISIONS-BEFORE-M06.md. Verifique os PRs #6 e #7 e o estado das branches. Preserve M00-M05. Considere M43 Fulfillment, M44 Discord Bridge, M45 Tutorial Studio, M46 MT Sounds e M47 Security Sentinel como parte obrigatória da arquitetura. NÃO recrie funções que já existam no FortuneECrazzy, Pink, IFOOD 420 ou MT Sounds sem antes comparar, recomendar migrar/recriar e perguntar quando a decisão mudar regra de negócio. M06 deve vir do Fortune/LZT, não do zero. PurinCash será estudado para PIX/cartão/LTC; entrega usa Entitlements/Fulfillment; tutoriais são liberados por direito; Discord sincroniza cargos; M47 registra bugs e tentativas suspeitas e envia alertas seguros pelo bot. Antes de iniciar M06, feche comigo todas as decisões pendentes D01-D10. Continue exatamente de onde paramos."
+
+
+## SECURITY SENTINEL
+
+Novo M47 — CRAZZY SECURITY SENTINEL.
+
+Objetivo:
+- registrar bugs críticos;
+- registrar tentativas suspeitas;
+- detectar tentativa de admin sem permissão;
+- detectar tentativa de acessar estoque/keys sem autorização;
+- registrar price/payload tamper;
+- webhook inválido/replay;
+- brute/repeated login attempts;
+- privilege escalation;
+- erros LZT/PurinCash/Fulfillment/Discord;
+- alertar pelo bot Discord.
+
+Regras:
+- severidade INFO/WARN/HIGH/CRITICAL;
+- canal de segurança configurável;
+- CRITICAL pode mencionar cargo configurável;
+- cooldown/agregação para não spammar;
+- deduplicação;
+- sem secrets/tokens/keys/licenças nos logs;
+- mascarar dados sensíveis;
+- Discord offline não bloqueia o sistema;
+- painel de auditoria admin.
+
+Decisão pendente D10:
+definir canal Discord de segurança e cargo a mencionar em CRITICAL.
