@@ -11,6 +11,7 @@ const productImages: Record<string, string> = {
   cod: "/products/cod.jpg",
   gta: "/products/gta.jpg",
   valorant: "/products/valorant.jpg",
+  fortnite: "/products/fortnite.jpg",
 };
 
 export function FeaturedProductsCarousel() {
