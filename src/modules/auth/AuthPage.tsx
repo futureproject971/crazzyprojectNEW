@@ -148,7 +148,7 @@ export function AuthPage({
             <div className="crz-auth-security">
               <NeonIcon name="shield" size={25} />
               <div>
-                <strong>Sessão protegida pelo Supabase Auth</strong>
+                <strong>Acesso seguro à sua conta</strong>
                 <span>
                   O token Discord é usado apenas durante o callback para consultar
                   identidade/guilds e não é salvo na nossa base.
