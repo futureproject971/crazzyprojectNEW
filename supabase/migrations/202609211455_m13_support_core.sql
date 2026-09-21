@@ -1,28 +1,35 @@
 -- M13 — CRAZZY SUPPORT
--- Separate support domain from order/fulfillment tickets.
+-- Evolve the pre-existing empty Support skeleton without reusing order_tickets.
 
-create table if not exists public.support_tickets (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  category text not null
+-- =========================================================
+-- SUPPORT TICKETS
+-- =========================================================
+
+alter table public.support_tickets
+  add column if not exists priority text not null default 'normal',
+  add column if not exists product_id uuid references public.products(id) on delete set null,
+  add column if not exists product_plan_id uuid references public.product_plans(id) on delete set null,
+  add column if not exists entitlement_id uuid references public.entitlements(id) on delete set null,
+  add column if not exists order_ticket_id uuid references public.order_tickets(id) on delete set null,
+  add column if not exists library_delivery_id uuid references public.library_deliveries(id) on delete set null,
+  add column if not exists assigned_to uuid references auth.users(id) on delete set null,
+  add column if not exists last_message_at timestamptz not null default now();
+
+alter table public.support_tickets
+  alter column category set default 'other';
+
+alter table public.support_tickets
+  drop constraint if exists support_tickets_category_check,
+  drop constraint if exists support_tickets_subject_check,
+  drop constraint if exists support_tickets_priority_check;
+
+alter table public.support_tickets
+  add constraint support_tickets_category_check
     check (category in ('product','payment','delivery','technical','account','other')),
-  subject text not null
+  add constraint support_tickets_subject_check
     check (char_length(btrim(subject)) between 4 and 120),
-  status text not null default 'open'
-    check (status in ('open','waiting_staff','waiting_user','resolved','closed')),
-  priority text not null default 'normal'
-    check (priority in ('low','normal','high','urgent')),
-  product_id uuid references public.products(id) on delete set null,
-  product_plan_id uuid references public.product_plans(id) on delete set null,
-  entitlement_id uuid references public.entitlements(id) on delete set null,
-  order_ticket_id uuid references public.order_tickets(id) on delete set null,
-  library_delivery_id uuid references public.library_deliveries(id) on delete set null,
-  assigned_to uuid references auth.users(id) on delete set null,
-  last_message_at timestamptz not null default now(),
-  closed_at timestamptz,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
+  add constraint support_tickets_priority_check
+    check (priority in ('low','normal','high','urgent'));
 
 create index if not exists support_tickets_user_updated_idx
   on public.support_tickets(user_id, updated_at desc);
@@ -40,7 +47,12 @@ revoke all on table public.support_tickets from anon;
 revoke all on table public.support_tickets from authenticated;
 grant select on table public.support_tickets to authenticated;
 
+drop policy if exists "Users create own support tickets" on public.support_tickets;
+drop policy if exists "Admins update support tickets" on public.support_tickets;
+drop policy if exists "Admins delete support tickets" on public.support_tickets;
+drop policy if exists "Support tickets visible to owner or admin" on public.support_tickets;
 drop policy if exists "Support tickets visible to owner or staff" on public.support_tickets;
+
 create policy "Support tickets visible to owner or staff"
 on public.support_tickets
 for select
@@ -51,17 +63,28 @@ using (
   or private.has_role((select auth.uid()), 'moderator'::app_role)
 );
 
-create table if not exists public.support_messages (
-  id uuid primary key default gen_random_uuid(),
-  ticket_id uuid not null references public.support_tickets(id) on delete cascade,
-  sender_user_id uuid references auth.users(id) on delete set null,
-  sender_role text not null
+-- =========================================================
+-- SUPPORT MESSAGES
+-- =========================================================
+
+alter table public.support_messages
+  add column if not exists edited_at timestamptz;
+
+alter table public.support_messages
+  alter column sender_id drop not null;
+
+alter table public.support_messages
+  drop constraint if exists support_messages_sender_id_fkey,
+  drop constraint if exists support_messages_sender_role_check,
+  drop constraint if exists support_messages_message_check;
+
+alter table public.support_messages
+  add constraint support_messages_sender_id_fkey
+    foreign key (sender_id) references auth.users(id) on delete set null,
+  add constraint support_messages_sender_role_check
     check (sender_role in ('user','staff','system')),
-  message text not null
-    check (char_length(btrim(message)) between 1 and 4000),
-  edited_at timestamptz,
-  created_at timestamptz not null default now()
-);
+  add constraint support_messages_message_check
+    check (char_length(btrim(message)) between 1 and 4000);
 
 create index if not exists support_messages_ticket_created_idx
   on public.support_messages(ticket_id, created_at asc);
@@ -72,7 +95,12 @@ revoke all on table public.support_messages from anon;
 revoke all on table public.support_messages from authenticated;
 grant select on table public.support_messages to authenticated;
 
+drop policy if exists "Support message insert user or admin" on public.support_messages;
+drop policy if exists "Admins update support messages" on public.support_messages;
+drop policy if exists "Admins delete support messages" on public.support_messages;
+drop policy if exists "Support messages visible to owner or admin" on public.support_messages;
 drop policy if exists "Support messages visible through ticket" on public.support_messages;
+
 create policy "Support messages visible through ticket"
 on public.support_messages
 for select
@@ -90,10 +118,14 @@ using (
   )
 );
 
+-- =========================================================
+-- SUPPORT ATTACHMENTS
+-- =========================================================
+
 create table if not exists public.support_attachments (
   id uuid primary key default gen_random_uuid(),
   ticket_id uuid not null references public.support_tickets(id) on delete cascade,
-  message_id uuid references public.support_messages(id) on delete cascade,
+  message_id uuid references public.support_messages(id) on delete set null,
   owner_user_id uuid not null references auth.users(id) on delete cascade,
   storage_path text not null unique,
   filename text not null
@@ -132,6 +164,10 @@ using (
       )
   )
 );
+
+-- =========================================================
+-- SUPPORT EVENTS / AUDIT
+-- =========================================================
 
 create table if not exists public.support_ticket_events (
   id uuid primary key default gen_random_uuid(),
@@ -172,7 +208,10 @@ using (
   )
 );
 
--- Private Support bucket. 25 MB/file and safe MIME allowlist.
+-- =========================================================
+-- PRIVATE SUPPORT STORAGE
+-- =========================================================
+
 insert into storage.buckets (
   id,
   name,
@@ -199,13 +238,13 @@ insert into storage.buckets (
   ]::text[]
 )
 on conflict (id) do update set
-  public = excluded.public,
+  public = false,
   file_size_limit = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
--- Browser never needs direct object access.
--- Uploads use short-lived signed upload URLs generated by the server.
--- Downloads use short-lived signed download URLs after ticket authorization.
+-- No direct authenticated policies are granted on storage.objects.
+-- Uploads use server-authorized signed upload URLs.
+-- Downloads use short-lived signed URLs after Support authorization.
 drop policy if exists "Support attachment direct select" on storage.objects;
 drop policy if exists "Support attachment direct insert" on storage.objects;
 drop policy if exists "Support attachment direct update" on storage.objects;
