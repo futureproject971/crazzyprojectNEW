@@ -63,23 +63,36 @@
 ## 🟡 M06 — CRAZZY ACCOUNTS MARKET — EM ANDAMENTO
 Fonte: FortuneECrazzy + LZT.
 
-- [ ] migrar listagem
-- [ ] migrar detalhes
-- [ ] Valorant
+- [x] migrar listagem (VALORANT/LZT)
+- [x] migrar detalhes (provider read-only)
+- [x] Valorant
 - [ ] LoL
 - [ ] Fortnite
 - [ ] Minecraft
-- [ ] rank
-- [ ] level
-- [ ] região
-- [ ] skins
+- [x] rank
+- [x] level
+- [x] região
+- [x] skins
 - [ ] inventário
-- [ ] filtros
+- [x] filtros (VALORANT)
 - [ ] markup
 - [ ] compra/entrega LZT
-- [ ] adaptar para CRAZZY UI
-- [ ] loading/error/empty
-- [ ] desktop/tablet/mobile
+- [x] adaptar para CRAZZY UI (primeiro corte)
+- [x] loading/error/empty
+- [x] desktop/tablet/mobile
+
+### QA M06 — corte VALORANT
+- [x] API pública somente leitura via Next
+- [x] token LZT não exposto
+- [x] fast-buy não exposto
+- [x] TypeScript PASS
+- [x] Next production build PASS
+- [x] GitHub Actions PASS
+- [ ] LoL via adapter multijogo
+- [ ] Fortnite via adapter multijogo
+- [ ] Minecraft via adapter multijogo
+- [ ] preço comercial/markup validado
+- [ ] compra/entrega LZT integrada ao M43
 
 ## ❌ M07 — CRAZZY CART
 - [ ] carrinho
