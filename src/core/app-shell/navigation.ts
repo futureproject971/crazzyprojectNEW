@@ -8,6 +8,7 @@ export const visitorNavigation: ShellNavItem[] = [
   { id: "news", label: "Novidades", href: "/novidades", icon: "/icons/flame.svg" },
   { id: "feedbacks", label: "Feedbacks", href: "/feedbacks", icon: "/icons/star.svg" },
   { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
+  { id: "club", label: "CLUB", href: "/club", icon: "/icons/crown.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
   { id: "ticket", label: "Ticket", href: "/tickets", icon: "/icons/headset.svg" },
 ];
