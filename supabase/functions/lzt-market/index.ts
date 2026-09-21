@@ -422,7 +422,8 @@ Deno.serve(async (req) => {
       const providerText = await providerResponse.text();
       let item: any;
       try {
-        item = JSON.parse(providerText);
+        const parsedItem = JSON.parse(providerText);
+        item = parsedItem?.item ?? parsedItem;
       } catch {
         return new Response(JSON.stringify({ error: "Provider returned invalid JSON" }), {
           status: 502,
