@@ -46,7 +46,18 @@ Página inicial pública da CRAZZY PROJECT seguindo a referência visual aprovad
 - carrossel começou a usar os crops reais disponíveis no repositório.
 
 ## Observação de asset
-A logo grande oficial em alta resolução continua sendo o asset preferido para substituição final. Enquanto ela não estiver versionada no repo, o Hero utiliza a logo oficial já disponível em `public/brand/crazzy-logo-navbar.png` como camada separada, sem depender da imagem de fundo.
+A logo grande oficial em alta resolução está versionada em `public/brand/crazzy-logo-hero.png` e é renderizada como camada separada.
+
+## QA técnico
+- typecheck: PASS
+- build: PASS
+- GitHub Actions: PASS
+- Hero HD asset: versionado
+- logo oficial HD: versionada
+- cinco produtos do coverflow com crops reais: versionados
+
+## Pendência visual não bloqueante
+A posição fina do crop do Hero pode ser ajustada depois do próximo screenshot local do usuário, sem alterar a arquitetura do módulo.
 
 ## Status
-EM IMPLEMENTAÇÃO / QA VISUAL.
+CONCLUÍDO EM FRONT-END / QA TÉCNICO.
