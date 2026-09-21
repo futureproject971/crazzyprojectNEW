@@ -324,10 +324,10 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] loading/error
 - [x] desktop/tablet/mobile
 - [x] Security Advisor: 0 lints
-- [ ] TypeScript PASS
-- [ ] production build PASS
-- [ ] smoke M12 PASS
-- [ ] GitHub Actions PASS
+- [x] TypeScript PASS
+- [x] production build PASS
+- [x] smoke M12 PASS
+- [x] GitHub Actions PASS
 - [ ] PR M12
 - [ ] merge M12
 
