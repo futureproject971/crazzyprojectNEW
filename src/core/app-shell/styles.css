@@ -790,3 +790,92 @@
     justify-self: center;
   }
 }
+
+
+.crz-shell-theme {
+  width: 35px;
+  height: 35px;
+  flex: 0 0 35px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 8px;
+  color: #d9e8fb;
+  background: rgba(8,16,29,.8);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: 160ms ease;
+}
+
+.crz-shell-theme:hover {
+  border-color: rgba(62,143,255,.45);
+  background: rgba(27,52,88,.6);
+  box-shadow: 0 0 14px rgba(0,91,255,.16);
+}
+
+.crz-shell-theme span { font-size: 15px; line-height: 1; }
+
+.crz-shell-mobile__theme {
+  min-height: 42px;
+  border: 1px solid rgba(89,137,207,.2);
+  border-radius: 9px;
+  padding: 0 12px;
+  color: #dce7f5;
+  background: rgba(8,17,30,.72);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+}
+
+html[data-theme="light"] .crz-shell-header__main,
+html[data-theme="light"] .crz-shell-header__account {
+  background: rgba(255,255,255,.93);
+  border-color: rgba(25,87,174,.22);
+  box-shadow: 0 8px 28px rgba(33,62,100,.10);
+}
+
+html[data-theme="light"] .crz-shell-nav__item,
+html[data-theme="light"] .crz-shell-auth,
+html[data-theme="light"] .crz-shell-user,
+html[data-theme="light"] .crz-shell-theme {
+  color: #1b2b3f;
+}
+
+html[data-theme="light"] .crz-shell-auth,
+html[data-theme="light"] .crz-shell-user,
+html[data-theme="light"] .crz-shell-theme,
+html[data-theme="light"] .crz-shell-search {
+  background: rgba(242,247,252,.94);
+  border-color: rgba(35,91,168,.14);
+}
+
+html[data-theme="light"] .crz-shell-nav__item:hover,
+html[data-theme="light"] .crz-shell-auth:hover,
+html[data-theme="light"] .crz-shell-user:hover,
+html[data-theme="light"] .crz-shell-theme:hover {
+  color: #071424;
+  background: rgba(214,230,248,.9);
+}
+
+html[data-theme="light"] .crz-shell-footer {
+  border-top-color: rgba(34,93,171,.2);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0,101,255,.09), transparent 42%),
+    linear-gradient(180deg,#f7fbff,#eaf2fa 72%);
+}
+
+html[data-theme="light"] .crz-shell-footer__brand strong { color: #102033; }
+html[data-theme="light"] .crz-shell-footer__brand p,
+html[data-theme="light"] .crz-shell-footer__links a,
+html[data-theme="light"] .crz-shell-footer__social > span,
+html[data-theme="light"] .crz-shell-footer__bottom { color: #61758d; }
+
+html[data-theme="light"] .crz-shell-footer__social a {
+  background: rgba(255,255,255,.82);
+  border-color: rgba(46,95,164,.18);
+}
+
+html[data-theme="light"] .crz-shell-footer__social img {
+  filter: none;
+  opacity: .72;
+}
