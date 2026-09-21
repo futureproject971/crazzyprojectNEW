@@ -483,14 +483,29 @@ M11 — CRAZZY LIBRARY.
 
 ## M11 — CRAZZY LIBRARY — EM ANDAMENTO
 
-A conversa foi interrompida durante a auditoria inicial do M11.
+### ORDEM OBRIGATÓRIA PARA O PRÓXIMO WORKER
+1. `docs/CHECKLIST-MASTER.md`
+2. `docs/M11-WORKER-HANDOFF.md`
+3. este arquivo `docs/00_CONTINUE_NEXT_CHAT.md`
 
-Leia PRIMEIRO:
+Branch:
+- `m11-library`
+
+Estado exato:
+- M11 iniciado;
+- frontend/backend final AINDA não implementados;
+- auditoria inicial do banco concluída parcialmente;
+- problema crítico identificado em `stock_items.content` e `reward_deliveries.content`;
+- cliente pode acabar lendo conteúdo sensível diretamente pelas policies atuais;
+- prioridade nº 1 é corrigir arquitetura de secrets/reveal;
+- NÃO criar UI de reveal antes da migration/segurança;
+- NÃO mergear M11 antes de smoke + Security Advisor + typecheck + production build.
+
+Fonte de verdade detalhada:
 - `docs/M11-WORKER-HANDOFF.md`
 
-Estado:
-- branch: `m11-library`
-- ainda sem implementação final do M11
-- problema crítico já identificado: `stock_items.content` e `reward_deliveries.content` podem ficar acessíveis diretamente por RLS/SELECT após entrega
-- prioridade nº 1: corrigir arquitetura de segredo/reveal antes de criar UI
-- não mergear M11 até concluir segurança + QA
+Checklist granular:
+- `docs/CHECKLIST-MASTER.md`
+
+Próximo módulo APENAS depois do merge do M11:
+- M12 — CRAZZY PROFILE.
