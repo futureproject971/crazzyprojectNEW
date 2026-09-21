@@ -331,44 +331,52 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] PR #14 M12
 - [x] merge M12 — 339fb34d4c466a34a23d5a78e23fc5bcaf62072d
 
-## 🟡 M13 — CRAZZY SUPPORT — EM ANDAMENTO
-- [x] branch `m13-support` criada
+## ✅ M13 — CRAZZY SUPPORT — IMPLEMENTADO / QA FINAL
+- [x] branch `m13-support`
 - [x] M12 confirmado mergeado
 - [x] auditoria inicial de `order_tickets` e `ticket_messages`
-- [x] decisão: suporte genérico NÃO reutiliza `order_tickets` como tabela principal
+- [x] suporte genérico separado do fulfillment
 - [x] Storage auditado
-- [x] bucket público `game-images` identificado como inadequado para anexos de suporte
-- [x] docs Supabase verificadas para private buckets + RLS
-- [ ] migration Support
-- [ ] `support_tickets`
-- [ ] `support_messages`
-- [ ] `support_attachments`
-- [ ] contexto opcional de pedido/produto/entitlement/library delivery
-- [ ] categorias de ticket
-- [ ] prioridade/status
-- [ ] criação de ticket autenticado
-- [ ] mensagens cliente/staff
-- [ ] anexos privados
-- [ ] imagem
-- [ ] vídeo
-- [ ] áudio
-- [ ] arquivos
-- [ ] signed URL / download autenticado
-- [ ] Realtime privado ou polling seguro
-- [ ] ticket real
-- [ ] contexto produto/pedido/key sem expor segredo
-- [ ] entitlement
-- [ ] tutorial relacionado
-- [ ] histórico de status
-- [ ] fechar/reabrir conforme regra
-- [ ] fila preparada para M32 Support Desk
-- [ ] desktop/tablet/mobile
-- [ ] loading/error/empty
-- [ ] Security Advisor
-- [ ] smoke M13
-- [ ] TypeScript
-- [ ] production build
-- [ ] GitHub Actions
+- [x] bucket público `game-images` rejeitado para Support
+- [x] docs Supabase de private bucket/signed URL verificadas
+- [x] migration Support versionada/aplicada
+- [x] `support_tickets`
+- [x] `support_messages`
+- [x] `support_attachments`
+- [x] `support_ticket_events`
+- [x] contexto opcional pedido/produto/entitlement/Library
+- [x] categorias de ticket
+- [x] prioridade/status
+- [x] criação de ticket autenticado
+- [x] mensagens cliente/staff
+- [x] bucket privado `support-attachments`
+- [x] signed upload URL
+- [x] signed download URL curta
+- [x] imagem
+- [x] vídeo
+- [x] áudio
+- [x] PDF/TXT
+- [x] contexto produto/pedido/key sem expor segredo
+- [x] entitlement
+- [x] tutorial relacionado sem expor conteúdo
+- [x] histórico de status/eventos
+- [x] fechar/reabrir
+- [x] polling seguro com aba visível
+- [x] fila preparada para M32 Support Desk
+- [x] /tickets
+- [x] /tickets/novo
+- [x] /tickets/[id]
+- [x] App Shell aponta para /tickets
+- [x] loading/error/empty
+- [x] desktop/tablet/mobile
+- [x] Security Advisor: 0 lints
+- [x] authenticated sem escrita direta nas tabelas Support
+- [x] bucket public=false
+- [x] índices de contexto/attachments/eventos
+- [ ] smoke M13 PASS
+- [ ] TypeScript PASS
+- [ ] production build PASS
+- [ ] GitHub Actions PASS
 - [ ] PR M13
 - [ ] merge M13
 
@@ -730,5 +738,6 @@ Fonte visual: Pink.
 - [x] M11 concluído e mergeado
 - [x] M12 concluído e mergeado
 - [x] iniciar M13 — CRAZZY SUPPORT
-- [ ] concluir M13 — CRAZZY SUPPORT
+- [x] M13 implementado tecnicamente
+- [ ] concluir QA/merge M13 — CRAZZY SUPPORT
 - [ ] iniciar M14 — CRAZZY COMMUNITY
