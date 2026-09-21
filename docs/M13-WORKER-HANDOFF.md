@@ -238,3 +238,44 @@ A cada avanço importante:
 - atualizar checklist/handoff quando mudar estado relevante.
 
 Assim qualquer outro Worker/chat consegue continuar sem depender desta conversa.
+
+
+## CHECKPOINT — SCHEMA M13 APLICADO
+
+Concluído:
+- migration versionada em `supabase/migrations/202609211455_m13_support_core.sql`;
+- migration adaptada para o esqueleto Support pré-existente;
+- `support_tickets` e `support_messages` antigas estavam vazias;
+- nenhuma linha real foi perdida;
+- `support_tickets` ampliada com:
+  - priority
+  - product_id
+  - product_plan_id
+  - entitlement_id
+  - order_ticket_id
+  - library_delivery_id
+  - assigned_to
+  - last_message_at
+- `support_messages` ganhou:
+  - edited_at
+  - sender_role user/staff/system
+  - sender_id nullable com FK SET NULL
+- criada `support_attachments`;
+- criada `support_ticket_events`;
+- authenticated agora possui somente SELECT direto nas tabelas Support;
+- escrita passa pelo backend/Edge Function;
+- RLS owner/admin/mod configurada;
+- bucket privado `support-attachments` criado;
+- bucket:
+  - public=false
+  - 25 MB por arquivo
+  - allowlist segura de imagem/vídeo/áudio/PDF/TXT
+- nenhum policy direto de browser foi concedido em storage.objects;
+- uploads serão por signed upload URL;
+- downloads serão por signed URL curto após authorization.
+
+Próximo passo exato:
+1. criar/versionar Edge Function `support`;
+2. ações: snapshot/create/thread/message/close/reopen/upload-url/finalize-attachment;
+3. depois Next API proxies;
+4. depois UI /tickets.
