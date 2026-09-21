@@ -110,6 +110,7 @@ export function AppHeader({
       : [
           { id: "client-dashboard", label: "Painel do Cliente", onSelect: () => go("/painel") },
           { id: "client-orders", label: "Minhas Compras", onSelect: () => go("/painel/pedidos") },
+          { id: "client-library", label: "Minha Biblioteca", onSelect: () => go("/biblioteca") },
           { id: "client-tickets", label: "Meus Tickets", onSelect: () => go("/tickets") },
           { id: "client-club", label: "CRAZZY CLUB", onSelect: () => go("/club") },
           { id: "client-coupons", label: "Meus Cupons", onSelect: () => go("/painel/cupons") },
