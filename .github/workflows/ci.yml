@@ -63,3 +63,7 @@ jobs:
       - name: Test M13 Support security
         if: github.ref_name == 'm13-support'
         run: node scripts/test-m13-support.mjs
+
+      - name: Test M14 Community security
+        if: github.ref_name == 'm14-community'
+        run: node scripts/test-m14-community.mjs

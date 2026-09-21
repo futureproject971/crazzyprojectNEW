@@ -605,3 +605,40 @@ Próximo:
 
 Handoff detalhado:
 - `docs/M13-WORKER-HANDOFF.md`
+
+
+---
+
+## M14 — CRAZZY COMMUNITY — QA VERDE
+
+Branch:
+- `m14-community`
+
+Implementado:
+- /comunidade privada
+- chat real
+- canal Geral
+- mensagens
+- reply
+- reações
+- perfil clicável
+- app roles
+- cargos Discord concedidos
+- badges
+- cor/cargo principal seguro
+- imagem/vídeo/áudio privados
+- signed upload/download
+- soft delete
+- polling 4s aba visível
+- Edge Function community v1
+- bucket community-media privado
+- Security Advisor 0 lints
+- npm ci/typecheck/build/smoke PASS
+
+Próximo:
+1. PR/merge M14
+2. validar base pós-merge
+3. M15 — CRAZZY REVIEWS
+
+Handoff detalhado:
+- `docs/M14-WORKER-HANDOFF.md`

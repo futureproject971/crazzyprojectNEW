@@ -377,18 +377,43 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] TypeScript PASS
 - [x] production build PASS
 - [x] GitHub Actions PASS
-- [ ] PR M13
-- [ ] merge M13
+- [x] PR #15 M13
+- [x] merge M13 — da7d4ac9b052493e7b9537ca15afe616db441157
 
-## ❌ M14 — CRAZZY COMMUNITY
-- [ ] chat real
-- [ ] perfil clicável
-- [ ] cargos
-- [ ] cor do cargo principal
-- [ ] badges
-- [ ] reações
-- [ ] respostas
-- [ ] sync Discord
+## 🟡 M14 — CRAZZY COMMUNITY — EM ANDAMENTO
+- [x] branch `m14-community` criada
+- [x] M13 mergeado e CI pós-merge verde
+- [x] schema Community
+- [x] chat real
+- [x] canais/sala principal
+- [x] mensagens
+- [x] respostas/thread reply
+- [x] reações emoji
+- [x] perfil clicável
+- [x] avatar
+- [x] cargos CRAZZY
+- [x] cargos Discord
+- [x] cor do cargo principal
+- [x] badges
+- [x] leitura do estado Discord já sincronizado; M44 fará sync autoritativo
+- [x] mídia imagem
+- [x] mídia vídeo
+- [x] mídia áudio
+- [x] bucket privado Community
+- [x] upload assinado
+- [x] polling seguro com aba visível; Realtime adiado sem perda de arquitetura
+- [x] rate limit
+- [x] moderação básica de própria mensagem
+- [x] sem secrets/keys no chat automático
+- [x] desktop/tablet/mobile
+- [x] loading/error/empty
+- [x] Security Advisor: 0 lints
+- [x] smoke M14 PASS
+- [x] TypeScript PASS
+- [x] production build PASS
+- [x] GitHub Actions PASS
+- [ ] PR M14
+- [ ] merge M14
 
 ## ❌ M15 — CRAZZY REVIEWS
 - [ ] feedback real
@@ -741,3 +766,10 @@ Fonte visual: Pink.
 - [x] M13 implementado tecnicamente
 - [ ] concluir QA/merge M13 — CRAZZY SUPPORT
 - [ ] iniciar M14 — CRAZZY COMMUNITY
+
+
+## CONTINUIDADE M14
+- [x] M13 concluído e mergeado
+- [x] iniciar M14 — CRAZZY COMMUNITY
+- [ ] concluir M14 — CRAZZY COMMUNITY
+- [ ] iniciar M15 — CRAZZY REVIEWS

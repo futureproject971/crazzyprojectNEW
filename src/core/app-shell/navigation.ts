@@ -7,7 +7,7 @@ export const visitorNavigation: ShellNavItem[] = [
   { id: "accounts", label: "Contas", href: "/contas", icon: "/icons/package.svg" },
   { id: "news", label: "Novidades", href: "/novidades", icon: "/icons/flame.svg" },
   { id: "feedbacks", label: "Feedbacks", href: "/#feedbacks", icon: "/icons/star.svg" },
-  { id: "community", label: "Comunidade", href: "/#comunidade", icon: "/icons/users.svg" },
+  { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
   { id: "ticket", label: "Ticket", href: "/tickets", icon: "/icons/headset.svg" },
 ];
@@ -17,7 +17,7 @@ export const clientNavigation: ShellNavItem[] = [
   { id: "products", label: "Produtos", href: "/produtos", icon: "/icons/shopping-bag.svg" },
   { id: "combo", label: "Combo", href: "/combo", icon: "/icons/crown.svg" },
   { id: "accounts", label: "Contas", href: "/contas", icon: "/icons/package.svg" },
-  { id: "community", label: "Comunidade", href: "/#comunidade", icon: "/icons/users.svg" },
+  { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
   { id: "support", label: "Suporte", href: "/tickets", icon: "/icons/headset.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
 ];
