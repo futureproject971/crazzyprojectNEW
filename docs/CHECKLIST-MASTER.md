@@ -328,18 +328,57 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] production build PASS
 - [x] smoke M12 PASS
 - [x] GitHub Actions PASS
-- [ ] PR M12
-- [ ] merge M12
+- [x] PR #14 M12
+- [x] merge M12 — 339fb34d4c466a34a23d5a78e23fc5bcaf62072d
 
-## ❌ M13 — CRAZZY SUPPORT
-- [ ] ticket real
-- [ ] imagem
-- [ ] vídeo
-- [ ] áudio
-- [ ] arquivos
-- [ ] contexto produto/pedido/key
-- [ ] entitlement
-- [ ] tutorial relacionado
+## ✅ M13 — CRAZZY SUPPORT — IMPLEMENTADO / QA FINAL
+- [x] branch `m13-support`
+- [x] M12 confirmado mergeado
+- [x] auditoria inicial de `order_tickets` e `ticket_messages`
+- [x] suporte genérico separado do fulfillment
+- [x] Storage auditado
+- [x] bucket público `game-images` rejeitado para Support
+- [x] docs Supabase de private bucket/signed URL verificadas
+- [x] migration Support versionada/aplicada
+- [x] `support_tickets`
+- [x] `support_messages`
+- [x] `support_attachments`
+- [x] `support_ticket_events`
+- [x] contexto opcional pedido/produto/entitlement/Library
+- [x] categorias de ticket
+- [x] prioridade/status
+- [x] criação de ticket autenticado
+- [x] mensagens cliente/staff
+- [x] bucket privado `support-attachments`
+- [x] signed upload URL
+- [x] signed download URL curta
+- [x] imagem
+- [x] vídeo
+- [x] áudio
+- [x] PDF/TXT
+- [x] contexto produto/pedido/key sem expor segredo
+- [x] entitlement
+- [x] tutorial relacionado sem expor conteúdo
+- [x] histórico de status/eventos
+- [x] fechar/reabrir
+- [x] polling seguro com aba visível
+- [x] fila preparada para M32 Support Desk
+- [x] /tickets
+- [x] /tickets/novo
+- [x] /tickets/[id]
+- [x] App Shell aponta para /tickets
+- [x] loading/error/empty
+- [x] desktop/tablet/mobile
+- [x] Security Advisor: 0 lints
+- [x] authenticated sem escrita direta nas tabelas Support
+- [x] bucket public=false
+- [x] índices de contexto/attachments/eventos
+- [x] smoke M13 PASS
+- [x] TypeScript PASS
+- [x] production build PASS
+- [x] GitHub Actions PASS
+- [ ] PR M13
+- [ ] merge M13
 
 ## ❌ M14 — CRAZZY COMMUNITY
 - [ ] chat real
@@ -693,3 +732,12 @@ Fonte visual: Pink.
 - [x] M10 concluído
 - [x] M11 concluído e mergeado
 - [x] iniciar M12 — CRAZZY PROFILE
+
+
+## CONTINUIDADE ATUAL
+- [x] M11 concluído e mergeado
+- [x] M12 concluído e mergeado
+- [x] iniciar M13 — CRAZZY SUPPORT
+- [x] M13 implementado tecnicamente
+- [ ] concluir QA/merge M13 — CRAZZY SUPPORT
+- [ ] iniciar M14 — CRAZZY COMMUNITY

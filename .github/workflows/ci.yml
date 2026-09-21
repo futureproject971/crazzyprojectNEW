@@ -59,3 +59,7 @@ jobs:
       - name: Test M12 profile security
         if: github.ref_name == 'm12-profile'
         run: node scripts/test-m12-profile.mjs
+
+      - name: Test M13 Support security
+        if: github.ref_name == 'm13-support'
+        run: node scripts/test-m13-support.mjs

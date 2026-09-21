@@ -550,3 +550,58 @@ QA:
 Próximo:
 - PR/merge M12
 - M13 — CRAZZY SUPPORT
+
+
+---
+
+## M13 — CRAZZY SUPPORT — EM ANDAMENTO
+
+Branch:
+- `m13-support`
+
+LEITURA OBRIGATÓRIA EM NOVO CHAT/WORKER:
+1. `docs/CHECKLIST-MASTER.md`
+2. `docs/M13-WORKER-HANDOFF.md`
+3. `docs/00_CONTINUE_NEXT_CHAT.md`
+
+Estado:
+- M12 mergeado via PR #14;
+- M13 iniciado;
+- auditoria inicial de Support + Storage concluída;
+- `order_tickets` NÃO será reutilizado como suporte genérico;
+- anexos precisarão de bucket privado próprio;
+- nenhum schema final M13 foi aplicado ainda;
+- próximo passo: migration de Support + bucket privado + RLS.
+
+Não iniciar M14 antes de concluir/mergear M13.
+
+
+---
+
+## M13 — CRAZZY SUPPORT — QA VERDE
+
+Branch:
+- `m13-support`
+
+Implementado:
+- /tickets
+- /tickets/novo
+- /tickets/[id]
+- support_tickets/messages/attachments/events
+- contexto seguro de produto/pedido/entitlement/Library
+- bucket privado support-attachments
+- imagem/vídeo/áudio/PDF/TXT
+- signed upload/download
+- polling seguro
+- fechar/reabrir
+- Edge Function support v1
+- Security Advisor: 0 lints
+- npm ci/typecheck/build/smoke: PASS
+
+Próximo:
+1. PR/merge M13
+2. validar base pós-merge
+3. M14 — CRAZZY COMMUNITY
+
+Handoff detalhado:
+- `docs/M13-WORKER-HANDOFF.md`
