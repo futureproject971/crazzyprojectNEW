@@ -43,3 +43,7 @@ jobs:
       - name: Test M08 checkout security
         if: github.ref_name == 'm08-checkout'
         run: node scripts/test-m08-checkout.mjs
+
+      - name: Test M09 auth security
+        if: github.ref_name == 'm09-auth'
+        run: node scripts/test-m09-auth.mjs
