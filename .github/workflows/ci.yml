@@ -83,3 +83,7 @@ jobs:
       - name: Test M20 Rank security
         if: github.ref_name == 'm20-rank-work'
         run: node scripts/test-m20-rank.mjs
+
+      - name: Test M21 Status security
+        if: github.ref_name == 'm21-status'
+        run: node scripts/test-m21-status.mjs
