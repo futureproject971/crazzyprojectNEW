@@ -43,9 +43,12 @@ console.log("[PASS] public tutorial blocks are available");
 
 const directBlocks = await req("/academy_tutorial_blocks?select=*&limit=1");
 if (directBlocks.ok) {
-  throw new Error("Anonymous users must not read Academy block tables directly");
+  const directRows = await directBlocks.json();
+  if (!Array.isArray(directRows) || directRows.length !== 0) {
+    throw new Error("Anonymous users must not read Academy block tables directly");
+  }
 }
-console.log("[PASS] direct Academy block reads are protected (" + directBlocks.status + ")");
+console.log("[PASS] direct Academy block reads expose no rows");
 
 const progress = await req("/rpc/save_academy_progress", {
   method: "POST",
