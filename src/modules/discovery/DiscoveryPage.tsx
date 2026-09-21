@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { NeonIcon } from "@/core/design-system";
-import { discoveryCategories, discoveryItems, discoveryNews } from "./data";
+import { discoveryCategories, discoveryItems, discoveryNews, discoveryTags } from "./data";
 
 export function DiscoveryPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
+  const [tag, setTag] = useState("all");
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -14,13 +15,14 @@ export function DiscoveryPage() {
     () =>
       discoveryItems.filter((item) => {
         const matchesCategory = category === "all" || item.category === category;
+        const matchesTag = tag === "all" || item.tags?.includes(tag);
         const matchesQuery =
           !normalizedQuery ||
           item.title.toLowerCase().includes(normalizedQuery) ||
           item.subtitle.toLowerCase().includes(normalizedQuery);
-        return matchesCategory && matchesQuery;
+        return matchesCategory && matchesTag && matchesQuery;
       }),
-    [category, normalizedQuery]
+    [category, tag, normalizedQuery]
   );
 
   const featured = discoveryItems.filter((item) => item.featured);
@@ -80,11 +82,28 @@ export function DiscoveryPage() {
               );
             })}
           </div>
+
+          <div className="crz-discovery-tags" aria-label="Filtrar por tendência">
+            {discoveryTags.map((item) => {
+              const active = tag === item.id;
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  className={active ? "is-active" : ""}
+                  aria-pressed={active}
+                  onClick={() => setTag(item.id)}
+                >
+                  #{item.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       <div className="crz-container crz-discovery-content">
-        {!normalizedQuery && category === "all" && (
+        {!normalizedQuery && category === "all" && tag === "all" && (
           <section className="crz-discovery-section" aria-labelledby="trending-title">
             <header className="crz-discovery-section__head">
               <div>
@@ -170,6 +189,7 @@ export function DiscoveryPage() {
                 onClick={() => {
                   setQuery("");
                   setCategory("all");
+                  setTag("all");
                 }}
               >
                 Limpar filtros
@@ -178,7 +198,7 @@ export function DiscoveryPage() {
           )}
         </section>
 
-        {!normalizedQuery && category === "all" && (
+        {!normalizedQuery && category === "all" && tag === "all" && (
           <section className="crz-discovery-section crz-discovery-news" aria-labelledby="news-title">
             <header className="crz-discovery-section__head">
               <div>
