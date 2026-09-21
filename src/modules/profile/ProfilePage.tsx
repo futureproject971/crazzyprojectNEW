@@ -42,7 +42,7 @@ const presetColors = [
 ];
 
 export function ProfilePage() {
-  const { signIn, linkDiscord } = useAuth();
+  const { signIn, linkDiscord, refresh: refreshAuth } = useAuth();
   const [snapshot, setSnapshot] = useState<ProfileSnapshot | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState("");
@@ -146,6 +146,7 @@ export function ProfilePage() {
         };
       });
 
+      await refreshAuth();
       setEditing(false);
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Falha ao salvar.");
