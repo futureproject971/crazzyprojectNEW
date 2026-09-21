@@ -802,3 +802,34 @@
     grid-column: 1 / -1;
   }
 }
+
+
+/* Home Community preview now routes to the real authenticated chat. */
+.chat-preview-link {
+  color: #7b8ca1;
+  text-decoration: none;
+}
+
+.chat-preview-link > span:nth-child(2) {
+  min-width: 0;
+  overflow: hidden;
+  padding-inline: 4px;
+  color: #718094;
+  font-size: 9.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-preview-link:hover {
+  border-color: rgba(49, 145, 255, .58);
+  color: #fff;
+}
+
+.chat-preview-link:hover > span:nth-child(2) {
+  color: #dce6f3;
+}
+
+.chat-preview-send {
+  display: grid;
+  place-items: center;
+}
