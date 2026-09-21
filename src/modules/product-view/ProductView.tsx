@@ -15,6 +15,7 @@ import { catalogCategories } from "@/modules/catalog";
 import { useCart } from "@/modules/cart/CartProvider";
 import { VerifiedReviewFeed } from "@/modules/reviews";
 import { InteractiveImGuiDemo } from "@/modules/interactive-demo";
+import { HelpFaqPreview } from "@/modules/help";
 import {
   getRelatedProducts,
   type ProductDetail,
@@ -348,12 +349,15 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
 
             {activeTab === "faq" && (
               <div className="crz-product-faq">
-                {detail.faq.map((item) => (
-                  <details key={item.question}>
-                    <summary>{item.question}</summary>
-                    <p>{item.answer}</p>
-                  </details>
-                ))}
+                <SectionTitle
+                  icon={<NeonIcon name="book" size={28} />}
+                  title="Ajuda e dúvidas"
+                  description="Respostas da Central de Ajuda da CRAZZY PROJECT."
+                />
+                <HelpFaqPreview query={product.name} limit={5} />
+                <a className="crz-button crz-button--secondary crz-button--sm" href="/help">
+                  Pesquisar na Central de Ajuda
+                </a>
               </div>
             )}
           </Panel>
