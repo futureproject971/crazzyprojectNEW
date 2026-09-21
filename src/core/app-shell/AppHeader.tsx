@@ -124,7 +124,7 @@ export function AppHeader({
       <header className="crz-shell-header">
         <div className="crz-shell-header__main">
           <a className="crz-shell-brand" href="/" aria-label="CRAZZY PROJECT, início">
-            <img src="/brand/crazzy-logo-navbar.png" alt="CRAZZY PROJECT" />
+            <img src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT" />
           </a>
 
           <NavLinks items={items} activeNav={activeNav} cartCount={cartCount} />
@@ -199,7 +199,7 @@ export function AppHeader({
 
       <Drawer open={mobileOpen} title="CRAZZY PROJECT" onClose={() => setMobileOpen(false)}>
         <div className="crz-shell-mobile">
-          <img className="crz-shell-mobile__logo" src="/brand/crazzy-logo-navbar.png" alt="CRAZZY PROJECT" />
+          <img className="crz-shell-mobile__logo" src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT" />
 
           <NavLinks
             items={items}
