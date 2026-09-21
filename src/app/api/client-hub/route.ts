@@ -110,8 +110,6 @@ export async function GET() {
       expiresAt: row.expires_at,
       tutorialAccess: Boolean(row.tutorial_access),
       hasTutorial: Boolean(product?.tutorial_text || product?.tutorial_file_url),
-      _tutorialText: nullableText(product?.tutorial_text),
-      _tutorialFileUrl: nullableText(product?.tutorial_file_url),
     };
   });
 
@@ -121,13 +119,11 @@ export async function GET() {
       entitlementId: item.id,
       productName: item.productName,
       productImage: item.productImage,
-      tutorialText: item._tutorialText,
-      tutorialFileUrl: item._tutorialFileUrl,
       entitlementStatus: item.status,
       expiresAt: item.expiresAt,
     }));
 
-  const safeEntitlements = entitlements.map(({ _tutorialText, _tutorialFileUrl, ...item }: any) => item);
+  const safeEntitlements = entitlements;
 
   const snapshot: ClientHubSnapshot = {
     profile: {
