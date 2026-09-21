@@ -19,10 +19,15 @@ export async function GET() {
     return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
   }
 
-  const [profileResult, rolesResult, discordResult] = await Promise.all([
+  const [profileResult, preferencesResult, rolesResult, discordResult] = await Promise.all([
     supabase
       .from("profiles")
       .select("username,avatar_url,banned")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("profile_preferences")
+      .select("display_name,avatar_source")
       .eq("user_id", user.id)
       .maybeSingle(),
     supabase
@@ -56,15 +61,23 @@ export async function GET() {
     [...roles].sort((a, b) => roleRank[b] - roleRank[a])[0] || "user";
 
   const profile = profileResult.data;
+  const preferences = preferencesResult.data;
   const discord = discordResult.data;
+  const baseAvatar = profile?.avatar_url || null;
+  const discordAvatar = discord?.avatar_url || null;
+  const avatarUrl =
+    preferences?.avatar_source === "discord"
+      ? discordAvatar || baseAvatar
+      : baseAvatar || discordAvatar;
 
   const payload: AuthMe = {
     id: user.id,
     email: user.email || null,
     username:
+      preferences?.display_name ||
       profile?.username ||
       String(user.user_metadata?.preferred_username || user.user_metadata?.name || "Meu Painel"),
-    avatarUrl: profile?.avatar_url || null,
+    avatarUrl,
     role,
     roles,
     banned: false,
