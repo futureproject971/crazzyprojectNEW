@@ -8,7 +8,7 @@
 
 .crz-accounts-hero {
   position: relative;
-  padding: 42px 0 18px;
+  padding: 92px 0 18px;
   border-bottom: 1px solid rgba(70, 130, 255, 0.16);
   background:
     linear-gradient(180deg, rgba(8, 18, 34, 0.72), rgba(3, 8, 15, 0.94)),
@@ -463,7 +463,7 @@
 /* Detail */
 
 .crz-account-detail {
-  padding: 22px 0 40px;
+  padding: 88px 0 40px;
 }
 
 .crz-account-detail--state {
@@ -688,7 +688,7 @@
 
 @media (max-width: 560px) {
   .crz-accounts-hero {
-    padding-top: 24px;
+    padding-top: 78px;
   }
 
   .crz-accounts-games {
