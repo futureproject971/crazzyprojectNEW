@@ -63,8 +63,8 @@ Não inclui:
 - [x] navegação atualizada com alteração mínima
 
 ## QA técnico
-- [ ] TypeScript / typecheck PASS no HEAD final
-- [ ] Next.js build PASS no HEAD final
-- [ ] GitHub Actions PASS no HEAD final
+- [x] TypeScript / typecheck PASS no HEAD final
+- [x] Next.js build PASS no HEAD final
+- [x] GitHub Actions PASS no HEAD final
 
-Somente após os três itens técnicos acima o M03 pode ser fechado.
+Os três gates técnicos passaram. M03 está pronto para revisão/aprovação do usuário.
