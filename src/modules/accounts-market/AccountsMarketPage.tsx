@@ -382,6 +382,12 @@ export function AccountsMarketPage() {
                 role="tab"
                 aria-selected={game === tab.id}
                 className={game === tab.id ? "is-active" : ""}
+                style={game === tab.id ? {
+                  borderColor: tab.accent,
+                  background: "radial-gradient(circle at 50% 0%, " + tab.accentSoft + ", transparent 62%), linear-gradient(180deg, rgba(10,22,39,.96), rgba(4,12,24,.98))",
+                  boxShadow: "0 0 22px " + tab.accentSoft,
+                  color: "#fff",
+                } : undefined}
                 onClick={() => selectGame(tab.id)}
               >
                 <NeonIcon name={tab.id === "valorant" ? "gamepad" : "cube"} size={25} />
