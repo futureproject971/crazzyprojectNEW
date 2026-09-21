@@ -5,7 +5,7 @@
 @import "../modules/home/styles.css";
 @import "../modules/discovery/styles.css";
 @import "../modules/catalog/styles.css";
-@import "../modules/product-view/styles.css";
+@import "../modules/product-view/styles.css";\n@import "../modules/accounts-market/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
