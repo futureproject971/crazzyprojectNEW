@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge, Button, ErrorState, LoadingState, NeonIcon } from "@/core/design-system";
 import { formatBrl } from "@/modules/cart/pricing";
 import { useCart } from "@/modules/cart/CartProvider";
-import { valorantRankImage } from "./legacy-data";
+import { gameTabs, valorantRankImage } from "./legacy-data";
 import type { AccountsMarketGame, AccountsMarketItem } from "./types";
 
 type InventoryItem = {
@@ -58,6 +58,20 @@ function gameName(game: AccountsMarketItem["game"]) {
   if (game === "fortnite") return "Fortnite";
   if (game === "minecraft") return "Minecraft";
   return "VALORANT";
+}
+
+function activityRisk(days: number | null) {
+  if (days == null) return { label: "Sem dado", level: "unknown" as const };
+  if (days >= 90) return { label: "Baixo", level: "low" as const };
+  if (days >= 30) return { label: "Médio", level: "medium" as const };
+  return { label: "Alto", level: "high" as const };
+}
+
+function offlineLabel(days: number | null) {
+  if (days == null) return "Não informado";
+  if (days === 0) return "Ativa recentemente";
+  if (days === 1) return "1 dia";
+  return days + " dias";
 }
 
 function detailsFor(item: AccountsMarketItem) {
@@ -299,9 +313,18 @@ export function AccountDetailView({
   };
 
   const rankImage = valorantRankImage(item.rankValue);
+  const risk = activityRisk(item.offlineDays);
+  const currentGame = item.game === "unknown" ? "valorant" : item.game;
+  const activeTheme = gameTabs.find((tab) => tab.id === currentGame) ?? gameTabs[0];
 
   return (
-    <main className="crz-account-detail crz-account-detail--legacy">
+    <main
+      className={"crz-account-detail crz-account-detail--legacy crz-account-detail--" + currentGame}
+      style={{
+        "--account-accent": activeTheme.accent,
+        "--account-accent-soft": activeTheme.accentSoft,
+      } as React.CSSProperties}
+    >
       <div className="crz-container">
         <nav className="crz-account-detail__breadcrumb" aria-label="Breadcrumb">
           <a href="/">Início</a><span>›</span><a href="/contas">Contas</a><span>›</span><span aria-current="page">#{item.id}</span>
@@ -376,6 +399,20 @@ export function AccountDetailView({
               <div className="crz-account-detail__badges">
                 <Badge tone="blue">FULL ACESSO</Badge>
                 <Badge tone="green">DISPONÍVEL</Badge>
+                <span
+                  className={"crz-account-risk crz-account-risk--" + risk.level}
+                  title="Estimativa baseada somente no tempo de inatividade informado pelo catálogo."
+                >
+                  Risco estimado: {risk.label}
+                </span>
+              </div>
+
+              <div className="crz-account-detail__activity-box">
+                <div>
+                  <small>TEMPO SEM ATIVIDADE</small>
+                  <strong>{offlineLabel(item.offlineDays)}</strong>
+                </div>
+                <span>Indicador calculado pela inatividade da conta, não é garantia de segurança.</span>
               </div>
 
               <div className="crz-account-detail__checklist">
@@ -406,6 +443,7 @@ export function AccountDetailView({
                 <Info label="Agentes" value={item.agentsCount} />
                 <Info label="Nível" value={item.level} />
                 <Info label="Knifes" value={item.knivesCount} />
+                <Info label="Inativa há" value={item.offlineDays == null ? "Não informado" : offlineLabel(item.offlineDays)} />
               </div>
             </div>
 
