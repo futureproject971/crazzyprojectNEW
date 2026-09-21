@@ -168,6 +168,7 @@ export function normalizeAccountItem(
     skinIds: toStringArray(firstValue(source, ["skinIds", "skin_ids"])),
     agentIds: toStringArray(firstValue(source, ["agentIds", "agent_ids"])),
     buddyIds: toStringArray(firstValue(source, ["buddyIds", "buddy_ids"])),
+    offlineDays: toNumberValue(firstValue(source, ["offlineDays", "offline_days", "daybreak"])),
   };
 }
 
