@@ -7,6 +7,7 @@ export type DiscoveryItem = {
   image?: string;
   tone: "blue" | "cyan" | "violet" | "pink" | "gold";
   featured?: boolean;
+  tags?: string[];
 };
 
 export const discoveryCategories = [
@@ -28,6 +29,7 @@ export const discoveryItems: DiscoveryItem[] = [
     image: "/products/gta.jpg",
     tone: "blue",
     featured: true,
+    tags: ["em-alta", "mais-vendidos", "jogos"],
   },
   {
     id: "valorant",
@@ -38,6 +40,7 @@ export const discoveryItems: DiscoveryItem[] = [
     image: "/products/valorant.jpg",
     tone: "pink",
     featured: true,
+    tags: ["novo", "lancamentos", "valorant"],
   },
   {
     id: "cod",
@@ -47,6 +50,7 @@ export const discoveryItems: DiscoveryItem[] = [
     image: "/products/cod.jpg",
     tone: "cyan",
     featured: true,
+    tags: ["em-alta", "fps", "jogos"],
   },
   {
     id: "rdr2",
@@ -55,6 +59,7 @@ export const discoveryItems: DiscoveryItem[] = [
     category: "games",
     image: "/products/rdr2.jpg",
     tone: "gold",
+    tags: ["mais-vendidos", "jogos"],
   },
   {
     id: "fortnite",
@@ -63,6 +68,7 @@ export const discoveryItems: DiscoveryItem[] = [
     category: "games",
     image: "/products/fortnite.jpg",
     tone: "violet",
+    tags: ["novo", "lancamentos", "jogos"],
   },
   {
     id: "software-tools",
@@ -71,6 +77,7 @@ export const discoveryItems: DiscoveryItem[] = [
     category: "software",
     badge: "DESTAQUE",
     tone: "blue",
+    tags: ["software", "destaques"],
   },
   {
     id: "ai-creation",
@@ -79,6 +86,7 @@ export const discoveryItems: DiscoveryItem[] = [
     category: "creation",
     badge: "NOVO",
     tone: "violet",
+    tags: ["novo", "creation", "destaques"],
   },
   {
     id: "premium-zone",
@@ -86,8 +94,18 @@ export const discoveryItems: DiscoveryItem[] = [
     subtitle: "Uma vitrine especial para produtos e experiências premium.",
     category: "premium",
     tone: "gold",
+    tags: ["premium", "destaques"],
   },
 ];
+
+export const discoveryTags = [
+  { id: "all", label: "Todos" },
+  { id: "em-alta", label: "Em alta" },
+  { id: "novo", label: "Novos" },
+  { id: "mais-vendidos", label: "Mais vendidos" },
+  { id: "lancamentos", label: "Lançamentos" },
+  { id: "destaques", label: "Destaques" },
+] as const;
 
 export const discoveryNews = [
   {
