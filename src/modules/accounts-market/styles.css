@@ -717,3 +717,17 @@
     padding: 17px;
   }
 }
+
+
+.crz-accounts-source.is-pending span {
+  color: #f6ce62;
+}
+
+.crz-accounts-source.is-pending span i {
+  background: #f6ce62;
+  box-shadow: 0 0 10px rgba(246, 206, 98, 0.58);
+}
+
+.crz-accounts-source.is-live span {
+  color: #78ffc5;
+}
