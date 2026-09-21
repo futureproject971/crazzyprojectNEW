@@ -222,7 +222,7 @@ export function StatusPage() {
             </section>
 
             <section className="crz-status-help">
-              <NeonIcon name="headset" size={28} />
+              <NeonIcon name="ticket" size={28} />
               <div>
                 <strong>Está com um problema que não aparece aqui?</strong>
                 <span>Abra um ticket e descreva o que está acontecendo.</span>
