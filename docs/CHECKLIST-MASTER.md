@@ -60,26 +60,48 @@
 
 ---
 
-## 🟡 M06 — CRAZZY ACCOUNTS MARKET — INÍCIO LIBERADO
-Fonte: FortuneECrazzy + LZT.
+## 🟡 M06 — CRAZZY ACCOUNTS MARKET — EM ANDAMENTO
+Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneECrazzy fica como referência histórica quando disponível.
 
-- [ ] migrar listagem
-- [ ] migrar detalhes
-- [ ] Valorant
-- [ ] LoL
-- [ ] Fortnite
-- [ ] Minecraft
-- [ ] rank
-- [ ] level
-- [ ] região
-- [ ] skins
+- [x] migrar listagem (VALORANT/LZT)
+- [x] migrar detalhes (provider read-only)
+- [x] Valorant
+- [x] LoL (adapter pronto; provider aguarda credencial)
+- [x] Fortnite (adapter pronto; provider aguarda credencial)
+- [x] Minecraft (adapter pronto; provider aguarda credencial)
+- [x] rank
+- [x] level
+- [x] região
+- [x] skins
 - [ ] inventário
-- [ ] filtros
+- [x] filtros (VALORANT)
 - [ ] markup
 - [ ] compra/entrega LZT
-- [ ] adaptar para CRAZZY UI
-- [ ] loading/error/empty
-- [ ] desktop/tablet/mobile
+- [x] adaptar para CRAZZY UI (primeiro corte)
+- [x] loading/error/empty
+- [x] desktop/tablet/mobile
+
+### BLOQUEIO EXTERNO M06
+- [ ] LZT credential configurada no backend (Edge Secret ou system_credentials admin-only)
+- [x] placeholder seguro criado sem valor
+- [x] adapter multijogo Riot/LoL + Fortnite + Minecraft criado
+- [x] action de detalhe sanitizado criada
+- [x] fallback de credencial server-side preparado
+- [ ] smoke test real contra provider (desbloqueia automaticamente quando a credencial existir)
+- [x] BRL direto no provider confirmado\n- [ ] fórmula de markup comercial validada
+
+### QA M06 — corte VALORANT
+- [x] API pública somente leitura via Next
+- [x] token LZT não exposto
+- [x] fast-buy não exposto
+- [x] TypeScript PASS
+- [x] Next production build PASS
+- [x] GitHub Actions PASS
+- [x] LoL via adapter multijogo
+- [x] Fortnite via adapter multijogo
+- [x] Minecraft via adapter multijogo
+- [ ] preço comercial/markup validado
+- [ ] compra/entrega LZT integrada ao M43
 
 ## ❌ M07 — CRAZZY CART
 - [ ] carrinho
@@ -494,6 +516,6 @@ Fonte visual: Pink.
 - [x] fechar decisões D01-D10
 - [x] mergear PR #6 M05
 - [x] mergear PR #7 Architecture V2
-- [ ] criar branch m06-accounts-market
-- [ ] migrar Fortune/LZT
+- [x] criar branch m06-accounts-market
+- [x] construir adapter oficial LZT multijogo\n- [ ] configurar primeiro token LZT do usuário e validar provider
 - [ ] seguir M07 -> M08 -> M09...

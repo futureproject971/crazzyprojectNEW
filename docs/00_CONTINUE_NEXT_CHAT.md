@@ -38,27 +38,20 @@ Este arquivo existe para retomar o projeto imediatamente em uma nova conversa/Wo
   - novos módulos M43-M47
 
 ### M06
-- NÃO iniciado
-- deve ser migração do sistema de contas/LZT existente no FortuneECrazzy
-- NÃO recriar LZT do zero
+- EM ANDAMENTO na branch `m06-accounts-market`
+- PR #8 aberto como draft
+- usuário confirmou em 2026-09-21 que esta será a PRIMEIRA configuração LZT
+- não existe token/integracao live antiga para recuperar
+- adapter oficial multijogo já criado para VALORANT, LoL, Fortnite e Minecraft
+- Edge Function `lzt-market` está versionada e com detalhe sanitizado/rate-limit
+- CI/typecheck/build PASS
+- blocker atual: criar primeiro Access Token LZT com scope `market`
 
 ## FONTES ANTIGAS AUDITADAS
 
-### FortuneECrazzy.rar
-Fonte preferida para:
-- Accounts Market
-- LZT
-- Valorant
-- LoL
-- Fortnite
-- Minecraft
-- filtros
-- rank
-- skins
-- inventário
-- region
-- markup
-- detalhes de conta
+### FortuneECrazzy
+Referência histórica para UI/regras caso o source seja localizado.
+IMPORTANTE: o usuário confirmou que LZT nunca foi configurado antes. Não procurar token antigo nem tratar Fortune como integração live.
 
 ### Pink
 Fonte preferida para:
@@ -268,13 +261,14 @@ Pensar assim:
 
 M06 está LIBERADO.
 
-1. criar branch `m06-accounts-market` a partir de `phase-1-home`
-2. localizar/auditar a fonte FortuneECrazzy/LZT já existente
-3. migrar listagem, filtros, markup e detalhes
-4. adaptar para Next.js/App Router e CRAZZY DESIGN SYSTEM
-5. não recriar LZT do zero
-6. não misturar M06 com checkout/PurinCash
-7. manter source/repo MT Sounds como dependência separada do M46
+1. branch `m06-accounts-market` já criada
+2. adapter oficial LZT multijogo já criado
+3. criar primeiro API Client/Access Token LZT com scope `market`
+4. salvar como Edge Function Secret `LZT_MARKET_TOKEN`
+5. rodar smoke real Riot/LoL + Fortnite + Minecraft
+6. confirmar fórmula final de markup
+7. não misturar M06 com checkout/PurinCash
+8. manter MT Sounds separado no M46
 
 ## PROMPT CURTO PARA NOVA CONVERSA
 

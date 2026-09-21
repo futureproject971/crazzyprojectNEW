@@ -9,7 +9,7 @@ Se a função antiga vende/entrega/suporta o mesmo tipo de produto que vendemos 
 | Recurso | Fonte preferida | Estratégia |
 |---|---|---|
 | Visual / design / layout | CRAZZY PROJECT | manter |
-| LZT Accounts | FortuneECrazzy | migrar e adaptar |
+| LZT Accounts | API oficial LZT + CRAZZY adapter | implementar primeira integração oficial; Fortune apenas como referência histórica |
 | Raspadinha UI | Pink | migrar visual |
 | Raspadinha RNG | Pink | NÃO copiar; reescrever server-side |
 | Cupons | Pink/Fortune | estudar e adaptar |

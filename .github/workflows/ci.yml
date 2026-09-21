@@ -35,3 +35,7 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Test M06 LZT preview
+        if: github.ref_name == 'm06-accounts-market'
+        run: node scripts/test-lzt-preview.mjs
