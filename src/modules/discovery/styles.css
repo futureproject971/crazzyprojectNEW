@@ -522,3 +522,17 @@
     transition-duration: 0ms;
   }
 }
+
+
+.crz-discovery-search__icon {
+  width: 19px;
+  height: 19px;
+  display: inline-block;
+  background: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
