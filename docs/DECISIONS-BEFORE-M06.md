@@ -1,168 +1,129 @@
 # CRAZZY PROJECT — DECISIONS BEFORE M06
 
-Estas decisões devem ser respondidas antes de implementar backend/fulfillment definitivo.
+Status: **D01-D10 APROVADAS pelo usuário em 2026-09-21.**
 
-## D01 — Fonte de keys
+Estas decisões passam a ser regra oficial da arquitetura até nova decisão explícita do usuário.
 
-### Opções
-A. Estoque interno Supabase / M27.
-B. PurinCash supplier.
-C. Híbrido.
+## D01 — Fonte de keys ✅ FECHADA
 
-### Recomendação
-**C — Híbrido**, com `internal_stock` como padrão.
+**Decisão: HÍBRIDO.**
 
-Motivo:
-- mantém admin/estoque sob controle do site;
-- permite usar supplier PurinCash quando já existe estoque útil lá;
-- suporta LZT e serviços no mesmo Fulfillment Engine.
+- `internal_stock` / Supabase / M27 é o padrão para produtos próprios.
+- `purincash_supplier` pode ser usado por produto/plano quando fizer sentido.
+- M06/LZT usa `lzt_account`.
+- Serviços podem usar `manual` ou `service`.
+- O M43 CRAZZY FULFILLMENT ENGINE é o único dono da entrega pós-pagamento.
 
 ---
 
-## D02 — Cargo Discord por produto
+## D02 — Cargo Discord por produto ✅ FECHADA
 
-### Recomendação
-Uma role por produto/benefício, não uma role por cliente.
-
-Campos:
-- role id;
-- nome;
-- emoji;
-- cor;
-- prioridade;
-- revoke on expire;
-- revoke on refund.
-
-Formato de nome precisa de definição do usuário.
+- Uma role por produto/benefício, nunca uma role nova por cliente.
+- Formato padrão de nome: **`emoji | PRODUTO`**.
+- Configuração pode guardar role id, emoji, cor, prioridade, `revoke_on_expire` e `revoke_on_refund`.
+- Cargo Discord não é prova de compra. Entitlement do site continua sendo a fonte de verdade.
 
 ---
 
-## D03 — Expiração
+## D03 — Expiração ✅ FECHADA
 
-Perguntas:
-- plano Diário/Semanal/Mensal remove cargo Discord quando expira?
-- tutorial protegido também expira?
-- key continua visível no histórico após expiração?
+Quando plano Diário/Semanal/Mensal expirar:
 
-### Recomendação
-- cargo: remover ao expirar;
-- entitlement ativo: expirar;
-- biblioteca/histórico: manter;
-- key já entregue: continuar acessível ao dono, salvo revogação específica;
-- tutorial: decisão de negócio ainda pendente.
+- entitlement ativo expira;
+- cargo Discord correspondente é removido;
+- biblioteca/histórico permanece;
+- key já entregue continua acessível ao dono no histórico, salvo revogação específica;
+- tutorial já liberado permanece acessível após a expiração normal do plano;
+- refund/dispute segue D08 e pode revogar acesso protegido.
 
 ---
 
-## D04 — Discord Bot
+## D04 — Discord Bot ✅ FECHADA
 
-Pergunta:
-usar o bot CRAZZY existente ou criar serviço/bot separado?
-
-### Recomendação
-Se o bot atual já é estável e pertence ao mesmo servidor:
-reaproveitar a mesma aplicação Discord e adicionar um serviço de sync isolado.
-
-Não misturar lógica de ticket, fulfillment e roles no mesmo arquivo/processo.
+- Reaproveitar a aplicação/bot CRAZZY existente se o código estiver saudável.
+- O serviço de sincronização será isolado no M44 CRAZZY DISCORD BRIDGE.
+- Não misturar ticket, fulfillment, roles e sync em um único arquivo/processo.
+- Falha do Discord nunca pode derrubar auth, checkout ou fulfillment.
 
 ---
 
-## D05 — PurinCash
+## D05 — PurinCash ✅ FECHADA
 
-### Recomendação
-PurinCash é gateway.
-CRAZZY PROJECT continua fonte de pedido/produto/entitlement.
-
-Usar:
-- PIX;
-- cartão;
-- LTC;
-- webhook;
-- polling;
-- disputes;
-- supplier opcional.
-
-Não depender do catálogo da loja PurinCash como banco principal do site.
+- PurinCash é gateway de pagamento.
+- CRAZZY PROJECT continua fonte de produtos, pedidos e entitlements.
+- Métodos previstos: PIX, cartão e LTC.
+- Webhook, idempotência, value check e reconcile/polling são obrigatórios.
+- Supplier PurinCash é opcional por produto/plano.
+- O catálogo da PurinCash não é o banco principal do site.
 
 ---
 
-## D06 — Tutorial
+## D06 — Tutorial ✅ FECHADA
 
-Pink possui base útil:
-- tutorial_text;
-- tutorial_file_url;
-- upload de imagem/vídeo;
-- product_media;
-- sort_order;
-- entrega no pedido.
-
-### Recomendação
-Migrar conceitos/upload/storage.
-Criar novo editor por blocos no M45.
-
-Perguntas:
-- acesso por produto ou por plano?
-- tutorial permanece após expiração?
-- vídeo será upload direto, YouTube/stream embed, ou ambos?
+- Acesso pode ser associado a produto **e/ou plano** por regra.
+- O entitlement libera o tutorial.
+- Após expiração normal do plano, o tutorial permanece acessível.
+- Refund/dispute pode revogar o acesso protegido conforme D08.
+- Vídeos aceitam **upload direto e YouTube/link/embed**.
+- Reaproveitar conceitos úteis de mídia/upload/sort_order do Pink.
+- O editor por blocos será o M45 CRAZZY TUTORIAL STUDIO.
 
 ---
 
-## D07 — MT Sounds
+## D07 — MT Sounds ✅ DECISÃO FECHADA / SOURCE AINDA PENDENTE
 
-Definido:
-- recurso free;
-- última aba pública;
-- vive dentro da CRAZZY PROJECT.
-
-Pendente:
-source/repo do site.
-
-### Recomendação
-Portar source para Next.js.
-Iframe apenas fallback temporário.
+- MT Sounds será recurso free/parceiro.
+- Será a última aba pública.
+- Rota planejada: `/mtsounds`.
+- Deve viver dentro do CRAZZY PROJECT e do mesmo App Shell.
+- Estratégia oficial: portar o source para Next.js.
+- Iframe é apenas fallback temporário.
+- O source/repo ainda precisa ser recebido/localizado, mas isso é uma dependência de implementação do M46, não uma decisão de arquitetura pendente e não bloqueia o início do M06.
 
 ---
 
-## D08 — Refund / dispute
+## D08 — Refund / dispute ✅ FECHADA
 
-Pergunta:
-ao reembolsar/estornar, o sistema deve:
-- revogar cargo;
-- revogar tutorial;
-- bloquear key/download futuro;
-- manter histórico?
+Em refund/chargeback/dispute confirmado:
 
-### Recomendação
-- manter histórico;
+- manter histórico e evidências;
 - revogar entitlement ativo;
-- remover cargo;
-- bloquear novos downloads protegidos;
-- nunca apagar logs/evidências.
+- remover cargo Discord relacionado;
+- bloquear novos downloads/entregas protegidas;
+- revogar acesso protegido quando aplicável;
+- não apagar logs/evidências;
+- registrar evento sensível no M47 Security Sentinel.
 
 ---
 
-## D09 — Role color no chat
+## D09 — Role color no chat ✅ FECHADA
 
-Definido:
-experiência estilo Discord.
-
-### Recomendação
-Cor do nick = role visível de maior prioridade.
-
-Cargos manuais podem aparecer no perfil, mas só roles/entitlements mapeados liberam conteúdo pago.
-
+- Cor do nick = role visível de maior prioridade.
+- Cargos manuais podem aparecer no perfil.
+- Apenas roles/entitlements mapeados liberam conteúdo pago.
 
 ---
 
-## D10 — Security Sentinel
+## D10 — Security Sentinel ✅ FECHADA
 
-Perguntas:
-- qual canal Discord receberá alertas de segurança?
-- qual cargo poderá ser mencionado quando o evento for CRITICAL?
+- Canal padrão: **`#security-logs`**, privado e configurável.
+- INFO/WARN: sem ping.
+- HIGH: normalmente sem ping; agregação/repetição pode elevar tratamento.
+- CRITICAL: pode mencionar somente uma role administrativa/de segurança configurada.
+- Cooldown, agregação e deduplicação são obrigatórios.
+- Nunca enviar secrets, tokens, senhas, keys, licenças ou conteúdo entregue ao Discord.
+- Discord offline não bloqueia o fluxo principal.
 
-### Recomendação
-- canal privado dedicado, por exemplo `#security-logs`;
-- INFO/WARN sem ping;
-- HIGH normalmente sem ping, salvo repetição;
-- CRITICAL pode mencionar somente um cargo de segurança/admin configurado;
-- agregação/cooldown para evitar spam;
-- nenhum secret, token, key/licença ou conteúdo sensível deve aparecer no Discord.
+---
+
+# GATE DO M06
+
+Com D01-D10 aprovadas, o gate de decisões está **FECHADO**.
+
+Sequência aprovada:
+1. mergear PR #6 — M05;
+2. mergear PR #7 — Architecture V2;
+3. criar branch `m06-accounts-market`;
+4. migrar FortuneECrazzy/LZT para CRAZZY PROJECT;
+5. não recriar LZT do zero;
+6. manter PurinCash, Discord, Fulfillment, Tutorial Studio, MT Sounds e Security Sentinel como arquitetura obrigatória.
