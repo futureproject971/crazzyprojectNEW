@@ -55,3 +55,7 @@ jobs:
       - name: Test M11 Library security
         if: github.ref_name == 'm11-library'
         run: node scripts/test-m11-library.mjs
+
+      - name: Test M12 profile security
+        if: github.ref_name == 'm12-profile'
+        run: node scripts/test-m12-profile.mjs

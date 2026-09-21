@@ -293,17 +293,43 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] production build PASS
 - [x] smoke M11 PASS
 - [x] validação isolada GitHub Actions PASS
-- [ ] CI oficial no head final
-- [ ] PR M11
-- [ ] merge M11
+- [x] CI oficial pós-merge na phase-1-home PASS
+- [x] PR #13 M11
+- [x] merge M11 — d833cbef71175487bbf0c150217a8b32b2953ce1
 
-## ❌ M12 — CRAZZY PROFILE
-- [ ] avatar
-- [ ] Discord conectado
-- [ ] cargos
-- [ ] badges
-- [ ] cor principal
-- [ ] perfil estilo Discord
+## ✅ M12 — CRAZZY PROFILE — IMPLEMENTADO / QA FINAL
+- [x] branch `m12-profile`
+- [x] /perfil
+- [x] snapshot privado do perfil
+- [x] username protegido
+- [x] display name personalizável
+- [x] avatar CRAZZY
+- [x] fallback/avatar Discord
+- [x] avatar source auto/crazzy/discord
+- [x] Discord conectado
+- [x] guild membership/status
+- [x] app roles
+- [x] cargos Discord
+- [x] badges derivados de fatos reais
+- [x] cor principal
+- [x] bio curta
+- [x] perfil estilo Discord
+- [x] editar personalização própria
+- [x] validação server-side de nome/bio/cor/avatar source
+- [x] RLS owner/admin em profile_preferences
+- [x] profiles sensível sem UPDATE direto do cliente
+- [x] sem alterar app role pelo cliente
+- [x] sem criar Discord role manual pelo cliente
+- [x] Auth header usa display name/avatar source
+- [x] loading/error
+- [x] desktop/tablet/mobile
+- [x] Security Advisor: 0 lints
+- [x] TypeScript PASS
+- [x] production build PASS
+- [x] smoke M12 PASS
+- [x] GitHub Actions PASS
+- [ ] PR M12
+- [ ] merge M12
 
 ## ❌ M13 — CRAZZY SUPPORT
 - [ ] ticket real
@@ -665,6 +691,5 @@ Fonte visual: Pink.
 - [x] M08 concluído estruturalmente
 - [x] M09 concluído estruturalmente
 - [x] M10 concluído
-- [x] M11 concluído tecnicamente
-- [ ] mergear M11 — CRAZZY LIBRARY
-- [ ] iniciar M12 — CRAZZY PROFILE
+- [x] M11 concluído e mergeado
+- [x] iniciar M12 — CRAZZY PROFILE

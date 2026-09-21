@@ -510,3 +510,43 @@ Falta:
 Regras completas:
 - `docs/M11-LIBRARY-RULES.md`
 - `docs/M11-WORKER-HANDOFF.md`
+
+
+---
+
+## M12 — CRAZZY PROFILE — QA VERDE
+
+Branch:
+- `m12-profile`
+
+Implementado:
+- /perfil
+- profile_preferences com RLS
+- display name
+- bio
+- cor principal
+- avatar source auto/crazzy/discord
+- perfil estilo Discord
+- badges derivados
+- app roles
+- Discord roles
+- conexão/guild status
+- edição inline
+- Auth header usa display name/avatar preference
+
+Hardening:
+- authenticated perdeu UPDATE/INSERT/DELETE direto em profiles
+- profile_preferences contém apenas dados seguros editáveis
+- badges/roles não são autoatribuíveis pelo cliente
+
+QA:
+- Security Advisor: 0 lints
+- npm ci PASS
+- TypeScript PASS
+- production build PASS
+- smoke M12 PASS
+- GitHub Actions PASS
+
+Próximo:
+- PR/merge M12
+- M13 — CRAZZY SUPPORT
