@@ -70,7 +70,7 @@ Próximo módulo após M02:
 ## M03 — CRAZZY DISCOVERY
 **GRUPO 01 — EXPERIÊNCIA PÚBLICA**
 
-Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+Status: **APROVADO E INTEGRADO**
 
 Branch:
 `m03-discovery`
@@ -102,3 +102,43 @@ Implementado:
 
 Próximo módulo previsto após aprovação:
 **M04 — CRAZZY CATALOG**
+
+
+---
+
+## M04 — CRAZZY CATALOG
+**GRUPO 02 — COMÉRCIO**
+
+Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+
+Branch:
+`m04-catalog`
+
+Rota:
+- `/produtos`
+
+Implementado:
+- grid de produtos
+- busca
+- filtros combináveis
+- categorias
+- ordenação
+- badges
+- estoque visual
+- novos
+- mais vendidos
+- promoções
+- paginação
+- loading
+- empty state
+- error state
+- responsividade desktop/tablet/mobile
+- integração mínima com Home/AppShell
+
+QA:
+- typecheck: PASS
+- build: PASS
+- GitHub Actions: PASS
+
+Próximo módulo previsto após aprovação:
+**M05 — CRAZZY PRODUCT VIEW**
