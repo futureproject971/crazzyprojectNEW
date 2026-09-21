@@ -41,5 +41,16 @@ Página individual de produto da CRAZZY PROJECT.
 - reaproveita M00 e M01;
 - M02/M03/M04 não devem ser redesenhados.
 
+## QA técnico
+- TypeScript / typecheck: PASS
+- Next.js build: PASS
+- GitHub Actions: PASS
+
 ## Status
-EM IMPLEMENTAÇÃO / QA.
+**CONCLUÍDO TECNICAMENTE / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+
+## Próximo módulo após aprovação
+**M06 — CRAZZY ACCOUNTS**
+
+Rota:
+`/contas`
