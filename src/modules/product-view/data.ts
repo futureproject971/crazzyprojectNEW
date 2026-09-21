@@ -1,4 +1,4 @@
-import { CRAZZY_STANDARD_PLANS, type StandardPlanCode } from "@/core/commerce/policy";
+import { CRAZZY_STANDARD_PLANS, shouldShowPlanToCustomer, type StandardPlanCode } from "@/core/commerce/policy";
 import { catalogProducts, type CatalogProduct } from "@/modules/catalog";
 
 export type ProductPlanCode = StandardPlanCode | "single" | "custom";
@@ -136,9 +136,7 @@ function categoryCopy(product: CatalogProduct) {
 }
 
 function planIsCustomerVisible(plan: ProductPlan) {
-  if (plan.stockCount == null) return true;
-  if (plan.stockCount > 0) return true;
-  return plan.showWhenOutOfStock === true;
+  return shouldShowPlanToCustomer(plan.stockCount, plan.showWhenOutOfStock);
 }
 
 function defaultPlans(product: CatalogProduct): ProductPlan[] {
