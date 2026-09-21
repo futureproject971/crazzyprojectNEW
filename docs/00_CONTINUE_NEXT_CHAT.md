@@ -394,3 +394,52 @@ Na etapa de integrações/SQL:
 
 ### Próximo módulo
 M09 — CRAZZY AUTH.
+
+
+---
+
+## M09 — CRAZZY AUTH
+
+### M09 CRAZZY AUTH
+- branch: `m09-auth`
+- Supabase SSR Auth integrado
+- dependências pinadas:
+  - @supabase/supabase-js 2.109.0
+  - @supabase/ssr 0.12.0
+- package-lock.json versionado
+- site permanece público
+- middleware protege apenas áreas privadas
+- rotas privadas preparadas:
+  - /checkout
+  - /painel
+  - /cliente
+  - /perfil
+  - /tickets
+  - /chat
+- Discord OAuth usa identify/email/guilds
+- Edge Function: `auth-discord-sync` v1
+- token Discord não é salvo
+- tabela `discord_identities`
+- guild status persistido como dado verificado
+- membership não é barreira global do site
+- Google é opcional e desligado por padrão
+- novos usuários recebem role `user`
+- roles: user / moderator / admin
+- header muda automaticamente visitor -> client/admin
+- checkout M08 agora usa sessão Supabase real
+- RLS e trigger auditados
+- Security Advisor: 0 lints
+- regras: `docs/M09-AUTH-RULES.md`
+
+### Ativação OAuth pendente
+Na etapa de integrações:
+- Discord Client ID
+- Discord Client Secret
+- Site URL
+- redirect allowlist /auth/callback
+- DISCORD_GUILD_ID
+- habilitar novos cadastros
+- Google provider somente se desejado
+
+### Próximo módulo
+M10 — CRAZZY CLIENT HUB.
