@@ -13,6 +13,7 @@ import {
 } from "@/core/design-system";
 import { catalogCategories } from "@/modules/catalog";
 import { useCart } from "@/modules/cart/CartProvider";
+import { VerifiedReviewFeed } from "@/modules/reviews";
 import {
   getRelatedProducts,
   type ProductDetail,
@@ -317,31 +318,18 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
 
             {activeTab === "reviews" && (
               <div className="crz-product-reviews">
-                <div className="crz-product-reviews__summary">
-                  <strong>{detail.rating.toFixed(1)}</strong>
-                  <span>★★★★★</span>
-                  <small>{detail.ratingCount} avaliações</small>
-                  <ProgressBar value={96} label="Satisfação visual" showValue />
-                </div>
-
-                <div className="crz-product-reviews__list">
-                  {detail.reviews.map((review) => (
-                    <article key={review.id}>
-                      <div className="crz-product-review__head">
-                        <span className="crz-product-review__avatar">{review.name.slice(0, 1)}</span>
-                        <div>
-                          <strong>{review.name}</strong>
-                          {review.verified && <small>✓ Cliente verificado</small>}
-                        </div>
-                        <time>{review.time}</time>
-                      </div>
-                      <div className="crz-product-review__stars">
-                        {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
-                      </div>
-                      <p>{review.text}</p>
-                    </article>
-                  ))}
-                </div>
+                <SectionTitle
+                  icon={<NeonIcon name="verified" size={28} />}
+                  title="Avaliações verificadas"
+                  description="Somente compras reais recebem o selo de cliente verificado."
+                />
+                <VerifiedReviewFeed
+                  productId={/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(product.id) ? product.id : undefined}
+                  limit={20}
+                />
+                <a className="crz-button crz-button--secondary crz-button--sm" href="/feedbacks">
+                  Ver todos os feedbacks
+                </a>
               </div>
             )}
 

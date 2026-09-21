@@ -67,3 +67,7 @@ jobs:
       - name: Test M14 Community security
         if: github.ref_name == 'm14-community'
         run: node scripts/test-m14-community.mjs
+
+      - name: Test M17 Rewards security
+        if: github.ref_name == 'm17-rewards-clean'
+        run: node scripts/test-m17-rewards.mjs
