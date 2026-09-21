@@ -45,6 +45,16 @@ export async function GET(
 
     const payload: any = await response.json().catch(() => null);
     const source = payload?.item ?? payload;
+    if (source && Array.isArray(source.cosmetics)) {
+      source.cosmetics = source.cosmetics.map((entry: any) => ({
+        name: String(entry?.name || "Item"),
+        category: entry?.category ?? null,
+        rarity: entry?.rarity ?? null,
+        imagePath: Number.isInteger(entry?.mediaIndex)
+          ? "/api/accounts/" + encodeURIComponent(id) + "/media?game=" + encodeURIComponent(game) + "&index=" + entry.mediaIndex
+          : null,
+      }));
+    }
     return NextResponse.json(
       { item: normalizeAccountItem(source, game) },
       { headers: { "Cache-Control": "no-store" } }
