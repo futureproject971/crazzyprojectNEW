@@ -537,6 +537,46 @@ serve(async (req) => {
     return json({ session: current, delivery: delivery || null });
   }
 
+  if (action === "history" && req.method === "GET") {
+    const { data: sessions, error } = await admin
+      .from("reward_sessions")
+      .select("id,campaign_id,campaign_product_id,product_id,product_plan_id,status,watched_seconds,started_at,completed_at,requested_at,delivered_at,cooldown_until,created_at,updated_at")
+      .eq("user_id", caller.id)
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) return json({ error: error.message }, 500);
+
+    const campaignIds = [...new Set((sessions || []).map((session: any) => session.campaign_id).filter(Boolean))];
+    const productIds = [...new Set((sessions || []).map((session: any) => session.product_id).filter(Boolean))];
+    const sessionIds = (sessions || []).map((session: any) => session.id);
+
+    const [{ data: campaigns }, { data: products }, { data: deliveries }] = await Promise.all([
+      campaignIds.length
+        ? admin.from("reward_campaigns").select("id,title,description,required_watch_seconds,cooldown_hours").in("id", campaignIds)
+        : Promise.resolve({ data: [] }),
+      productIds.length
+        ? admin.from("products").select("id,name,image_url").in("id", productIds)
+        : Promise.resolve({ data: [] }),
+      sessionIds.length
+        ? admin.from("reward_deliveries").select("session_id,delivery_mode,delivered_at,expires_at").in("session_id", sessionIds).eq("user_id", caller.id)
+        : Promise.resolve({ data: [] }),
+    ]);
+
+    const campaignMap = new Map((campaigns || []).map((item: any) => [item.id, item]));
+    const productMap = new Map((products || []).map((item: any) => [item.id, item]));
+    const deliveryMap = new Map((deliveries || []).map((item: any) => [item.session_id, item]));
+
+    return json({
+      history: (sessions || []).map((session: any) => ({
+        ...session,
+        campaign: campaignMap.get(session.campaign_id) || null,
+        product: productMap.get(session.product_id) || null,
+        delivery: deliveryMap.get(session.id) || null,
+      })),
+    });
+  }
+
   if (action.startsWith("admin-") && !(await isAdmin(admin, caller.id))) return json({ error: "Forbidden" }, 403);
 
   if (action === "admin-queue" && req.method === "GET") {
