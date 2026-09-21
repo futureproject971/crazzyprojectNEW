@@ -13,11 +13,19 @@ export type AccountsMarketItem = {
   skinsCount: number | null;
   knivesCount: number | null;
   agentsCount: number | null;
+  championsCount: number | null;
   inventoryValue: number | null;
   vp: number | null;
   rp: number | null;
   emailType: string | null;
   country: string | null;
+  vbucks: number | null;
+  minecoins: number | null;
+  capesCount: number | null;
+  java: boolean | null;
+  bedrock: boolean | null;
+  dungeons: boolean | null;
+  legends: boolean | null;
   imageUrl: string | null;
 };
 
@@ -28,6 +36,8 @@ export type AccountsMarketPageData = {
   totalItems: number;
   hasNextPage: boolean;
   source: "lzt";
+  game: AccountsMarketGame;
+  credentialReady: true;
   commercialPriceReady: false;
 };
 
@@ -42,4 +52,12 @@ export type AccountsMarketFilters = {
   skinsMin: string;
   knivesMin: string;
   region: string;
+  championsMin: string;
+  vbucksMin: string;
+  platform: string;
+  capesMin: string;
+  minecoinsMin: string;
+  hypixelLevelMin: string;
+  javaEdition: string;
+  bedrockEdition: string;
 };
