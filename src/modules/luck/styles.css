@@ -1,0 +1,353 @@
+.crz-luck-page {
+  min-height:100vh;
+  padding:92px 0 44px;
+  background:
+    radial-gradient(circle at 50% -8%,rgba(0,102,255,.13),transparent 33%),
+    linear-gradient(180deg,#02070f,#02050a);
+}
+.crz-luck-rules,.crz-luck-notice {
+  margin-bottom:12px;
+  border:1px solid rgba(68,137,229,.2);
+  border-radius:11px;
+  background:rgba(6,15,27,.88);
+}
+.crz-luck-rules { padding:11px 13px; display:flex; align-items:center; gap:10px; }
+.crz-luck-rules > div { display:grid; gap:2px; }
+.crz-luck-rules strong { color:#e5f1ff; font-size:10px; }
+.crz-luck-rules span { color:#71839a; font-size:8px; }
+.crz-luck-notice { padding:10px 12px; color:#9fd3ff; font-size:8px; }
+
+.crz-luck-tabs {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:12px;
+}
+.crz-luck-tabs button {
+  min-height:54px;
+  border:1px solid rgba(70,128,207,.2);
+  border-radius:10px;
+  color:#8294aa;
+  background:rgba(6,15,27,.82);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  cursor:pointer;
+  font-size:9px;
+  font-weight:800;
+  transition:170ms ease;
+}
+.crz-luck-tabs button:hover { transform:translateY(-1px); border-color:rgba(47,143,255,.45); }
+.crz-luck-tabs button.is-active {
+  color:#eef7ff;
+  border-color:rgba(40,143,255,.72);
+  background:radial-gradient(circle at 50% 0%,rgba(0,120,255,.18),transparent 70%),rgba(7,22,42,.96);
+  box-shadow:0 0 18px rgba(0,112,255,.14);
+}
+
+.crz-luck-main {
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(290px,.65fr);
+  gap:13px;
+  align-items:stretch;
+}
+.crz-luck-game,.crz-luck-odds,.crz-luck-history {
+  border:1px solid rgba(68,127,205,.2);
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(7,15,28,.97),rgba(3,9,17,.99));
+  box-shadow:0 17px 40px rgba(0,0,0,.26);
+}
+.crz-luck-game {
+  min-height:520px;
+  padding:18px;
+  overflow:hidden;
+  position:relative;
+}
+.crz-luck-game::before {
+  content:"";
+  position:absolute;
+  width:420px;
+  height:420px;
+  left:50%;
+  top:30%;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:rgba(0,100,255,.07);
+  filter:blur(38px);
+  pointer-events:none;
+}
+.crz-luck-game--scratch::before { background:rgba(255,47,155,.06); }
+.crz-luck-game--drop::before { background:rgba(124,60,255,.07); }
+
+.crz-luck-wheel-layout,
+.crz-luck-scratch-layout,
+.crz-luck-drop-layout {
+  position:relative;
+  z-index:1;
+  min-height:480px;
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(230px,.9fr);
+  gap:20px;
+  align-items:center;
+}
+.crz-luck-wheel-wrap {
+  position:relative;
+  width:min(430px,90%);
+  aspect-ratio:1;
+  margin:auto;
+  display:grid;
+  place-items:center;
+}
+.crz-luck-wheel-pointer {
+  position:absolute;
+  z-index:6;
+  top:-3px;
+  left:50%;
+  transform:translateX(-50%);
+  color:#eaf7ff;
+  font-size:34px;
+  filter:drop-shadow(0 0 12px #00aaff);
+}
+.crz-luck-wheel {
+  position:relative;
+  width:100%;
+  height:100%;
+  border:9px solid #071326;
+  border-radius:50%;
+  transition:transform 3.2s cubic-bezier(.12,.68,.08,1);
+  box-shadow:
+    inset 0 0 0 2px rgba(99,179,255,.38),
+    inset 0 0 32px rgba(0,0,0,.32),
+    0 0 0 4px rgba(0,98,255,.12),
+    0 0 40px rgba(0,112,255,.24);
+}
+.crz-luck-wheel__rings {
+  position:absolute;
+  inset:7%;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:50%;
+  box-shadow:inset 0 0 24px rgba(0,0,0,.28);
+}
+.crz-luck-wheel__hub {
+  position:absolute;
+  inset:50%;
+  width:35%;
+  height:35%;
+  transform:translate(-50%,-50%);
+  border:3px solid rgba(65,159,255,.68);
+  border-radius:50%;
+  background:radial-gradient(circle,#0f2445,#040b16 70%);
+  box-shadow:0 0 30px rgba(0,105,255,.35);
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:2px;
+}
+.crz-luck-wheel__hub img { width:70%; max-height:52px; object-fit:contain; }
+.crz-luck-wheel__hub span { color:#58c6ff; font-size:7px; font-weight:900; letter-spacing:.14em; }
+
+.crz-luck-game-actions { display:grid; gap:10px; align-content:center; }
+.crz-luck-game-actions > strong { color:#edf6ff; font-size:14px; }
+.crz-luck-game-actions > p { margin:0; color:#788aa0; font-size:8px; line-height:1.55; }
+.crz-luck-game-actions > .crz-button { width:100%; }
+
+.crz-luck-result {
+  border:1px solid rgba(67,148,255,.28);
+  border-radius:12px;
+  padding:14px;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(0,122,255,.13),transparent 65%),
+    rgba(5,14,26,.85);
+  display:grid;
+  gap:5px;
+  text-align:center;
+}
+.crz-luck-result > span { color:#5ec6ff; font-size:7px; font-weight:900; letter-spacing:.11em; }
+.crz-luck-result > strong { color:#fff; font-family:var(--crz-font-display); font-size:22px; }
+.crz-luck-result > small,.crz-luck-result > em { color:#75889f; font-size:7px; font-style:normal; }
+.crz-luck-result__coupon {
+  margin-top:6px;
+  border:1px dashed rgba(76,154,255,.4);
+  border-radius:9px;
+  padding:10px;
+  background:rgba(0,87,196,.09);
+  display:grid;
+  gap:5px;
+}
+.crz-luck-result__coupon label { color:#7189a5; font-size:6px; font-weight:800; }
+.crz-luck-result__coupon code { color:#e8f5ff; font-size:15px; font-weight:900; letter-spacing:.08em; }
+.crz-luck-result__coupon button { justify-self:center; border:0; color:#5fc3ff; background:transparent; cursor:pointer; font-size:7px; }
+
+.crz-luck-scratch-card {
+  position:relative;
+  width:min(520px,95%);
+  min-height:300px;
+  margin:auto;
+  border:2px solid rgba(255,74,177,.35);
+  border-radius:18px;
+  overflow:hidden;
+  background:linear-gradient(145deg,#10162b,#270f29 55%,#071f36);
+  box-shadow:0 0 38px rgba(255,47,155,.13);
+}
+.crz-luck-scratch-prize {
+  position:absolute;
+  inset:0;
+  padding:28px;
+  display:grid;
+  place-items:center;
+}
+.crz-luck-scratch-prize > div:not(.crz-luck-result) { display:grid; place-items:center; gap:7px; color:#8ba0b8; }
+.crz-luck-scratch-prize > div > strong { color:#edf4ff; font-size:17px; }
+.crz-luck-scratch-prize > div > span { font-size:8px; }
+.crz-luck-scratch-cover {
+  position:absolute;
+  inset:0;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  grid-template-rows:repeat(6,1fr);
+  touch-action:none;
+  cursor:crosshair;
+}
+.crz-luck-scratch-cover button {
+  border:0;
+  background:
+    linear-gradient(135deg,rgba(202,213,228,.98),rgba(83,105,137,.98));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+  cursor:crosshair;
+}
+.crz-luck-scratch-cover button.is-scratched { opacity:0; pointer-events:none; }
+
+.crz-luck-drop-layout { grid-template-columns:minmax(0,1fr) minmax(240px,.8fr); }
+.crz-luck-drop-box {
+  position:relative;
+  width:min(420px,85%);
+  height:320px;
+  margin:auto;
+  perspective:900px;
+}
+.crz-luck-drop-box__body {
+  position:absolute;
+  left:10%;
+  right:10%;
+  bottom:10%;
+  height:62%;
+  border:2px solid rgba(128,82,255,.45);
+  border-radius:12px;
+  background:linear-gradient(145deg,#151035,#09162c 60%,#061020);
+  box-shadow:inset 0 0 35px rgba(123,60,255,.18),0 0 34px rgba(92,51,255,.2);
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:7px;
+}
+.crz-luck-drop-box__body strong { color:#c9baff; font-family:var(--crz-font-display); font-size:18px; }
+.crz-luck-drop-box__lid {
+  position:absolute;
+  z-index:3;
+  left:6%;
+  right:6%;
+  top:22%;
+  height:22%;
+  border:2px solid rgba(147,94,255,.5);
+  border-radius:11px;
+  background:linear-gradient(180deg,#26164f,#0e1730);
+  transform-origin:left bottom;
+  transition:transform 800ms cubic-bezier(.2,.75,.2,1);
+  box-shadow:0 0 25px rgba(114,61,255,.22);
+}
+.crz-luck-drop-box__light {
+  position:absolute;
+  left:30%;
+  right:30%;
+  top:34%;
+  bottom:28%;
+  background:rgba(118,70,255,.14);
+  filter:blur(28px);
+  opacity:.2;
+  transition:opacity 700ms ease;
+}
+.crz-luck-drop-box.is-opening { animation:crz-drop-shake .14s linear 8; }
+.crz-luck-drop-box.is-opening .crz-luck-drop-box__lid,
+.crz-luck-drop-box.is-open .crz-luck-drop-box__lid { transform:rotateZ(-24deg) translateY(-45px); }
+.crz-luck-drop-box.is-opening .crz-luck-drop-box__light,
+.crz-luck-drop-box.is-open .crz-luck-drop-box__light { opacity:1; }
+@keyframes crz-drop-shake { 0%,100%{transform:translateX(0)} 50%{transform:translateX(5px)} }
+
+.crz-luck-odds { padding:15px; }
+.crz-luck-odds header { display:grid; gap:3px; }
+.crz-luck-odds header span,.crz-luck-history header span { color:#20adff; font-size:7px; font-weight:900; letter-spacing:.1em; }
+.crz-luck-odds h2,.crz-luck-history h2 { margin:0; color:#edf5ff; font-size:17px; }
+.crz-luck-odds > p { margin:7px 0 11px; color:#72859d; font-size:8px; line-height:1.5; }
+.crz-luck-odds__list { display:grid; gap:5px; }
+.crz-luck-odds__list > div {
+  min-height:44px;
+  border:1px solid rgba(71,127,202,.15);
+  border-radius:8px;
+  padding:6px 8px;
+  background:rgba(6,14,25,.72);
+  display:grid;
+  grid-template-columns:5px minmax(0,1fr) auto;
+  gap:8px;
+  align-items:center;
+}
+.crz-luck-odds__list i { width:5px; height:28px; border-radius:999px; box-shadow:0 0 8px currentColor; }
+.crz-luck-odds__list span { display:grid; gap:1px; color:#dbe8f7; font-size:8px; }
+.crz-luck-odds__list small { color:#657891; font-size:6px; text-transform:uppercase; }
+.crz-luck-odds__list strong { color:#79c8ff; font-size:9px; }
+.crz-luck-odds > .crz-button { width:100%; margin-top:12px; }
+
+.crz-luck-history { margin-top:13px; padding:15px; }
+.crz-luck-history > header { display:flex; align-items:center; justify-content:space-between; }
+.crz-luck-history > header > div { display:grid; gap:3px; }
+.crz-luck-history > header button { border:0; color:#67baff; background:transparent; font-size:8px; cursor:pointer; }
+.crz-luck-history__grid { margin-top:10px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+.crz-luck-history__grid article {
+  min-height:75px;
+  border:1px solid rgba(71,126,198,.15);
+  border-radius:9px;
+  padding:9px;
+  background:rgba(6,14,25,.72);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.crz-luck-history__grid article > div { display:grid; gap:2px; }
+.crz-luck-history__grid small,.crz-luck-history__grid span { color:#677a92; font-size:6.5px; }
+.crz-luck-history__grid strong { color:#e8f2ff; font-size:9px; }
+.crz-luck-history__grid b { color:#67c3ff; font-size:9px; }
+.crz-luck-history__grid code { color:#ffd36d; font-size:7px; }
+
+.crz-luck-state { min-height:420px; display:grid; place-items:center; align-content:center; gap:8px; text-align:center; color:#71849c; }
+.crz-luck-state--small { min-height:120px; }
+.crz-luck-state strong { color:#e4effd; font-size:11px; }
+.crz-luck-state p { margin:0; font-size:8px; }
+
+html[data-theme="light"] .crz-luck-page { background:#eef4fb; }
+html[data-theme="light"] .crz-luck-game,
+html[data-theme="light"] .crz-luck-odds,
+html[data-theme="light"] .crz-luck-history,
+html[data-theme="light"] .crz-luck-rules {
+  background:rgba(255,255,255,.94);
+  border-color:rgba(31,91,170,.17);
+  box-shadow:0 14px 34px rgba(25,55,95,.08);
+}
+html[data-theme="light"] .crz-luck-game-actions > strong,
+html[data-theme="light"] .crz-luck-odds h2,
+html[data-theme="light"] .crz-luck-history h2,
+html[data-theme="light"] .crz-luck-history__grid strong { color:#102033; }
+html[data-theme="light"] .crz-luck-odds__list > div,
+html[data-theme="light"] .crz-luck-history__grid article { background:rgba(246,250,255,.95); }
+
+@media (max-width:940px) {
+  .crz-luck-main { grid-template-columns:1fr; }
+  .crz-luck-wheel-layout,.crz-luck-scratch-layout,.crz-luck-drop-layout { grid-template-columns:1fr; }
+  .crz-luck-history__grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:580px) {
+  .crz-luck-tabs { grid-template-columns:1fr; }
+  .crz-luck-game { padding:11px; }
+  .crz-luck-history__grid { grid-template-columns:1fr; }
+  .crz-luck-wheel-wrap { width:95%; }
+}
