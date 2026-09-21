@@ -497,3 +497,59 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+.crz-profile-rank {
+  --profile-rank-color: #2AA8FF;
+  min-height: 102px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 52px minmax(0,1fr) auto;
+  gap: 11px;
+  align-items: center;
+  border-color: color-mix(in srgb,var(--profile-rank-color) 40%,rgba(78,126,194,.17));
+  background:
+    linear-gradient(110deg,color-mix(in srgb,var(--profile-rank-color) 10%,transparent),transparent 50%),
+    rgba(6,15,27,.78);
+}
+.crz-profile-rank__icon {
+  width: 48px;
+  height: 48px;
+  border: 1px solid color-mix(in srgb,var(--profile-rank-color) 55%,transparent);
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: var(--profile-rank-color);
+  background: color-mix(in srgb,var(--profile-rank-color) 9%,#07111d 91%);
+  box-shadow: 0 0 18px color-mix(in srgb,var(--profile-rank-color) 12%,transparent);
+}
+.crz-profile-rank__main {display:grid;gap:2px;min-width:0}
+.crz-profile-rank__main small {color:#6d8097;font-size:6.5px;font-weight:900;letter-spacing:.08em}
+.crz-profile-rank__main strong {color:#eef6ff;font-size:11px}
+.crz-profile-rank__main span {color:var(--profile-rank-color);font-size:7px;font-weight:850}
+.crz-profile-rank__main em {color:#687b92;font-size:6.4px;font-style:normal}
+.crz-profile-rank__track {
+  height:5px;
+  margin:4px 0 2px;
+  border-radius:99px;
+  overflow:hidden;
+  background:#111d2a;
+}
+.crz-profile-rank__track i {
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:var(--profile-rank-color);
+  box-shadow:0 0 9px color-mix(in srgb,var(--profile-rank-color) 35%,transparent);
+}
+.crz-profile-rank > a {color:#69bdff;font-size:7px;font-weight:800;white-space:nowrap}
+
+html[data-theme="light"] .crz-profile-rank {
+  background:linear-gradient(110deg,color-mix(in srgb,var(--profile-rank-color) 8%,white),white 60%);
+}
+html[data-theme="light"] .crz-profile-rank__main strong {color:#102033}
+
+@media (max-width:620px) {
+  .crz-profile-rank {grid-template-columns:46px minmax(0,1fr)}
+  .crz-profile-rank > a {grid-column:2}
+}
