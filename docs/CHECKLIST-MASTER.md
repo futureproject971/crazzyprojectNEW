@@ -103,7 +103,7 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [ ] preço comercial/markup validado
 - [ ] compra/entrega LZT integrada ao M43
 
-## 🟡 M07 — CRAZZY CART — EM ANDAMENTO
+## ✅ M07 — CRAZZY CART — CONCLUÍDO
 - [x] carrinho global persistente
 - [x] produto
 - [x] conta LZT
@@ -133,6 +133,9 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [x] preço ausente bloqueia checkout
 - [x] desktop/tablet/mobile
 - [x] loading/error/empty
+- [x] typecheck
+- [x] production build
+- [x] GitHub Actions
 - [x] stock 0 oculto por padrão
 - [x] admin poderá exibir stock 0 como esgotado
 
