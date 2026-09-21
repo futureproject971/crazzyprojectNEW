@@ -17,6 +17,7 @@
 @import "../modules/community/styles.css";
 @import "../modules/reviews/styles.css";
 @import "../modules/club/styles.css";
+@import "../modules/rewards/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
