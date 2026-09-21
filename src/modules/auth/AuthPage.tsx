@@ -72,7 +72,7 @@ export function AuthPage({
         ) : user ? (
           <div className="crz-auth-current">
             <div className="crz-auth-avatar">
-              {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <NeonIcon name="user" size={30} />}
+              {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <NeonIcon name="verified" size={30} />}
             </div>
             <div>
               <strong>{user.username}</strong>
