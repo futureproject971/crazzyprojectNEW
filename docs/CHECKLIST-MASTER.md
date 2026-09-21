@@ -60,7 +60,7 @@
 
 ---
 
-## 🟡 M06 — CRAZZY ACCOUNTS MARKET — EM ANDAMENTO
+## ✅ M06 — CRAZZY ACCOUNTS MARKET — ESTRUTURA INTEGRADA
 Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneECrazzy fica como referência histórica quando disponível.
 
 - [x] migrar listagem (VALORANT/LZT)
@@ -103,18 +103,38 @@ Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneE
 - [ ] preço comercial/markup validado
 - [ ] compra/entrega LZT integrada ao M43
 
-## ❌ M07 — CRAZZY CART
-- [ ] carrinho
-- [ ] produto
-- [ ] conta
-- [ ] plano
-- [ ] quantidade
-- [ ] cupom
-- [ ] subtotal
-- [ ] desconto
-- [ ] total
-- [ ] carrinho rápido
-- [ ] página completa
+## 🟡 M07 — CRAZZY CART — EM ANDAMENTO
+- [x] carrinho global persistente
+- [x] produto
+- [x] conta LZT
+- [x] plano
+- [x] planos padrão 1d/3d/7d/15d/30d/90d/lifetime
+- [x] quantidade
+- [x] alterar plano no carrinho
+- [x] remover item / limpar carrinho
+- [x] cupom preservado para validação server-side
+- [x] subtotal
+- [x] desconto
+- [x] total
+- [x] carrinho rápido / drawer
+- [x] página completa /carrinho
+- [x] /combo
+- [x] Combo Mensal
+- [x] Combo Lifetime
+- [x] 2 produtos = 10%
+- [x] 3 produtos = 15%
+- [x] 4 produtos = 20%
+- [x] 5 produtos = 25%
+- [x] 6 produtos = 30%
+- [x] 7+ produtos = 35% teto
+- [x] produto repetido não sobe faixa
+- [x] Mensal/Lifetime calculados separados
+- [x] cupom + combo não acumulam
+- [x] preço ausente bloqueia checkout
+- [x] desktop/tablet/mobile
+- [x] loading/error/empty
+- [x] stock 0 oculto por padrão
+- [x] admin poderá exibir stock 0 como esgotado
 
 ## ❌ M08 — CRAZZY CHECKOUT
 - [ ] PIX PurinCash
@@ -280,6 +300,9 @@ Fonte visual: Pink.
 ## ❌ M25 — CRAZZY PRODUCT MANAGER
 - [ ] criar/editar produto
 - [ ] planos
+- [ ] auto-criar variantes 1d/3d/7d/15d/30d/90d/lifetime ao criar produto
+- [ ] configurar preço por variante
+- [ ] showWhenOutOfStock por variante
 - [ ] emoji
 - [ ] cargo Discord
 - [ ] cor
@@ -297,6 +320,9 @@ Fonte visual: Pink.
 
 ## ❌ M27 — CRAZZY STOCK
 - [ ] keys
+- [ ] abastecer estoque por variante padrão
+- [ ] ocultar plano sem estoque por padrão
+- [ ] override para mostrar plano esgotado
 - [ ] reserva atômica
 - [ ] consumo idempotente
 - [ ] lote
