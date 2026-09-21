@@ -79,3 +79,21 @@
     --crz-duration-slow: 0ms;
   }
 }
+
+
+html[data-theme="light"] {
+  --crz-color-black: #eef4fb;
+  --crz-color-navy-950: #f7fbff;
+  --crz-color-navy-900: #e8f0fa;
+  --crz-color-navy-850: #dce8f6;
+  --crz-color-line: rgba(24, 86, 173, 0.22);
+  --crz-color-line-strong: rgba(0, 100, 230, 0.44);
+  --crz-color-text: #0c1726;
+  --crz-color-text-soft: #26384e;
+  --crz-color-muted: #65768d;
+  --crz-gradient-panel: linear-gradient(180deg, rgba(255,255,255,.97), rgba(239,246,253,.97));
+  --crz-gradient-panel-soft: linear-gradient(180deg, rgba(250,253,255,.96), rgba(233,242,251,.96));
+  --crz-shadow-panel: 0 14px 34px rgba(27, 61, 107, .12);
+  --crz-shadow-blue: 0 0 18px rgba(0, 102, 255, .2);
+  --crz-shadow-blue-strong: 0 0 26px rgba(0, 111, 255, .28);
+}

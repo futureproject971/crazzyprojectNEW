@@ -15,6 +15,7 @@
 @import "../modules/profile/styles.css";
 @import "../modules/support/styles.css";
 @import "../modules/community/styles.css";
+@import "../modules/reviews/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
@@ -38,7 +39,6 @@
 
 html {
   background: var(--bg-0);
-  color-scheme: dark;
   scroll-behavior: smooth;
 }
 
@@ -1869,4 +1869,87 @@ img.store-category-icon--gold {
   .crz-account-detail {
     padding-top: 78px;
   }
+}
+
+
+html[data-theme="dark"] { color-scheme: dark; }
+html[data-theme="light"] { color-scheme: light; }
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: #eef4fb;
+  color: var(--crz-color-text);
+}
+
+html[data-theme="light"] body {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(0,91,255,.10), transparent 34%),
+    linear-gradient(180deg, #f8fbff 0%, #edf4fb 100%);
+}
+
+html[data-theme="light"] .crz-app-shell,
+html[data-theme="light"] .crz-accounts-market,
+html[data-theme="light"] .crz-account-detail,
+html[data-theme="light"] .crz-product-view,
+html[data-theme="light"] .crz-cart-page,
+html[data-theme="light"] .crz-checkout-page,
+html[data-theme="light"] .crz-community-page,
+html[data-theme="light"] .crz-support-page,
+html[data-theme="light"] .crz-profile-page,
+html[data-theme="light"] .crz-library-page,
+html[data-theme="light"] .crz-hub-page {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(0,102,255,.10), transparent 36%),
+    #eef4fb;
+  color: #0c1726;
+}
+
+html[data-theme="light"] .social-panel,
+html[data-theme="light"] .crz-panel,
+html[data-theme="light"] .crz-account-card,
+html[data-theme="light"] .crz-accounts-filters,
+html[data-theme="light"] .crz-accounts-results,
+html[data-theme="light"] .crz-account-detail__gallery,
+html[data-theme="light"] .crz-account-detail__legacy-stats,
+html[data-theme="light"] .crz-account-detail__purchase,
+html[data-theme="light"] .crz-account-detail__full-access,
+html[data-theme="light"] .crz-account-detail__inventory-legacy,
+html[data-theme="light"] .crz-account-detail__facts-panel {
+  background: rgba(255,255,255,.92);
+  color: #0c1726;
+  border-color: rgba(28,91,180,.2);
+  box-shadow: 0 14px 34px rgba(22,52,91,.09);
+}
+
+html[data-theme="light"] .panel-heading h2,
+html[data-theme="light"] .why-heading h2,
+html[data-theme="light"] .crz-page-header h1,
+html[data-theme="light"] .crz-section-title h2,
+html[data-theme="light"] .crz-account-detail__facts-panel h2,
+html[data-theme="light"] .crz-account-detail__facts-panel strong,
+html[data-theme="light"] .crz-account-card strong {
+  color: #0c1726;
+}
+
+html[data-theme="light"] .feedback-body p,
+html[data-theme="light"] .crz-field-label,
+html[data-theme="light"] .crz-account-detail__fact strong,
+html[data-theme="light"] .crz-account-detail__activity-box strong {
+  color: #21334a;
+}
+
+html[data-theme="light"] .crz-input,
+html[data-theme="light"] .crz-select,
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea {
+  color: #102033;
+  background: rgba(255,255,255,.92);
+}
+
+html[data-theme="light"] .crz-dropdown-menu,
+html[data-theme="light"] .crz-dialog,
+html[data-theme="light"] .crz-drawer {
+  background: rgba(250,253,255,.985);
+  color: #15263a;
 }

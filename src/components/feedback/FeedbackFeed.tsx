@@ -1,9 +1,7 @@
-import { feedbacks } from "@/data/home";
-import { NeonSectionIcon } from "@/components/ui/NeonSectionIcon";
+"use client";
 
-function Avatar({ seed }: { seed: number }) {
-  return <span className={`mock-avatar mock-avatar--${seed % 5}`} aria-hidden="true" />;
-}
+import { NeonSectionIcon } from "@/components/ui/NeonSectionIcon";
+import { VerifiedReviewFeed } from "@/modules/reviews";
 
 export function FeedbackFeed() {
   return (
@@ -13,44 +11,24 @@ export function FeedbackFeed() {
           <NeonSectionIcon src="/icons/neon-v2/feedback.svg" />
           <div>
             <h2 id="feedback-title">Feedback de Clientes</h2>
-            <p>Apenas clientes podem ver e publicar feedbacks.</p>
+            <p>Avaliações públicas de clientes com compra verificada.</p>
           </div>
         </div>
-        <span className="exclusive-badge">EXCLUSIVO</span>
+        <span className="exclusive-badge">VERIFICADO</span>
       </header>
 
       <div className="feedback-list custom-scroll">
-        {feedbacks.map((item) => (
-          <article className="feedback-entry" key={item.id}>
-            <Avatar seed={item.id} />
-            <div className="feedback-body">
-              <div className="feedback-meta">
-                <strong>{item.name}</strong>
-                {item.verified && <span className="verified-dot">● Cliente Verificado</span>}
-                <span>{item.time}</span>
-              </div>
-              <p>{item.message}</p>
-              <div className="feedback-media">
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className="feedback-reactions">
-                <span>♥ {item.reactions.heart}</span>
-                <span>🔥 {item.reactions.fire}</span>
-                <span>▢ {item.reactions.comments}</span>
-              </div>
-            </div>
-          </article>
-        ))}
+        <VerifiedReviewFeed limit={12} compact />
       </div>
 
       <footer className="panel-login-gate">
         <div className="login-gate-copy">
-          <span className="gate-lock">▣</span>
-          <span>Faça parte de milhares de clientes satisfeitos.</span>
+          <span className="gate-lock">✓</span>
+          <span>Comprou? Publique sua experiência com selo verificado.</span>
         </div>
-        <button type="button">Fazer Login para Publicar</button>
+        <a className="crz-button crz-button--primary crz-button--sm" href="/feedbacks">
+          Ver e publicar avaliações
+        </a>
       </footer>
     </section>
   );

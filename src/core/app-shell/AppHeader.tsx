@@ -5,6 +5,7 @@ import { Drawer, Dropdown, LineIcon } from "@/core/design-system";
 import { useAuth } from "@/modules/auth/AuthProvider";
 import { useCart } from "@/modules/cart/CartProvider";
 import { getNavigation } from "./navigation";
+import { useTheme } from "@/core/theme/ThemeProvider";
 import type { ShellMode, ShellNavItem } from "./types";
 
 function ShellIcon({ src }: { src: string }) {
@@ -76,6 +77,7 @@ export function AppHeader({
   userName?: string;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const { totalQuantity, hydrated } = useCart();
   const {
     user,
@@ -137,6 +139,15 @@ export function AppHeader({
         </div>
 
         <div className="crz-shell-header__account" aria-label="Conta e acesso">
+          <button
+            type="button"
+            className="crz-shell-theme"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}
+            title={theme === "dark" ? "Tema claro" : "Tema escuro"}
+          >
+            <span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
+          </button>
           {!user ? (
             <>
               <a href="/login" className="crz-shell-auth crz-shell-auth--compact">
@@ -208,6 +219,15 @@ export function AppHeader({
             compact
             onNavigate={() => setMobileOpen(false)}
           />
+
+          <button
+            type="button"
+            className="crz-shell-mobile__theme"
+            onClick={toggleTheme}
+          >
+            <span>{theme === "dark" ? "☀" : "☾"}</span>
+            {theme === "dark" ? "Usar tema claro" : "Usar tema escuro"}
+          </button>
 
           <div className="crz-shell-mobile__account">
             {!user ? (
