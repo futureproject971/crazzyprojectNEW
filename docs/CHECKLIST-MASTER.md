@@ -61,14 +61,14 @@
 ---
 
 ## 🟡 M06 — CRAZZY ACCOUNTS MARKET — EM ANDAMENTO
-Fonte: FortuneECrazzy + LZT.
+Fonte: API oficial LZT Market. Primeira configuração LZT do usuário; FortuneECrazzy fica como referência histórica quando disponível.
 
 - [x] migrar listagem (VALORANT/LZT)
 - [x] migrar detalhes (provider read-only)
 - [x] Valorant
-- [ ] LoL
-- [ ] Fortnite
-- [ ] Minecraft
+- [x] LoL (adapter pronto; provider aguarda credencial)
+- [x] Fortnite (adapter pronto; provider aguarda credencial)
+- [x] Minecraft (adapter pronto; provider aguarda credencial)
 - [x] rank
 - [x] level
 - [x] região
@@ -88,7 +88,7 @@ Fonte: FortuneECrazzy + LZT.
 - [x] action de detalhe sanitizado criada
 - [x] fallback de credencial server-side preparado
 - [ ] smoke test real contra provider (desbloqueia automaticamente quando a credencial existir)
-- [ ] regra RUB -> BRL / markup comercial recuperada e validada
+- [x] BRL direto no provider confirmado\n- [ ] fórmula de markup comercial validada
 
 ### QA M06 — corte VALORANT
 - [x] API pública somente leitura via Next
@@ -97,9 +97,9 @@ Fonte: FortuneECrazzy + LZT.
 - [x] TypeScript PASS
 - [x] Next production build PASS
 - [x] GitHub Actions PASS
-- [ ] LoL via adapter multijogo
-- [ ] Fortnite via adapter multijogo
-- [ ] Minecraft via adapter multijogo
+- [x] LoL via adapter multijogo
+- [x] Fortnite via adapter multijogo
+- [x] Minecraft via adapter multijogo
 - [ ] preço comercial/markup validado
 - [ ] compra/entrega LZT integrada ao M43
 
@@ -517,5 +517,5 @@ Fonte visual: Pink.
 - [x] mergear PR #6 M05
 - [x] mergear PR #7 Architecture V2
 - [x] criar branch m06-accounts-market
-- [ ] migrar Fortune/LZT
+- [x] construir adapter oficial LZT multijogo\n- [ ] configurar primeiro token LZT do usuário e validar provider
 - [ ] seguir M07 -> M08 -> M09...
