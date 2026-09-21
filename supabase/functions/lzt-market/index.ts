@@ -76,6 +76,22 @@ function cosmeticAssets(item: any): CosmeticAsset[] {
   return assets;
 }
 
+function safeStringList(value: any): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => typeof entry === "string" || typeof entry === "number" ? String(entry) : "")
+      .filter(Boolean)
+      .slice(0, 250);
+  }
+  if (value && typeof value === "object") {
+    return Object.values(value)
+      .map((entry) => typeof entry === "string" || typeof entry === "number" ? String(entry) : "")
+      .filter(Boolean)
+      .slice(0, 250);
+  }
+  return [];
+}
+
 function safeRemoteImageUrl(value: string | null): string | null {
   if (!value) return null;
   try {
@@ -493,40 +509,44 @@ Deno.serve(async (req) => {
         price: commercialPrice,
         cosmetics: publicCosmetics,
         region: first([
-          "valorant_region", "lol_region", "region", "fortnite_region", "country",
+          "riot_valorant_region", "valorantRegionPhrase", "valorant_region",
+          "riot_lol_region", "lol_region", "region", "fortnite_region", "country",
         ]),
         rank: first([
-          "valorant_rank_name", "valorant_rank", "lol_rank", "rank_name", "rank",
+          "riot_lol_rank", "lol_rank", "valorant_rank_name", "rank_name", "rank",
         ]),
-        rankValue: first(["valorant_rank", "rank_value", "rank"]),
+        rankValue: first(["riot_valorant_rank", "valorant_rank", "rank_value", "rank"]),
         level: first([
-          "valorant_level", "lol_level", "level", "fortnite_level", "hypixel_level",
+          "riot_valorant_level", "riot_lol_level", "valorant_level", "lol_level",
+          "fortnite_level", "minecraft_hypixel_level", "hypixel_level", "level",
         ]),
         skinsCount: safeCount(first([
-          "valorant_skins", "weaponSkins", "weapon_skins", "skins",
-          "skin_count", "skins_count", "fortnite_skins", "lol_skins",
+          "riot_valorant_skin_count", "riot_lol_skin_count", "fortnite_skin_count",
+          "valorant_skins", "weaponSkins", "weapon_skins", "skins", "skin_count", "skins_count",
         ])),
         knivesCount: safeCount(first([
+          "riot_valorant_knife_count", "riot_valorant_knife",
           "valorant_knives", "knives", "knife_count", "valorant_knife_count",
         ])),
         agentsCount: safeCount(first([
-          "agents", "valorant_agents", "agent_count", "agents_count",
+          "riot_valorant_agent_count", "agents", "valorant_agents", "agent_count", "agents_count",
         ])),
         championsCount: safeCount(first([
-          "champions", "champion_count", "champions_count",
+          "riot_lol_champion_count", "champions", "champion_count", "champions_count",
         ])),
-        inventoryValue: first(["inventory_value", "inv", "inventoryValue"]),
-        vp: first(["vp", "valorant_points", "valorant_vp"]),
-        rp: first(["rp", "radiant_points", "valorant_rp"]),
+        inventoryValue: first(["riot_valorant_inventory_value", "inventory_value", "inv", "inventoryValue"]),
+        vp: first(["riot_valorant_wallet_vp", "vp", "valorant_points", "valorant_vp"]),
+        rp: first(["riot_valorant_wallet_rp", "rp", "radiant_points", "valorant_rp"]),
         emailType: first(["email_type", "emailType"]),
-        country: first(["country", "country_name"]),
-        vbucks: first(["vbucks", "v_bucks", "fortnite_vbucks"]),
-        minecoins: first(["minecoins", "minecraft_minecoins"]),
-        capesCount: safeCount(first(["capes", "cape_count", "capes_count"])),
-        java: first(["java", "minecraft_java"]),
-        bedrock: first(["bedrock", "minecraft_bedrock"]),
-        dungeons: first(["dungeons", "minecraft_dungeons"]),
-        legends: first(["legends", "minecraft_legends"]),
+        country: first(["riot_country", "country", "country_name"]),
+        vbucks: first(["fortnite_vbucks", "vbucks", "v_bucks"]),
+        minecoins: first(["minecraft_minecoins", "minecoins"]),
+        capesCount: safeCount(first(["minecraft_capes_count", "capes", "cape_count", "capes_count"])),
+        java: first(["minecraft_java", "java"]),
+        bedrock: first(["minecraft_bedrock", "bedrock"]),
+        dungeons: first(["minecraft_dungeons", "dungeons"]),
+        legends: first(["minecraft_legends", "legends"]),
+        skinIds: safeStringList(item?.valorantInventory?.WeaponSkins),
       };
 
       return new Response(JSON.stringify({ item: safeItem }), {
@@ -781,30 +801,43 @@ Deno.serve(async (req) => {
         title: String(first(item, ["title", "title_en", "name"]) ?? ""),
         category,
         region: first(item, [
-          "valorant_region", "lol_region", "region", "fortnite_region", "country",
+          "riot_valorant_region", "valorantRegionPhrase", "valorant_region",
+          "riot_lol_region", "lol_region", "region", "fortnite_region", "country",
         ]),
         rank: first(item, [
-          "valorant_rank", "valorant_rank_name", "lol_rank", "rank", "rank_name",
+          "riot_lol_rank", "lol_rank", "valorant_rank_name", "rank", "rank_name",
         ]),
+        rankValue: first(item, ["riot_valorant_rank", "valorant_rank", "rank_value", "rank"]),
         level: first(item, [
-          "valorant_level", "lol_level", "level", "fortnite_level", "hypixel_level",
+          "riot_valorant_level", "riot_lol_level", "valorant_level", "lol_level",
+          "fortnite_level", "minecraft_hypixel_level", "hypixel_level", "level",
         ]),
         skinsCount: safeCount(first(item, [
-          "valorant_skins", "weaponSkins", "weapon_skins", "skins",
-          "skin_count", "skins_count", "fortnite_skins", "lol_skins",
+          "riot_valorant_skin_count", "riot_lol_skin_count", "fortnite_skin_count",
+          "valorant_skins", "weaponSkins", "weapon_skins", "skins", "skin_count", "skins_count",
         ])),
         knivesCount: safeCount(first(item, [
+          "riot_valorant_knife_count", "riot_valorant_knife",
           "valorant_knives", "knives", "knife_count", "valorant_knife_count",
         ])),
         agentsCount: safeCount(first(item, [
-          "agents", "valorant_agents", "agent_count", "agents_count",
+          "riot_valorant_agent_count", "agents", "valorant_agents", "agent_count", "agents_count",
         ])),
         championsCount: safeCount(first(item, [
-          "champions", "champion_count", "champions_count",
+          "riot_lol_champion_count", "champions", "champion_count", "champions_count",
         ])),
-        vbucks: first(item, ["vbucks", "v_bucks", "fortnite_vbucks"]),
-        minecoins: first(item, ["minecoins", "minecraft_minecoins"]),
-        capesCount: safeCount(first(item, ["capes", "cape_count", "capes_count"])),
+        inventoryValue: first(item, ["riot_valorant_inventory_value", "inventory_value", "inv", "inventoryValue"]),
+        vp: first(item, ["riot_valorant_wallet_vp", "vp", "valorant_points", "valorant_vp"]),
+        rp: first(item, ["riot_valorant_wallet_rp", "rp", "radiant_points", "valorant_rp"]),
+        country: first(item, ["riot_country", "country", "country_name"]),
+        vbucks: first(item, ["fortnite_vbucks", "vbucks", "v_bucks"]),
+        minecoins: first(item, ["minecraft_minecoins", "minecoins"]),
+        capesCount: safeCount(first(item, ["minecraft_capes_count", "capes", "cape_count", "capes_count"])),
+        java: first(item, ["minecraft_java", "java"]),
+        bedrock: first(item, ["minecraft_bedrock", "bedrock"]),
+        dungeons: first(item, ["minecraft_dungeons", "dungeons"]),
+        legends: first(item, ["minecraft_legends", "legends"]),
+        skinIds: safeStringList(item?.valorantInventory?.WeaponSkins),
         price: (() => {
           const base = Number(first(item, ["price", "price_value", "item_price"]) || 0);
           const game = url.searchParams.get("game") || "";
