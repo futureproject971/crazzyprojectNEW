@@ -149,3 +149,20 @@ experiência estilo Discord.
 Cor do nick = role visível de maior prioridade.
 
 Cargos manuais podem aparecer no perfil, mas só roles/entitlements mapeados liberam conteúdo pago.
+
+
+---
+
+## D10 — Security Sentinel
+
+Perguntas:
+- qual canal Discord receberá alertas de segurança?
+- qual cargo poderá ser mencionado quando o evento for CRITICAL?
+
+### Recomendação
+- canal privado dedicado, por exemplo `#security-logs`;
+- INFO/WARN sem ping;
+- HIGH normalmente sem ping, salvo repetição;
+- CRITICAL pode mencionar somente um cargo de segurança/admin configurado;
+- agregação/cooldown para evitar spam;
+- nenhum secret, token, key/licença ou conteúdo sensível deve aparecer no Discord.
