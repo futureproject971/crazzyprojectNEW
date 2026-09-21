@@ -884,7 +884,7 @@ html[data-theme="light"] .crz-shell-footer__social img {
 /* Header proportions + crispness pass (desktop) */
 @media (min-width: 981px) {
   .crz-shell-header {
-    top: 8px;
+    top: 3px;
     width: min(1810px, calc(100% - 24px));
     min-height: 64px;
     gap: 10px;
