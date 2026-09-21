@@ -47,3 +47,7 @@ jobs:
       - name: Test M09 auth security
         if: github.ref_name == 'm09-auth'
         run: node scripts/test-m09-auth.mjs
+
+      - name: Test M10 client hub security
+        if: github.ref_name == 'm10-client-hub'
+        run: node scripts/test-m10-client-hub.mjs
