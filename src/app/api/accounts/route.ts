@@ -1,58 +1,79 @@
 import { NextRequest, NextResponse } from "next/server";
 import { normalizeLztPage } from "@/modules/accounts-market/normalizer";
+import type { AccountsMarketGame } from "@/modules/accounts-market/types";
 
 const DEFAULT_SUPABASE_URL = "https://nnmglkdpmffmaiuwbcct.supabase.co";
+const games = new Set<AccountsMarketGame>(["valorant", "lol", "fortnite", "minecraft"]);
 
-const scalarParams = new Set([
-  "page",
-  "pmin",
-  "pmax",
-  "title",
-  "order_by",
-  "rmin",
-  "rmax",
-  "last_rmin",
-  "last_rmax",
-  "previous_rmin",
-  "previous_rmax",
-  "valorant_level_min",
-  "valorant_level_max",
-  "valorant_smin",
-  "valorant_smax",
-  "valorant_knife_min",
-  "valorant_knife_max",
-  "vp_min",
-  "vp_max",
-  "rp_min",
-  "rp_max",
-  "fa_min",
-  "fa_max",
-  "inv_min",
-  "inv_max",
-  "knife",
-  "nsb",
-  "amin",
-  "amax",
-]);
+function gameCategory(game: AccountsMarketGame) {
+  if (game === "fortnite") return "fortnite";
+  if (game === "minecraft") return "minecraft";
+  return "riot";
+}
 
-const arrayParams = new Set([
-  "weaponSkin[]",
-  "buddy[]",
-  "agent[]",
-  "valorant_region[]",
-  "valorant_rank_type[]",
-  "email_type[]",
-  "country[]",
-]);
+function copyIfPresent(
+  source: URLSearchParams,
+  target: URLSearchParams,
+  sourceKey: string,
+  targetKey: string
+) {
+  const value = source.get(sourceKey);
+  if (value != null && value.trim() !== "") target.set(targetKey, value.trim());
+}
 
 export async function GET(request: NextRequest) {
   const incoming = request.nextUrl.searchParams;
-  const params = new URLSearchParams();
-  params.set("action", "list");
+  const requestedGame = incoming.get("game") || "valorant";
 
-  for (const [key, value] of incoming.entries()) {
-    if (scalarParams.has(key)) params.set(key, value);
-    if (arrayParams.has(key)) params.append(key, value);
+  if (!games.has(requestedGame as AccountsMarketGame)) {
+    return NextResponse.json({ error: "Jogo inválido." }, { status: 400 });
+  }
+
+  const game = requestedGame as AccountsMarketGame;
+  const params = new URLSearchParams();
+  params.set("action", "preview-v2");
+  params.set("category", gameCategory(game));
+  params.set("game", game);
+
+  copyIfPresent(incoming, params, "page", "page");
+  copyIfPresent(incoming, params, "query", "title");
+  copyIfPresent(incoming, params, "orderBy", "order_by");
+
+  if (game === "valorant") {
+    copyIfPresent(incoming, params, "rankMin", "rmin");
+    copyIfPresent(incoming, params, "rankMax", "rmax");
+    copyIfPresent(incoming, params, "levelMin", "valorant_level_min");
+    copyIfPresent(incoming, params, "levelMax", "valorant_level_max");
+    copyIfPresent(incoming, params, "skinsMin", "valorant_smin");
+    copyIfPresent(incoming, params, "knivesMin", "valorant_knife_min");
+    const region = incoming.get("region");
+    if (region?.trim()) params.append("valorant_region[]", region.trim());
+  }
+
+  if (game === "lol") {
+    copyIfPresent(incoming, params, "levelMin", "lol_level_min");
+    copyIfPresent(incoming, params, "levelMax", "lol_level_max");
+    copyIfPresent(incoming, params, "skinsMin", "lol_smin");
+    copyIfPresent(incoming, params, "championsMin", "champion_min");
+    const region = incoming.get("region");
+    if (region?.trim()) params.append("lol_region[]", region.trim());
+  }
+
+  if (game === "fortnite") {
+    copyIfPresent(incoming, params, "levelMin", "lmin");
+    copyIfPresent(incoming, params, "levelMax", "lmax");
+    copyIfPresent(incoming, params, "skinsMin", "smin");
+    copyIfPresent(incoming, params, "vbucksMin", "vbmin");
+    const platform = incoming.get("platform");
+    if (platform?.trim()) params.append("platform[]", platform.trim());
+  }
+
+  if (game === "minecraft") {
+    copyIfPresent(incoming, params, "hypixelLevelMin", "level_hypixel_min");
+    copyIfPresent(incoming, params, "capesMin", "capes_min");
+    copyIfPresent(incoming, params, "minecoinsMin", "minecoins_min");
+    copyIfPresent(incoming, params, "javaEdition", "java");
+    copyIfPresent(incoming, params, "bedrockEdition", "bedrock");
   }
 
   if (!params.has("page")) params.set("page", "1");
@@ -68,26 +89,35 @@ export async function GET(request: NextRequest) {
       cache: "no-store",
     });
 
-    const payload: unknown = await response.json().catch(() => null);
+    const payload: any = await response.json().catch(() => null);
 
     if (!response.ok) {
+      if (payload?.error === "LZT token not configured") {
+        return NextResponse.json(
+          {
+            error: "Catálogo temporariamente em configuração.",
+            code: "LZT_CREDENTIAL_MISSING",
+          },
+          { status: 503 }
+        );
+      }
+
       return NextResponse.json(
         {
           error: "Não foi possível consultar o catálogo de contas agora.",
-          providerStatus: response.status,
+          code: "LZT_PROVIDER_ERROR",
+          providerStatus: payload?.status ?? response.status,
         },
-        { status: response.status >= 500 ? 502 : response.status }
+        { status: 502 }
       );
     }
 
-    return NextResponse.json(normalizeLztPage(payload), {
-      headers: {
-        "Cache-Control": "no-store",
-      },
+    return NextResponse.json(normalizeLztPage(payload, game), {
+      headers: { "Cache-Control": "no-store" },
     });
   } catch {
     return NextResponse.json(
-      { error: "Falha temporária ao consultar o catálogo de contas." },
+      { error: "Falha temporária ao consultar o catálogo de contas.", code: "LZT_NETWORK_ERROR" },
       { status: 502 }
     );
   }
