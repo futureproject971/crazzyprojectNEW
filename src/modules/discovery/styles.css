@@ -536,3 +536,22 @@
   -webkit-mask-size: contain;
   mask-size: contain;
 }
+
+
+.crz-discovery-categories button:focus-visible,
+.crz-discovery-search button:focus-visible,
+.crz-discovery-card__body a:focus-visible,
+.crz-discovery-empty button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--crz-color-black),
+    0 0 0 4px var(--crz-color-blue-2),
+    var(--crz-shadow-blue);
+}
+
+.crz-discovery-card,
+.crz-discovery-feature,
+.crz-discovery-news__grid article {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 240px;
+}
