@@ -481,31 +481,32 @@ M11 — CRAZZY LIBRARY.
 
 ---
 
-## M11 — CRAZZY LIBRARY — EM ANDAMENTO
-
-### ORDEM OBRIGATÓRIA PARA O PRÓXIMO WORKER
-1. `docs/CHECKLIST-MASTER.md`
-2. `docs/M11-WORKER-HANDOFF.md`
-3. este arquivo `docs/00_CONTINUE_NEXT_CHAT.md`
+## M11 — CRAZZY LIBRARY — CONCLUÍDO TECNICAMENTE
 
 Branch:
 - `m11-library`
 
-Estado exato:
-- M11 iniciado;
-- frontend/backend final AINDA não implementados;
-- auditoria inicial do banco concluída parcialmente;
-- problema crítico identificado em `stock_items.content` e `reward_deliveries.content`;
-- cliente pode acabar lendo conteúdo sensível diretamente pelas policies atuais;
-- prioridade nº 1 é corrigir arquitetura de secrets/reveal;
-- NÃO criar UI de reveal antes da migration/segurança;
-- NÃO mergear M11 antes de smoke + Security Advisor + typecheck + production build.
+Implementado:
+- metadata segura em `library_deliveries`
+- payload server-only em `private.library_delivery_secrets`
+- auditoria em `library_reveal_events`
+- reveal/copy via backend autenticado
+- /biblioteca
+- alias /painel/biblioteca
+- integração Client Hub + menu
+- rewards v5 sem plaintext
+- purincash-payment v6 sem credenciais LZT em ticket
+- stock/reward plaintext removido do acesso normal do cliente
+- Security Advisor: 0 lints
+- npm ci/typecheck/build/smoke: PASS
+- validação isolada GitHub Actions: PASS
 
-Fonte de verdade detalhada:
+Falta:
+1. CI oficial no head final
+2. PR M11
+3. merge M11
+4. iniciar M12 — CRAZZY PROFILE
+
+Regras completas:
+- `docs/M11-LIBRARY-RULES.md`
 - `docs/M11-WORKER-HANDOFF.md`
-
-Checklist granular:
-- `docs/CHECKLIST-MASTER.md`
-
-Próximo módulo APENAS depois do merge do M11:
-- M12 — CRAZZY PROFILE.
