@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Orbitron, Poppins } from "next/font/google";
 import { AuthProvider } from "@/modules/auth/AuthProvider";
 import { CartProvider } from "@/modules/cart/CartProvider";
+import { PublicInteractionGuard } from "@/core/security/PublicInteractionGuard";
 import "./globals.css";
 
 const inter = Inter({
@@ -37,6 +38,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} ${orbitron.variable} ${poppins.variable}`}>
+        <PublicInteractionGuard />
         <AuthProvider>
           <CartProvider>{children}</CartProvider>
         </AuthProvider>
