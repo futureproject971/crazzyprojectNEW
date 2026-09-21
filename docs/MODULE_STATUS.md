@@ -26,7 +26,7 @@ QA:
 ## M02 — CRAZZY HOME
 **GRUPO 01 — EXPERIÊNCIA PÚBLICA**
 
-Status: **EM IMPLEMENTAÇÃO / QA**
+Status: **CONCLUÍDO / QA TÉCNICO PASS**
 
 Branch:
 `m02-home`
@@ -57,7 +57,9 @@ Correções críticas concluídas:
 
 QA técnico:
 - CI anterior do módulo: PASS
-- último commit em validação
+- typecheck: PASS
+- build: PASS
+- GitHub Actions: PASS
 
 Próximo módulo após M02:
 **M03 — CRAZZY DISCOVERY**
