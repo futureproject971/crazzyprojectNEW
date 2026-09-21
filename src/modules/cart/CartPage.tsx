@@ -106,7 +106,7 @@ export function CartPage() {
       <section className="crz-cart-hero">
         <div className="crz-container">
           <PageHeader
-            eyebrow="M07 • CRAZZY CART"
+            eyebrow="CRAZZY CART"
             title="Seu carrinho"
             description="Revise produtos, planos, quantidades, combos e cupons antes do checkout."
             actions={
