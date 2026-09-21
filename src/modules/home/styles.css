@@ -389,3 +389,23 @@
     transition-duration: 0ms !important;
   }
 }
+
+
+.product-info .product-view-link {
+  height: 28px;
+  margin-top: 4px;
+  border: 1px solid #298aff;
+  border-radius: 6px;
+  color: #fff;
+  background: linear-gradient(180deg,#116dff,#0756e5);
+  box-shadow: 0 0 14px rgba(0,100,255,.36);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8.5px;
+  font-weight: 650;
+}
+
+.product-info .product-view-link:hover {
+  box-shadow: 0 0 19px rgba(0,112,255,.5);
+}
