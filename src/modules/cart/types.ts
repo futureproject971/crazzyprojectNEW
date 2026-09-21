@@ -11,7 +11,7 @@ export type CartItem = {
   subtitle?: string;
   image?: string | null;
   planId: string;
-  planCode: CartPlanCode | "lzt-account";
+  planCode: CartPlanCode | "single" | "custom" | "lzt-account";
   planName: string;
   durationLabel: string;
   price: number | null;
