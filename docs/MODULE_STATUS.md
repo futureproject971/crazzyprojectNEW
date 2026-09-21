@@ -1,12 +1,7 @@
 # CRAZZY PROJECT — Module Status
 
-## M00
-**GRUPO 00 — CORE DA PLATAFORMA**  
-**M00 — CRAZZY DESIGN SYSTEM**  
+## M00 — CRAZZY DESIGN SYSTEM
 Status: **APROVADO E INTEGRADO**
-
-Merged into `phase-1-home`:
-`0531d09b81b5a3f5324871bb30224cc060c71dae`
 
 QA:
 - typecheck: PASS
@@ -15,46 +10,56 @@ QA:
 
 ---
 
-## M01
-**GRUPO 00 — CORE DA PLATAFORMA**  
-**M01 — CRAZZY APP SHELL**  
-Status: **CONCLUÍDO / AGUARDANDO APROVAÇÃO DO USUÁRIO**
+## M01 — CRAZZY APP SHELL
+Status: **APROVADO E INTEGRADO**
 
-Branch:
-`m01-app-shell`
+Merged into `phase-1-home`:
+`e52fc62a8ccb388cf5a28a39ec708d8152dd3d0f`
 
 QA:
 - typecheck: PASS
 - build: PASS
 - GitHub Actions: PASS
 
-Implementado:
-- AppShell
-- Header/Navbar
-- visitor/client/admin modes
-- account menus mock
-- responsive mobile Drawer
-- shell search visual
-- global Footer
-- social fallback icons
-- compatibility wrappers
-- Home provisória consumindo AppShell
-- compile fixture dos três modos
+---
 
-Não inclui:
-- Auth real
-- Client Hub
-- Admin pages
-- Product/Cart/Ticket business logic
-- backend/Supabase
+## M02 — CRAZZY HOME
+**GRUPO 01 — EXPERIÊNCIA PÚBLICA**
 
-**NÃO iniciar M02 automaticamente.**
+Status: **CONCLUÍDO / QA TÉCNICO PASS**
 
-Próximo módulo previsto, após autorização:
-**M02 — CRAZZY HOME**
+Branch:
+`m02-home`
 
-Prioridade do M02:
-- corrigir wallpaper do Hero;
-- inserir logo grande oficial separada;
-- reconstruir Hero em camadas reais;
-- continuar fidelidade pixel-level à referência.
+Implementado até agora:
+- Home modular em `src/modules/home`
+- Hero reconstruído em camadas reais
+- wallpaper HD separado
+- logo oficial grande separada e em alta resolução
+- tagline real
+- pilares do Hero
+- CTAs reais
+- BenefitsBar preservada
+- preview Feedbacks
+- preview Chat Geral
+- preview Ticket
+- bloco Por que escolher a CRAZZY
+- Produtos em Destaque / coverflow
+- crops reais dos produtos existentes
+- Explore Nossa Loja
+- Footer fornecido pelo M01
+- responsividade desktop/tablet/mobile
+
+Correções críticas concluídas:
+- removida dependência visual do wallpaper de ~5 KB pixelado
+- logo deixou de ser parte implícita do wallpaper
+- Hero agora é background + logo + textos + CTAs independentes
+
+QA técnico:
+- CI anterior do módulo: PASS
+- typecheck: PASS
+- build: PASS
+- GitHub Actions: PASS
+
+Próximo módulo após M02:
+**M03 — CRAZZY DISCOVERY**

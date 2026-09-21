@@ -2,6 +2,7 @@
 @import "../core/design-system/styles/tokens.css";
 @import "../core/design-system/styles/primitives.css";
 @import "../core/app-shell/styles.css";
+@import "../modules/home/styles.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
