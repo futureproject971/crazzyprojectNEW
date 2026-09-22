@@ -459,7 +459,7 @@ begin
     status=coalesce(nullif(btrim(p_status),''),'undetected'),
     status_label=coalesce(nullif(btrim(p_status_label),''),'Indetectável'),
     emoji=nullif(btrim(coalesce(p_emoji,'')),''),
-    accent_color=upper(nullif(btrim(coalesce(p_accent_color,'')),''),
+    accent_color=upper(nullif(btrim(coalesce(p_accent_color,'')),'')),
     updated_at=now()
   where id=p_product_id
   returning * into v_row;
