@@ -7,38 +7,38 @@ const clubModules = [
   {
     id: "rewards",
     title: "CRAZZY REWARDS",
-    description: "Complete missões, assista conteúdos e resgate recompensas.",
+    description: "Faz missão, farma ponto e pega tua recompensa.",
     href: "/club/rewards",
     icon: "crown" as const,
     tone: "blue",
-    status: "Missões e recompensas",
+    status: "Farma e recompensa",
   },
   {
     id: "luck",
     title: "CRAZZY LUCK",
-    description: "Roleta, raspadinha, drops e prêmios com resultado validado no servidor.",
+    description: "Roleta, raspadinha e drop. A sorte vem no servidor, sem truque de palco.",
     href: "/club/luck",
     icon: "lightning" as const,
     tone: "pink",
-    status: "Roleta e raspadinha",
+    status: "Sorte no talo",
   },
   {
     id: "coupons",
     title: "MEUS CUPONS",
-    description: "Veja cupons liberados, regras de uso e validade.",
+    description: "Teus cupons ficam aqui, prontos pra entrar no corre.",
     href: "/painel/cupons",
     icon: "featured" as const,
     tone: "gold",
-    status: "Descontos e prêmios",
+    status: "Cupom no bolso",
   },
   {
     id: "rank",
     title: "CRAZZY RANK",
-    description: "Acompanhe badges, progressão e destaques da comunidade.",
+    description: "Sobe de nível, pega badge e deixa teu nome aceso na comunidade.",
     href: "/club/rank",
     icon: "community" as const,
     tone: "green",
-    status: "Ranking e badges",
+    status: "Nome no topo",
   },
 ];
 
@@ -50,16 +50,16 @@ export function ClubHubPage() {
       <div className="crz-container">
         <PageHeader
           eyebrow="CRAZZY CLUB"
-          title="Seu hub de recompensas"
-          description="Missões, sorteios, cupons e progressão reunidos em um só lugar."
+          title="Teu QG de recompensa"
+          description="Missão, sorte, cupom e rank no mesmo QG. Faz teu corre e deixa a barra subir."
           actions={
             user ? (
               <a className="crz-button crz-button--secondary crz-button--sm" href="/painel">
-                Meu painel
+                MEU QG
               </a>
             ) : (
               <a className="crz-button crz-button--primary crz-button--sm" href="/login">
-                Entrar no CLUB
+                COLAR NO CLUB
               </a>
             )
           }
@@ -69,9 +69,9 @@ export function ClubHubPage() {
           <div className="crz-club-hero-card__glow" aria-hidden="true" />
           <div className="crz-club-hero-card__copy">
             <span>MEMBRO CRAZZY</span>
-            <h2>{loading ? "Carregando seu CLUB..." : user ? "Bem-vindo, " + (user.username || "membro") : "Entre para desbloquear o CLUB"}</h2>
+            <h2>{loading ? "Puxando teu CLUB..." : user ? "Chegou, " + (user.username || "membro") : "Entra aí e destrava o CLUB"}</h2>
             <p>
-              O CRAZZY CLUB conecta suas compras, missões, recompensas e benefícios sem misturar dados sensíveis no navegador.
+              Compra, missão, prêmio e benefício no mesmo corre. Teus dados sensíveis ficam fora da bagunça.
             </p>
           </div>
           <div className="crz-club-hero-card__mark">
@@ -102,8 +102,8 @@ export function ClubHubPage() {
         <section className="crz-club-security">
           <NeonIcon name="shield" size={28} />
           <div>
-            <strong>Progressão vinculada à sua conta</strong>
-            <span>Missões, claims e prêmios usam sessão autenticada e validação no servidor.</span>
+            <strong>Teu progresso fica colado na tua conta</strong>
+            <span>Missão e prêmio passam pelo servidor. Sem jeitinho, sem prêmio fantasma.</span>
           </div>
         </section>
       </div>
