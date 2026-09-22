@@ -111,3 +111,7 @@ jobs:
       - name: Test M26 Category Manager
         if: github.ref_name == 'm26-category-manager' || github.head_ref == 'm26-category-manager'
         run: node scripts/test-m26-category-manager.mjs
+
+      - name: Test M27 Stock Manager
+        if: github.ref_name == 'm27-stock-manager' || github.head_ref == 'm27-stock-manager'
+        run: node scripts/test-m27-stock-manager.mjs
