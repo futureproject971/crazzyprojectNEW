@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Badge, NeonIcon, PageHeader } from "@/core/design-system";
-import type { ManagerCatalog, ManagerPlan, ManagerProduct } from "./types";
+import type { ManagerCatalog, ManagerPlan, ManagerPlanCode, ManagerProduct } from "./types";
 
 const deliveryModes = [
   ["internal_stock", "Estoque interno"],
@@ -18,6 +18,18 @@ const automationKeys = [
   ["auto_tutorial_unlock", "Tutorial automático"],
   ["auto_expire", "Expiração automática"],
 ] as const;
+
+const planCodes: Array<[ManagerPlanCode, string]> = [
+  ["1d", "1 dia"],
+  ["3d", "3 dias"],
+  ["7d", "7 dias"],
+  ["15d", "15 dias"],
+  ["30d", "30 dias"],
+  ["90d", "90 dias"],
+  ["lifetime", "Lifetime"],
+  ["single", "Uso único"],
+  ["custom", "Personalizado"],
+];
 
 function cloneProduct(product: ManagerProduct): ManagerProduct {
   return JSON.parse(JSON.stringify(product));
@@ -41,6 +53,24 @@ export function ProductManagerPage() {
   const [planDraft, setPlanDraft] = useState<ManagerPlan | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [creatingProduct, setCreatingProduct] = useState(false);
+  const [creatingPlan, setCreatingPlan] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    gameId: "",
+    name: "",
+    emoji: "🎮",
+    accentColor: "#1687FF",
+    createDefaultPlans: true,
+  });
+  const [newPlan, setNewPlan] = useState<{
+    name: string;
+    planCode: ManagerPlanCode;
+    price: number;
+  }>({
+    name: "Novo plano",
+    planCode: "custom",
+    price: 0,
+  });
 
   const load = async (preserveSelection = true) => {
     setState("loading");
@@ -56,6 +86,10 @@ export function ProductManagerPage() {
 
       const next = payload.catalog as ManagerCatalog;
       setCatalog(next);
+      setNewProduct(current => ({
+        ...current,
+        gameId: current.gameId || next.games.find(game => game.active)?.id || next.games[0]?.id || "",
+      }));
 
       const wantedId = preserveSelection ? selectedProductId : null;
       const selected =
@@ -130,6 +164,70 @@ export function ProductManagerPage() {
         ? planDraft.tutorials.filter(item => item.id !== id)
         : [...planDraft.tutorials, tutorial],
     });
+  };
+
+  const createProduct = async () => {
+    if (busy || !newProduct.name.trim() || !newProduct.gameId) return;
+    setBusy(true);
+    setNotice("");
+
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "create_product",
+          gameId: newProduct.gameId,
+          name: newProduct.name,
+          emoji: newProduct.emoji,
+          accentColor: newProduct.accentColor,
+          createDefaultPlans: newProduct.createDefaultPlans,
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload?.created?.id) throw new Error("Falha ao criar produto.");
+
+      setCreatingProduct(false);
+      setNewProduct(current => ({ ...current, name: "" }));
+      setSelectedProductId(String(payload.created.id));
+      setNotice("Produto criado desativado. Configure os preços antes de ativar.");
+      await load(true);
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : "Falha ao criar produto.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const createPlan = async () => {
+    if (!productDraft || busy || !newPlan.name.trim()) return;
+    setBusy(true);
+    setNotice("");
+
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "create_plan",
+          productId: productDraft.id,
+          name: newPlan.name,
+          planCode: newPlan.planCode,
+          price: newPlan.price,
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload?.created?.id) throw new Error("Falha ao criar plano.");
+
+      setCreatingPlan(false);
+      setSelectedPlanId(String(payload.created.id));
+      setNotice("Plano criado desativado. Revise entrega, preço e automações antes de ativar.");
+      await load(true);
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : "Falha ao criar plano.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const saveProduct = async () => {
@@ -215,6 +313,33 @@ export function ProductManagerPage() {
 
         <div className="crz-pm-layout">
           <aside className="crz-pm-products">
+            <div className="crz-pm-products__head">
+              <span>CATÁLOGO</span>
+              <button type="button" onClick={() => setCreatingProduct(value => !value)}>
+                {creatingProduct ? "Cancelar" : "+ Produto"}
+              </button>
+            </div>
+
+            {creatingProduct && (
+              <div className="crz-pm-create-card">
+                <strong>Novo produto</strong>
+                <select value={newProduct.gameId} onChange={event => setNewProduct({...newProduct,gameId:event.target.value})}>
+                  {catalog.games.map(game => <option key={game.id} value={game.id}>{game.name}{game.active ? "" : " (inativa)"}</option>)}
+                </select>
+                <input value={newProduct.name} onChange={event => setNewProduct({...newProduct,name:event.target.value.slice(0,120)})} placeholder="Nome do produto" />
+                <div className="crz-pm-create-inline">
+                  <input value={newProduct.emoji} onChange={event => setNewProduct({...newProduct,emoji:event.target.value.slice(0,32)})} aria-label="Emoji" />
+                  <input type="color" value={newProduct.accentColor} onChange={event => setNewProduct({...newProduct,accentColor:event.target.value})} aria-label="Cor" />
+                </div>
+                <button type="button" className={newProduct.createDefaultPlans ? "is-on" : ""} onClick={() => setNewProduct({...newProduct,createDefaultPlans:!newProduct.createDefaultPlans})}>
+                  <i /> Criar planos padrão 1d → Lifetime
+                </button>
+                <button type="button" className="crz-button crz-button--primary crz-button--sm" disabled={busy || !newProduct.name.trim() || !newProduct.gameId} onClick={() => void createProduct()}>
+                  {busy ? "Criando..." : "Criar produto"}
+                </button>
+              </div>
+            )}
+
             <div className="crz-pm-search">
               <span>⌕</span>
               <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Buscar produto..." />
@@ -259,6 +384,10 @@ export function ProductManagerPage() {
 
                 <div className="crz-pm-form-grid">
                   <label><span>Nome</span><input value={productDraft.name} onChange={e => setProductDraft({...productDraft,name:e.target.value})} /></label>
+                  <label><span>Jogo / categoria</span><select value={productDraft.game_id} onChange={e => {
+                    const game = catalog.games.find(item => item.id === e.target.value);
+                    setProductDraft({...productDraft,game_id:e.target.value,game_name:game?.name || productDraft.game_name});
+                  }}>{catalog.games.map(game => <option key={game.id} value={game.id}>{game.name}{game.active ? "" : " (inativa)"}</option>)}</select></label>
                   <label><span>Emoji</span><input value={productDraft.emoji || ""} onChange={e => setProductDraft({...productDraft,emoji:e.target.value})} placeholder="🎮" /></label>
                   <label><span>Cor</span><div className="crz-pm-color"><input type="color" value={productDraft.accent_color || "#1687ff"} onChange={e => setProductDraft({...productDraft,accent_color:e.target.value})} /><input value={productDraft.accent_color || ""} onChange={e => setProductDraft({...productDraft,accent_color:e.target.value})} placeholder="#1687FF" /></div></label>
                   <label><span>Status interno</span><input value={productDraft.status} onChange={e => setProductDraft({...productDraft,status:e.target.value})} /></label>
@@ -274,6 +403,16 @@ export function ProductManagerPage() {
                   <button type="button" className={productDraft.is_new ? "is-on" : ""} onClick={() => setProductDraft({...productDraft,is_new:!productDraft.is_new})}><i /> Marcar como novo</button>
                 </div>
 
+                <div className="crz-pm-subsection">
+                  <header><small>AUTOMAÇÃO DO PRODUTO</small><strong>Comportamentos padrão</strong></header>
+                  <div className="crz-pm-automation">
+                    {automationKeys.map(([key,label]) => {
+                      const active = checkedFlags(productDraft.automation_flags,key);
+                      return <button type="button" key={key} className={active ? "is-on" : ""} onClick={() => setProductDraft({...productDraft,automation_flags:{...productDraft.automation_flags,[key]:!active}})}><i />{label}</button>;
+                    })}
+                  </div>
+                </div>
+
                 <section className="crz-pm-tutorials">
                   <header><small>ACADEMY</small><h3>Tutorial por produto</h3></header>
                   <div>
@@ -285,7 +424,23 @@ export function ProductManagerPage() {
                 </section>
 
                 <section className="crz-pm-plans">
-                  <header><div><small>PLANOS</small><h3>Configuração de entrega</h3></div><span>{productDraft.plans.length} plano(s)</span></header>
+                  <header>
+                    <div><small>PLANOS</small><h3>Configuração de entrega</h3></div>
+                    <div className="crz-pm-plans__actions">
+                      <span>{productDraft.plans.length} plano(s)</span>
+                      <button type="button" onClick={() => setCreatingPlan(value => !value)}>{creatingPlan ? "Cancelar" : "+ Plano"}</button>
+                    </div>
+                  </header>
+
+                  {creatingPlan && (
+                    <div className="crz-pm-create-plan">
+                      <label><span>Nome</span><input value={newPlan.name} onChange={event => setNewPlan({...newPlan,name:event.target.value.slice(0,80)})} /></label>
+                      <label><span>Código</span><select value={newPlan.planCode} onChange={event => setNewPlan({...newPlan,planCode:event.target.value as ManagerPlanCode})}>{planCodes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+                      <label><span>Preço inicial</span><input type="number" min="0" step="0.01" value={newPlan.price} onChange={event => setNewPlan({...newPlan,price:Number(event.target.value)})} /></label>
+                      <button type="button" className="crz-button crz-button--primary crz-button--sm" disabled={busy || !newPlan.name.trim()} onClick={() => void createPlan()}>{busy ? "Criando..." : "Criar plano"}</button>
+                    </div>
+                  )}
+
                   <div className="crz-pm-plan-tabs">
                     {productDraft.plans.map(plan => (
                       <button type="button" key={plan.id} className={selectedPlanId === plan.id ? "is-active" : ""} onClick={() => selectPlan(plan)}>
@@ -299,7 +454,7 @@ export function ProductManagerPage() {
                       <div className="crz-pm-form-grid">
                         <label><span>Nome do plano</span><input value={planDraft.name} onChange={e => setPlanDraft({...planDraft,name:e.target.value})} /></label>
                         <label><span>Preço</span><input type="number" step="0.01" value={planDraft.price} onChange={e => setPlanDraft({...planDraft,price:Number(e.target.value)})} /></label>
-                        <label><span>Código</span><input value={planDraft.plan_code || ""} onChange={e => setPlanDraft({...planDraft,plan_code:e.target.value})} /></label>
+                        <label><span>Código</span><select value={planDraft.plan_code || "custom"} onChange={e => setPlanDraft({...planDraft,plan_code:e.target.value as ManagerPlanCode})}>{planCodes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
                         <label><span>Modo de entrega</span><select value={planDraft.delivery_mode} onChange={e => setPlanDraft({...planDraft,delivery_mode:e.target.value as ManagerPlan["delivery_mode"]})}>{deliveryModes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
                         <label><span>Emoji</span><input value={planDraft.emoji || ""} onChange={e => setPlanDraft({...planDraft,emoji:e.target.value})} /></label>
                         <label><span>Cor</span><div className="crz-pm-color"><input type="color" value={planDraft.accent_color || productDraft.accent_color || "#1687ff"} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /><input value={planDraft.accent_color || ""} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /></div></label>
