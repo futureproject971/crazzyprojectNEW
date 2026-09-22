@@ -823,10 +823,10 @@ begin
 end;
 $$;
 
-revoke all on public.call_rooms from anon;
-revoke all on public.call_participants from anon;
-revoke all on public.call_messages from anon;
-revoke all on public.call_events from anon;
+revoke all on public.call_rooms from anon, authenticated;
+revoke all on public.call_participants from anon, authenticated;
+revoke all on public.call_messages from anon, authenticated;
+revoke all on public.call_events from anon, authenticated;
 
 grant select on public.call_rooms to authenticated;
 grant select on public.call_participants to authenticated;
