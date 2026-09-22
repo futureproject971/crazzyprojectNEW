@@ -132,7 +132,7 @@ function ProfileCard({
             <span>{profile.primaryRole.label}</span>
           </div>
 
-          <p>{profile.bio || "Membro da comunidade CRAZZY PROJECT."}</p>
+          <p>{profile.bio || "Tá no bonde CRAZZY PROJECT."}</p>
 
           <div className="crz-community-profile-badges">
             {profile.badges.map((item) => (
@@ -146,10 +146,10 @@ function ProfileCard({
             <dt>Discord</dt>
             <dd>
               {profile.discord.guildMember
-                ? "Servidor verificado"
+                ? "No servidor e verificado"
                 : profile.discord.connected
                   ? "Conectado"
-                  : "Não conectado"}
+                  : "Ainda fora do servidor"}
             </dd>
 
             <dt>Produtos</dt>
@@ -205,7 +205,7 @@ export function CommunityPage() {
       const payload = await response.json();
 
       if (!response.ok) {
-        throw new Error(payload?.error || "Não foi possível carregar a comunidade.");
+        throw new Error(payload?.error || "A comunidade não respondeu agora.");
       }
 
       setSnapshot(payload as CommunitySnapshot);
@@ -223,7 +223,7 @@ export function CommunityPage() {
         setError(
           loadError instanceof Error
             ? loadError.message
-            : "Falha ao carregar a comunidade."
+            : "A comunidade deu uma engasgada."
         );
         setState("error");
       }
@@ -265,7 +265,7 @@ export function CommunityPage() {
   };
 
   const send = async () => {
-    const text = message.trim() || (files.length ? "📎 Mídia enviada." : "");
+    const text = message.trim() || (files.length ? "📎 Mídia no ar." : "");
     if (!text || sending) return;
 
     setSending(true);
@@ -285,7 +285,7 @@ export function CommunityPage() {
 
       const sent = await response.json();
       if (!response.ok) {
-        throw new Error(sent?.error || "Não foi possível enviar a mensagem.");
+        throw new Error(sent?.error || "A mensagem não saiu. Tenta de novo.");
       }
 
       for (let index = 0; index < files.length; index += 1) {
@@ -312,7 +312,7 @@ export function CommunityPage() {
       );
     } catch (sendError) {
       setError(
-        sendError instanceof Error ? sendError.message : "Falha ao enviar."
+        sendError instanceof Error ? sendError.message : "O envio tropeçou."
       );
     } finally {
       setSending(false);
@@ -334,7 +334,7 @@ export function CommunityPage() {
 
       if (!response.ok) {
         const payload = await response.json();
-        throw new Error(payload?.error || "Falha na reação.");
+        throw new Error(payload?.error || "A reação não colou.");
       }
 
       await load(true);
@@ -359,7 +359,7 @@ export function CommunityPage() {
 
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(payload?.error || "Não foi possível apagar a mensagem.");
+        throw new Error(payload?.error || "Não deu pra apagar essa mensagem agora.");
       }
 
       if (reply?.id === messageId) setReply(null);
@@ -368,7 +368,7 @@ export function CommunityPage() {
       setError(
         deleteError instanceof Error
           ? deleteError.message
-          : "Falha ao apagar mensagem."
+          : "A mensagem segurou firme e não apagou."
       );
     }
   };
@@ -385,7 +385,7 @@ export function CommunityPage() {
 
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(payload?.error || "Não foi possível abrir o perfil.");
+        throw new Error(payload?.error || "Esse perfil não abriu agora.");
       }
 
       setSelectedProfile(payload.profile as CommunityProfile);
@@ -393,7 +393,7 @@ export function CommunityPage() {
       setError(
         profileError instanceof Error
           ? profileError.message
-          : "Falha ao abrir perfil."
+          : "O perfil deu uma travada."
       );
     } finally {
       setProfileLoading(false);
@@ -403,7 +403,7 @@ export function CommunityPage() {
   if (state === "loading") {
     return (
       <main className="crz-community-page crz-community-state">
-        <LoadingState label="Entrando na comunidade CRAZZY PROJECT..." />
+        <LoadingState label="Abrindo a porta da comunidade CRAZZY..." />
       </main>
     );
   }
@@ -412,8 +412,8 @@ export function CommunityPage() {
     return (
       <main className="crz-community-page crz-community-state">
         <ErrorState
-          title="A comunidade não carregou"
-          description={error || "Tente novamente."}
+          title="A comunidade não entrou no mapa"
+          description={error || "Mete mais uma tentativa."}
           onRetry={() => void load()}
         />
       </main>
@@ -427,13 +427,13 @@ export function CommunityPage() {
           <div>
             <small>M14 • CRAZZY COMMUNITY</small>
             <h1>Comunidade</h1>
-            <p>Texto, voz, vídeo e compartilhamento de tela no mesmo ecossistema CRAZZY PROJECT.</p>
+            <p>Texto, voz, vídeo e tela no mesmo QG. Cola, chama o squad e faz barulho.</p>
           </div>
 
           <div className="crz-community-live">
             <i />
             <strong>{snapshot.activity.recentUsers}</strong>
-            <span>ativos nos últimos 15 min</span>
+            <span>na pista nos últimos 15 min</span>
           </div>
         </div>
       </section>
@@ -467,8 +467,8 @@ export function CommunityPage() {
           <Panel className="crz-community-rules">
             <NeonIcon name="shield" size={25} />
             <div>
-              <strong>Comunidade segura</strong>
-              <span>Sem keys automáticas no chat. Mídias privadas e mensagens vinculadas à sua conta.</span>
+              <strong>Bagunça boa, segurança séria</strong>
+              <span>Sem key voando no chat. Mídia no modo fechado e mensagem ficam coladas na tua conta.</span>
             </div>
           </Panel>
         </aside>
@@ -490,8 +490,8 @@ export function CommunityPage() {
               {visibleMessages.length === 0 ? (
                 <div className="crz-community-empty">
                   <NeonIcon name="community" size={46} />
-                  <strong>O chat está zerado</strong>
-                  <span>Seja a primeira pessoa a mandar mensagem aqui. 🚀</span>
+                  <strong>Chat zerado. Silêncio suspeito.</strong>
+                  <span>Quebra o gelo aí. Manda a primeira. 🚀</span>
                 </div>
               ) : (
                 visibleMessages.map((item) => (
@@ -546,14 +546,14 @@ export function CommunityPage() {
                           <strong>↪ {item.reply.authorName}</strong>
                           <span>
                             {item.reply.deleted
-                              ? "Mensagem removida"
+                              ? "Mensagem foi de base"
                               : item.reply.body}
                           </span>
                         </div>
                       )}
 
                       {item.deleted ? (
-                        <p className="crz-community-deleted">Mensagem removida.</p>
+                        <p className="crz-community-deleted">Foi de base.</p>
                       ) : (
                         <p>{item.body}</p>
                       )}
@@ -649,7 +649,7 @@ export function CommunityPage() {
               <div className="crz-community-compose-row">
                 <label
                   className="crz-community-attach"
-                  title="Anexar imagem, vídeo ou áudio"
+                  title="Jogar mídia no chat"
                 >
                   ＋
                   <input
@@ -708,12 +708,12 @@ export function CommunityPage() {
                   }
                   onClick={() => void send()}
                 >
-                  {sending ? uploadLabel || "Enviando..." : "Enviar"}
+                  {sending ? uploadLabel || "Mandando..." : "Enviar"}
                 </Button>
               </div>
 
               <footer>
-                <span>Enter envia • Shift + Enter quebra linha</span>
+                <span>Enter manda • Shift + Enter pula linha</span>
                 <span>{message.length}/2000</span>
               </footer>
             </div>
@@ -726,8 +726,8 @@ export function CommunityPage() {
           <Panel className="crz-community-info">
             <NeonIcon name="community" size={28} />
             <div>
-              <strong>Chat real</strong>
-              <span>Mensagens, replies e reações ficam salvos na sua conta CRAZZY.</span>
+              <strong>Papo de verdade</strong>
+              <span>Mensagem, reply e reação ficam guardados na tua conta CRAZZY.</span>
             </div>
           </Panel>
 
@@ -735,15 +735,15 @@ export function CommunityPage() {
             <NeonIcon name="shield" size={28} />
             <div>
               <strong>Mídia privada</strong>
-              <span>Imagem, vídeo e áudio usam links temporários. O bucket não é público.</span>
+              <span>Imagem, vídeo e áudio usam link temporário. Nada de bucket aberto dando sopa.</span>
             </div>
           </Panel>
 
           <Panel className="crz-community-info">
             <NeonIcon name="verified" size={28} />
             <div>
-              <strong>Perfil estilo Discord</strong>
-              <span>Clique no avatar ou nick para ver cargos, badges e Discord verificado.</span>
+              <strong>Perfil com cara de Discord</strong>
+              <span>Clica no avatar ou nick e vê cargo, badge e o Discord verificado.</span>
             </div>
           </Panel>
         </aside>
