@@ -1,9 +1,0 @@
-{
-  "safeMode": true,
-  "preserveExistingChannels": true,
-  "deleteExistingChannels": false,
-  "renameExistingChannels": false,
-  "moveExistingChannels": false,
-  "editExistingChannelPermissions": false,
-  "behavior": "append_only"
-}
