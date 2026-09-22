@@ -6,17 +6,35 @@ export type ManagerTutorial = {
   access_type?: "public" | "product";
 };
 
+export type ManagerDeliveryMode =
+  | "internal_stock"
+  | "purincash_supplier"
+  | "lzt_account"
+  | "manual"
+  | "service";
+
+export type ManagerPlanCode =
+  | "1d"
+  | "3d"
+  | "7d"
+  | "15d"
+  | "30d"
+  | "90d"
+  | "lifetime"
+  | "single"
+  | "custom";
+
 export type ManagerPlan = {
   id: string;
   name: string;
   price: number;
   active: boolean;
   sort_order: number;
-  plan_code: string | null;
+  plan_code: ManagerPlanCode | null;
   show_when_out_of_stock: boolean;
   emoji: string | null;
   accent_color: string | null;
-  delivery_mode: "internal_stock" | "purincash_supplier" | "lzt_account" | "manual" | "service";
+  delivery_mode: ManagerDeliveryMode;
   discord_role_id: string | null;
   discord_role_name: string | null;
   discord_role_color: string | null;
@@ -50,8 +68,15 @@ export type ManagerProduct = {
   plans: ManagerPlan[];
 };
 
+export type ManagerGame = {
+  id: string;
+  name: string;
+  slug: string | null;
+  active: boolean;
+};
+
 export type ManagerCatalog = {
   products: ManagerProduct[];
-  games: Array<{ id: string; name: string; slug: string | null; active: boolean }>;
+  games: ManagerGame[];
   tutorials: ManagerTutorial[];
 };
