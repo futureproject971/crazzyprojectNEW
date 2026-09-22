@@ -64,7 +64,7 @@ function PrizeResult({ result }: { result: LuckResult }) {
         </div>
       )}
       {result.coupon_expires_at && <em>Válido até {formatDate(result.coupon_expires_at)}</em>}
-      {result.delivery_status === "pending" && <em>Prêmio em preparação para entrega.</em>}
+      {result.delivery_status === "pending" && <em>Prêmio no forno. Já já cai.</em>}
     </div>
   );
 }
@@ -104,12 +104,12 @@ function WheelGame({
       <div className="crz-luck-game-actions">
         {result ? <PrizeResult result={result} /> : (
           <>
-            <strong>Uma jogada. Um resultado do servidor.</strong>
-            <p>A animação só revela o prêmio que já foi sorteado e registrado com segurança.</p>
+            <strong>Uma jogada. O servidor bate o martelo.</strong>
+            <p>A animação só faz o show. O prêmio já saiu no servidor antes.</p>
           </>
         )}
         <button type="button" className="crz-button crz-button--primary crz-button--lg" disabled={spinning} onClick={onPlay}>
-          {spinning ? "Girando..." : "Girar roleta"}
+          {spinning ? "RODANDO..." : "GIRAR E VER NO QUE DÁ"}
         </button>
       </div>
     </div>
@@ -147,7 +147,7 @@ function ScratchGame({
       <div className="crz-luck-scratch-card">
         <div className="crz-luck-scratch-prize">
           {result ? <PrizeResult result={result} /> : (
-            <div><NeonIcon name="crown" size={52} /><strong>CRAZZY SCRATCH</strong><span>Gere sua raspadinha para começar</span></div>
+            <div><NeonIcon name="crown" size={52} /><strong>CRAZZY SCRATCH</strong><span>Puxa tua raspadinha e mete a unha</span></div>
           )}
         </div>
         {result && (
@@ -172,11 +172,11 @@ function ScratchGame({
       </div>
 
       <div className="crz-luck-game-actions">
-        <strong>{result ? "Raspe a camada para revelar." : "Sua raspadinha diária espera por você."}</strong>
-        <p>O prêmio é registrado antes da raspagem. Alterar o visual no navegador não altera o resultado.</p>
+        <strong>{result ? "Raspa aí e descobre a treta." : "A raspadinha do dia tá te encarando."}</strong>
+        <p>O prêmio nasce no servidor antes da raspada. Mexer no visual não muda o destino.</p>
         {!result && (
           <button type="button" className="crz-button crz-button--primary crz-button--lg" disabled={busy} onClick={onPlay}>
-            {busy ? "Gerando..." : "Gerar raspadinha"}
+            {busy ? "PREPARANDO..." : "GERAR RASPADINHA"}
           </button>
         )}
       </div>
@@ -209,12 +209,12 @@ function DropGame({
       <div className="crz-luck-game-actions">
         {result ? <PrizeResult result={result} /> : (
           <>
-            <strong>Abra seu drop do dia.</strong>
-            <p>O servidor escolhe e registra o prêmio antes da caixa abrir.</p>
+            <strong>Abre o drop do dia e vê o estrago.</strong>
+            <p>O servidor decide primeiro. A caixa só faz suspense.</p>
           </>
         )}
         <button type="button" className="crz-button crz-button--primary crz-button--lg" disabled={busy || opening} onClick={onPlay}>
-          {opening ? "Abrindo..." : result ? "Drop aberto" : "Abrir drop"}
+          {opening ? "ABRINDO..." : result ? "Drop estourado" : "ABRIR O DROP"}
         </button>
       </div>
     </div>
@@ -238,7 +238,7 @@ export function LuckPage() {
     const response = await fetch("/api/luck?action=catalog", { cache: "no-store" });
     const payload = await response.json().catch(() => ({}));
     if (response.ok) setCampaigns(payload.campaigns || []);
-    else setNotice(payload?.error || "Não foi possível carregar o CRAZZY LUCK.");
+    else setNotice(payload?.error || "O CRAZZY LUCK não entrou no mapa agora.");
   }, []);
 
   const loadHistory = useCallback(async () => {
@@ -294,7 +294,7 @@ export function LuckPage() {
       setBusy(false);
       setSpinning(false);
       setOpening(false);
-      setNotice(payload?.error || "Não foi possível jogar agora.");
+      setNotice(payload?.error || "Essa jogada não saiu. Tenta mais uma.");
       return;
     }
 
@@ -332,16 +332,16 @@ export function LuckPage() {
       <div className="crz-container">
         <PageHeader
           eyebrow="CRAZZY LUCK"
-          title="Roleta, raspadinha e drops"
-          description="Prêmios reais com resultado definido no servidor e chances exibidas com transparência."
-          actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">Voltar ao CLUB</a>}
+          title="Roleta, raspadinha e drop no caos certo"
+          description="Prêmio real, chance na mesa e resultado decidido no servidor. Sem truque."
+          actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">VOLTAR PRO CLUB</a>}
         />
 
         <div className="crz-luck-rules">
           <NeonIcon name="shield" size={28} />
           <div>
-            <strong>1 jogada grátis diária compartilhada entre os modos</strong>
-            <span>Escolha Roleta, Raspadinha ou Drop. O prêmio e o log são criados no servidor.</span>
+            <strong>1 jogada grátis por dia. Escolhe teu veneno.</strong>
+            <span>Escolhe o modo. Prêmio e log nascem no servidor antes do show.</span>
           </div>
         </div>
 
@@ -359,9 +359,9 @@ export function LuckPage() {
         <section className="crz-luck-main">
           <div className={"crz-luck-game crz-luck-game--" + mode}>
             {loading ? (
-              <div className="crz-luck-state"><span className="crz-spinner" /><p>Carregando campanhas...</p></div>
+              <div className="crz-luck-state"><span className="crz-spinner" /><p>Puxando as chances...</p></div>
             ) : !campaign ? (
-              <div className="crz-luck-state"><NeonIcon name="crown" size={40} /><strong>Modo indisponível</strong><p>Esta campanha está pausada no momento.</p></div>
+              <div className="crz-luck-state"><NeonIcon name="crown" size={40} /><strong>Esse modo saiu do round</strong><p>Tá pausado agora. Já já volta a bagunça.</p></div>
             ) : mode === "wheel" ? (
               <WheelGame campaign={campaign} result={result} spinning={spinning} rotation={rotation} onPlay={() => void play()} />
             ) : mode === "scratch" ? (
@@ -372,8 +372,8 @@ export function LuckPage() {
           </div>
 
           <aside className="crz-luck-odds">
-            <header><span>CHANCES REAIS</span><h2>{campaign?.title || "Prêmios"}</h2></header>
-            <p>As porcentagens abaixo são calculadas pelos pesos ativos da campanha no servidor.</p>
+            <header><span>CHANCES NA MESA</span><h2>{campaign?.title || "Prêmios"}</h2></header>
+            <p>Essas porcentagens vêm direto dos pesos ativos no servidor.</p>
             <div className="crz-luck-odds__list">
               {(campaign?.prizes || []).map((prize, index) => (
                 <div key={prize.id}>
@@ -383,16 +383,16 @@ export function LuckPage() {
                 </div>
               ))}
             </div>
-            {!authLoading && !user && <a className="crz-button crz-button--primary crz-button--md" href="/login">Entrar para jogar</a>}
+            {!authLoading && !user && <a className="crz-button crz-button--primary crz-button--md" href="/login">ENTRAR E JOGAR</a>}
           </aside>
         </section>
 
         <section className="crz-luck-history">
-          <header><div><span>SEU HISTÓRICO</span><h2>Jogadas e prêmios</h2></div><button type="button" onClick={() => void loadHistory()}>Atualizar</button></header>
+          <header><div><span>SEU HISTÓRICO</span><h2>Teus giros e teus drops</h2></div><button type="button" onClick={() => void loadHistory()}>Atualizar</button></header>
           {!user ? (
-            <div className="crz-luck-state crz-luck-state--small"><p>Entre para ver suas jogadas.</p></div>
+            <div className="crz-luck-state crz-luck-state--small"><p>Entra aí pra ver teu histórico.</p></div>
           ) : !history.length ? (
-            <div className="crz-luck-state crz-luck-state--small"><p>Nenhuma jogada registrada ainda.</p></div>
+            <div className="crz-luck-state crz-luck-state--small"><p>Ainda não tem jogada. Tá esperando o quê?</p></div>
           ) : (
             <div className="crz-luck-history__grid">
               {history.map((item) => (
