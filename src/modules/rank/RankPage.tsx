@@ -20,10 +20,10 @@ function tone(value: string): RankTone {
 }
 
 const breakdownConfig = [
-  { key: "purchase_points", countKey: "purchases", label: "Compras confirmadas", icon: "lightning", unit: "compra(s)" },
-  { key: "entitlement_points", countKey: "active_entitlements", label: "Produtos ativos", icon: "cube", unit: "ativo(s)" },
-  { key: "review_points", countKey: "reviews", label: "Avaliações verificadas", icon: "verified", unit: "avaliação(ões)" },
-  { key: "reward_points", countKey: "rewards", label: "Rewards concluídos", icon: "featured", unit: "reward(s)" },
+  { key: "purchase_points", countKey: "purchases", label: "Compras no placar", icon: "lightning", unit: "compra(s)" },
+  { key: "entitlement_points", countKey: "active_entitlements", label: "Arsenal ativo", icon: "cube", unit: "ativo(s)" },
+  { key: "review_points", countKey: "reviews", label: "Review que vale", icon: "verified", unit: "avaliação(ões)" },
+  { key: "reward_points", countKey: "rewards", label: "Missões fechadas", icon: "featured", unit: "reward(s)" },
   { key: "luck_points", countKey: "luck_plays", label: "CRAZZY LUCK", icon: "crown", unit: "jogada(s)" },
   { key: "community_points", countKey: "community_messages", label: "Comunidade", icon: "community", unit: "mensagem(ns)" },
 ] as const;
@@ -54,10 +54,10 @@ export function RankPage() {
       const leaderboardPayload = await leaderboardResponse.json();
 
       if (!snapshotResponse.ok) {
-        throw new Error(snapshotPayload?.error || "Não foi possível carregar seu rank.");
+        throw new Error(snapshotPayload?.error || "Teu rank não apareceu agora.");
       }
       if (!leaderboardResponse.ok) {
-        throw new Error(leaderboardPayload?.error || "Não foi possível carregar o ranking.");
+        throw new Error(leaderboardPayload?.error || "O ranking deu uma travada.");
       }
 
       setSnapshot(snapshotPayload.snapshot as RankSnapshot);
@@ -65,7 +65,7 @@ export function RankPage() {
       setLeaderboard(leaderboardPayload.leaderboard || []);
       setState("ready");
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Falha ao carregar CRAZZY RANK.");
+      setError(loadError instanceof Error ? loadError.message : "O CRAZZY RANK tropeçou.");
       setState("error");
     }
   };
@@ -84,23 +84,23 @@ export function RankPage() {
       <div className="crz-container">
         <PageHeader
           eyebrow="CRAZZY RANK"
-          title="Seu progresso no ecossistema"
+          title="Teu nome subindo no mapa"
           description="O rank é calculado no servidor usando atividade real da conta. Compras, produtos ativos, avaliações, Rewards, Luck e comunidade entram no progresso."
-          actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">Voltar ao CLUB</a>}
+          actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">VOLTAR PRO CLUB</a>}
         />
 
         {state === "loading" && (
           <section className="crz-rank-state">
             <span className="crz-spinner" />
-            <p>Calculando seu rank...</p>
+            <p>Contando teu XP...</p>
           </section>
         )}
 
         {state === "auth" && (
           <section className="crz-rank-state">
             <NeonIcon name="crown" size={46} />
-            <strong>Entre para ver seu rank</strong>
-            <p>Seu progresso é vinculado à sua conta CRAZZY.</p>
+            <strong>Entra aí pra ver onde teu nome tá</strong>
+            <p>Teu progresso cola na tua conta CRAZZY. Nada de XP fantasma.</p>
             <a className="crz-button crz-button--primary crz-button--md" href="/login">Entrar</a>
           </section>
         )}
@@ -108,7 +108,7 @@ export function RankPage() {
         {state === "error" && (
           <section className="crz-rank-state">
             <NeonIcon name="shield" size={42} />
-            <strong>Rank indisponível agora</strong>
+            <strong>Rank fora do ar por um segundo</strong>
             <p>{error}</p>
             <button className="crz-button crz-button--secondary crz-button--sm" type="button" onClick={() => void load()}>
               Tentar novamente
@@ -126,7 +126,7 @@ export function RankPage() {
               </div>
 
               <div className="crz-rank-hero-card__main">
-                <small>SEU RANK ATUAL</small>
+                <small>TEU RANK AGORA</small>
                 <h2>{snapshot.current.label}</h2>
                 <div className="crz-rank-points">
                   <strong>{formatPoints(snapshot.points)}</strong>
@@ -145,8 +145,8 @@ export function RankPage() {
                     <span>{Number(snapshot.progress_percent || 0).toFixed(0)}% da faixa</span>
                     <strong>
                       {snapshot.next
-                        ? formatPoints(snapshot.next.points_needed || 0) + " XP para subir"
-                        : "Você chegou ao topo"}
+                        ? formatPoints(snapshot.next.points_needed || 0) + " XP que falta pro próximo"
+                        : "Tu bateu no teto. Brabo."}
                     </strong>
                   </footer>
                 </div>
@@ -161,8 +161,8 @@ export function RankPage() {
 
             <section className="crz-rank-breakdown">
               <header>
-                <div><small>COMO SEU XP É FORMADO</small><h2>Progresso verificável</h2></div>
-                <span>O navegador não concede pontos.</span>
+                <div><small>DE ONDE SAI TEU XP</small><h2>XP que dá pra provar</h2></div>
+                <span>Navegador não inventa ponto. Tudo passa pelo servidor.</span>
               </header>
 
               <div className="crz-rank-breakdown__grid">
@@ -184,7 +184,7 @@ export function RankPage() {
             </section>
 
             <section className="crz-rank-tiers">
-              <header><small>ESCADA CRAZZY</small><h2>Todos os ranks</h2></header>
+              <header><small>ESCADA CRAZZY</small><h2>A escada inteira</h2></header>
               <div>
                 {tiers.map((tier) => {
                   const reached = snapshot.points >= tier.min_points;
@@ -208,7 +208,7 @@ export function RankPage() {
             <section className="crz-rank-board">
               <header>
                 <div><small>TOP CRAZZY</small><h2>Leaderboard</h2></div>
-                <button type="button" onClick={() => void load()}>↻ Atualizar</button>
+                <button type="button" onClick={() => void load()}>↻ PUXAR DE NOVO</button>
               </header>
 
               <div className="crz-rank-board__list">
