@@ -11,6 +11,36 @@ export function HeroSection() {
       <div className="crz-home-hero__backdrop" aria-hidden="true" />
       <div className="crz-home-hero__shade" aria-hidden="true" />
 
+      <div className="crz-home-hero__agents" aria-hidden="true">
+        <div className="crz-home-hero__agent-side crz-home-hero__agent-side--left">
+          <img
+            className="crz-home-hero__agent crz-home-hero__agent--gekko"
+            src="https://media.valorant-api.com/agents/e370fa57-4757-3604-3648-499e1f642d3f/fullportrait.png"
+            alt=""
+          />
+          <img
+            className="crz-home-hero__agent crz-home-hero__agent--raze"
+            src="https://media.valorant-api.com/agents/f94c3b30-42be-e959-889c-5aa313dba261/fullportrait.png"
+            alt=""
+          />
+          <div className="crz-home-hero__smoke crz-home-hero__smoke--left" />
+        </div>
+
+        <div className="crz-home-hero__agent-side crz-home-hero__agent-side--right">
+          <img
+            className="crz-home-hero__agent crz-home-hero__agent--yoru"
+            src="https://media.valorant-api.com/agents/7f94d92c-4234-0a36-9646-3a87eb8b5c89/fullportrait.png"
+            alt=""
+          />
+          <img
+            className="crz-home-hero__agent crz-home-hero__agent--chamber"
+            src="https://media.valorant-api.com/agents/22697a3d-45bf-8dd7-4fec-84a9e28c69d7/fullportrait.png"
+            alt=""
+          />
+          <div className="crz-home-hero__smoke crz-home-hero__smoke--right" />
+        </div>
+      </div>
+
       <div className="crz-home-hero__content">
         <img
           className="crz-home-hero__logo"
