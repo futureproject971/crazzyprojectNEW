@@ -482,13 +482,30 @@ Capacidades PurinCash úteis reservadas:
 - split/subcontas opcionais para revendedores.
 
 ### M30 — CRAZZY FINANCE
-Adicionar:
-- taxas de gateway;
-- receita por método;
-- reembolso;
-- disputa;
-- retenção;
-- resultado líquido.
+Status: IMPLEMENTADO / QA FINAL.
+
+Inclui:
+- rota `/admin/finance`;
+- receita por período e método;
+- taxas reais por pagamento quando conhecidas;
+- regras de taxa estimadas por método com histórico de vigência;
+- transações sem taxa conhecidas ficam explicitamente como não precificadas;
+- líquido definitivo não é exibido quando faltam custos relevantes;
+- reembolsos concluídos e pendentes;
+- chargebacks/disputas perdidas;
+- exposição de disputas abertas;
+- retenções/holds separadas do resultado realizado;
+- custo real manual/provider pode substituir estimativa;
+- gráfico diário;
+- trilha recente por pagamento;
+- RLS + RPCs admin-only SECURITY INVOKER.
+
+Regra financeira:
+- nunca inventar taxa PurinCash;
+- regra configurada é marcada como estimativa;
+- custo real por transação tem prioridade;
+- retenção/disputa aberta é exposição, não despesa realizada;
+- líquido permanece parcial quando houver pagamentos ou chargebacks não precificados.
 
 ---
 
