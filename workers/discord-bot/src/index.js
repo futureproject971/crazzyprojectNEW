@@ -10,10 +10,13 @@ import { config, assertConfig } from "./config.js";
 import { commandDefinitions } from "./commands.js";
 import {
   handleCampaignInteraction,
-  heartbeatCampaignWorker,
+  heartbeatBotWorker,
   pollCampaignQueue,
 } from "./modules/campaigns.js";
-import { handleBuilderInteraction } from "./modules/server-builder.js";
+import {
+  handleBuilderInteraction,
+  pollBuilderQueue,
+} from "./modules/server-builder.js";
 
 assertConfig();
 
@@ -50,7 +53,7 @@ client.once("ready", async () => {
   }
 
   try {
-    await heartbeatCampaignWorker(client);
+    await heartbeatBotWorker(client);
   } catch (error) {
     console.error("[bot-core] Falha no heartbeat inicial", error);
   }
@@ -62,7 +65,13 @@ client.once("ready", async () => {
   }, config.pollMs);
 
   setInterval(() => {
-    void heartbeatCampaignWorker(client).catch((error) =>
+    void pollBuilderQueue(client).catch((error) =>
+      console.error("[bot-core] builder poll", error)
+    );
+  }, Math.max(config.pollMs, 5000));
+
+  setInterval(() => {
+    void heartbeatBotWorker(client).catch((error) =>
       console.error("[bot-core] heartbeat", error)
     );
   }, 30000);
