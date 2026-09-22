@@ -69,7 +69,7 @@ export function AppHeader({
   mode = "visitor",
   activeNav = "home",
   cartCount: fallbackCartCount = 0,
-  userName = "Meu Painel",
+  userName = "Meu QG",
 }: {
   mode?: ShellMode;
   activeNav?: string;
@@ -110,12 +110,12 @@ export function AppHeader({
           { id: "admin-signout", label: "Sair", danger: true, onSelect: () => void signOut() },
         ]
       : [
-          { id: "client-dashboard", label: "Painel do Cliente", onSelect: () => go("/painel") },
-          { id: "client-orders", label: "Minhas Compras", onSelect: () => go("/painel/pedidos") },
-          { id: "client-library", label: "Minha Biblioteca", onSelect: () => go("/biblioteca") },
-          { id: "client-tickets", label: "Meus Tickets", onSelect: () => go("/tickets") },
+          { id: "client-dashboard", label: "Meu QG", onSelect: () => go("/painel") },
+          { id: "client-orders", label: "Meu Arsenal", onSelect: () => go("/painel/pedidos") },
+          { id: "client-library", label: "Minha Bag", onSelect: () => go("/biblioteca") },
+          { id: "client-tickets", label: "Meu Suporte", onSelect: () => go("/tickets") },
           { id: "client-club", label: "CRAZZY CLUB", onSelect: () => go("/club") },
-          { id: "client-coupons", label: "Meus Cupons", onSelect: () => go("/painel/cupons") },
+          { id: "client-coupons", label: "Meus Cupons 🔥", onSelect: () => go("/painel/cupons") },
           { id: "client-tutorial", label: "Tutorial", onSelect: () => go("/academy") },
           { id: "client-profile", label: "Meu Perfil", onSelect: () => go("/perfil") },
           { id: "client-signout", label: "Sair", danger: true, onSelect: () => void signOut() },
@@ -152,7 +152,7 @@ export function AppHeader({
             <>
               <a href="/login" className="crz-shell-auth crz-shell-auth--compact">
                 <LineIcon name="user" size={14} />
-                <span>{authLoading ? "Verificando..." : "Login"}</span>
+                <span>{authLoading ? "Só um segundo..." : "BORA ENTRAR"}</span>
               </a>
 
               {googleEnabled && (
@@ -163,7 +163,7 @@ export function AppHeader({
                   onClick={() => void signIn("google", window.location.pathname)}
                 >
                   <img src="/icons/brand-google.svg" alt="" aria-hidden="true" />
-                  <span>Login com Google</span>
+                  <span>ENTRAR COM GOOGLE</span>
                 </button>
               )}
 
@@ -175,7 +175,7 @@ export function AppHeader({
                   onClick={() => void signIn("discord", window.location.pathname)}
                 >
                   <img src="/icons/brand-discord.svg" alt="" aria-hidden="true" />
-                  <span>Login com Discord</span>
+                  <span>ENTRAR COM DISCORD</span>
                 </button>
               )}
             </>
@@ -226,7 +226,7 @@ export function AppHeader({
             onClick={toggleTheme}
           >
             <span>{theme === "dark" ? "☀" : "☾"}</span>
-            {theme === "dark" ? "Usar tema claro" : "Usar tema escuro"}
+            {theme === "dark" ? "Acender o mapa" : "Voltar pro underground"}
           </button>
 
           <div className="crz-shell-mobile__account">
