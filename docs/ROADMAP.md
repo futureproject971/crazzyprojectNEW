@@ -770,3 +770,196 @@ Nunca:
    - expiração de cargo/tutorial;
    - integração MT Sounds;
    - estratégia PurinCash supplier.
+
+
+---
+
+# ATUALIZAÇÃO DE ESCOPO — 2026-09-22
+
+Esta seção prevalece sobre estados antigos do roadmap quando houver conflito.
+
+## REGRA VISUAL GLOBAL — CARDS CRAZZY PROJECT
+- todos os cards/superfícies de conteúdo usam navy/dark glass premium;
+- degradê profundo;
+- brilho azul interno sutil;
+- borda fria e sombra com profundidade;
+- evitar blocos azul chapado/seco;
+- superfícies com wallpaper, foto, capa, banner, galeria, thumbnail, vídeo, roleta, raspadinha ou arte própria NÃO recebem override de fundo;
+- estados selecionados podem usar azul como acento, sem virar um bloco azul sólido.
+
+## CRAZZY COMMUNITY + CRAZZY CALL
+A Comunidade passa a ser a central social do CRAZZY PROJECT.
+
+Experiência desejada:
+- chat de texto estilo Discord;
+- canais/salas;
+- participantes;
+- voz;
+- vídeo;
+- compartilhamento de tela;
+- múltiplas transmissões;
+- seleção do stream principal;
+- fullscreen;
+- Picture-in-Picture nativo;
+- chat da chamada;
+- lobby;
+- host/co-host;
+- lock/kick/end room;
+- estado de mic/câmera/tela;
+- atalho de criação/entrada de CRAZZY CALL dentro da própria Comunidade;
+- rota /call continua existindo como central independente.
+
+## DISCORD BOT CORE — REGRA DEFINITIVA
+Todo recurso de bot Discord do CRAZZY PROJECT deve usar:
+- UM ÚNICO bot;
+- UM ÚNICO Discord application/client;
+- UM ÚNICO token;
+- UM ÚNICO processo/worker hospedado na Discloud;
+- módulos internos independentes;
+- uma única conexão Discord Gateway;
+- Supabase como fila/estado compartilhado com o site.
+
+Não criar bots separados para campanhas, builder, roles, notificações, tickets ou outras automações se puderem viver no mesmo Bot Core.
+
+### Módulos do Bot Core
+1. Campaigns / DM
+   - /disparar;
+   - /dispararonline;
+   - templates;
+   - todos;
+   - somente online;
+   - por role;
+   - usuário único/teste;
+   - fila persistente;
+   - progresso;
+   - cancelamento;
+   - histórico;
+   - rate pacing;
+   - worker heartbeat.
+
+2. Server Builder
+   - /preview-tema;
+   - /montar-servidor;
+   - SAFE MODE append-only;
+   - nunca apagar canal/categoria existente;
+   - nunca renomear canal/categoria existente;
+   - nunca mover/reordenar recurso existente;
+   - nunca alterar permissões de recurso existente;
+   - apenas criar o que estiver faltando;
+   - confirmação antes de executar;
+   - relatório final;
+   - template/tema administráveis pelo ecossistema CRAZZY.
+
+3. Discord Bridge
+   - product → role;
+   - grant/revoke;
+   - reconcile;
+   - retry;
+   - role metadata;
+   - vínculo usuário/site/Discord.
+
+4. Notify
+   - compra;
+   - pagamento;
+   - key/entrega;
+   - tutorial;
+   - cargo;
+   - alertas.
+
+5. Support / Tickets
+   - integrações de ticket e suporte quando necessário;
+   - reutilizar o mesmo bot/token.
+
+6. Security Alerts
+   - alertas M47;
+   - sem secrets em mensagens;
+   - cooldown/agregação.
+
+## DISCORD CAMPAIGN CENTER — PAINEL NO SITE
+Rota administrativa:
+`/admin/campanhas`
+
+Obrigatório:
+- editor de embed;
+- preview Discord em tempo real dentro do site;
+- título;
+- descrição;
+- imagem;
+- thumbnail;
+- link;
+- texto do botão;
+- footer;
+- cor;
+- templates salvos;
+- criar/editar/desativar/remover template;
+- carregar template no editor;
+- testar envio para o próprio admin;
+- público: todos;
+- público: somente online/idle/dnd;
+- público: cargo;
+- público: usuário específico;
+- agendar campanha;
+- disparar agora;
+- fila;
+- status queued/running/completed/cancelled/failed;
+- progresso total/processado/sucesso/falha/pulado;
+- cancelar campanha;
+- histórico;
+- saúde/status do worker Discloud;
+- guild;
+- membros;
+- online;
+- roles disponíveis;
+- heartbeat;
+- logs sem conteúdo sensível.
+
+Arquitetura:
+site = control plane;
+Supabase = fila/estado;
+Discloud = worker/Gateway;
+Discord = destino.
+
+Templates locais em JSON deixam de ser fonte principal. O site/Supabase vira fonte compartilhada para painel e slash commands.
+
+## DISCORD SERVER BUILDER — INTEGRAÇÃO
+O sistema CRAZZY PROJECT SERVER BUILDER enviado em 2026-09-22 será absorvido pelo mesmo Bot Core.
+
+Preservar:
+- tema configurável;
+- template de categorias/canais;
+- preview;
+- confirmação;
+- safe mode absoluto;
+- cargos visuais;
+- relatório de criação.
+
+Melhorias planejadas no site:
+- editor visual do template do servidor;
+- preview da estrutura;
+- contador de categorias/canais;
+- executar pelo painel admin;
+- acompanhar progresso;
+- histórico de execuções;
+- diff "já existe / será criado";
+- escolher tema/cor;
+- nenhuma ação destrutiva no SAFE MODE.
+
+## ESTADO ATUAL DESTA FRENTE
+- [x] M28 Sales Manager mergeado na main;
+- [x] novo padrão premium de cards mergeado na main;
+- [x] banco Discord Campaign Center aplicado no Supabase;
+- [x] tabelas de templates/campanhas/deliveries/worker criadas;
+- [x] fila/cancelamento/claim/progress/finish/heartbeat RPC criados;
+- [x] preview Discord foundation criado;
+- [x] API admin de Campaign Center criada;
+- [x] CRAZZY CALL transplantado para branch atual;
+- [x] voice dock da Comunidade criado;
+- [ ] finalizar UI Campaign Center;
+- [ ] finalizar Bot Core único;
+- [ ] migrar Campaign DM bot para módulo do Bot Core;
+- [ ] migrar Server Builder para módulo do Bot Core;
+- [ ] atualizar slash commands unificados;
+- [ ] testar um único token/processo na Discloud;
+- [ ] testar campanhas pelo painel;
+- [ ] testar builder safe mode pelo painel;
+- [ ] concluir CI e merge.
