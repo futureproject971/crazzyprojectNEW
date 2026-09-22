@@ -125,8 +125,12 @@ jobs:
         run: node scripts/test-m29-payments-manager.mjs
 
       - name: Test CRAZZY CALL transplant
-        if: github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns' || github.ref_name == 'm-discord-bot-core-builder' || github.head_ref == 'm-discord-bot-core-builder'
+        if: github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns' || github.ref_name == 'm-discord-bot-core-builder' || github.head_ref == 'm-discord-bot-core-builder' || github.head_ref == 'auth-discord-crazzy-call'
         run: node scripts/test-crazzy-call.mjs
+
+      - name: Test Discord CRAZZY CALL auth
+        if: github.head_ref == 'auth-discord-crazzy-call' || github.ref_name == 'auth-discord-crazzy-call'
+        run: node scripts/test-discord-call-auth.mjs
 
       - name: Check unified Discord bot syntax
         if: github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns' || github.ref_name == 'm-discord-bot-core-builder' || github.head_ref == 'm-discord-bot-core-builder'

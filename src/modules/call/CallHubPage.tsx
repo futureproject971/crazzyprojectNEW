@@ -92,21 +92,43 @@ export function CallHubPage() {
     return <main className="crz-call-state"><span className="crz-spinner" /><strong>Carregando CRAZZY CALL...</strong></main>;
   }
 
-  if (!user) {
+  if (!user || !user.discord.connected) {
     return (
       <main className="crz-call-hub">
         <div className="crz-container">
           <PageHeader
             eyebrow="CRAZZY CALL"
-            title="Chamadas e compartilhamento em tempo real."
-            description="Crie uma sala privada, compartilhe o link e converse por voz, vídeo, tela e chat."
+            title="Discord é a chave da CRAZZY CALL."
+            description="Conecta teu Discord uma vez e volta direto pra call."
           />
           <section className="crz-call-auth-gate">
             <NeonIcon name="community" size={38} />
-            <strong>Entre para criar ou acessar suas salas</strong>
-            <p>CRAZZY CALL usa a mesma conta do CRAZZY PROJECT.</p>
+            <strong>{user ? "Conecta teu Discord pra liberar a CRAZZY CALL" : "Entra com Discord pra abrir a CRAZZY CALL"}</strong>
+            <p>Voz, vídeo, tela, chat e PiP ficam vinculados à tua conta CRAZZY PROJECT.</p>
             <a className="crz-button crz-button--primary crz-button--md" href="/login?next=%2Fcall">
-              Entrar
+              {user ? "CONECTAR DISCORD" : "ENTRAR COM DISCORD"}
+            </a>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
+  if (user.discord.guildId && !user.discord.guildMember) {
+    return (
+      <main className="crz-call-hub">
+        <div className="crz-container">
+          <PageHeader
+            eyebrow="CRAZZY CALL"
+            title="Falta entrar no servidor oficial."
+            description="Teu Discord já está conectado, mas o último sync não encontrou tua conta no servidor CRAZZY PROJECT."
+          />
+          <section className="crz-call-auth-gate">
+            <NeonIcon name="community" size={38} />
+            <strong>Entra no servidor e atualiza teu Discord</strong>
+            <p>Assim que o sync confirmar tua presença, a CRAZZY CALL libera.</p>
+            <a className="crz-button crz-button--primary crz-button--md" href="/perfil">
+              ATUALIZAR DISCORD
             </a>
           </section>
         </div>

@@ -9,6 +9,7 @@ const errorCopy: Record<string, string> = {
   oauth_exchange: "A sessão não pôde ser criada. Tente entrar novamente.",
   banned: "Esta conta está bloqueada para acesso à plataforma.",
   signup_disabled: "Novos cadastros estão desativados no Auth.",
+  discord_guild_required: "Teu Discord está conectado, mas ainda não apareceu no servidor oficial. Entra no servidor e atualiza o vínculo.",
 };
 
 export function AuthPage({
@@ -52,15 +53,15 @@ export function AuthPage({
 
       <section className="crz-auth-card">
         <a className="crz-auth-brand" href="/">
-          <img src="/brand/crazzy-logo-navbar.png" alt="CRAZZY PROJECT" />
+          <img src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT" />
         </a>
 
         <div className="crz-auth-heading">
           <Badge tone="blue">CRAZZY AUTH</Badge>
           <h1>{user ? "Você já está conectado" : "Entrar na CRAZZY PROJECT"}</h1>
           <p>
-            O site continua público. A conta é usada para checkout, pedidos,
-            chat, tickets e outras áreas privadas.
+            O site continua público. Para CRAZZY CALL e áreas privadas,
+            o Discord vira tua identidade principal.
           </p>
         </div>
 
@@ -91,14 +92,18 @@ export function AuthPage({
               )}
             </div>
             <div className="crz-auth-current__actions">
-              {!user.discord.connected && discordEnabled && (
-                <button
-                  type="button"
-                  onClick={() => void linkDiscord(nextPath)}
-                >
-                  Conectar Discord
-                </button>
-              )}
+              {discordEnabled &&
+                (!user.discord.connected ||
+                  initialError === "discord_guild_required") && (
+                  <button
+                    type="button"
+                    onClick={() => void linkDiscord(nextPath)}
+                  >
+                    {user.discord.connected
+                      ? "ATUALIZAR DISCORD"
+                      : "CONECTAR DISCORD"}
+                  </button>
+                )}
               <a href={nextPath}>Continuar →</a>
             </div>
           </div>
@@ -114,8 +119,8 @@ export function AuthPage({
                 >
                   <img src="/icons/brand-discord.svg" alt="" aria-hidden="true" />
                   <span>
-                    <strong>{busy === "discord" ? "Abrindo Discord..." : "Entrar com Discord"}</strong>
-                    <small>Identidade principal + status do servidor.</small>
+                    <strong>{busy === "discord" ? "Abrindo Discord..." : "ENTRAR COM DISCORD"}</strong>
+                    <small>Identidade principal da CRAZZY PROJECT + acesso à CRAZZY CALL.</small>
                   </span>
                   <b>→</b>
                 </button>

@@ -10,6 +10,7 @@ const protectedPrefixes = [
   "/perfil",
   "/tickets",
   "/chat",
+  "/call",
 ];
 
 function isProtected(pathname: string) {
