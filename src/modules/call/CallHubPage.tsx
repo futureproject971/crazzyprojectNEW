@@ -55,7 +55,7 @@ export function CallHubPage() {
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok || !payload.room?.code) {
-        setNotice("Não foi possível criar a sala.");
+        setNotice("A sala não saiu do chão. Tenta de novo.");
         return;
       }
       window.location.assign("/call/" + payload.room.code);
@@ -67,11 +67,11 @@ export function CallHubPage() {
   const copy = async (code: string) => {
     const url = window.location.origin + "/call/" + code;
     await navigator.clipboard?.writeText(url);
-    setNotice("Link da sala copiado.");
+    setNotice("Link copiado. Manda pro squad e bora.");
   };
 
   const endRoom = async (room: HubRoom) => {
-    if (!window.confirm("Encerrar esta CRAZZY CALL para todos?")) return;
+    if (!window.confirm("Vai derrubar a CRAZZY CALL pra geral mesmo?")) return;
     setBusy(room.id);
     try {
       const response = await fetch("/api/call/end", {
@@ -81,7 +81,7 @@ export function CallHubPage() {
       });
       if (response.ok) {
         await load();
-        setNotice("Sala encerrada.");
+        setNotice("Call encerrada. GG.");
       }
     } finally {
       setBusy(null);
@@ -89,7 +89,7 @@ export function CallHubPage() {
   };
 
   if (authLoading) {
-    return <main className="crz-call-state"><span className="crz-spinner" /><strong>Carregando CRAZZY CALL...</strong></main>;
+    return <main className="crz-call-state"><span className="crz-spinner" /><strong>Ligando os cabos da CRAZZY CALL...</strong></main>;
   }
 
   if (!user) {
@@ -98,13 +98,13 @@ export function CallHubPage() {
         <div className="crz-container">
           <PageHeader
             eyebrow="CRAZZY CALL"
-            title="Chamadas e compartilhamento em tempo real."
-            description="Crie uma sala privada, compartilhe o link e converse por voz, vídeo, tela e chat."
+            title="Chama o squad e faz barulho."
+            description="Abre tua sala, joga o link pro squad e usa voz, vídeo, tela e chat sem sair do corre."
           />
           <section className="crz-call-auth-gate">
             <NeonIcon name="community" size={38} />
-            <strong>Entre para criar ou acessar suas salas</strong>
-            <p>CRAZZY CALL usa a mesma conta do CRAZZY PROJECT.</p>
+            <strong>Entra aí pra abrir ou colar numa sala</strong>
+            <p>Mesma conta CRAZZY PROJECT. Zero novela.</p>
             <a className="crz-button crz-button--primary crz-button--md" href="/login?next=%2Fcall">
               Entrar
             </a>
@@ -120,7 +120,7 @@ export function CallHubPage() {
         <PageHeader
           eyebrow="CRAZZY CALL"
           title="Chamadas e compartilhamento em tempo real."
-          description="Salas por link com voz, câmera, screen share, múltiplas transmissões, chat, PiP e moderação."
+          description="Voz, câmera, tela, vários streams, chat, PiP e controle da sala. Tudo no mesmo caos organizado."
         />
 
         {notice && (
@@ -136,13 +136,13 @@ export function CallHubPage() {
             <span>
               <small>NOVA SALA</small>
               <strong>CRIAR CRAZZY CALL</strong>
-              <em>O link será criado sem tokens ou segredos na URL.</em>
+              <em>Link limpo, sem token nem segredo passeando pela URL.</em>
             </span>
           </div>
           <input
             value={title}
             onChange={(event) => setTitle(event.target.value.slice(0, 80))}
-            placeholder="Nome da sala (opcional)"
+            placeholder="Dá um nome pro caos (opcional)"
             maxLength={80}
           />
           <button
@@ -151,21 +151,21 @@ export function CallHubPage() {
             disabled={busy === "create"}
             onClick={() => void createRoom()}
           >
-            {busy === "create" ? "CRIANDO..." : "+ CRIAR NOVA SALA"}
+            {busy === "create" ? "MONTANDO..." : "+ ABRIR NOVA SALA"}
           </button>
         </section>
 
         <section className="crz-call-my-rooms">
           <header>
-            <div><small>MINHAS SALAS</small><h2>CRAZZY CALLS recentes</h2></div>
-            <button type="button" onClick={() => void load()}>↻ Atualizar</button>
+            <div><small>MINHAS SALAS</small><h2>Teus corres recentes</h2></div>
+            <button type="button" onClick={() => void load()}>↻ Puxar de novo</button>
           </header>
 
           {!rooms.length ? (
             <div className="crz-call-empty-list">
               <NeonIcon name="community" size={30} />
-              <strong>Nenhuma sala ainda</strong>
-              <span>Crie sua primeira CRAZZY CALL acima.</span>
+              <strong>Nenhuma call por aqui ainda</strong>
+              <span>Abre a primeira aí em cima e chama o squad.</span>
             </div>
           ) : (
             <div className="crz-call-room-cards">
@@ -190,7 +190,7 @@ export function CallHubPage() {
                       </a>
                     )}
                     <button type="button" onClick={() => void copy(room.code)}>
-                      COPIAR LINK
+                      COPIAR E CHAMAR
                     </button>
                     {room.owner_id === user.id && room.status !== "ended" && (
                       <button
@@ -199,7 +199,7 @@ export function CallHubPage() {
                         disabled={busy === room.id}
                         onClick={() => void endRoom(room)}
                       >
-                        {busy === room.id ? "ENCERRANDO..." : "ENCERRAR"}
+                        {busy === room.id ? "DERRUBANDO..." : "ENCERRAR CALL"}
                       </button>
                     )}
                   </div>
