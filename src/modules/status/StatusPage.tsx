@@ -58,12 +58,12 @@ export function StatusPage() {
       const response = await fetch("/api/status", { cache: "no-store" });
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(payload?.message || "Não foi possível consultar o status.");
+        throw new Error(payload?.message || "O radar não respondeu agora.");
       }
       setSnapshot(payload as PublicStatusSnapshot);
       setState("ready");
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Falha ao carregar status.");
+      setError(loadError instanceof Error ? loadError.message : "O status deu uma engasgada.");
       setState("error");
     }
   };
@@ -89,8 +89,8 @@ export function StatusPage() {
       <div className="crz-container">
         <PageHeader
           eyebrow="CRAZZY STATUS"
-          title="Status dos serviços"
-          description="Acompanhe disponibilidade, manutenções e incidentes dos recursos da CRAZZY PROJECT."
+          title="Radar da CRAZZY"
+          description="Vê o que tá voando, o que tá em manutenção e o que resolveu tirar férias sem avisar."
           actions={
             <button className="crz-button crz-button--secondary crz-button--sm" type="button" onClick={() => void load()}>
               ↻ Atualizar
@@ -101,14 +101,14 @@ export function StatusPage() {
         {state === "loading" && !snapshot && (
           <section className="crz-status-state">
             <span className="crz-spinner" />
-            <p>Consultando serviços...</p>
+            <p>Passando o radar...</p>
           </section>
         )}
 
         {state === "error" && !snapshot && (
           <section className="crz-status-state">
             <NeonIcon name="shield" size={42} />
-            <strong>Status temporariamente indisponível</strong>
+            <strong>Radar temporariamente fora</strong>
             <p>{error}</p>
             <button className="crz-button crz-button--secondary crz-button--sm" type="button" onClick={() => void load()}>
               Tentar novamente
@@ -127,13 +127,13 @@ export function StatusPage() {
                 <small>STATUS GERAL</small>
                 <h2>
                   {overall === "operational"
-                    ? "Todos os serviços estão operacionais"
+                    ? "Tudo no ar. Pode meter ficha."
                     : meta.label}
                 </h2>
                 <p>
                   {activeIncidents.length
-                    ? activeIncidents.length + " incidente(s) ativo(s) no momento."
-                    : "Nenhum incidente ativo registrado."}
+                    ? activeIncidents.length + " treta(s) ativa(s) agora."
+                    : "Nenhuma treta ativa no radar."}
                 </p>
               </div>
               <Badge tone={meta.tone}>{meta.label.toUpperCase()}</Badge>
@@ -141,7 +141,7 @@ export function StatusPage() {
 
             <section className="crz-status-components">
               <header>
-                <div><small>SERVIÇOS</small><h2>Disponibilidade atual</h2></div>
+                <div><small>SERVIÇOS</small><h2>Como tá o mapa agora</h2></div>
                 <span>Atualizado em {formatDate(snapshot.generated_at)}</span>
               </header>
 
@@ -167,14 +167,14 @@ export function StatusPage() {
             </section>
 
             <section className="crz-status-incidents">
-              <header><small>INCIDENTES</small><h2>Atividade recente</h2></header>
+              <header><small>INCIDENTES</small><h2>O que rolou por último</h2></header>
 
               {activeIncidents.length === 0 && resolvedIncidents.length === 0 ? (
                 <div className="crz-status-no-incidents">
                   <NeonIcon name="verified" size={34} />
                   <div>
-                    <strong>Nenhum incidente recente</strong>
-                    <span>Quando houver manutenção ou instabilidade, as atualizações aparecem aqui.</span>
+                    <strong>Nada pegou fogo recentemente</strong>
+                    <span>Se alguma coisa tossir, quebrar ou entrar em manutenção, aparece aqui.</span>
                   </div>
                 </div>
               ) : (
@@ -224,10 +224,10 @@ export function StatusPage() {
             <section className="crz-status-help">
               <NeonIcon name="ticket" size={28} />
               <div>
-                <strong>Está com um problema que não aparece aqui?</strong>
-                <span>Abra um ticket e descreva o que está acontecendo.</span>
+                <strong>Tá dando ruim e o radar tá fingindo que não?</strong>
+                <span>Chama o suporte e conta a treta direito.</span>
               </div>
-              <a className="crz-button crz-button--primary crz-button--sm" href="/tickets/novo">Abrir ticket</a>
+              <a className="crz-button crz-button--primary crz-button--sm" href="/tickets/novo">CHAMAR O SUPORTE</a>
             </section>
           </>
         )}
