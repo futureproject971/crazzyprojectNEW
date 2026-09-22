@@ -31,6 +31,7 @@
 @import "../modules/category-manager/styles.css";
 @import "../modules/stock-manager/styles.css";
 @import "../modules/sales-manager/styles.css";
+@import "../modules/payments-manager/styles.css";
 @import "../modules/call/styles.css";
 @import "../modules/discord-campaigns/styles.css";
 @import "../modules/discord-bot-core/styles.css";
