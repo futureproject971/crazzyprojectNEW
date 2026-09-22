@@ -5,10 +5,10 @@ import { Badge, NeonIcon } from "@/core/design-system";
 import { useAuth } from "./AuthProvider";
 
 const errorCopy: Record<string, string> = {
-  missing_code: "O provedor não devolveu o código de autenticação.",
-  oauth_exchange: "A sessão não pôde ser criada. Tente entrar novamente.",
-  banned: "Esta conta está bloqueada para acesso à plataforma.",
-  signup_disabled: "Novos cadastros estão desativados no Auth.",
+  missing_code: "O login voltou sem o código. Tenta entrar de novo.",
+  oauth_exchange: "A sessão não fechou o round. Entra de novo.",
+  banned: "Essa conta tá bloqueada de entrar por aqui.",
+  signup_disabled: "Cadastro novo tá fechado por enquanto.",
 };
 
 export function AuthPage({
@@ -28,7 +28,7 @@ export function AuthPage({
   } = useAuth();
   const [busy, setBusy] = useState<"discord" | "google" | null>(null);
   const [error, setError] = useState(
-    errorCopy[initialError] || (initialError ? "Não foi possível concluir o login." : "")
+    errorCopy[initialError] || (initialError ? "O login tropeçou. Tenta mais uma." : "")
   );
 
   const login = async (provider: "discord" | "google") => {
@@ -40,7 +40,7 @@ export function AuthPage({
       setError(
         loginError instanceof Error
           ? loginError.message
-          : "Não foi possível abrir o provedor de login."
+          : "Não consegui abrir o login agora."
       );
       setBusy(null);
     }
@@ -57,7 +57,7 @@ export function AuthPage({
 
         <div className="crz-auth-heading">
           <Badge tone="blue">CRAZZY AUTH</Badge>
-          <h1>{user ? "Você já está conectado" : "Entrar na CRAZZY PROJECT"}</h1>
+          <h1>{user ? "Tu já tá dentro" : "COLA NA CRAZZY PROJECT"}</h1>
           <p>
             O site continua público. A conta é usada para checkout, pedidos,
             chat, tickets e outras áreas privadas.
@@ -76,7 +76,7 @@ export function AuthPage({
             </div>
             <div>
               <strong>{user.username}</strong>
-              <span>{user.email || "Conta conectada"}</span>
+              <span>{user.email || "Conta no mapa"}</span>
               {user.discord.connected ? (
                 <small>
                   Discord conectado
@@ -87,7 +87,7 @@ export function AuthPage({
                     : ""}
                 </small>
               ) : (
-                <small>Discord ainda não conectado</small>
+                <small>Discord ainda tá fora do squad</small>
               )}
             </div>
             <div className="crz-auth-current__actions">
@@ -99,7 +99,7 @@ export function AuthPage({
                   Conectar Discord
                 </button>
               )}
-              <a href={nextPath}>Continuar →</a>
+              <a href={nextPath}>BORA →</a>
             </div>
           </div>
         ) : (
@@ -114,8 +114,8 @@ export function AuthPage({
                 >
                   <img src="/icons/brand-discord.svg" alt="" aria-hidden="true" />
                   <span>
-                    <strong>{busy === "discord" ? "Abrindo Discord..." : "Entrar com Discord"}</strong>
-                    <small>Identidade principal + status do servidor.</small>
+                    <strong>{busy === "discord" ? "Chamando o Discord..." : "ENTRAR COM DISCORD"}</strong>
+                    <small>Tua identidade principal + teu status no servidor.</small>
                   </span>
                   <b>→</b>
                 </button>
@@ -130,8 +130,8 @@ export function AuthPage({
                 >
                   <img src="/icons/brand-google.svg" alt="" aria-hidden="true" />
                   <span>
-                    <strong>{busy === "google" ? "Abrindo Google..." : "Entrar com Google"}</strong>
-                    <small>Opção alternativa de autenticação.</small>
+                    <strong>{busy === "google" ? "Chamando o Google..." : "ENTRAR COM GOOGLE"}</strong>
+                    <small>Plano B pra entrar sem drama.</small>
                   </span>
                   <b>→</b>
                 </button>
@@ -148,7 +148,7 @@ export function AuthPage({
             <div className="crz-auth-security">
               <NeonIcon name="shield" size={25} />
               <div>
-                <strong>Acesso seguro à sua conta</strong>
+                <strong>Entrada segura, sem novela</strong>
                 <span>
                   O token Discord é usado apenas durante o callback para consultar
                   identidade/guilds e não é salvo na nossa base.
@@ -159,8 +159,8 @@ export function AuthPage({
         )}
 
         <footer>
-          <a href="/">← Voltar para a loja</a>
-          <span>Ao continuar, você autentica apenas as áreas privadas.</span>
+          <a href="/">← VOLTAR PRO MAPA</a>
+          <span>Entrando, só as áreas privadas recebem tua sessão. O resto fica na moral.</span>
         </footer>
       </section>
     </main>
