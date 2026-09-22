@@ -8,7 +8,9 @@ Use **um único Discord bot token** e **um único processo na Discloud**.
 
 Novos sistemas Discord entram como módulos em `src/modules`. Não crie outro bot.
 
-## Módulo já migrado
+## Módulos já migrados
+
+### Campanhas/DM
 
 - Campanhas/DM
 - /disparar
@@ -18,6 +20,17 @@ Novos sistemas Discord entram como módulos em `src/modules`. Não crie outro bo
 - templates Supabase
 - heartbeat para o Campaign Center
 - progresso/cancelamento/histórico
+
+### Server Builder
+
+- /preview-tema
+- /montar-servidor
+- painel /admin/discord
+- template e tema compartilhados pelo Supabase
+- fila e histórico de execução
+- SAFE MODE append-only
+- não apaga, renomeia, move, reposiciona ou altera permissões de canal/categoria existente
+- cria apenas recursos que estiverem faltando
 
 ## Variáveis Discloud
 
