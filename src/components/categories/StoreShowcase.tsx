@@ -12,11 +12,11 @@ export function StoreShowcase() {
         <div className="store-title-wrap">
           <NeonSectionIcon src="/icons/neon-v2/cube.svg" />
           <div>
-            <h2 id="store-title">Explore Nossa Loja</h2>
-            <p>Tudo que um gamer precisa, em um só lugar.</p>
+            <h2 id="store-title">VAI PRO ARSENAL</h2>
+            <p>Jogo, conta, ferramenta e umas paradas brabas no mesmo mapa.</p>
           </div>
         </div>
-        <a href="/categorias" className="section-link">Ver todas as categorias →</a>
+        <a href="/categorias" className="section-link">VER O MAPA TODO →</a>
       </div>
 
       <div className="store-grid">
