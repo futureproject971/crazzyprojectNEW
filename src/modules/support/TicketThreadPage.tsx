@@ -49,7 +49,7 @@ function AttachmentView({ attachment }: { attachment: SupportAttachment }) {
         <span>📎</span>
         <div>
           <strong>{attachment.filename}</strong>
-          <small>URL temporária indisponível</small>
+          <small>Link temporário tirou folga</small>
         </div>
       </div>
     );
@@ -127,12 +127,12 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
         credentials: "same-origin",
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload?.error || "Não foi possível abrir o ticket.");
+      if (!response.ok) throw new Error(payload?.error || "Esse ticket não abriu agora.");
       setThread(payload as SupportThread);
       setState("ready");
     } catch (loadError) {
       if (!silent) {
-        setError(loadError instanceof Error ? loadError.message : "Falha ao abrir ticket.");
+        setError(loadError instanceof Error ? loadError.message : "A conversa deu uma travada.");
         setState("error");
       }
     }
@@ -184,7 +184,7 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
 
   const send = async () => {
     if (!thread || sending) return;
-    const text = message.trim() || (files.length ? "📎 Anexo enviado." : "");
+    const text = message.trim() || (files.length ? "📎 Anexo no ar." : "");
     if (!text) return;
 
     setSending(true);
@@ -198,7 +198,7 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
         body: JSON.stringify({ message: text }),
       });
       const sent = await response.json();
-      if (!response.ok) throw new Error(sent?.error || "Não foi possível enviar a mensagem.");
+      if (!response.ok) throw new Error(sent?.error || "A mensagem não saiu agora.");
 
       for (let index = 0; index < files.length; index += 1) {
         const file = files[index];
@@ -217,7 +217,7 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
       await load(true);
       window.setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 60);
     } catch (sendError) {
-      setError(sendError instanceof Error ? sendError.message : "Falha ao enviar.");
+      setError(sendError instanceof Error ? sendError.message : "O envio tropeçou.");
     } finally {
       setSending(false);
       setUploadLabel("");
@@ -235,10 +235,10 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
         body: JSON.stringify({ action }),
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload?.error || "Não foi possível alterar o ticket.");
+      if (!response.ok) throw new Error(payload?.error || "Não deu pra mexer no ticket agora.");
       await load(true);
     } catch (statusError) {
-      setError(statusError instanceof Error ? statusError.message : "Falha ao alterar ticket.");
+      setError(statusError instanceof Error ? statusError.message : "O ticket segurou firme e não mudou.");
     } finally {
       setStatusBusy(false);
     }
@@ -247,7 +247,7 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
   if (state === "loading") {
     return (
       <main className="crz-support-page crz-support-state">
-        <LoadingState label="Abrindo conversa de suporte..." />
+        <LoadingState label="Abrindo o papo com o suporte..." />
       </main>
     );
   }
@@ -256,8 +256,8 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
     return (
       <main className="crz-support-page crz-support-state">
         <ErrorState
-          title="Ticket indisponível"
-          description={error || "Esse ticket não existe ou não pertence à sua conta."}
+          title="Esse ticket saiu do mapa"
+          description={error || "Ou ele não existe, ou não é teu. Sem atalho estranho por aqui."}
           onRetry={() => void load()}
         />
       </main>
@@ -272,7 +272,7 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
       <section className="crz-support-thread-head">
         <div className="crz-container crz-support-thread-head__inner">
           <div>
-            <a href="/tickets">← Voltar aos tickets</a>
+            <a href="/tickets">← VOLTAR PROS TICKETS</a>
             <small>#{thread.ticket.id.slice(0, 8).toUpperCase()}</small>
             <h1>{thread.ticket.subject}</h1>
           </div>
@@ -359,7 +359,7 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
                   value={message}
                   maxLength={4000}
                   rows={4}
-                  placeholder="Escreva sua resposta..."
+                  placeholder="Manda tua resposta..."
                   onChange={(event) => setMessage(event.target.value)}
                 />
 
@@ -390,14 +390,14 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
                     onClick={() => void send()}
                     leadingIcon={<NeonIcon name="ticket" size={18} />}
                   >
-                    {sending ? uploadLabel || "Enviando..." : "Enviar resposta"}
+                    {sending ? uploadLabel || "MANDANDO..." : "MANDAR RESPOSTA"}
                   </Button>
                 </div>
               </div>
             ) : (
               <div className="crz-support-closed-notice">
                 <NeonIcon name="shield" size={24} />
-                <span>Esse ticket está fechado. Reabra para enviar uma nova mensagem.</span>
+                <span>Esse ticket tá fechado. Reabre se quiser continuar o papo.</span>
               </div>
             )}
           </Panel>
@@ -408,7 +408,7 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
             <header>
               <div>
                 <small>CONTEXTO</small>
-                <h2>Dados relacionados</h2>
+                <h2>O que tá ligado nessa treta</h2>
               </div>
               <NeonIcon name="cube" size={24} />
             </header>
@@ -426,7 +426,7 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
                 </span>
               </div>
             ) : (
-              <div className="crz-support-context-empty">Ticket sem produto vinculado.</div>
+              <div className="crz-support-context-empty">Esse ticket não tá grudado em nenhum produto.</div>
             )}
 
             <dl>
@@ -449,19 +449,19 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
                 </>
               )}
               <dt>Tutorial</dt>
-              <dd>{context.tutorialAvailable ? "Disponível" : "Não associado"}</dd>
+              <dd>{context.tutorialAvailable ? "NO JOGO" : "SEM VÍNCULO"}</dd>
             </dl>
 
             <div className="crz-support-context-safe">
               <NeonIcon name="shield" size={20} />
-              <span>Keys, senhas e payloads privados não entram no ticket automaticamente.</span>
+              <span>Key, senha e payload privado ficam longe do ticket. Do jeito certo.</span>
             </div>
           </Panel>
 
           <Panel className="crz-support-timeline-card">
             <header>
               <div>
-                <small>HISTÓRICO</small>
+                <small>TUDO QUE ROLOU</small>
                 <h2>Eventos</h2>
               </div>
               <Badge tone="blue">{thread.events.length}</Badge>
