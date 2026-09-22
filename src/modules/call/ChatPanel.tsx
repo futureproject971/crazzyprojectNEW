@@ -53,7 +53,7 @@ export function ChatPanel({
           table: "call_messages",
           filter: "room_id=eq." + roomId,
         },
-        (payload) => {
+        (payload: any) => {
           const next = payload.new as CallMessage;
           setMessages((current) => mergeMessages(current, next));
           if (collapsed && next.user_id !== currentUserId) {
