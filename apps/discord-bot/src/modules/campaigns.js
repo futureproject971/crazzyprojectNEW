@@ -2,6 +2,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ChannelType,
   EmbedBuilder,
 } from "discord.js";
 
@@ -270,7 +271,8 @@ export function startCampaignWorker(client, supabase, config) {
 
 export function startWorkerHeartbeat(client, supabase, config) {
   let cachedRoles = [];
-  let lastMemberRefresh = 0;
+  let cachedChannels = [];
+  let lastRefresh = 0;
 
   const heartbeat = async () => {
     if (!client.isReady()) return;
@@ -279,8 +281,10 @@ export function startWorkerHeartbeat(client, supabase, config) {
       const guild = await client.guilds.fetch(config.guildId);
       const now = Date.now();
 
-      if (now - lastMemberRefresh > 5 * 60 * 1000) {
-        await guild.members.fetch().catch(() => undefined);
+      if (now - lastRefresh > 60 * 1000) {
+        await guild.members.fetch({ withPresences: true }).catch(() => guild.members.fetch().catch(() => undefined));
+        await guild.channels.fetch().catch(() => undefined);
+
         cachedRoles = [...guild.roles.cache.values()]
           .filter((role) => role.id !== guild.id)
           .map((role) => ({
@@ -290,15 +294,36 @@ export function startWorkerHeartbeat(client, supabase, config) {
             position: role.position,
             member_count: role.members.size,
           }))
-          .sort((a, b) => b.position - a.position);
-        lastMemberRefresh = now;
+          .sort((a, b) => b.position - a.position)
+          .slice(0, 100);
+
+        cachedChannels = [...guild.channels.cache.values()]
+          .filter((channel) =>
+            [ChannelType.GuildCategory, ChannelType.GuildText, ChannelType.GuildVoice].includes(channel.type)
+          )
+          .sort((a, b) => a.rawPosition - b.rawPosition)
+          .map((channel) => ({
+            id: channel.id,
+            name: channel.name,
+            type:
+              channel.type === ChannelType.GuildCategory
+                ? "category"
+                : channel.type === ChannelType.GuildVoice
+                  ? "voice"
+                  : "text",
+            parent_id: channel.parentId || null,
+            position: channel.rawPosition,
+          }))
+          .slice(0, 300);
+
+        lastRefresh = now;
       }
 
       const onlineCount = guild.members.cache.filter((member) =>
         ["online", "idle", "dnd"].includes(member.presence?.status)
       ).size;
 
-      await supabase.rpc("heartbeat_discord_campaign_worker", {
+      await supabase.rpc("heartbeat_discord_bot_worker", {
         p_worker_id: config.workerId,
         p_guild_id: guild.id,
         p_guild_name: guild.name,
@@ -308,7 +333,8 @@ export function startWorkerHeartbeat(client, supabase, config) {
         p_member_count: guild.memberCount || guild.members.cache.size,
         p_online_count: onlineCount,
         p_roles: cachedRoles,
-        p_version: "2.0.0",
+        p_channels: cachedChannels,
+        p_version: "3.0.0",
         p_last_error: null,
       });
     } catch (error) {

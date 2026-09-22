@@ -15,6 +15,7 @@
 - [x] **UM ÚNICO BOT DISCORD CRAZZY PROJECT**: um token, um processo/worker na Discloud e módulos internos. Não hospedar vários bots separados.
 - [ ] Migrar para esse bot único todos os sistemas Discord existentes e futuros:
   - [x] Campanhas/DM
+  - [x] Server Builder SAFE MODE
   - [ ] Discord Bridge de cargos/entitlements
   - [ ] Notificações do site
   - [ ] Tickets/suporte
@@ -22,11 +23,14 @@
   - [ ] Slash commands administrativos
   - [ ] Outras automações Discord futuras
 - [x] Os comandos antigos de divulgação devem continuar disponíveis, mas usando a mesma base/fila do site.
+- [x] **Server Builder unificado no mesmo bot/token**: /preview-tema + /montar-servidor, editor no site, fila, diff, histórico e SAFE MODE append-only.
+- [x] **SAFE MODE reforçado**: não apagar, renomear, mover, reposicionar ou alterar permissões de recursos existentes; criar somente o que estiver faltando.
+- [x] **Painel Bot Core** em /admin/discord: saúde do worker, módulos, estrutura do servidor e execução do builder.
 - [x] Mesmo bot, mesma guild, mesmo Supabase e **mesmo token Discord** para todos os módulos.
 - [x] Token Discord e Supabase service-role **somente na Discloud/server**, nunca no navegador.
 
 
-Última atualização: 2026-09-21
+Última atualização: 2026-09-22
 
 ## ✅ INTEGRADO
 

@@ -21,6 +21,8 @@ for (const table of [
   "discord_campaigns",
   "discord_campaign_deliveries",
   "discord_campaign_worker_status",
+  "discord_builder_configs",
+  "discord_builder_jobs",
 ]) {
   const response = await req("/" + table + "?select=*&limit=1");
   if (response.ok) {
@@ -60,6 +62,23 @@ for (const [name, body] of [
     p_failed: 0,
     p_skipped: 0,
   }],
+  ["queue_discord_builder_job", { p_guild_id: null }],
+  ["cancel_discord_builder_job", { p_job_id: zero }],
+  ["claim_discord_builder_job", { p_worker_id: "anon" }],
+  ["heartbeat_discord_bot_worker", {
+    p_worker_id: "anon",
+    p_guild_id: null,
+    p_guild_name: null,
+    p_bot_user_id: null,
+    p_bot_tag: null,
+    p_connected: false,
+    p_member_count: 0,
+    p_online_count: 0,
+    p_roles: [],
+    p_channels: [],
+    p_version: "anon",
+    p_last_error: null,
+  }],
 ]) {
   const response = await req("/rpc/" + name, {
     method: "POST",
@@ -78,6 +97,8 @@ for (const file of [
   "src/modules/discord-campaigns/DiscordCampaignCenterPage.tsx",
   "src/modules/discord-campaigns/DiscordEmbedPreview.tsx",
   "src/modules/community/CommunityVoiceDock.tsx",
+  "src/app/api/admin/discord-bot/route.ts",
+  "src/modules/discord-bot-core/DiscordBotCorePage.tsx",
 ]) {
   const content = await readFile(file, "utf8");
   for (const secret of [
@@ -105,7 +126,7 @@ for (const required of [
   "claim_discord_campaign",
   "update_discord_campaign_progress",
   "finish_discord_campaign",
-  "heartbeat_discord_campaign_worker",
+  "heartbeat_discord_bot_worker",
 ]) {
   if (!campaignWorker.includes(required)) {
     throw new Error("Unified campaign worker missing " + required);
@@ -115,6 +136,39 @@ if (campaignWorker.includes("templates.json")) {
   throw new Error("Unified bot must not use templates.json as source of truth");
 }
 console.log("[PASS] campaigns use Supabase queue/state instead of local templates.json");
+
+const builderWorker = await readFile("apps/discord-bot/src/modules/server-builder.js", "utf8");
+for (const required of [
+  "claim_discord_builder_job",
+  "finish_discord_builder_job",
+  "SAFE_MODE_REQUIRED",
+  "append_only",
+]) {
+  if (!builderWorker.includes(required)) {
+    throw new Error("Unified Server Builder missing " + required);
+  }
+}
+for (const forbidden of [
+  ".delete(",
+  ".setParent(",
+  ".setPosition(",
+  "bulkDelete(",
+]) {
+  if (builderWorker.includes(forbidden)) {
+    throw new Error("Server Builder SAFE MODE contains destructive mutation: " + forbidden);
+  }
+}
+console.log("[PASS] Server Builder is inside the same Bot Core and remains append-only");
+
+const botIndex = await readFile("apps/discord-bot/src/index.js", "utf8");
+const loginCount = (botIndex.match(/client\.login\(/g) || []).length;
+if (loginCount !== 1) {
+  throw new Error("Bot Core must have exactly one Discord Gateway login, found " + loginCount);
+}
+if (!botIndex.includes("startCampaignWorker") || !botIndex.includes("startBuilderWorker")) {
+  throw new Error("Single Bot Core must start both Campaigns and Server Builder modules");
+}
+console.log("[PASS] one Gateway login runs multiple Discord modules");
 
 const preview = await readFile("src/modules/discord-campaigns/DiscordEmbedPreview.tsx", "utf8");
 for (const feature of [

@@ -33,6 +33,7 @@
 @import "../modules/sales-manager/styles.css";
 @import "../modules/call/styles.css";
 @import "../modules/discord-campaigns/styles.css";
+@import "../modules/discord-bot-core/styles.css";
 @import "../core/design-system/styles/card-surfaces.css";
 
 :root {

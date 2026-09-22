@@ -1,0 +1,382 @@
+.crz-discord-core {
+  min-height:100vh;
+  padding:92px 0 48px;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(0,101,255,.12),transparent 35%),
+    linear-gradient(180deg,#020711,#01050b);
+  color:#eaf4ff;
+}
+.crz-discord-core__container { max-width:1660px; }
+.crz-discord-core-state {
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:10px;
+  text-align:center;
+  background:#020711;
+  color:#7a8fa6;
+}
+.crz-discord-core-state strong { color:#edf6ff; }
+
+.crz-discord-core-status {
+  min-width:180px;
+  border:1px solid var(--crz-card-border);
+  border-radius:10px;
+  padding:7px 9px;
+  display:grid;
+  grid-template-columns:9px 1fr;
+  gap:7px;
+  align-items:center;
+  background:var(--crz-gradient-card);
+  box-shadow:var(--crz-card-shadow);
+}
+.crz-discord-core-status i {
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5c77;
+  box-shadow:0 0 8px rgba(255,70,101,.45);
+}
+.crz-discord-core-status i.is-online {
+  background:#2ee895;
+  box-shadow:0 0 8px rgba(46,232,149,.48);
+}
+.crz-discord-core-status > div { display:grid;gap:2px; }
+.crz-discord-core-status strong { color:#edf6ff;font-size:6.8px; }
+.crz-discord-core-status small { color:#667b92;font-size:5.5px; }
+
+.crz-discord-core-notice {
+  margin-bottom:9px;
+  border:1px solid rgba(49,145,255,.24);
+  border-radius:9px;
+  padding:9px 11px;
+  color:#9ed6ff;
+  background:var(--crz-gradient-card-soft);
+  font-size:6.8px;
+}
+
+.crz-discord-core-stats {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:10px;
+}
+.crz-discord-core-stats article {
+  min-height:82px;
+  border:1px solid var(--crz-card-border);
+  border-radius:10px;
+  padding:10px;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:2px;
+  background:var(--crz-gradient-card);
+  box-shadow:var(--crz-card-shadow);
+}
+.crz-discord-core-stats small {
+  color:#20adff;font-size:5.5px;font-weight:900;letter-spacing:.1em;
+}
+.crz-discord-core-stats strong {
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#eff7ff;
+  font-family:var(--crz-font-display);
+  font-size:15px;
+}
+.crz-discord-core-stats span {
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#697e95;font-size:5.6px;
+}
+
+.crz-discord-core-modules {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:10px;
+}
+.crz-discord-core-modules > * {
+  min-height:86px;
+  border:1px solid var(--crz-card-border);
+  border-radius:10px;
+  padding:10px;
+  display:grid;
+  grid-template-columns:34px 1fr auto;
+  gap:8px;
+  align-items:center;
+  color:#8195ac;
+  background:var(--crz-gradient-card);
+  box-shadow:var(--crz-card-shadow);
+  text-decoration:none;
+}
+.crz-discord-core-modules > *.is-active,
+.crz-discord-core-modules > a:hover {
+  border-color:var(--crz-card-border-hover);
+}
+.crz-discord-core-modules b {
+  width:33px;height:33px;border-radius:9px;
+  display:grid;place-items:center;
+  background:rgba(0,100,230,.13);
+  font-size:15px;
+}
+.crz-discord-core-modules > * > div { min-width:0;display:grid;gap:2px; }
+.crz-discord-core-modules small {
+  color:#20adff;font-size:5px;font-weight:900;letter-spacing:.08em;
+}
+.crz-discord-core-modules strong { color:#e3eef9;font-size:7.5px; }
+.crz-discord-core-modules span {
+  color:#667b91;font-size:5.5px;line-height:1.35;
+}
+.crz-discord-core-modules em {
+  color:#56bbff;font-size:5.3px;font-style:normal;font-weight:800;
+}
+
+.crz-discord-builder-layout {
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(360px,.65fr);
+  gap:10px;
+  align-items:start;
+}
+.crz-discord-builder-editor,
+.crz-discord-builder-preview,
+.crz-discord-builder-history {
+  border:1px solid var(--crz-card-border);
+  border-radius:12px;
+  background:var(--crz-gradient-card);
+  box-shadow:var(--crz-card-shadow);
+}
+.crz-discord-builder-editor { padding:12px; }
+.crz-discord-builder-preview {
+  position:sticky;
+  top:82px;
+  padding:12px;
+}
+.crz-discord-builder-editor > header,
+.crz-discord-builder-preview > header,
+.crz-discord-builder-history > header {
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.crz-discord-builder-editor > header > div,
+.crz-discord-builder-preview > header > div,
+.crz-discord-builder-history > header > div { display:grid;gap:2px; }
+.crz-discord-builder-editor header small,
+.crz-discord-builder-preview header small,
+.crz-discord-builder-history header small {
+  color:#20adff;font-size:5.5px;font-weight:900;letter-spacing:.1em;
+}
+.crz-discord-builder-editor header strong,
+.crz-discord-builder-preview header strong,
+.crz-discord-builder-history header strong {
+  color:#e9f3ff;font-size:9px;
+}
+
+.crz-discord-builder-theme {
+  margin-top:10px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+}
+.crz-discord-builder-theme label {
+  min-height:50px;
+  border:1px solid rgba(73,128,201,.13);
+  border-radius:8px;
+  padding:6px;
+  display:grid;
+  gap:4px;
+  background:var(--crz-gradient-card-soft);
+}
+.crz-discord-builder-theme label.is-wide { grid-column:1/-1; }
+.crz-discord-builder-theme span { color:#6c8198;font-size:5.5px; }
+.crz-discord-builder-theme input {
+  width:100%;
+  min-height:29px;
+  border:1px solid rgba(73,128,201,.16);
+  border-radius:6px;
+  padding:4px 6px;
+  color:#dce9f7;
+  background:#07111c;
+  outline:0;
+  font-size:6.3px;
+}
+.crz-discord-builder-theme input[type=color] { padding:2px; }
+
+.crz-discord-builder-categories {
+  margin-top:9px;
+  display:grid;
+  gap:7px;
+}
+.crz-discord-builder-categories > article {
+  border:1px solid rgba(72,128,202,.14);
+  border-radius:9px;
+  overflow:hidden;
+  background:var(--crz-gradient-card-soft);
+}
+.crz-discord-builder-categories > article > header {
+  min-height:41px;
+  padding:5px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  gap:5px;
+  align-items:center;
+  border-bottom:1px solid rgba(72,128,202,.1);
+}
+.crz-discord-builder-categories input {
+  min-width:0;
+  min-height:31px;
+  border:1px solid rgba(73,128,201,.15);
+  border-radius:6px;
+  padding:0 7px;
+  color:#deebf8;
+  background:#06101b;
+  outline:0;
+  font-size:6.4px;
+}
+.crz-discord-builder-categories button,
+.crz-discord-builder-editor-actions button,
+.crz-discord-builder-history button {
+  min-height:30px;
+  border:1px solid rgba(54,144,255,.22);
+  border-radius:6px;
+  padding:0 8px;
+  color:#86ceff;
+  background:rgba(0,88,196,.09);
+  font-size:5.7px;
+  cursor:pointer;
+}
+.crz-discord-builder-categories button.is-danger,
+.crz-discord-builder-history button.is-danger {
+  color:#ff8fa3;border-color:rgba(255,77,110,.22);background:rgba(110,17,39,.11);
+}
+.crz-discord-builder-categories > article > div {
+  padding:6px;
+  display:grid;
+  gap:4px;
+}
+.crz-discord-builder-categories p {
+  margin:3px;color:#657991;font-size:5.6px;
+}
+.crz-discord-builder-channel {
+  display:grid;
+  grid-template-columns:20px minmax(0,1fr) 110px auto;
+  gap:5px;
+  align-items:center;
+}
+.crz-discord-builder-channel > span {
+  width:20px;height:29px;border-radius:6px;
+  display:grid;place-items:center;
+  color:#4dafff;background:rgba(0,99,224,.12);
+  font-size:8px;font-weight:900;
+}
+.crz-discord-builder-channel button.is-on {
+  color:#ffd171;border-color:rgba(255,194,57,.22);background:rgba(103,69,10,.1);
+}
+
+.crz-discord-builder-editor-actions {
+  margin-top:9px;
+  display:flex;
+  justify-content:flex-end;
+  gap:6px;
+}
+.crz-discord-builder-editor-actions button:last-child {
+  color:white;border-color:#1687ff;background:linear-gradient(180deg,#126eff,#0755dd);
+}
+
+.crz-discord-builder-tree {
+  margin-top:10px;
+  max-height:520px;
+  overflow:auto;
+  display:grid;
+  gap:6px;
+}
+.crz-discord-builder-tree section {
+  border:1px solid rgba(71,128,202,.13);
+  border-radius:8px;
+  padding:7px;
+  display:grid;
+  gap:4px;
+  background:var(--crz-gradient-card-soft);
+}
+.crz-discord-builder-tree section > strong {
+  color:#8ed5ff;font-size:6.6px;
+}
+.crz-discord-builder-tree section > span {
+  padding-left:11px;
+  color:#73879e;
+  font-size:5.7px;
+}
+.crz-discord-builder-tree .is-missing {
+  color:#ffd16b;
+  border-color:rgba(255,192,48,.19);
+}
+.crz-discord-builder-safety {
+  margin:9px 0;
+  border:1px solid rgba(45,216,143,.18);
+  border-radius:8px;
+  padding:8px;
+  display:grid;
+  gap:3px;
+  background:rgba(15,99,65,.08);
+}
+.crz-discord-builder-safety strong { color:#55e7a5;font-size:6.3px; }
+.crz-discord-builder-safety span { color:#6f8c80;font-size:5.5px;line-height:1.35; }
+.crz-discord-builder-preview > .crz-button { width:100%; }
+
+.crz-discord-builder-history {
+  margin-top:10px;
+  padding:10px;
+}
+.crz-discord-builder-history__table { margin-top:8px;overflow:auto; }
+.crz-discord-builder-history__head,
+.crz-discord-builder-history__table article {
+  min-width:900px;
+  display:grid;
+  grid-template-columns:.8fr 1.15fr .65fr .75fr 1fr 1fr .6fr;
+  gap:8px;
+  align-items:center;
+}
+.crz-discord-builder-history__head {
+  min-height:31px;padding:0 7px;color:#647a91;font-size:5.3px;font-weight:900;letter-spacing:.07em;
+}
+.crz-discord-builder-history__table article {
+  min-height:54px;
+  border-top:1px solid rgba(72,128,198,.1);
+  padding:7px;
+  color:#7f93aa;
+  font-size:5.9px;
+}
+.crz-discord-builder-history__table article > span { min-width:0;display:grid;gap:2px; }
+.crz-discord-builder-history__table strong { color:#dce8f5;font-size:6.2px; }
+.crz-discord-builder-history__table small { color:#61768d;font-size:5.1px; }
+.crz-discord-builder-empty { min-height:90px;display:grid;place-items:center;color:#667a91;font-size:6px; }
+
+html[data-theme="light"] .crz-discord-core { background:#eef4fb;color:#102033; }
+html[data-theme="light"] .crz-discord-builder-theme input,
+html[data-theme="light"] .crz-discord-builder-categories input { background:#fff;color:#102033; }
+
+@media(max-width:1180px) {
+  .crz-discord-core-modules { grid-template-columns:1fr 1fr; }
+  .crz-discord-builder-layout { grid-template-columns:1fr; }
+  .crz-discord-builder-preview { position:static; }
+}
+@media(max-width:850px) {
+  .crz-discord-core-stats { grid-template-columns:1fr 1fr; }
+  .crz-discord-builder-theme { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:620px) {
+  .crz-discord-core { padding-top:80px; }
+  .crz-discord-core-stats,
+  .crz-discord-core-modules,
+  .crz-discord-builder-theme { grid-template-columns:1fr; }
+  .crz-discord-builder-theme label.is-wide { grid-column:auto; }
+  .crz-discord-builder-categories > article > header {
+    grid-template-columns:1fr auto;
+  }
+  .crz-discord-builder-categories > article > header input { grid-column:1/-1; }
+  .crz-discord-builder-channel {
+    grid-template-columns:20px 1fr auto;
+  }
+  .crz-discord-builder-channel button:not(.is-danger) { grid-column:2/4; }
+}
