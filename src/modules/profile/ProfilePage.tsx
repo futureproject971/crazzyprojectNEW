@@ -66,7 +66,7 @@ export function ProfilePage() {
       });
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(payload?.error || "Não foi possível carregar o perfil.");
+        throw new Error(payload?.error || "Teu perfil não abriu agora.");
       }
 
       const next = payload as ProfileSnapshot;
@@ -80,7 +80,7 @@ export function ProfilePage() {
       setState("ready");
     } catch (loadError) {
       setError(
-        loadError instanceof Error ? loadError.message : "Falha ao carregar perfil."
+        loadError instanceof Error ? loadError.message : "O perfil deu uma engasgada."
       );
       setState("error");
     }
@@ -122,7 +122,7 @@ export function ProfilePage() {
           INVALID_PRIMARY_COLOR: "Escolha uma cor hexadecimal válida.",
           INVALID_AVATAR_SOURCE: "Fonte de avatar inválida.",
         };
-        throw new Error(messages[payload?.error] || payload?.error || "Falha ao salvar.");
+        throw new Error(messages[payload?.error] || payload?.error || "Não deu pra salvar agora.");
       }
 
       setSnapshot((current) => {
@@ -149,7 +149,7 @@ export function ProfilePage() {
       await refreshAuth();
       setEditing(false);
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : "Falha ao salvar.");
+      setError(saveError instanceof Error ? saveError.message : "Não deu pra salvar agora.");
     } finally {
       setSaving(false);
     }
@@ -168,7 +168,7 @@ export function ProfilePage() {
       setError(
         syncError instanceof Error
           ? syncError.message
-          : "Não foi possível abrir o Discord."
+          : "O Discord não abriu agora."
       );
       setDiscordBusy(false);
     }
@@ -177,7 +177,7 @@ export function ProfilePage() {
   if (state === "loading") {
     return (
       <main className="crz-profile-page crz-profile-state">
-        <LoadingState label="Montando seu perfil CRAZZY..." />
+        <LoadingState label="Montando teu cartão CRAZZY..." />
       </main>
     );
   }
@@ -186,8 +186,8 @@ export function ProfilePage() {
     return (
       <main className="crz-profile-page crz-profile-state">
         <ErrorState
-          title="Seu perfil não carregou"
-          description={error || "Tente novamente."}
+          title="Teu perfil não entrou no mapa"
+          description={error || "Mete outra tentativa."}
           onRetry={() => void load()}
         />
       </main>
@@ -220,7 +220,7 @@ export function ProfilePage() {
                 ) : (
                   <NeonIcon name="verified" size={48} />
                 )}
-                <span className="crz-profile-card__status" title="Conta ativa" />
+                <span className="crz-profile-card__status" title="Conta no jogo" />
               </div>
 
               <div className="crz-profile-card__actions">
@@ -238,7 +238,7 @@ export function ProfilePage() {
                     setEditing((value) => !value);
                   }}
                 >
-                  {editing ? "Cancelar" : "Editar perfil"}
+                  {editing ? "Cancelar" : "Dar um tapa no perfil"}
                 </Button>
               </div>
             </div>
@@ -259,20 +259,20 @@ export function ProfilePage() {
               </div>
 
               <div className="crz-profile-about">
-                <strong>SOBRE MIM</strong>
+                <strong>QUAL É A TUA</strong>
                 <p>
                   {(editing ? form.bio : snapshot.preferences.bio) ||
-                    "Esse usuário ainda não escreveu uma bio."}
+                    "Ainda não mandou a visão por aqui."}
                 </p>
               </div>
 
               <div className="crz-profile-member">
-                <strong>MEMBRO DESDE</strong>
+                <strong>NO BONDE DESDE</strong>
                 <span>{date(snapshot.account.createdAt)}</span>
               </div>
 
               <div className="crz-profile-app-roles">
-                <strong>ROLES CRAZZY</strong>
+                <strong>CARGOS DO BONDE</strong>
                 <div>
                   {snapshot.appRoles.map((role) => (
                     <span key={role}>{role.toUpperCase()}</span>
@@ -287,14 +287,14 @@ export function ProfilePage() {
               <Panel className="crz-profile-editor">
                 <header>
                   <div>
-                    <small>PERSONALIZAÇÃO</small>
-                    <h2>Editar perfil</h2>
+                    <small>DEIXA COM TUA CARA</small>
+                    <h2>Dar um tapa no perfil</h2>
                   </div>
                   <NeonIcon name="verified" size={24} />
                 </header>
 
                 <label>
-                  <span>Nome de exibição</span>
+                  <span>Nome que vai brilhar</span>
                   <input
                     value={form.displayName || ""}
                     maxLength={32}
@@ -315,7 +315,7 @@ export function ProfilePage() {
                     value={form.bio || ""}
                     maxLength={280}
                     rows={5}
-                    placeholder="Fale um pouco sobre você..."
+                    placeholder="Manda a visão sobre ti..."
                     onChange={(event) =>
                       setForm((current) => ({
                         ...current,
@@ -327,7 +327,7 @@ export function ProfilePage() {
                 </label>
 
                 <div className="crz-profile-color-field">
-                  <span>Cor principal</span>
+                  <span>Tua cor</span>
                   <div className="crz-profile-color-row">
                     <input
                       type="color"
@@ -346,7 +346,7 @@ export function ProfilePage() {
                       <button
                         key={color}
                         type="button"
-                        aria-label={"Usar cor " + color}
+                        aria-label={"USAR ESSA " + color}
                         className={form.primaryColor === color ? "is-active" : ""}
                         style={{ background: color }}
                         onClick={() =>
@@ -371,11 +371,11 @@ export function ProfilePage() {
                       }))
                     }
                   >
-                    <option value="auto">Automático</option>
-                    <option value="crazzy">Conta CRAZZY</option>
+                    <option value="auto">NO AUTOMÁTICO</option>
+                    <option value="crazzy">Conta do QG</option>
                     <option value="discord">Discord</option>
                   </select>
-                  <small>O fallback é automático quando uma fonte não possui avatar.</small>
+                  <small>Se faltar avatar numa fonte, o site se vira sozinho.</small>
                 </label>
 
                 <Button
@@ -383,7 +383,7 @@ export function ProfilePage() {
                   onClick={() => void save()}
                   leadingIcon={<NeonIcon name="verified" size={18} />}
                 >
-                  {saving ? "Salvando..." : "Salvar perfil"}
+                  {saving ? "GUARDANDO..." : "SALVAR E BRILHAR"}
                 </Button>
               </Panel>
             ) : (
@@ -426,17 +426,17 @@ export function ProfilePage() {
                       <em>
                         {snapshot.rank.next
                           ? new Intl.NumberFormat("pt-BR").format(snapshot.rank.next.pointsNeeded) + " XP para " + snapshot.rank.next.label
-                          : "Rank máximo alcançado"}
+                          : "Tu bateu no teto"}
                       </em>
                     </div>
-                    <a href="/club/rank">Ver rank →</a>
+                    <a href="/club/rank">VER MEU RANK →</a>
                   </Panel>
                 )}
 
                 <Panel className="crz-profile-panel">
                   <header>
                     <div>
-                      <small>CONEXÃO</small>
+                      <small>CONEXÕES</small>
                       <h2>Discord</h2>
                     </div>
                     <Badge
@@ -452,7 +452,7 @@ export function ProfilePage() {
                         ? snapshot.discord.guildMember
                           ? "VERIFICADO"
                           : "CONECTADO"
-                        : "NÃO CONECTADO"}
+                        : "FORA DO SQUAD"}
                     </Badge>
                   </header>
 
@@ -468,12 +468,12 @@ export function ProfilePage() {
                       <strong>
                         {snapshot.discord.globalName ||
                           snapshot.discord.username ||
-                          "Discord não conectado"}
+                          "Discord fora do squad"}
                       </strong>
                       <span>
                         {snapshot.discord.username
                           ? "@" + snapshot.discord.username
-                          : "Conecte para sincronizar identidade e cargos."}
+                          : "Conecta e puxa tua identidade + cargos pra cá."}
                       </span>
                       {snapshot.discord.lastCheckedAt && (
                         <small>
@@ -490,17 +490,17 @@ export function ProfilePage() {
                     leadingIcon={<NeonIcon name="community" size={18} />}
                   >
                     {discordBusy
-                      ? "Abrindo Discord..."
+                      ? "Chamando o Discord..."
                       : snapshot.discord.connected
-                        ? "Atualizar Discord"
-                        : "Conectar Discord"}
+                        ? "PUXAR DISCORD DE NOVO"
+                        : "CONECTAR DISCORD"}
                   </Button>
                 </Panel>
 
                 <Panel className="crz-profile-panel">
                   <header>
                     <div>
-                      <small>BENEFÍCIOS</small>
+                      <small>O QUE TÁ LIBERADO</small>
                       <h2>Cargos Discord</h2>
                     </div>
                     <Badge tone="blue">{snapshot.discordRoles.length}</Badge>
@@ -509,7 +509,7 @@ export function ProfilePage() {
                   {!snapshot.discordRoles.length ? (
                     <div className="crz-profile-empty-roles">
                       <NeonIcon name="community" size={31} />
-                      <span>Nenhum cargo de produto registrado ainda.</span>
+                      <span>Ainda não tem cargo de produto no teu nome.</span>
                     </div>
                   ) : (
                     <div className="crz-profile-role-list">
