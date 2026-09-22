@@ -103,3 +103,7 @@ jobs:
       - name: Test M24 Control Center
         if: github.ref_name == 'm24-control-center-work'
         run: node scripts/test-m24-control-center.mjs
+
+      - name: Test M25 Product Manager
+        if: github.ref_name == 'm25-product-manager' || github.head_ref == 'm25-product-manager'
+        run: node scripts/test-m25-product-manager.mjs
