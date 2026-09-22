@@ -75,6 +75,57 @@ function inferProviderKind(providerId: string, event?: string): ProviderKind {
   return "card";
 }
 
+function providerKindFromPayment(payment: any): ProviderKind {
+  const method = String(payment?.payment_method || "").toLowerCase();
+  if (method === "card") return "card";
+  if (method === "crypto") return "payment";
+  if (method === "pix") return "charge";
+  return inferProviderKind(String(payment?.charge_id || ""));
+}
+
+async function recordPaymentEvent(
+  supabaseAdmin: any,
+  args: {
+    paymentId: string;
+    providerRef?: string | null;
+    source: "checkout" | "webhook" | "reconcile" | "provider" | "admin" | "system";
+    eventType: string;
+    severity?: "info" | "warn" | "error" | "critical";
+    statusBefore?: string | null;
+    statusAfter?: string | null;
+    providerStatus?: string | null;
+    amountCents?: number | null;
+    httpStatus?: number | null;
+    detail?: Record<string, unknown>;
+  },
+) {
+  const { error } = await supabaseAdmin
+    .from("payment_events")
+    .insert({
+      payment_id: args.paymentId,
+      provider_ref: args.providerRef || null,
+      source: args.source,
+      event_type: args.eventType,
+      severity: args.severity || "info",
+      status_before: args.statusBefore || null,
+      status_after: args.statusAfter || null,
+      provider_status: args.providerStatus || null,
+      amount_cents:
+        Number.isFinite(Number(args.amountCents)) && Number(args.amountCents) >= 0
+          ? Math.round(Number(args.amountCents))
+          : null,
+      http_status:
+        Number.isFinite(Number(args.httpStatus)) && Number(args.httpStatus) >= 100
+          ? Math.round(Number(args.httpStatus))
+          : null,
+      detail: args.detail || {},
+    });
+
+  if (error) {
+    console.warn("[purincash] payment event write failed", args.eventType, error.message);
+  }
+}
+
 function orderIdFromMetadata(payload: any): string {
   const raw = payload?.metadata;
   if (!raw) return "";
@@ -447,6 +498,303 @@ Deno.serve(async (req) => {
   const { data: userData, error: userError } = await supabaseUser.auth.getUser(token);
   if (userError || !userData.user) return json({ error: "Unauthorized" }, 401);
   const userId = userData.user.id;
+
+  if (action === "admin-reconcile" && req.method === "POST") {
+    const { data: isAdmin, error: adminError } = await supabaseUser.rpc("is_current_admin");
+    if (adminError || isAdmin !== true) return json({ error: "Forbidden" }, 403);
+    if (!PURINCASH_API_KEY) return json({ error: "PURINCASH_API_KEY not configured" }, 500);
+    if (!CHECKOUT_SIGNING_SECRET) return json({ error: "Checkout signing secret not configured" }, 500);
+
+    const body = await req.json().catch(() => ({}));
+    const paymentId = String(body?.payment_id || "").trim();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(paymentId)) {
+      return json({ error: "payment_id inválido" }, 400);
+    }
+
+    const { data: payment, error: paymentError } = await supabaseAdmin
+      .from("payments")
+      .select("*")
+      .eq("id", paymentId)
+      .maybeSingle();
+
+    if (paymentError || !payment) return json({ error: "Pagamento não encontrado" }, 404);
+
+    const { data: reconcileRequest } = await supabaseAdmin
+      .from("payment_reconcile_requests")
+      .select("id,status,status_before")
+      .eq("payment_id", paymentId)
+      .in("status", ["queued", "running"])
+      .order("requested_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (reconcileRequest?.id && reconcileRequest.status === "queued") {
+      await supabaseAdmin
+        .from("payment_reconcile_requests")
+        .update({
+          status: "running",
+          started_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          status_before: reconcileRequest.status_before || payment.status,
+        })
+        .eq("id", reconcileRequest.id)
+        .eq("status", "queued");
+    }
+
+    const finishReconcile = async (
+      status: "completed" | "failed",
+      values: {
+        providerStatus?: string | null;
+        statusAfter?: string | null;
+        errorCode?: string | null;
+      },
+    ) => {
+      if (!reconcileRequest?.id) return;
+      await supabaseAdmin
+        .from("payment_reconcile_requests")
+        .update({
+          status,
+          provider_status: values.providerStatus || null,
+          status_before: reconcileRequest.status_before || payment.status,
+          status_after: values.statusAfter || payment.status,
+          last_error_code: values.errorCode || null,
+          finished_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", reconcileRequest.id);
+    };
+
+    if (!payment.charge_id) {
+      await finishReconcile("failed", {
+        statusAfter: payment.status,
+        errorCode: "PROVIDER_REFERENCE_MISSING",
+      });
+      await recordPaymentEvent(supabaseAdmin, {
+        paymentId,
+        source: "reconcile",
+        eventType: "reconcile.failed",
+        severity: "error",
+        statusBefore: payment.status,
+        statusAfter: payment.status,
+        detail: {
+          request_id: reconcileRequest?.id || null,
+          error_code: "PROVIDER_REFERENCE_MISSING",
+        },
+      });
+      return json({ error: "Pagamento sem referência do gateway" }, 409);
+    }
+
+    const providerKind = providerKindFromPayment(payment);
+    const { response: providerResponse, body: providerData } =
+      await fetchProviderPayment(PURINCASH_API_KEY, payment.charge_id, providerKind);
+
+    const providerStatusRaw = String(providerData?.status || "");
+    const providerStatus = normalizeProviderStatus(providerStatusRaw);
+    const providerAmount = providerAmountCents(providerData, providerKind);
+    const expectedAmount = Math.round(Number(payment.amount));
+
+    if (!providerResponse.ok) {
+      const errorCode = "PROVIDER_HTTP_" + providerResponse.status;
+      await finishReconcile("failed", {
+        providerStatus: providerStatusRaw || null,
+        statusAfter: payment.status,
+        errorCode,
+      });
+      await recordPaymentEvent(supabaseAdmin, {
+        paymentId,
+        providerRef: payment.charge_id,
+        source: "reconcile",
+        eventType: "reconcile.provider_error",
+        severity: "error",
+        statusBefore: payment.status,
+        statusAfter: payment.status,
+        providerStatus: providerStatusRaw || null,
+        httpStatus: providerResponse.status,
+        detail: {
+          request_id: reconcileRequest?.id || null,
+          provider_kind: providerKind,
+          error_code: errorCode,
+        },
+      });
+      return json({ error: "Gateway indisponível para reconciliação" }, 502);
+    }
+
+    if (
+      providerAmount !== null &&
+      Number.isFinite(expectedAmount) &&
+      providerAmount !== expectedAmount
+    ) {
+      await finishReconcile("failed", {
+        providerStatus: providerStatusRaw || providerStatus,
+        statusAfter: payment.status,
+        errorCode: "AMOUNT_MISMATCH",
+      });
+      await recordPaymentEvent(supabaseAdmin, {
+        paymentId,
+        providerRef: payment.charge_id,
+        source: "reconcile",
+        eventType: "reconcile.amount_mismatch",
+        severity: "critical",
+        statusBefore: payment.status,
+        statusAfter: payment.status,
+        providerStatus: providerStatusRaw || providerStatus,
+        amountCents: providerAmount,
+        httpStatus: providerResponse.status,
+        detail: {
+          request_id: reconcileRequest?.id || null,
+          provider_kind: providerKind,
+          expected_amount_cents: expectedAmount,
+        },
+      });
+      return json({ error: "Valor do gateway diverge do pedido" }, 409);
+    }
+
+    let internalStatus = String(payment.status || "ACTIVE");
+    let fulfilled = false;
+    let alreadyClaimed = false;
+
+    if (providerStatus === "COMPLETED") {
+      if (internalStatus === "COMPLETED") {
+        // Already reconciled.
+      } else if (["ACTIVE", "EXPIRED", "FULFILLING"].includes(internalStatus)) {
+        const fulfillment = await claimAndFulfill(
+          supabaseAdmin,
+          payment,
+          providerData,
+          providerKind,
+          CHECKOUT_SIGNING_SECRET,
+        );
+
+        if (!fulfillment.ok) {
+          const errorCode = "FULFILLMENT_RECONCILE_FAILED";
+          await finishReconcile("failed", {
+            providerStatus: providerStatusRaw || providerStatus,
+            statusAfter: internalStatus,
+            errorCode,
+          });
+          await recordPaymentEvent(supabaseAdmin, {
+            paymentId,
+            providerRef: payment.charge_id,
+            source: "reconcile",
+            eventType: "reconcile.fulfillment_failed",
+            severity: "error",
+            statusBefore: payment.status,
+            statusAfter: internalStatus,
+            providerStatus: providerStatusRaw || providerStatus,
+            amountCents: providerAmount,
+            httpStatus: providerResponse.status,
+            detail: {
+              request_id: reconcileRequest?.id || null,
+              provider_kind: providerKind,
+              error_code: errorCode,
+            },
+          });
+          return json({ error: fulfillment.error || "Falha no fulfillment" }, fulfillment.status || 409);
+        }
+
+        alreadyClaimed = fulfillment.alreadyClaimed === true;
+        fulfilled = !alreadyClaimed;
+
+        const { data: currentPayment } = await supabaseAdmin
+          .from("payments")
+          .select("status")
+          .eq("id", paymentId)
+          .maybeSingle();
+        internalStatus = String(currentPayment?.status || internalStatus);
+      } else {
+        const errorCode = "PAID_UNSAFE_INTERNAL_STATUS";
+        await finishReconcile("failed", {
+          providerStatus: providerStatusRaw || providerStatus,
+          statusAfter: internalStatus,
+          errorCode,
+        });
+        await recordPaymentEvent(supabaseAdmin, {
+          paymentId,
+          providerRef: payment.charge_id,
+          source: "reconcile",
+          eventType: "reconcile.manual_review_required",
+          severity: "critical",
+          statusBefore: payment.status,
+          statusAfter: internalStatus,
+          providerStatus: providerStatusRaw || providerStatus,
+          amountCents: providerAmount,
+          httpStatus: providerResponse.status,
+          detail: {
+            request_id: reconcileRequest?.id || null,
+            provider_kind: providerKind,
+            error_code: errorCode,
+          },
+        });
+        return json({
+          error: "Gateway confirma pagamento, mas o status interno exige revisão manual",
+          providerStatus,
+          internalStatus,
+        }, 409);
+      }
+    } else if (["EXPIRED", "FAILED", "CANCELLED"].includes(providerStatus)) {
+      if (!["COMPLETED", "FULFILLING"].includes(internalStatus)) {
+        const { data: updated } = await supabaseAdmin
+          .from("payments")
+          .update({
+            status: providerStatus,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", paymentId)
+          .neq("status", "COMPLETED")
+          .neq("status", "FULFILLING")
+          .select("status")
+          .maybeSingle();
+        internalStatus = String(updated?.status || internalStatus);
+      }
+    } else if (providerStatus === "ACTIVE" && internalStatus === "EXPIRED") {
+      const { data: updated } = await supabaseAdmin
+        .from("payments")
+        .update({
+          status: "ACTIVE",
+          expires_at: providerData?.expiresAt || payment.expires_at || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", paymentId)
+        .eq("status", "EXPIRED")
+        .select("status")
+        .maybeSingle();
+      internalStatus = String(updated?.status || internalStatus);
+    }
+
+    await finishReconcile("completed", {
+      providerStatus: providerStatusRaw || providerStatus,
+      statusAfter: internalStatus,
+      errorCode: null,
+    });
+
+    await recordPaymentEvent(supabaseAdmin, {
+      paymentId,
+      providerRef: payment.charge_id,
+      source: "reconcile",
+      eventType: "reconcile.completed",
+      severity: "info",
+      statusBefore: payment.status,
+      statusAfter: internalStatus,
+      providerStatus: providerStatusRaw || providerStatus,
+      amountCents: providerAmount,
+      httpStatus: providerResponse.status,
+      detail: {
+        request_id: reconcileRequest?.id || null,
+        provider_kind: providerKind,
+        fulfilled,
+        already_claimed: alreadyClaimed,
+      },
+    });
+
+    return json({
+      success: true,
+      payment_id: paymentId,
+      providerStatus,
+      internalStatus,
+      fulfilled,
+      alreadyClaimed,
+    });
+  }
 
   if (!CHECKOUT_SIGNING_SECRET && ["create", "create-card", "create-crypto", "status", "card-status", "crypto-status", "quote"].includes(action)) {
     return json({ error: "Checkout signing secret not configured" }, 500);
