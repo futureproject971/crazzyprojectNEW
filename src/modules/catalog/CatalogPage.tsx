@@ -130,7 +130,7 @@ export function CatalogPage() {
           <PageHeader
             eyebrow="CRAZZY CATALOG"
             title="Produtos"
-            description="Explore o catálogo da CRAZZY PROJECT por categoria, disponibilidade, destaque e novidade."
+            description="Vasculha o arsenal por categoria, novidade, destaque e o que tá pronto pra jogo."
             actions={
               <a className="crz-catalog-discovery-link" href="/destaques">
                 <NeonIcon name="featured" size={22} />
@@ -144,8 +144,8 @@ export function CatalogPage() {
               id="catalog-search"
               value={query}
               onChange={(event) => updateFilter(() => setQuery(event.target.value))}
-              placeholder="Buscar no catálogo..."
-              aria-label="Buscar produtos"
+              placeholder="Caça teu próximo item..."
+              aria-label="Caçar produtos"
             />
 
             <Select
@@ -236,7 +236,7 @@ export function CatalogPage() {
                   updateFilter(() => setOnlyAvailable(event.target.checked))
                 }
               />
-              <span>Somente disponíveis</span>
+              <span>Só o que tá no jogo</span>
             </label>
           </fieldset>
 
@@ -248,15 +248,15 @@ export function CatalogPage() {
                 checked={onlyPromo}
                 onChange={(event) => updateFilter(() => setOnlyPromo(event.target.checked))}
               />
-              <span>Em promoção</span>
+              <span>Preço no chão</span>
             </label>
           </fieldset>
 
           <div className="crz-catalog-filter-note">
             <NeonIcon name="shield" size={28} />
             <div>
-              <strong>Compra simples e segura</strong>
-              <span>Escolha o produto e confira os detalhes antes de finalizar.</span>
+              <strong>Compra rápida, sem labirinto</strong>
+              <span>Escolhe o bagulho, confere tudo e só depois mete ficha.</span>
             </div>
           </div>
         </aside>
@@ -267,7 +267,7 @@ export function CatalogPage() {
               <span className="crz-catalog-results__eyebrow">VITRINE</span>
               <h2 id="catalog-results-title">
                 {category === "all"
-                  ? "Todos os produtos"
+                  ? "O arsenal todo"
                   : catalogCategories.find((item) => item.id === category)?.label}
               </h2>
             </div>
@@ -353,8 +353,8 @@ export function CatalogPage() {
             </>
           ) : (
             <EmptyState
-              title="Nenhum produto encontrado"
-              description="Altere a busca ou os filtros para ver outros itens do catálogo."
+              title="Nada caiu nessa busca"
+              description="Mexe na busca ou nos filtros e tenta outro caminho."
               icon={<NeonIcon name="cube" size={30} />}
               action={
                 <Button variant="secondary" onClick={clearFilters}>
