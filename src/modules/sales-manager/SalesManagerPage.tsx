@@ -303,7 +303,7 @@ export function SalesManagerPage() {
 
             {rows.length === 0 ? (
               <div className="crz-sales-empty">
-                <NeonIcon name="shopping-bag" size={34} />
+                <NeonIcon name="cube" size={34} />
                 <strong>Nenhuma venda encontrada</strong>
                 <span>Altere o filtro ou aguarde as primeiras compras.</span>
               </div>
@@ -376,7 +376,7 @@ export function SalesManagerPage() {
           <aside className="crz-sales-detail">
             {!selected ? (
               <div className="crz-sales-detail-empty">
-                <NeonIcon name="shopping-bag" size={38} />
+                <NeonIcon name="cube" size={38} />
                 <strong>Selecione uma venda</strong>
                 <span>Veja toda a trilha comercial sem abrir cinco telas.</span>
               </div>
