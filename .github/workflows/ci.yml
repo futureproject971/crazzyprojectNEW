@@ -107,3 +107,7 @@ jobs:
       - name: Test M25 Product Manager
         if: github.ref_name == 'm25-product-manager' || github.head_ref == 'm25-product-manager'
         run: node scripts/test-m25-product-manager.mjs
+
+      - name: Test M26 Category Manager
+        if: github.ref_name == 'm26-category-manager' || github.head_ref == 'm26-category-manager'
+        run: node scripts/test-m26-category-manager.mjs
