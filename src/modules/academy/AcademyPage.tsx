@@ -16,11 +16,11 @@ export function AcademyPage({ onlyUnlocked = false }: { onlyUnlocked?: boolean }
     try {
       const response = await fetch("/api/academy", { cache: "no-store" });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload?.error || "Não foi possível carregar a Academy.");
+      if (!response.ok) throw new Error(payload?.error || "A Academy não abriu agora.");
       setTutorials(payload.tutorials || []);
       setState("ready");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Falha ao carregar tutoriais.");
+      setError(e instanceof Error ? e.message : "Os tutoriais deram uma engasgada.");
       setState("error");
     }
   };
@@ -43,24 +43,24 @@ export function AcademyPage({ onlyUnlocked = false }: { onlyUnlocked?: boolean }
       <div className="crz-container">
         <PageHeader
           eyebrow="CRAZZY ACADEMY"
-          title={onlyUnlocked ? "Seus tutoriais liberados" : "Tutoriais e guias"}
+          title={onlyUnlocked ? "Teus tutoriais destravados" : "Guia rápido pra não entrar perdido"}
           description={onlyUnlocked
-            ? "Conteúdos públicos e guias dos produtos que sua conta possui."
-            : "Aprenda a usar a plataforma e acesse tutoriais protegidos quando um produto for liberado na sua conta."}
+            ? "Guia público e tutorial dos produtos que já estão na tua bag."
+            : "Pega o jeito da plataforma e destrava tutorial protegido junto com teus produtos."}
           actions={<a className="crz-button crz-button--secondary crz-button--sm" href={onlyUnlocked ? "/painel" : "/"}>Voltar</a>}
         />
 
         <div className="crz-academy-search">
           <span>⌕</span>
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar tutorial..." />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Caça um tutorial..." />
           <a href="/status">Status</a>
         </div>
 
         {state === "loading" && (
-          <section className="crz-academy-state"><span className="crz-spinner" /><p>Carregando Academy...</p></section>
+          <section className="crz-academy-state"><span className="crz-spinner" /><p>Abrindo a Academy...</p></section>
         )}
         {state === "error" && (
-          <section className="crz-academy-state"><NeonIcon name="shield" size={40} /><strong>Não foi possível carregar</strong><p>{error}</p><button type="button" className="crz-button crz-button--secondary crz-button--sm" onClick={() => void load()}>Tentar novamente</button></section>
+          <section className="crz-academy-state"><NeonIcon name="shield" size={40} /><strong>Não abriu agora</strong><p>{error}</p><button type="button" className="crz-button crz-button--secondary crz-button--sm" onClick={() => void load()}>TENTAR DE NOVO</button></section>
         )}
 
         {state === "ready" && (
@@ -74,8 +74,8 @@ export function AcademyPage({ onlyUnlocked = false }: { onlyUnlocked?: boolean }
             {!filtered.length ? (
               <section className="crz-academy-state">
                 <NeonIcon name="book" size={42} />
-                <strong>Nenhum tutorial encontrado</strong>
-                <p>Altere a busca ou volte depois para conferir novos conteúdos.</p>
+                <strong>Nada bateu nessa busca</strong>
+                <p>Mexe na busca ou volta depois. Conteúdo novo entra sem bater na porta.</p>
               </section>
             ) : (
               <section className="crz-academy-grid">
@@ -111,7 +111,7 @@ export function AcademyPage({ onlyUnlocked = false }: { onlyUnlocked?: boolean }
                           {item.locked ? "BLOQUEADO" : item.progress.completed ? "CONCLUÍDO" : item.access_type === "public" ? "PÚBLICO" : "LIBERADO"}
                         </Badge>
                         <a className={"crz-button crz-button--" + (item.locked ? "secondary" : "primary") + " crz-button--sm"} href={"/academy/" + item.slug}>
-                          {item.locked ? "Ver requisito" : item.progress.completed ? "Rever" : "Abrir tutorial"}
+                          {item.locked ? "VER O QUE FALTA" : item.progress.completed ? "Rever" : "ABRIR E METER FICHA"}
                         </a>
                       </footer>
                     </div>
