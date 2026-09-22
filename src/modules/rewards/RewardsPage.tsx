@@ -20,9 +20,9 @@ function youtubeEmbed(url: string) {
 function statusLabel(status: string) {
   const map: Record<string,string> = {
     watching: "Em andamento",
-    completed: "Missão concluída",
-    requested: "Resgate solicitado",
-    delivering: "Preparando entrega",
+    completed: "Missão fechada",
+    requested: "Resgate no corre",
+    delivering: "Preparando teu drop",
     delivered: "Entregue",
     rejected: "Recusado",
   };
@@ -92,7 +92,7 @@ export function RewardsPage() {
     setBusy(false);
 
     if (!response.ok) {
-      setNotice(payload?.error || "Não foi possível iniciar a missão.");
+      setNotice(payload?.error || "A missão não arrancou. Tenta de novo.");
       return;
     }
 
@@ -148,7 +148,7 @@ export function RewardsPage() {
     const payload = await response.json().catch(() => ({}));
     setBusy(false);
     if (!response.ok) {
-      setNotice(payload?.error || "Não foi possível confirmar sua presença.");
+      setNotice(payload?.error || "Não consegui confirmar que tu tá aí.");
       return;
     }
     if (payload.session) setSession(payload.session);
@@ -167,11 +167,11 @@ export function RewardsPage() {
     const payload = await response.json().catch(() => ({}));
     setBusy(false);
     if (!response.ok) {
-      setNotice(payload?.error || "Não foi possível solicitar a recompensa.");
+      setNotice(payload?.error || "O resgate não saiu agora.");
       return;
     }
     setSession(payload.session);
-    setNotice(payload.session?.status === "delivered" ? "Recompensa entregue. Confira sua biblioteca." : "Resgate solicitado com sucesso.");
+    setNotice(payload.session?.status === "delivered" ? "Drop entregue. Dá uma olhada na tua biblioteca." : "Resgate no corre. Agora segura a ansiedade.");
     void loadHistory();
   };
 
@@ -198,15 +198,15 @@ export function RewardsPage() {
       <div className="crz-container">
         <PageHeader
           eyebrow="CRAZZY REWARDS"
-          title="Missões e recompensas"
-          description="Complete a missão, mantenha a página ativa e resgate a recompensa quando o progresso chegar a 100%."
-          actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">Voltar ao CLUB</a>}
+          title="Missão, farm e recompensa"
+          description="Faz a missão, fica presente e bate 100%. Aí o prêmio é teu."
+          actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">VOLTAR PRO CLUB</a>}
         />
 
         {!authLoading && !user && (
           <div className="crz-rewards-login">
             <NeonIcon name="crown" size={36} />
-            <div><strong>Entre para cumprir missões</strong><span>O catálogo pode ser visto por todos, mas progresso e resgate ficam vinculados à sua conta.</span></div>
+            <div><strong>Entra aí pra começar o farm</strong><span>Todo mundo vê o mapa. Progresso e prêmio ficam presos na tua conta.</span></div>
             <a className="crz-button crz-button--primary crz-button--md" href="/login">Entrar</a>
           </div>
         )}
@@ -215,15 +215,15 @@ export function RewardsPage() {
 
         <section className="crz-rewards-layout">
           <div className="crz-rewards-catalog">
-            <header><span>MISSÕES DISPONÍVEIS</span><h2>Escolha sua recompensa</h2></header>
+            <header><span>MISSÕES DISPONÍVEIS</span><h2>Escolhe teu alvo</h2></header>
 
             {loading ? (
-              <div className="crz-rewards-state"><span className="crz-spinner" /><p>Carregando missões...</p></div>
+              <div className="crz-rewards-state"><span className="crz-spinner" /><p>Puxando as missões...</p></div>
             ) : !campaigns.length ? (
               <div className="crz-rewards-state">
                 <NeonIcon name="crown" size={34} />
-                <strong>Nenhuma missão ativa agora</strong>
-                <p>Quando uma campanha for publicada, ela aparece aqui automaticamente.</p>
+                <strong>Nada pra farmar agora</strong>
+                <p>Quando pintar missão nova, ela cai aqui sozinha.</p>
               </div>
             ) : (
               <div className="crz-rewards-cards">
@@ -244,7 +244,7 @@ export function RewardsPage() {
                         >
                           {product.product?.image_url ? <img src={product.product.image_url} alt="" /> : <NeonIcon name="cube" size={28} />}
                           <span><strong>{product.product?.name || "Recompensa"}</strong><small>{product.plan?.name || product.trial_duration_minutes + " min"}</small></span>
-                          <b>Começar</b>
+                          <b>BORA</b>
                         </button>
                       ))}
                     </div>
@@ -255,12 +255,12 @@ export function RewardsPage() {
           </div>
 
           <aside className="crz-rewards-active">
-            <header><span>MISSÃO ATUAL</span><h2>{activeCampaign?.title || "Nenhuma missão iniciada"}</h2></header>
+            <header><span>MISSÃO ATUAL</span><h2>{activeCampaign?.title || "Nenhuma missão rodando"}</h2></header>
 
             {!session || !activeCampaign ? (
               <div className="crz-rewards-state crz-rewards-state--active">
                 <NeonIcon name="lightning" size={36} />
-                <p>Escolha uma missão ao lado para começar.</p>
+                <p>Escolhe uma aí do lado e mete ficha.</p>
               </div>
             ) : (
               <>
@@ -270,12 +270,12 @@ export function RewardsPage() {
                   ) : activeCampaign.video_url ? (
                     <video src={activeCampaign.video_url} controls playsInline />
                   ) : (
-                    <div><NeonIcon name="book" size={48} /><span>Conteúdo da missão</span></div>
+                    <div><NeonIcon name="book" size={48} /><span>O alvo da missão</span></div>
                   )}
                 </div>
 
                 <div className="crz-rewards-progress">
-                  <div><span>Progresso validado</span><strong>{progress}%</strong></div>
+                  <div><span>Progresso valendo</span><strong>{progress}%</strong></div>
                   <div className="crz-rewards-progress__bar"><i style={{ width: progress + "%" }} /></div>
                   <small>{seconds(watchedSeconds)} / {seconds(requiredSeconds)}</small>
                 </div>
@@ -288,7 +288,7 @@ export function RewardsPage() {
                 {challenge && (
                   <div className="crz-rewards-attention">
                     <NeonIcon name="verified" size={28} />
-                    <div><strong>Confirme que você está acompanhando</strong><span>O contador fica pausado até a confirmação.</span></div>
+                    <div><strong>Dá um toque pra gente saber que tu tá aí</strong><span>Sem confirmação, o relógio fica congelado.</span></div>
                     <button type="button" className="crz-button crz-button--primary crz-button--sm" disabled={busy} onClick={() => void confirmAttention()}>
                       Continuar missão
                     </button>
@@ -302,21 +302,21 @@ export function RewardsPage() {
                 )}
 
                 {session.status === "delivered" && (
-                  <a className="crz-button crz-button--primary crz-button--lg" href="/biblioteca">Abrir minha biblioteca</a>
+                  <a className="crz-button crz-button--primary crz-button--lg" href="/biblioteca">ABRIR MINHA BAG</a>
                 )}
 
-                <p className="crz-rewards-watch-note">O progresso pausa quando a aba não está visível ou a janela não está ativa.</p>
+                <p className="crz-rewards-watch-note">Saiu da aba? O farm pausa. Voltou? Continua.</p>
               </>
             )}
           </aside>
         </section>
 
         <section className="crz-rewards-history">
-          <header><div><span>HISTÓRICO</span><h2>Suas missões</h2></div><button type="button" onClick={() => void loadHistory()}>Atualizar</button></header>
+          <header><div><span>HISTÓRICO</span><h2>Teus corres</h2></div><button type="button" onClick={() => void loadHistory()}>Atualizar</button></header>
           {!user ? (
-            <div className="crz-rewards-state"><p>Entre para visualizar seu histórico.</p></div>
+            <div className="crz-rewards-state"><p>Entra pra ver o histórico do farm.</p></div>
           ) : !history.length ? (
-            <div className="crz-rewards-state"><p>Você ainda não concluiu nenhuma missão.</p></div>
+            <div className="crz-rewards-state"><p>Ainda não fechou missão nenhuma. Bora mudar isso.</p></div>
           ) : (
             <div className="crz-rewards-history__list">
               {history.map((item) => (
