@@ -22,12 +22,12 @@ const categories: Array<{
   title: string;
   description: string;
 }> = [
-  { id: "technical", title: "Suporte técnico", description: "Instalação, erro, crash ou funcionamento." },
-  { id: "delivery", title: "Entrega", description: "Key, conta, Library ou conteúdo entregue." },
-  { id: "payment", title: "Pagamento", description: "PIX, cartão, LTC ou status da cobrança." },
-  { id: "product", title: "Produto", description: "Plano, compatibilidade ou acesso." },
-  { id: "account", title: "Conta", description: "Login, Discord, perfil ou acesso ao site." },
-  { id: "other", title: "Outro", description: "Algo que não se encaixa nas opções acima." },
+  { id: "technical", title: "Deu ruim no produto", description: "Instalação, erro, crash ou alguma coisa fazendo gracinha." },
+  { id: "delivery", title: "Entrega", description: "Key, conta, Library ou entrega que não caiu direito." },
+  { id: "payment", title: "Pagamento", description: "PIX, cartão, LTC ou cobrança fazendo suspense." },
+  { id: "product", title: "Produto", description: "Plano, compatibilidade ou acesso travando teu caminho." },
+  { id: "account", title: "Conta", description: "Login, Discord, perfil ou site te segurando do lado de fora." },
+  { id: "other", title: "Outro", description: "A treta é outra. Manda a boa." },
 ];
 
 type ContextOption = {
@@ -131,11 +131,11 @@ export function NewTicketPage() {
     setError("");
 
     if (subject.trim().length < 4) {
-      setError("O assunto precisa ter pelo menos 4 caracteres.");
+      setError("Bota pelo menos 4 letras pra gente entender o rolê.");
       return;
     }
     if (!message.trim()) {
-      setError("Descreva o que aconteceu para o suporte conseguir te ajudar.");
+      setError("Conta o que rolou direito pra gente chegar mais rápido na solução.");
       return;
     }
 
@@ -155,7 +155,7 @@ export function NewTicketPage() {
 
       const created = await response.json();
       if (!response.ok) {
-        throw new Error(created?.error || "Não foi possível abrir o ticket.");
+        throw new Error(created?.error || "O ticket não abriu agora.");
       }
 
       for (let index = 0; index < files.length; index += 1) {
@@ -170,7 +170,7 @@ export function NewTicketPage() {
 
       window.location.assign("/tickets/" + created.ticketId);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Falha ao abrir ticket.");
+      setError(submitError instanceof Error ? submitError.message : "A abertura tropeçou.");
       setBusy(false);
       setUploadLabel("");
     }
@@ -182,10 +182,10 @@ export function NewTicketPage() {
         <div className="crz-container crz-support-hero__inner">
           <div>
             <small>NOVO TICKET</small>
-            <h1>Como podemos ajudar?</h1>
-            <p>Quanto melhor o contexto, mais rápido o suporte consegue entender o caso.</p>
+            <h1>Qual foi a treta?</h1>
+            <p>Quanto melhor tu contar, mais rápido a gente mata a charada.</p>
           </div>
-          <a className="crz-button crz-button--ghost crz-button--md" href="/tickets">← Meus tickets</a>
+          <a className="crz-button crz-button--ghost crz-button--md" href="/tickets">← VOLTAR PROS TICKETS</a>
         </div>
       </section>
 
@@ -194,7 +194,7 @@ export function NewTicketPage() {
           <header>
             <div>
               <small>1 • CATEGORIA</small>
-              <h2>Escolha o assunto principal</h2>
+              <h2>Escolhe onde pegou fogo</h2>
             </div>
           </header>
 
@@ -218,13 +218,13 @@ export function NewTicketPage() {
           <div className="crz-support-form-section">
             <div>
               <small>2 • CONTEXTO</small>
-              <h2>Vincular compra ou produto</h2>
+              <h2>Amarrar com compra ou produto</h2>
             </div>
             <select
               value={contextValue}
               onChange={(event) => setContextValue(event.target.value)}
             >
-              <option value="none">Sem vínculo específico</option>
+              <option value="none">Sem ligação específica</option>
               {contextOptions.map((item) => (
                 <option value={item.value} key={item.value}>
                   {item.label} — {item.detail}
@@ -246,7 +246,7 @@ export function NewTicketPage() {
           <div className="crz-support-form-section">
             <div>
               <small>3 • DESCRIÇÃO</small>
-              <h2>Conte o que aconteceu</h2>
+              <h2>Manda a história toda</h2>
             </div>
 
             <label>
@@ -254,7 +254,7 @@ export function NewTicketPage() {
               <input
                 value={subject}
                 maxLength={120}
-                placeholder="Ex.: Erro ao iniciar o produto"
+                placeholder="Ex.: o produto não quer abrir"
                 onChange={(event) => setSubject(event.target.value)}
               />
               <small>{subject.length}/120</small>
@@ -266,7 +266,7 @@ export function NewTicketPage() {
                 value={message}
                 maxLength={4000}
                 rows={8}
-                placeholder="Explique o problema, o que você tentou e o que apareceu na tela..."
+                placeholder="Conta o problema, o que tu já tentou e o que apareceu na tela..."
                 onChange={(event) => setMessage(event.target.value)}
               />
               <small>{message.length}/4000</small>
@@ -276,12 +276,12 @@ export function NewTicketPage() {
           <div className="crz-support-form-section">
             <div>
               <small>4 • ANEXOS</small>
-              <h2>Imagem, vídeo, áudio ou arquivo</h2>
+              <h2>Joga prova na mesa</h2>
             </div>
 
             <label className="crz-support-file-picker">
               <NeonIcon name="shield" size={28} />
-              <strong>Selecionar arquivos</strong>
+              <strong>PEGAR ARQUIVOS</strong>
               <span>Até 5 por mensagem • 25 MB cada • bucket privado</span>
               <input
                 type="file"
@@ -313,7 +313,7 @@ export function NewTicketPage() {
             onClick={() => void submit()}
             leadingIcon={<NeonIcon name="ticket" size={19} />}
           >
-            {busy ? uploadLabel || "Abrindo ticket..." : "Abrir ticket"}
+            {busy ? uploadLabel || "ABRINDO O CORRE..." : "ABRIR TICKET"}
           </Button>
         </Panel>
 
@@ -321,16 +321,16 @@ export function NewTicketPage() {
           <Panel className="crz-support-tip">
             <NeonIcon name="shield" size={30} />
             <div>
-              <strong>Seus anexos são privados</strong>
-              <span>O site gera uma autorização curta para upload e outra curta para visualizar. O bucket não é público.</span>
+              <strong>Teus anexos ficam no modo fechado</strong>
+              <span>Upload e visualização usam autorização curta. Nada de bucket aberto dando sopa.</span>
             </div>
           </Panel>
 
           <Panel className="crz-support-tip">
             <NeonIcon name="cube" size={30} />
             <div>
-              <strong>Contexto sem expor sua key</strong>
-              <span>Você pode vincular pedido, entitlement ou entrega. O ticket recebe a referência, nunca o segredo da Library.</span>
+              <strong>Contexto sim, segredo não</strong>
+              <span>Pode ligar pedido, acesso ou entrega. O ticket pega a referência, nunca o segredo da Library.</span>
             </div>
           </Panel>
         </aside>
