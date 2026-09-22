@@ -37,10 +37,10 @@ function ComboStatus() {
       <div className="crz-cart-combo-status__title">
         <NeonIcon name="crown" size={28} />
         <div>
-          <small>MONTE SEU COMBO</small>
-          <strong>Mensal ou Lifetime, até 35% OFF</strong>
+          <small>MONTA TEU COMBO</small>
+          <strong>Mensal ou Lifetime. Quanto mais junta, mais o preço apanha.</strong>
         </div>
-        <a href="/combo">Montar combo →</a>
+        <a href="/combo">MONTAR O COMBO →</a>
       </div>
 
       <div className="crz-cart-combo-status__grid">
@@ -56,7 +56,7 @@ function ComboStatus() {
                 <strong>
                   {group.discountPercent > 0
                     ? group.discountPercent + "% OFF"
-                    : "A partir de 2 produtos"}
+                    : "Começa com 2 produtos"}
                 </strong>
               </header>
               <div className="crz-cart-combo-meter__track">
@@ -69,7 +69,7 @@ function ComboStatus() {
                     Faltam {group.nextProducts - group.uniqueProducts} para {group.nextDiscountPercent}%
                   </span>
                 ) : (
-                  <span>Teto máximo atingido 🔥</span>
+                  <span>Chegou no teto. Tá brilhando 🔥</span>
                 )}
               </footer>
             </div>
@@ -108,8 +108,8 @@ export function CartPage() {
         <div className="crz-container">
           <PageHeader
             eyebrow="CRAZZY CART"
-            title="Seu carrinho"
-            description="Revise produtos, planos, quantidades, combos e cupons antes do checkout."
+            title="Tua bag"
+            description="Confere a bag, o plano, o combo e o cupom antes de fechar o round."
             actions={
               items.length ? (
                 <Button variant="ghost" onClick={clearCart}>
@@ -128,8 +128,8 @@ export function CartPage() {
           <div className="crz-cart-empty">
             <EmptyState
               icon={<NeonIcon name="cube" size={42} />}
-              title="Seu carrinho está vazio"
-              description="Adicione um produto ou monte um combo Mensal/Lifetime."
+              title="Tua bag tá vazia"
+              description="Joga um produto aí dentro ou monta um combo pra começar."
               action={
                 <div className="crz-cart-empty__actions">
                   <a className="crz-button crz-button--primary crz-button--md" href="/produtos">
@@ -156,7 +156,7 @@ export function CartPage() {
                     <div className="crz-cart-item__body">
                       <div className="crz-cart-item__headline">
                         <div>
-                          <small>{item.category ?? (item.kind === "account" ? "Conta" : "Produto digital")}</small>
+                          <small>{item.category ?? (item.kind === "account" ? "Conta" : "Item digital")}</small>
                           <strong>{item.name}</strong>
                           <span>{item.subtitle}</span>
                         </div>
@@ -222,7 +222,7 @@ export function CartPage() {
 
                       <div className="crz-cart-item__bottom">
                         <div>
-                          <span>Valor unitário</span>
+                          <span>Preço por unidade</span>
                           <strong>{item.price == null ? "Consultar" : formatBrl(item.price)}</strong>
                         </div>
                         <button type="button" onClick={() => removeItem(item.key)}>
@@ -239,7 +239,7 @@ export function CartPage() {
               <Panel className="crz-cart-summary__panel">
                 <header>
                   <small>RESUMO</small>
-                  <h2>Fechamento do carrinho</h2>
+                  <h2>Fechando a bag</h2>
                 </header>
 
                 <div className="crz-cart-summary__coupon">
@@ -263,7 +263,7 @@ export function CartPage() {
                     </button>
                   </div>
                   <small>
-                    {couponSaved ? "Cupom guardado para o checkout. " : ""}
+                    {couponSaved ? "Cupom na manga. Ele entra no checkout. " : ""}
                     O código fica salvo no carrinho e será validado de forma autoritativa no checkout.
                     Cupom e combo não acumulam: será usado o benefício válido mais vantajoso.
                   </small>
@@ -278,7 +278,7 @@ export function CartPage() {
 
                 <div className="crz-cart-summary__lines">
                   <div>
-                    <span>Subtotal conhecido</span>
+                    <span>Subtotal no radar</span>
                     <strong>{formatBrl(totals.knownSubtotal)}</strong>
                   </div>
 
@@ -321,10 +321,10 @@ export function CartPage() {
                   }}
                   leadingIcon={<NeonIcon name="lightning" size={20} />}
                 >
-                  {totals.hasUnpricedItems ? "Aguardando preços" : "Ir para checkout"}
+                  {totals.hasUnpricedItems ? "Esperando o preço fechar" : "FECHAR O ROUND"}
                 </Button>
 
-                <a href="/produtos">← Continuar comprando</a>
+                <a href="/produtos">← VOLTAR PRO ARSENAL</a>
               </Panel>
             </aside>
           </div>
