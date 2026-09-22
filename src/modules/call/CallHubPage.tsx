@@ -102,7 +102,7 @@ export function CallHubPage() {
             description="Crie uma sala privada, compartilhe o link e converse por voz, vídeo, tela e chat."
           />
           <section className="crz-call-auth-gate">
-            <NeonIcon name="users" size={38} />
+            <NeonIcon name="community" size={38} />
             <strong>Entre para criar ou acessar suas salas</strong>
             <p>CRAZZY CALL usa a mesma conta do CRAZZY PROJECT.</p>
             <a className="crz-button crz-button--primary crz-button--md" href="/login?next=%2Fcall">
@@ -132,7 +132,7 @@ export function CallHubPage() {
 
         <section className="crz-call-create">
           <div>
-            <NeonIcon name="users" size={32} />
+            <NeonIcon name="community" size={32} />
             <span>
               <small>NOVA SALA</small>
               <strong>CRIAR CRAZZY CALL</strong>
@@ -163,7 +163,7 @@ export function CallHubPage() {
 
           {!rooms.length ? (
             <div className="crz-call-empty-list">
-              <NeonIcon name="users" size={30} />
+              <NeonIcon name="community" size={30} />
               <strong>Nenhuma sala ainda</strong>
               <span>Crie sua primeira CRAZZY CALL acima.</span>
             </div>
