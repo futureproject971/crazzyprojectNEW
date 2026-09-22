@@ -60,11 +60,11 @@ export function ReviewsPage() {
     setSaving(false);
 
     if (!response.ok) {
-      setNotice(payload?.error || "Não foi possível publicar sua avaliação.");
+      setNotice(payload?.error || "Teu review não subiu agora.");
       return;
     }
 
-    setNotice("Avaliação publicada com compra verificada.");
+    setNotice("Review no ar com compra verificada. 🔥");
     setProducts((current) =>
       current.map((product) =>
         product.id === selectedId
@@ -80,8 +80,8 @@ export function ReviewsPage() {
       <div className="crz-container">
         <PageHeader
           eyebrow="CRAZZY REVIEWS"
-          title="Avaliações da comunidade"
-          description="Feedback público com selo de compra verificada baseado em pedido e entitlement reais."
+          title="A voz de quem já comprou"
+          description="Review público com selo quando a compra é real. Sem aplauso de papelão."
           actions={
             <a className="crz-button crz-button--secondary crz-button--sm" href="/">
               Voltar ao início
@@ -93,8 +93,8 @@ export function ReviewsPage() {
           <div className="crz-reviews-public">
             <div className="crz-reviews-section-head">
               <div>
-                <span>FEEDBACK REAL</span>
-                <h2>Últimas avaliações</h2>
+                <span>PAPO RETO</span>
+                <h2>O que a galera tá falando</h2>
               </div>
               <NeonIcon name="verified" size={30} />
             </div>
@@ -102,29 +102,29 @@ export function ReviewsPage() {
           </div>
 
           <aside className="crz-reviews-compose">
-            <span className="crz-reviews-compose__eyebrow">SUA EXPERIÊNCIA</span>
-            <h2>Publicar avaliação</h2>
+            <span className="crz-reviews-compose__eyebrow">MANDA A TUA</span>
+            <h2>SOLTAR REVIEW</h2>
             <p>
               O selo de compra verificada só é liberado quando a sua conta possui um produto realmente comprado.
             </p>
 
             {loadingProducts ? (
-              <div className="crz-review-compose-state">Carregando suas compras...</div>
+              <div className="crz-review-compose-state">Puxando tuas compras...</div>
             ) : !authenticated ? (
               <div className="crz-review-compose-state">
-                <strong>Entre na sua conta</strong>
-                <span>Faça login para consultar suas compras e publicar.</span>
+                <strong>Entra aí primeiro</strong>
+                <span>Entra na conta, puxa tuas compras e manda teu review.</span>
                 <a className="crz-button crz-button--primary crz-button--md" href="/login">Entrar</a>
               </div>
             ) : !products.length ? (
               <div className="crz-review-compose-state">
-                <strong>Nenhuma compra avaliável</strong>
-                <span>Quando uma compra for concluída, o produto aparecerá aqui.</span>
+                <strong>Nada liberado pra avaliar ainda</strong>
+                <span>Fechou a compra? O produto aparece aqui pra tu mandar a real.</span>
               </div>
             ) : (
               <>
                 <label className="crz-reviews-field">
-                  <span>Produto comprado</span>
+                  <span>O que tu pegou</span>
                   <select value={selectedId} onChange={(event) => chooseProduct(event.target.value)}>
                     {products.map((product) => (
                       <option key={product.id} value={product.id}>{product.name}</option>
@@ -145,12 +145,12 @@ export function ReviewsPage() {
                 </div>
 
                 <label className="crz-reviews-field">
-                  <span>Comentário</span>
+                  <span>Manda a real</span>
                   <textarea
                     value={comment}
                     minLength={3}
                     maxLength={800}
-                    placeholder="Conte como foi sua experiência..."
+                    placeholder="Foi brabo? Deu ruim? Conta como foi..."
                     onChange={(event) => setComment(event.target.value.slice(0, 800))}
                   />
                   <small>{comment.length}/800</small>
@@ -162,7 +162,7 @@ export function ReviewsPage() {
                   disabled={saving || !selected}
                   onClick={() => void submit()}
                 >
-                  {saving ? "Publicando..." : selected?.currentRating ? "Atualizar avaliação" : "Publicar avaliação"}
+                  {saving ? "MANDANDO..." : selected?.currentRating ? "ATUALIZAR REVIEW" : "SOLTAR REVIEW"}
                 </button>
 
                 {notice && <div className="crz-reviews-notice">{notice}</div>}
