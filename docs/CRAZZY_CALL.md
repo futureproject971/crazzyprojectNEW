@@ -48,6 +48,7 @@ Migrations:
 
 - `supabase/migrations/202609220230_crazzy_call.sql`
 - `supabase/migrations/202609220235_crazzy_call_privileges.sql`
+- `supabase/migrations/202609220240_crazzy_call_table_privileges.sql`
 
 Tabelas:
 
