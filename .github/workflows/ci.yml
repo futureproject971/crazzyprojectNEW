@@ -131,6 +131,7 @@ jobs:
           node --check apps/discord-bot/src/config.js
           node --check apps/discord-bot/src/supabase.js
           node --check apps/discord-bot/src/modules/campaigns.js
+          node --check apps/discord-bot/src/modules/server-builder.js
           node --check apps/discord-bot/src/modules/commands.js
 
       - name: Test unified Discord integration
