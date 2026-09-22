@@ -182,3 +182,25 @@ QA:
 
 Próximo módulo previsto após aprovação:
 **M06 — CRAZZY ACCOUNTS**
+
+---
+
+## 2026-09-22 — ESTADO ATUAL DO PROJETO
+
+- M25 Product Manager: integrado na main.
+- M26 Category Manager: integrado na main.
+- M27 Stock Manager: integrado na main.
+- M28 Sales Manager: integrado na main.
+- Visual global de cards premium: integrado na main, preservando mídias/artes.
+- CRAZZY CALL: transplantado para a base atual na branch `m-discord-campaigns`.
+- CRAZZY Community: dock de voz/vídeo/tela conectado ao CRAZZY CALL na branch `m-discord-campaigns`.
+- Discord Campaign Center: editor, preview, templates, fila, público, agendamento, teste, progresso e histórico na branch `m-discord-campaigns`.
+- Unified Discord Bot: bot-core único criado em `apps/discord-bot` com 1 token/1 worker Discloud.
+- Módulo Campaigns do bot único: implementado.
+- Próximas migrações para o mesmo bot: roles, notify, support e security alerts.
+- PR atual: #43.
+
+Bloqueios externos atuais:
+- Vercel continua reportando `build-rate-limit`.
+- CRAZZY CALL ainda precisa das credenciais LiveKit reais para teste de mídia ponta a ponta.
+- Unified Discord Bot precisa receber as variáveis da aplicação Discloud antes do teste ao vivo.

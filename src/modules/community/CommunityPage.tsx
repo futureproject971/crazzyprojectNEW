@@ -15,6 +15,7 @@ import type {
   CommunityProfile,
   CommunitySnapshot,
 } from "./types";
+import { CommunityVoiceDock } from "./CommunityVoiceDock";
 import {
   COMMUNITY_FILE_ACCEPT,
   COMMUNITY_MAX_FILES,
@@ -426,7 +427,7 @@ export function CommunityPage() {
           <div>
             <small>M14 • CRAZZY COMMUNITY</small>
             <h1>Comunidade</h1>
-            <p>Um chat familiar para trocar ideia sem sair do ecossistema CRAZZY PROJECT.</p>
+            <p>Texto, voz, vídeo e compartilhamento de tela no mesmo ecossistema CRAZZY PROJECT.</p>
           </div>
 
           <div className="crz-community-live">
@@ -720,6 +721,8 @@ export function CommunityPage() {
         </section>
 
         <aside className="crz-community-side">
+          <CommunityVoiceDock />
+
           <Panel className="crz-community-info">
             <NeonIcon name="community" size={28} />
             <div>
