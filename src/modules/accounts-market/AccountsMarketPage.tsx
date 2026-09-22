@@ -118,16 +118,16 @@ function displayBoolean(value: boolean | null) {
 }
 
 function activityRisk(days: number | null) {
-  if (days == null) return { label: "Sem dado", level: "unknown" as const };
+  if (days == null) return { label: "Sem info", level: "unknown" as const };
   if (days >= 90) return { label: "Baixo", level: "low" as const };
   if (days >= 30) return { label: "Médio", level: "medium" as const };
   return { label: "Alto", level: "high" as const };
 }
 
 function offlineLabel(days: number | null) {
-  if (days == null) return "Inatividade não informada";
-  if (days === 0) return "Ativa recentemente";
-  if (days === 1) return "Inativa há 1 dia";
+  if (days == null) return "Sem info de inatividade";
+  if (days === 0) return "Mexeu recentemente";
+  if (days === 1) return "Parada há 1 dia";
   return "Inativa há " + days + " dias";
 }
 
@@ -282,21 +282,21 @@ function AccountCard({
 
         <div className="crz-account-card__activity">
           <div>
-            <small>ÚLTIMA ATIVIDADE</small>
+            <small>ÚLTIMO SINAL</small>
             <strong>{offlineLabel(item.offlineDays)}</strong>
           </div>
           <span
             className={"crz-account-risk crz-account-risk--" + risk.level}
-            title="Estimativa baseada somente no tempo de inatividade informado pelo catálogo."
+            title="Estimativa feita só com o tempo de inatividade que o catálogo informou."
           >
             Risco estimado: {risk.label}
           </span>
         </div>
 
         <div className="crz-account-card__legacy-benefits">
-          <span>✓ Conta Full Acesso</span>
-          <span>✓ Email e senha inclusos</span>
-          <span>✓ Entrega após confirmação</span>
+          <span>✓ Full acesso</span>
+          <span>✓ Email e senha junto</span>
+          <span>✓ Cai depois da confirmação</span>
         </div>
 
         <div className="crz-account-card__stats">
@@ -377,14 +377,14 @@ export function AccountsMarketPage() {
     })
       .then(async (response) => {
         const payload = await response.json();
-        if (!response.ok) throw new Error(payload?.error || "Não foi possível carregar as contas.");
+        if (!response.ok) throw new Error(payload?.error || "As contas não entraram no mapa agora.");
         return payload as AccountsMarketPageData;
       })
       .then(setData)
       .catch((requestError: Error) => {
         if (requestError.name !== "AbortError") {
           setData(null);
-          setError(requestError.message || "Não foi possível carregar as contas.");
+          setError(requestError.message || "As contas não entraram no mapa agora.");
         }
       })
       .finally(() => {
@@ -432,11 +432,11 @@ export function AccountsMarketPage() {
         <div className="crz-container">
           <PageHeader
             eyebrow="CRAZZY ACCOUNTS"
-            title="Marketplace de contas"
-            description="Escolha o jogo, filtre a conta e confira inventário, rank e detalhes antes da compra."
+            title="Mercado de contas no radar"
+            description="Escolhe o jogo, afina o filtro e confere rank, inventário e detalhes antes de meter ficha."
             actions={
               <div className={"crz-accounts-source " + (isLive ? "is-live" : "is-pending")}>
-                <span><i aria-hidden="true" /> {isLive ? "CATÁLOGO ONLINE" : "ATUALIZANDO"}</span>
+                <span><i aria-hidden="true" /> {isLive ? "MERCADO NO AR" : "ATUALIZANDO"}</span>
                 <strong>CRAZZY MARKET</strong>
               </div>
             }
@@ -481,7 +481,7 @@ export function AccountsMarketPage() {
             <input
               value={draft.query}
               onChange={(event) => setField("query", event.target.value.slice(0, 100))}
-              placeholder="Buscar contas..."
+              placeholder="Caça uma conta..."
             />
           </label>
 
@@ -619,7 +619,7 @@ export function AccountsMarketPage() {
           )}
 
           <FilterSection
-            title="Faixa de Preço"
+            title="Faixa de grana"
             icon={<span className="crz-account-filter-symbol">$</span>}
             open={priceOpen}
             onToggle={() => setPriceOpen((value) => !value)}
@@ -635,7 +635,7 @@ export function AccountsMarketPage() {
 
           {game === "valorant" && (
             <FilterSection
-              title="Valor do Inventário"
+              title="Peso do inventário"
               icon={<span className="crz-account-filter-symbol">↗</span>}
               open={inventoryOpen}
               onToggle={() => setInventoryOpen((value) => !value)}
@@ -651,7 +651,7 @@ export function AccountsMarketPage() {
 
           {game !== "minecraft" && (
             <FilterSection
-              title="Nível da Conta"
+              title="Nível da bag"
               icon={<span className="crz-account-filter-symbol">★</span>}
               open={levelOpen}
               onToggle={() => setLevelOpen((value) => !value)}
@@ -669,14 +669,14 @@ export function AccountsMarketPage() {
         <section className="crz-accounts-results" aria-live="polite">
           <header className="crz-accounts-results__head">
             <div>
-              <span>CONTAS DISPONÍVEIS</span>
+              <span>CONTAS NO RADAR</span>
               <h2>{label}</h2>
             </div>
             <div className="crz-accounts-results__tools">
               <label>
                 <span>Ordenar</span>
                 <select value={draft.orderBy} onChange={(e) => setField("orderBy", e.target.value as AccountsMarketFilters["orderBy"])}>
-                  <option value="pdate_to_down">Mais recentes</option>
+                  <option value="pdate_to_down">Chegaram agora</option>
                   <option value="price_to_up">Menor preço</option>
                   <option value="price_to_down">Maior preço</option>
                 </select>
