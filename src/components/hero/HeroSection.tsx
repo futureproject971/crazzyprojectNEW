@@ -51,7 +51,7 @@ export function HeroSection() {
         <h1 id="hero-title" className="sr-only">CRAZZY PROJECT</h1>
 
         <p className="crz-home-hero__tagline">
-          JOGOS. PESSOAS. CULTURA. SEMPRE JUNTOS.
+          QUEM NAO XITA NAO BRILHA
         </p>
 
         <div className="crz-home-hero__pillars" aria-label="Áreas CRAZZY PROJECT">
@@ -68,21 +68,21 @@ export function HeroSection() {
 
         <div className="crz-home-hero__actions">
           <a className="crz-home-hero__cta crz-home-hero__cta--primary" href="#produtos">
-            Explorar Produtos
+            BORA PROS PRODUTOS
             <span aria-hidden="true">→</span>
           </a>
           <a className="crz-home-hero__cta crz-home-hero__cta--secondary" href="#comunidade">
             <img src="/icons/brand-discord.svg" alt="" aria-hidden="true" />
-            Entrar na Comunidade
+            COLA NA COMUNIDADE
           </a>
         </div>
       </div>
 
       <div className="crz-home-hero__graffiti crz-home-hero__graffiti--left" aria-hidden="true">
-        GOOD GAMES<br />BETTER PEOPLE
+        JOGA FORTE<br />BRILHA MAIS
       </div>
       <div className="crz-home-hero__graffiti crz-home-hero__graffiti--right" aria-hidden="true">
-        SAME GAMES<br />DIFFERENT MENTALITY.
+        MESMO MAPA<br />OUTRA MENTALIDADE.
       </div>
     </section>
   );
