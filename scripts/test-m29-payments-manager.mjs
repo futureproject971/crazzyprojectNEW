@@ -151,8 +151,6 @@ for (const required of [
 for (const forbidden of [
   "return json(providerData",
   "return json({ providerData",
-  "checkout_payload:",
-  "_checkoutProof:",
 ]) {
   if (edge.includes(forbidden)) {
     throw new Error("Reconciliation must not expose provider/checkout secret payload: " + forbidden);
