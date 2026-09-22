@@ -42,8 +42,8 @@ function methodName(method: CheckoutMethod) {
 
 function methodCopy(method: CheckoutMethod) {
   if (method === "pix") return "QR Code + copia e cola. Confirmação automática.";
-  if (method === "card") return "Pagamento por cartão em ambiente seguro.";
-  return "Pagamento em LTC com valor exato e confirmação pela rede.";
+  if (method === "card") return "Cartão em ambiente seguro. Sem susto no caminho.";
+  return "LTC no valor certinho, confirmado pela rede.";
 }
 
 function cents(value: number) {
@@ -68,7 +68,7 @@ export function CheckoutPage() {
     fetch("/api/checkout/config", { cache: "no-store" })
       .then(async (response) => {
         const payload = await response.json();
-        if (!response.ok) throw new Error(payload?.error || "Falha ao carregar métodos.");
+        if (!response.ok) throw new Error(payload?.error || "Os métodos não responderam agora.");
         return payload as CheckoutConfig;
       })
       .then(setConfig)
@@ -102,7 +102,7 @@ export function CheckoutPage() {
           setQuoteState("auth");
           return null;
         }
-        if (!response.ok) throw new Error(payload?.error || "Não foi possível calcular o checkout.");
+        if (!response.ok) throw new Error(payload?.error || "O servidor não conseguiu fechar essa conta.");
         return payload as CheckoutQuote;
       })
       .then((payload) => {
@@ -182,11 +182,11 @@ export function CheckoutPage() {
 
       if (response.status === 401 || payload?.error === "AUTH_REQUIRED") {
         setQuoteState("auth");
-        throw new Error("Entre na sua conta para continuar.");
+        throw new Error("Entra na tua conta pra seguir o round.");
       }
       if (!response.ok) {
         if (response.status === 409) attemptKey.current = null;
-        throw new Error(payload?.error || "Não foi possível iniciar o pagamento.");
+        throw new Error(payload?.error || "Não deu pra abrir esse pagamento agora.");
       }
 
       setPayment(payload as CheckoutCreateResponse);
@@ -196,7 +196,7 @@ export function CheckoutPage() {
         window.location.assign(payload.paymentUrl);
       }
     } catch (error) {
-      setPaymentError(error instanceof Error ? error.message : "Erro ao iniciar pagamento.");
+      setPaymentError(error instanceof Error ? error.message : "O pagamento tropeçou na largada.");
     } finally {
       setCreating(false);
     }
@@ -215,9 +215,9 @@ export function CheckoutPage() {
         <div className="crz-container crz-checkout-empty">
           <EmptyState
             icon={<NeonIcon name="cube" size={42} />}
-            title="Seu carrinho está vazio"
-            description="Adicione produtos antes de abrir o checkout."
-            action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">Ver produtos</a>}
+            title="Tua bag tá vazia"
+            description="Joga algo na bag antes de vir fechar a compra."
+            action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">VOLTAR PRO ARSENAL</a>}
           />
         </div>
       </main>
@@ -230,8 +230,8 @@ export function CheckoutPage() {
         <div className="crz-container">
           <PageHeader
             eyebrow="CRAZZY CHECKOUT"
-            title="Finalizar compra"
-            description="Revise seu pedido, escolha a forma de pagamento e finalize com segurança."
+            title="Fechar o round"
+            description="Confere o pedido, escolhe como pagar e fecha sem pressa. O servidor segura a bronca."
             actions={<Badge tone="green">CHECKOUT PROTEGIDO</Badge>}
           />
         </div>
@@ -244,18 +244,18 @@ export function CheckoutPage() {
               <NeonIcon name="shield" size={27} />
               <div>
                 <small>MÉTODO DE PAGAMENTO</small>
-                <h2>Como você quer pagar?</h2>
+                <h2>Como vai pagar esse corre?</h2>
               </div>
             </header>
 
             {configError ? (
               <ErrorState
-                title="Não foi possível carregar pagamentos"
+                title="Os pagamentos deram uma engasgada"
                 description={configError}
                 onRetry={() => window.location.reload()}
               />
             ) : !config ? (
-              <LoadingState label="Consultando métodos disponíveis..." />
+              <LoadingState label="Puxando as formas de pagamento..." />
             ) : (
               <div className="crz-checkout-methods">
                 {(["pix", "card", "crypto"] as CheckoutMethod[]).map((id) => {
@@ -277,7 +277,7 @@ export function CheckoutPage() {
                         <strong>{methodName(id)}</strong>
                         <small>{methodCopy(id)}</small>
                       </span>
-                      <em>{enabled ? "Disponível" : "Configuração pendente"}</em>
+                      <em>{enabled ? "Disponível" : "Ainda configurando"}</em>
                     </button>
                   );
                 })}
@@ -288,8 +288,8 @@ export function CheckoutPage() {
               <div className="crz-checkout-notice">
                 <NeonIcon name="shield" size={26} />
                 <div>
-                  <strong>Gateway preparado, ativação pendente</strong>
-                  <span>Este método de pagamento está temporariamente indisponível. Escolha outra opção ou tente novamente mais tarde.</span>
+                  <strong>Gateway no jeito, só falta liberar.</strong>
+                  <span>Esse método tá fora do round por enquanto. Escolhe outro ou tenta de novo depois.</span>
                 </div>
               </div>
             )}
@@ -298,8 +298,8 @@ export function CheckoutPage() {
               <div className="crz-checkout-auth-gate">
                 <NeonIcon name="verified" size={30} />
                 <div>
-                  <strong>Login necessário</strong>
-                  <span>Entre na sua conta para continuar com a compra.</span>
+                  <strong>Precisa entrar primeiro</strong>
+                  <span>Entra na conta e a gente continua daqui.</span>
                 </div>
                 <a className="crz-button crz-button--primary crz-button--sm" href="/login">Entrar</a>
               </div>
@@ -314,7 +314,7 @@ export function CheckoutPage() {
             <Panel className="crz-checkout-payment-box">
               <header>
                 <Badge tone="blue">PIX GERADO</Badge>
-                <strong>Aguardando pagamento</strong>
+                <strong>Esperando o pagamento cair</strong>
               </header>
               {payment.charge.qrCodeImage && (
                 <img className="crz-checkout-qr" src={payment.charge.qrCodeImage} alt="QR Code PIX" />
@@ -329,7 +329,7 @@ export function CheckoutPage() {
               >
                 Copiar código PIX
               </Button>
-              <small>O produto é liberado após a confirmação do pagamento.</small>
+              <small>Confirmou no servidor, a entrega entra em ação.</small>
             </Panel>
           )}
 
@@ -337,12 +337,12 @@ export function CheckoutPage() {
             <Panel className="crz-checkout-payment-box">
               <header>
                 <Badge tone="gold">LITECOIN</Badge>
-                <strong>Aguardando confirmações da rede</strong>
+                <strong>Esperando a rede bater o martelo</strong>
               </header>
               <div className="crz-checkout-ltc-amount">
                 <small>ENVIE EXATAMENTE</small>
                 <strong>{payment.crypto.payAmount} LTC</strong>
-                <span>Não arredonde o valor.</span>
+                <span>Manda o valor exato. Nem um centavo de freestyle.</span>
               </div>
               <label>
                 <span>Endereço Litecoin</span>
@@ -370,8 +370,8 @@ export function CheckoutPage() {
         <aside className="crz-checkout-summary">
           <Panel className="crz-checkout-summary__panel">
             <header>
-              <small>SEU PEDIDO</small>
-              <h2>Resumo final</h2>
+              <small>TUA COMPRA</small>
+              <h2>Confere a jogada</h2>
             </header>
 
             <div className="crz-checkout-summary__items">
@@ -389,10 +389,10 @@ export function CheckoutPage() {
             {hasUnpricedItems ? (
               <div className="crz-checkout-blocker">
                 <NeonIcon name="shield" size={24} />
-                <span>Existem itens sem preço autoritativo. A cobrança fica bloqueada.</span>
+                <span>Tem item sem preço fechado pelo servidor. Cobrança bloqueada até ficar certo.</span>
               </div>
             ) : quoteState === "loading" ? (
-              <LoadingState label="Recalculando no servidor..." />
+              <LoadingState label="Servidor refazendo as contas..." />
             ) : quote ? (
               <div className="crz-checkout-totals">
                 <div><span>Subtotal</span><strong>{cents(quote.subtotalCents)}</strong></div>
@@ -408,9 +408,9 @@ export function CheckoutPage() {
 
             {couponCode && (
               <div className="crz-checkout-coupon">
-                <span>Cupom informado</span>
+                <span>Cupom na manga</span>
                 <strong>{couponCode}</strong>
-                <small>Combo e cupom não acumulam. O servidor aplica o melhor benefício válido.</small>
+                <small>Combo e cupom não somam. O servidor pega o melhor desconto válido pra ti.</small>
               </div>
             )}
 
@@ -420,15 +420,15 @@ export function CheckoutPage() {
               onClick={createPayment}
               leadingIcon={<NeonIcon name="lightning" size={20} />}
             >
-              {creating ? "Criando cobrança..." : selectedMethod?.enabled ? "Gerar pagamento" : "Método indisponível"}
+              {creating ? "Montando a cobrança..." : selectedMethod?.enabled ? "GERAR PAGAMENTO" : "Esse método saiu do round"}
             </Button>
 
             <div className="crz-checkout-security">
               <NeonIcon name="shield" size={22} />
-              <span>Pagamento protegido e entrega vinculada ao seu pedido.</span>
+              <span>Pagamento protegido e entrega amarrada ao teu pedido.</span>
             </div>
 
-            <a href="/carrinho">← Voltar ao carrinho</a>
+            <a href="/carrinho">← VOLTAR PRA BAG</a>
           </Panel>
         </aside>
       </div>
