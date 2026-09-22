@@ -591,6 +591,24 @@ Não duplicar essa lógica em Checkout, Library, Stock ou Discord Bot.
 ### M44 — CRAZZY DISCORD BRIDGE
 Proprietário da sincronização site ↔ Discord.
 
+Regra fixa de infraestrutura:
+- existe apenas UM Bot Core CRAZZY PROJECT;
+- um Discord application/client;
+- um token;
+- uma conexão Gateway;
+- um processo Discloud;
+- Campanhas/DM e Server Builder já são módulos internos desse mesmo processo;
+- Bridge, Notify, Support e Security Alerts entram como módulos adicionais, nunca como bots separados.
+
+Server Builder já incorporado ao Bot Core:
+- /preview-tema;
+- /montar-servidor;
+- editor visual em /admin/discord;
+- template/tema centralizados no Supabase;
+- fila e histórico;
+- SAFE MODE append-only;
+- sem delete/rename/move/reposition/perms em recursos existentes.
+
 Inclui:
 - bot;
 - guild;
