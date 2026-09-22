@@ -56,53 +56,83 @@ using (private.has_role((select auth.uid()),'admin'::app_role))
 with check (private.has_role((select auth.uid()),'admin'::app_role));
 
 -- Migrate any M25 draft data that was temporarily stored on public tables.
-insert into private.product_operations(product_id,automation_flags,updated_at)
-select id,coalesce(automation_flags,'{}'::jsonb),now()
-from public.products
-on conflict(product_id) do update
-set automation_flags=excluded.automation_flags,
-    updated_at=now();
+-- Dynamic SQL keeps this migration recoverable if an earlier attempt already dropped
+-- the temporary public operational columns.
+do $migrate_product_ops$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema='public'
+      and table_name='products'
+      and column_name='automation_flags'
+  ) then
+    execute $sql$
+      insert into private.product_operations(product_id,automation_flags,updated_at)
+      select id,coalesce(automation_flags,'{}'::jsonb),now()
+      from public.products
+      on conflict(product_id) do update
+      set automation_flags=excluded.automation_flags,
+          updated_at=now()
+    $sql$;
+  end if;
+end
+$migrate_product_ops$;
 
-insert into private.product_plan_operations(
-  product_plan_id,
-  delivery_mode,
-  discord_role_id,
-  discord_role_name,
-  discord_role_color,
-  discord_role_position,
-  entitlement_duration_minutes,
-  supplier_provider,
-  supplier_product_id,
-  supplier_variation_id,
-  automation_flags,
-  updated_at
-)
-select
-  id,
-  coalesce(delivery_mode,'manual'),
-  discord_role_id,
-  discord_role_name,
-  discord_role_color,
-  discord_role_position,
-  entitlement_duration_minutes,
-  supplier_provider,
-  supplier_product_id,
-  supplier_variation_id,
-  coalesce(automation_flags,'{}'::jsonb),
-  now()
-from public.product_plans
-on conflict(product_plan_id) do update
-set delivery_mode=excluded.delivery_mode,
-    discord_role_id=excluded.discord_role_id,
-    discord_role_name=excluded.discord_role_name,
-    discord_role_color=excluded.discord_role_color,
-    discord_role_position=excluded.discord_role_position,
-    entitlement_duration_minutes=excluded.entitlement_duration_minutes,
-    supplier_provider=excluded.supplier_provider,
-    supplier_product_id=excluded.supplier_product_id,
-    supplier_variation_id=excluded.supplier_variation_id,
-    automation_flags=excluded.automation_flags,
-    updated_at=now();
+do $migrate_plan_ops$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema='public'
+      and table_name='product_plans'
+      and column_name='delivery_mode'
+  ) then
+    execute $sql$
+      insert into private.product_plan_operations(
+        product_plan_id,
+        delivery_mode,
+        discord_role_id,
+        discord_role_name,
+        discord_role_color,
+        discord_role_position,
+        entitlement_duration_minutes,
+        supplier_provider,
+        supplier_product_id,
+        supplier_variation_id,
+        automation_flags,
+        updated_at
+      )
+      select
+        id,
+        coalesce(delivery_mode,'manual'),
+        discord_role_id,
+        discord_role_name,
+        discord_role_color,
+        discord_role_position,
+        entitlement_duration_minutes,
+        supplier_provider,
+        supplier_product_id,
+        supplier_variation_id,
+        coalesce(automation_flags,'{}'::jsonb),
+        now()
+      from public.product_plans
+      on conflict(product_plan_id) do update
+      set delivery_mode=excluded.delivery_mode,
+          discord_role_id=excluded.discord_role_id,
+          discord_role_name=excluded.discord_role_name,
+          discord_role_color=excluded.discord_role_color,
+          discord_role_position=excluded.discord_role_position,
+          entitlement_duration_minutes=excluded.entitlement_duration_minutes,
+          supplier_provider=excluded.supplier_provider,
+          supplier_product_id=excluded.supplier_product_id,
+          supplier_variation_id=excluded.supplier_variation_id,
+          automation_flags=excluded.automation_flags,
+          updated_at=now()
+    $sql$;
+  end if;
+end
+$migrate_plan_ops$;
 
 -- Operational mappings are intentionally removed from public REST-readable tables.
 alter table public.products
