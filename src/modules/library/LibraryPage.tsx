@@ -23,9 +23,9 @@ type LibraryTab = "all" | "key" | "account" | "link" | "reward" | "history";
 const tabs: Array<{ id: LibraryTab; label: string }> = [
   { id: "all", label: "Tudo" },
   { id: "key", label: "Minhas Keys" },
-  { id: "account", label: "Minhas Contas" },
-  { id: "link", label: "Links / Downloads" },
-  { id: "reward", label: "Trials / Recompensas" },
+  { id: "account", label: "Minhas contas" },
+  { id: "link", label: "Links e downloads" },
+  { id: "reward", label: "Trials e drops" },
   { id: "history", label: "Histórico" },
 ];
 
@@ -100,11 +100,11 @@ export function LibraryPage() {
         credentials: "same-origin",
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload?.error || "Não foi possível abrir sua Library.");
+      if (!response.ok) throw new Error(payload?.error || "Tua Library não abriu agora.");
       setSnapshot(payload as LibrarySnapshot);
       setState("ready");
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Falha ao carregar a Library.");
+      setError(loadError instanceof Error ? loadError.message : "A Library deu uma engasgada.");
       setState("error");
     }
   };
@@ -141,8 +141,8 @@ export function LibraryPage() {
       if (!response.ok) {
         throw new Error(
           payload?.error === "DELIVERY_NOT_AVAILABLE"
-            ? "Esta entrega não está disponível para revelação."
-            : payload?.error || "Não foi possível revelar a entrega."
+            ? "Essa entrega não tá pronta pra revelar."
+            : payload?.error || "Não deu pra revelar isso agora."
         );
       }
 
@@ -163,7 +163,7 @@ export function LibraryPage() {
         };
       });
     } catch (revealError) {
-      setError(revealError instanceof Error ? revealError.message : "Falha ao revelar.");
+      setError(revealError instanceof Error ? revealError.message : "A revelação tropeçou.");
     } finally {
       setRevealBusy(null);
     }
@@ -194,7 +194,7 @@ export function LibraryPage() {
   if (state === "loading") {
     return (
       <main className="crz-library-page crz-library-state">
-        <LoadingState label="Abrindo sua Library segura..." />
+        <LoadingState label="Abrindo tua bag segura..." />
       </main>
     );
   }
@@ -203,8 +203,8 @@ export function LibraryPage() {
     return (
       <main className="crz-library-page crz-library-state">
         <ErrorState
-          title="Sua Library não carregou"
-          description={error || "Tente novamente."}
+          title="Tua bag não entrou no mapa"
+          description={error || "Tenta mais uma."}
           onRetry={() => void load()}
         />
       </main>
@@ -217,7 +217,7 @@ export function LibraryPage() {
         <div className="crz-container crz-library-hero__inner">
           <div>
             <small>M11 • CRAZZY LIBRARY</small>
-            <h1>Suas entregas, sob seu controle</h1>
+            <h1>Tua bag. Teu controle.</h1>
             <p>
               Keys, contas e links ficam mascarados até você pedir a revelação segura.
             </p>
@@ -232,7 +232,7 @@ export function LibraryPage() {
       </section>
 
       <div className="crz-container crz-library-shell">
-        <nav className="crz-library-tabs" aria-label="Categorias da Library">
+        <nav className="crz-library-tabs" aria-label="Separa por tipo">
           {tabs.map((item) => (
             <button
               key={item.id}
@@ -248,7 +248,7 @@ export function LibraryPage() {
         <div className="crz-library-security">
           <NeonIcon name="shield" size={24} />
           <div>
-            <strong>Reveal protegido</strong>
+            <strong>Reveal no modo seguro</strong>
             <span>
               O conteúdo não fica em localStorage, URL ou snapshot. Ao ocultar ou trocar de aba,
               o plaintext sai da interface.
@@ -261,7 +261,7 @@ export function LibraryPage() {
             <header>
               <div>
                 <small>AUDITORIA</small>
-                <h2>Histórico de revelações e cópias</h2>
+                <h2>Tudo que tu revelou ou copiou</h2>
               </div>
               <Badge tone="blue">{snapshot.history.length}</Badge>
             </header>
@@ -269,8 +269,8 @@ export function LibraryPage() {
             {!snapshot.history.length ? (
               <EmptyState
                 icon={<NeonIcon name="shield" size={38} />}
-                title="Nenhuma revelação registrada"
-                description="Quando você revelar ou copiar uma entrega, o evento aparecerá aqui. O segredo nunca é salvo no histórico."
+                title="Nada revelado ainda"
+                description="Revelou ou copiou? O evento fica no histórico, mas o segredo não fica dando sopa."
               />
             ) : (
               <div className="crz-library-history">
@@ -279,7 +279,7 @@ export function LibraryPage() {
                     <NeonIcon name={event.action === "copy" ? "verified" : "shield"} size={22} />
                     <div>
                       <strong>{event.productName}</strong>
-                      <span>{event.action === "copy" ? "Conteúdo copiado" : "Conteúdo revelado"} • {typeLabel(event.deliveryType)}</span>
+                      <span>{event.action === "copy" ? "Copiado. GG." : "Reveal feito"} • {typeLabel(event.deliveryType)}</span>
                     </div>
                     <small>{formatDate(event.createdAt)}</small>
                   </article>
@@ -291,9 +291,9 @@ export function LibraryPage() {
           <div className="crz-library-empty">
             <EmptyState
               icon={<NeonIcon name="cube" size={42} />}
-              title="Nada nesta categoria ainda"
-              description="As entregas concluídas aparecerão aqui automaticamente."
-              action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">Ver produtos</a>}
+              title="Essa prateleira tá vazia"
+              description="Entregou no servidor, cai aqui sozinho."
+              action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">VER O ARSENAL</a>}
             />
           </div>
         ) : (
@@ -320,9 +320,9 @@ export function LibraryPage() {
                   <div className="crz-library-card__body">
                     <div className="crz-library-card__headline">
                       <div>
-                        <small>{delivery.plan.name || delivery.plan.code || "ENTREGA DIGITAL"}</small>
+                        <small>{delivery.plan.name || delivery.plan.code || "DROP DIGITAL"}</small>
                         <strong>{accountName || delivery.product.name}</strong>
-                        <span>{delivery.product.statusLabel || "Entrega registrada"}</span>
+                        <span>{delivery.product.statusLabel || "Entrega no histórico"}</span>
                       </div>
                       <Badge tone={statusTone(delivery.status)}>
                         {statusLabel(delivery.status)}
@@ -335,10 +335,10 @@ export function LibraryPage() {
                           {delivery.deliveryType === "account"
                             ? "Credenciais"
                             : delivery.deliveryType === "link"
-                              ? "Link privado"
-                              : "Conteúdo da entrega"}
+                              ? "Link no modo fechado"
+                              : "O que caiu pra ti"}
                         </span>
-                        {isRevealed && <b>VISÍVEL TEMPORARIAMENTE</b>}
+                        {isRevealed && <b>ABERTO POR TEMPO CURTO</b>}
                       </div>
                       <pre>{isRevealed ? revealed.payload : maskedValue(delivery.deliveryType)}</pre>
                     </div>
@@ -352,10 +352,10 @@ export function LibraryPage() {
                           leadingIcon={<NeonIcon name="shield" size={18} />}
                         >
                           {revealBusy === delivery.id
-                            ? "Revelando..."
+                            ? "ABRINDO..."
                             : delivery.canReveal
                               ? "Revelar"
-                              : "Indisponível"}
+                              : "FORA DO ROUND"}
                         </Button>
                       ) : (
                         <>
@@ -364,7 +364,7 @@ export function LibraryPage() {
                             leadingIcon={<NeonIcon name="verified" size={18} />}
                           >
                             {copyStatus === delivery.id
-                              ? "Copiado ✓"
+                              ? "COPIADO ✓"
                               : copyStatus === "copy-error:" + delivery.id
                                 ? "Falhou"
                                 : "Copiar"}
@@ -385,7 +385,7 @@ export function LibraryPage() {
                     <div className="crz-library-card__meta">
                       <span>Entregue: <strong>{formatDate(delivery.deliveredAt)}</strong></span>
                       <span>
-                        Expiração: <strong>{delivery.expiresAt ? formatDate(delivery.expiresAt) : "Sem expiração"}</strong>
+                        Expiração: <strong>{delivery.expiresAt ? formatDate(delivery.expiresAt) : "Sem relógio correndo"}</strong>
                       </span>
                       <span>Revelações: <strong>{delivery.revealCount}</strong></span>
                       <span>Última: <strong>{formatDate(delivery.lastRevealedAt)}</strong></span>
@@ -395,14 +395,14 @@ export function LibraryPage() {
                       {delivery.tutorialAvailable ? (
                         <span className="is-info">📖 Tutorial liberado • viewer no M22</span>
                       ) : (
-                        <span>Sem tutorial associado</span>
+                        <span>Sem tutorial grudado nisso</span>
                       )}
                       {role ? (
                         <span className={role.status === "granted" ? "is-ok" : ""}>
                           Discord: {role.role_name || "Cargo"} • {role.status}
                         </span>
                       ) : (
-                        <span>Sem cargo Discord associado</span>
+                        <span>Sem cargo Discord ligado nisso</span>
                       )}
                     </footer>
                   </div>
