@@ -433,6 +433,8 @@ Adicionar:
 - delivery log.
 
 ### M29 — CRAZZY PAYMENTS
+Status: IMPLEMENTADO / QA FINAL.
+
 Gateway principal: PurinCash.
 
 Admin:
@@ -440,16 +442,33 @@ Admin:
 - cartão;
 - LTC;
 - transações;
-- paymentId/orderCode;
+- paymentId/orderCode mascarado;
 - status;
-- tentativas;
-- webhooks;
-- idempotência;
+- tentativas/idempotência;
+- webhooks/eventos operacionais;
 - divergências;
-- reconciliação;
-- reembolso;
+- reconciliação manual real contra o gateway;
+- casos de reembolso;
 - disputas;
 - evidências.
+
+Implementado:
+- rota `/admin/pagamentos`;
+- filtros por status/método/cliente/payment/charge/idempotency;
+- liga/desliga de métodos via `payment_settings`;
+- `payment_events`;
+- `payment_reconcile_requests`;
+- `payment_refunds`;
+- `payment_disputes`;
+- `payment_dispute_evidence`;
+- RPCs admin-only com SECURITY INVOKER;
+- Edge Function `purincash-payment?action=admin-reconcile`;
+- verificação de admin no Edge;
+- comparação de valor gateway x pedido;
+- reaproveitamento do fulfillment idempotente existente;
+- divergência crítica não força transição insegura;
+- nenhum payload bruto/QR/proof/segredo no painel;
+- registro de refund não movimenta dinheiro automaticamente até endpoint oficial ser validado.
 
 Capacidades PurinCash úteis reservadas:
 - sandbox para PIX;
@@ -458,7 +477,7 @@ Capacidades PurinCash úteis reservadas:
 - LTC;
 - cartão hospedado;
 - automatic delivery/supplier opcional;
-- disputas/evidências;
+- refund provider real somente após validação oficial do endpoint;
 - subscriptions opcionais;
 - split/subcontas opcionais para revendedores.
 
