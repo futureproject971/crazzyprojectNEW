@@ -4,6 +4,27 @@ Atualizado em 2026-09-21 após auditoria dos projetos antigos, PurinCash, Discor
 
 ## Regra central
 
+### Regra permanente — Discord
+A CRAZZY PROJECT terá **um único bot Discord oficial**.
+
+Arquitetura obrigatória:
+- um único token Discord;
+- um único processo/worker 24/7 na Discloud;
+- arquitetura modular interna;
+- Supabase como fila/estado compartilhado com o site;
+- site como painel de controle;
+- nunca criar outro bot separado para campanha, cargo, notificação, ticket ou alerta;
+- novos recursos Discord entram como módulo do mesmo bot-core.
+
+Módulos previstos no bot-core:
+1. Campaigns/DM;
+2. Discord Bridge de cargos;
+3. Notify;
+4. Tickets/Support;
+5. Security Sentinel alerts;
+6. Slash commands administrativos;
+7. integrações futuras.
+
 A CRAZZY PROJECT continua sendo a fonte de verdade para:
 - arquitetura;
 - identidade visual;
