@@ -23,10 +23,10 @@ import {
 } from "./data";
 
 const tabItems = [
-  { id: "description", label: "Descrição" },
-  { id: "demo", label: "Demo Interativa" },
+  { id: "description", label: "A visão" },
+  { id: "demo", label: "Testa no navegador" },
   { id: "compatibility", label: "Compatibilidade" },
-  { id: "reviews", label: "Avaliações" },
+  { id: "reviews", label: "Reviews" },
   { id: "faq", label: "Dúvidas" },
 ];
 
@@ -80,7 +80,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
 
   const handlePurchase = () => {
     if (product.stock === "out" || selectedPlanData.stockCount === 0) {
-      setNotice("Este plano está esgotado no momento.");
+      setNotice("Esse plano evaporou por enquanto.");
       return;
     }
 
@@ -102,7 +102,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
       comboEligible: selectedPlanData.code === "30d" || selectedPlanData.code === "lifetime",
     });
 
-    setNotice(selectedPlanData.name + " adicionado ao carrinho.");
+    setNotice(selectedPlanData.name + " caiu na tua bag.");
     openCart();
   };
 
@@ -193,7 +193,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
 
             <div className="crz-product-plan-block" id="planos">
               <div className="crz-product-plan-block__head">
-                <span>ESCOLHA UMA OPÇÃO</span>
+                <span>ESCOLHE A JOGADA</span>
                 <strong>{selectedPlanData.duration}</strong>
               </div>
 
@@ -219,7 +219,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
 
             <div className="crz-product-buy-box">
               <div>
-                <small>PLANO SELECIONADO</small>
+                <small>PLANO NA MIRA</small>
                 <strong>{selectedPlanData.name}</strong>
                 <span>{selectedPlanData.priceLabel}</span>
               </div>
@@ -231,8 +231,8 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
                 leadingIcon={<NeonIcon name="lightning" size={20} />}
               >
                 {product.stock === "out" || selectedPlanData.stockCount === 0
-                  ? "Plano esgotado"
-                  : "Adicionar ao carrinho"}
+                  ? "Esse plano foi de base"
+                  : "JOGAR NA BAG"}
               </Button>
 
               <p>
@@ -250,7 +250,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
           </aside>
         </section>
 
-        <section className="crz-product-benefits" aria-label="Benefícios">
+        <section className="crz-product-benefits" aria-label="O que vem junto">
           {detail.benefits.map((benefit) => (
             <div key={benefit.title}>
               <NeonIcon name={benefit.icon} size={30} />
@@ -268,7 +268,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
               items={tabItems}
               value={activeTab}
               onChange={setActiveTab}
-              ariaLabel="Informações do produto"
+              ariaLabel="Raio-X do produto"
             />
           </div>
 
@@ -277,8 +277,8 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
               <div className="crz-product-info__description">
                 <SectionTitle
                   icon={<NeonIcon name="cube" size={28} />}
-                  title="Sobre este produto"
-                  description="Informações organizadas antes da etapa de compra."
+                  title="Qual é a desse produto"
+                  description="Tudo mastigado antes de tu fechar a compra."
                 />
                 <p>{detail.longDescription}</p>
 
@@ -297,8 +297,8 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
               <div className="crz-product-demo-tab">
                 <SectionTitle
                   icon={<NeonIcon name="customization" size={28} />}
-                  title="Teste o menu no navegador"
-                  description="Uma simulação interativa do painel para você experimentar abas, botões, sliders e o preview antes da compra."
+                  title="Mexe no painel antes de levar"
+                  description="Fuça aba, botão, slider e preview à vontade antes de meter ficha."
                 />
                 <InteractiveImGuiDemo title={product.name} />
               </div>
@@ -310,7 +310,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
                   <SectionTitle
                     icon={<NeonIcon name="gear" size={28} />}
                     title="Compatibilidade"
-                    description="Exemplo visual até os dados reais do produto serem conectados."
+                    description="Preview visual enquanto os dados reais não entram no round."
                   />
                   <ul>
                     {detail.compatibility.map((item) => <li key={item}>{item}</li>)}
@@ -321,7 +321,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
                   <SectionTitle
                     icon={<NeonIcon name="shield" size={28} />}
                     title="Requisitos"
-                    description="Checklist de preparação."
+                    description="Checklist pra não entrar torto."
                   />
                   <ul>
                     {detail.requirements.map((item) => <li key={item}>{item}</li>)}
@@ -334,8 +334,8 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
               <div className="crz-product-reviews">
                 <SectionTitle
                   icon={<NeonIcon name="verified" size={28} />}
-                  title="Avaliações verificadas"
-                  description="Somente compras reais recebem o selo de cliente verificado."
+                  title="Reviews verificadas"
+                  description="Selo verificado só aparece quando a compra existe de verdade."
                 />
                 <VerifiedReviewFeed
                   productId={/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(product.id) ? product.id : undefined}
@@ -351,8 +351,8 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
               <div className="crz-product-faq">
                 <SectionTitle
                   icon={<NeonIcon name="book" size={28} />}
-                  title="Ajuda e dúvidas"
-                  description="Respostas da Central de Ajuda da CRAZZY PROJECT."
+                  title="Travou? Cola aqui"
+                  description="Resposta rápida da CRAZZY PROJECT pra não te deixar rodando em círculo."
                 />
                 <HelpFaqPreview query={product.name} limit={5} />
                 <a className="crz-button crz-button--secondary crz-button--sm" href="/help">
@@ -366,11 +366,11 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
         <section className="crz-product-related" aria-labelledby="related-title">
           <SectionTitle
             icon={<NeonIcon name="featured" size={30} />}
-            title="Você também pode gostar"
-            description="Produtos relacionados da CRAZZY PROJECT."
+            title="Talvez isso aqui seja tua cara"
+            description="Mais umas paradas do mesmo universo."
           />
 
-          <h2 id="related-title" className="sr-only">Produtos relacionados</h2>
+          <h2 id="related-title" className="sr-only">Mais do mesmo corre</h2>
 
           <div className="crz-product-related__grid">
             {related.map((item) => (
@@ -403,7 +403,7 @@ export function ProductView({ detail }: { detail: ProductDetail }) {
           aria-label="Imagem ampliada do produto"
           onClick={() => setZoomOpen(false)}
         >
-          <button type="button" onClick={() => setZoomOpen(false)} aria-label="Fechar zoom">
+          <button type="button" onClick={() => setZoomOpen(false)} aria-label="FECHAR">
             ×
           </button>
           <div onClick={(event) => event.stopPropagation()}>
