@@ -11,6 +11,7 @@ const footerLinks = [
   { label: "Contas", href: "/contas" },
   { label: "Feedbacks", href: "/feedbacks" },
   { label: "Comunidade", href: "/comunidade" },
+  { label: "CRAZZY CALL", href: "/call" },
   { label: "Suporte", href: "/tickets" },
   { label: "Status", href: "/status" },
   { label: "Academy", href: "/academy" },
