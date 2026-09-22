@@ -25,7 +25,7 @@ export function AppFooter() {
 
       <div className="crz-shell-footer__inner">
         <div className="crz-shell-footer__brand">
-          <img src="/brand/crazzy-logo-navbar.png" alt="CRAZZY PROJECT" />
+          <img src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT" />
           <div>
             <strong>CRAZZY PROJECT</strong>
             <p>Produtos digitais, comunidade e suporte em um só lugar.</p>

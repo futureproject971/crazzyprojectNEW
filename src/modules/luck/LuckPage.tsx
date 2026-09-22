@@ -95,7 +95,7 @@ function WheelGame({
         >
           <div className="crz-luck-wheel__rings" />
           <div className="crz-luck-wheel__hub">
-            <img src="/brand/crazzy-logo-navbar.png" alt="" aria-hidden="true" />
+            <img src="/brand/crazzy-logo-hero.png" alt="" aria-hidden="true" />
             <span>LUCK</span>
           </div>
         </div>
