@@ -29,7 +29,7 @@ export function AppFooter() {
           <img src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT" />
           <div>
             <strong>CRAZZY PROJECT</strong>
-            <p>Produtos digitais, comunidade e suporte em um só lugar.</p>
+            <p>Produto, resenha e suporte no mesmo corre.</p>
           </div>
         </div>
 
@@ -40,7 +40,7 @@ export function AppFooter() {
         </nav>
 
         <div className="crz-shell-footer__social">
-          <span>Siga a CRAZZY PROJECT</span>
+          <span>COLA NO BONDE CRAZZY</span>
           <div>
             {socials.map((item) => (
               <a href="#" aria-label={item.label} key={item.label}>
@@ -53,8 +53,8 @@ export function AppFooter() {
 
       <div className="crz-shell-footer__bottom">
         <span>© {new Date().getFullYear()} CRAZZY PROJECT</span>
-        <a className="crz-shell-footer__status" href="/status"><i /> Ver status dos serviços</a>
-        <strong>GAMERS BUILD A BETTER TOMORROW</strong>
+        <a className="crz-shell-footer__status" href="/status"><i /> Ver se tá tudo no ar</a>
+        <strong>QUEM NAO XITA NAO BRILHA</strong>
       </div>
     </footer>
   );
