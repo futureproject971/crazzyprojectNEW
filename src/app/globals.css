@@ -30,6 +30,8 @@
 @import "../modules/product-manager/styles.css";
 @import "../modules/category-manager/styles.css";
 @import "../modules/stock-manager/styles.css";
+@import "../modules/sales-manager/styles.css";
+@import "../core/design-system/styles/card-surfaces.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */

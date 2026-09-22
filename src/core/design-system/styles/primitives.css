@@ -258,16 +258,14 @@
 .crz-panel {
   border: 1px solid var(--crz-color-line);
   border-radius: var(--crz-radius-md);
-  background: var(--crz-gradient-panel);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.025),
-    var(--crz-shadow-panel);
+  background: var(--crz-gradient-card);
+  box-shadow: var(--crz-card-shadow);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
 
 .crz-panel--soft {
-  background: var(--crz-gradient-panel-soft);
+  background: var(--crz-gradient-card-soft);
 }
 
 .crz-panel--interactive {

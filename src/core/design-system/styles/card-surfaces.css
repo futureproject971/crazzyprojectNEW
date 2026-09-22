@@ -1,0 +1,142 @@
+/* CRAZZY PROJECT — premium card surfaces
+   Applies only to content surfaces. Artwork, photos, wallpapers, galleries,
+   thumbnails and media stages keep their own backgrounds. */
+
+:where(
+  .social-panel,
+  .crz-discovery-card,
+  .crz-discovery-state-card,
+  .crz-catalog-card,
+  .crz-catalog-filters,
+  .crz-catalog-results__meta,
+  .crz-product-summary,
+  .crz-product-info__panel,
+  .crz-product-benefits,
+  .crz-product-related,
+  .crz-product-status-grid > div,
+  .crz-product-buy-box,
+  .crz-product-notice,
+  .crz-product-reviews__summary,
+  .crz-account-card,
+  .crz-account-detail__summary,
+  .crz-account-detail__panel,
+  .crz-account-detail__price-box,
+  .crz-account-detail__activity-box,
+  .crz-account-detail__facts-panel,
+  .crz-cart-item,
+  .crz-cart-summary__panel,
+  .crz-cart-combo-status,
+  .crz-combo-card,
+  .crz-checkout-panel,
+  .crz-checkout-payment-box,
+  .crz-checkout-summary__panel,
+  .crz-checkout-notice,
+  .crz-auth-card,
+  .crz-auth-recovery__panel,
+  .crz-hub-sidebar nav,
+  .crz-hub-panel,
+  .crz-hub-stat,
+  .crz-hub-discord-card,
+  .crz-library-panel,
+  .crz-library-card,
+  .crz-library-history,
+  .crz-profile-card,
+  .crz-profile-panel,
+  .crz-profile-stat,
+  .crz-support-stat,
+  .crz-support-list-panel,
+  .crz-support-form-panel,
+  .crz-support-chat-panel,
+  .crz-support-context-card,
+  .crz-support-timeline-card,
+  .crz-support-ticket-card,
+  .crz-support-closed-notice,
+  .crz-community-channel-panel,
+  .crz-community-chat-panel,
+  .crz-community-profile-card,
+  .crz-review-card,
+  .crz-reviews-notice,
+  .crz-club-hero-card,
+  .crz-club-card:not(.crz-club-card--pink):not(.crz-club-card--gold):not(.crz-club-card--green),
+  .crz-rewards-login,
+  .crz-rewards-catalog,
+  .crz-rewards-active,
+  .crz-rewards-history,
+  .crz-reward-card,
+  .crz-luck-rules,
+  .crz-luck-game,
+  .crz-luck-odds,
+  .crz-luck-history,
+  .crz-luck-result,
+  .crz-luck-odds__list > div,
+  .crz-luck-history__grid article,
+  .crz-coupons-summary,
+  .crz-coupon-card,
+  .crz-rank-hero-card,
+  .crz-status-overall,
+  .crz-status-components,
+  .crz-status-incidents,
+  .crz-status-help,
+  .crz-academy-summary,
+  .crz-academy-card,
+  .crz-help-search-box,
+  .crz-control-panel,
+  .crz-pm-create-card,
+  .crz-pm-subsection,
+  .crz-cm-list-panel,
+  .crz-category-directory__card,
+  .crz-stock-summary > div,
+  .crz-stock-plans,
+  .crz-stock-workspace,
+  .crz-stock-history > article,
+  .crz-stock-plan-metrics > div
+) {
+  background: var(--crz-gradient-card);
+  border-color: var(--crz-card-border);
+  box-shadow: var(--crz-card-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+:where(
+  .crz-product-plans button,
+  .crz-reward-card__products button,
+  .crz-support-category-grid button,
+  .crz-stock-plan-list > button,
+  .crz-library-card__meta,
+  .crz-account-stat
+) {
+  background: var(--crz-gradient-card-soft);
+  border-color: rgba(75, 135, 218, .18);
+}
+
+/* Preserve blue emphasis without turning selected cards into flat blue slabs. */
+:where(
+  .crz-product-plans button.is-selected,
+  .crz-product-plans button:hover,
+  .crz-stock-plan-list > button.is-active,
+  .crz-support-category-grid button.is-active,
+  .crz-support-category-grid button:hover
+) {
+  background:
+    radial-gradient(120% 110% at 16% -8%, rgba(31, 133, 255, .24), transparent 57%),
+    radial-gradient(80% 70% at 100% 100%, rgba(0, 199, 255, .07), transparent 62%),
+    linear-gradient(145deg, rgba(10, 30, 54, .985), rgba(5, 14, 27, .995));
+  border-color: var(--crz-card-border-hover);
+}
+
+/* Image/media surfaces deliberately excluded:
+   *-art, *-visual, *-banner, *-gallery, *-thumb, *-preview,
+   hero wallpapers, wheel/scratch/drop visuals and video stages. */
+
+html[data-theme="light"] :where(
+  .crz-product-plans button.is-selected,
+  .crz-product-plans button:hover,
+  .crz-stock-plan-list > button.is-active,
+  .crz-support-category-grid button.is-active,
+  .crz-support-category-grid button:hover
+) {
+  background:
+    radial-gradient(115% 100% at 15% -8%, rgba(0, 112, 240, .12), transparent 58%),
+    linear-gradient(145deg, rgba(255,255,255,.99), rgba(235,245,255,.99));
+}
