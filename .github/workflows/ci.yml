@@ -103,3 +103,7 @@ jobs:
       - name: Test M24 Control Center
         if: github.ref_name == 'm24-control-center-work'
         run: node scripts/test-m24-control-center.mjs
+
+      - name: Test CRAZZY CALL
+        if: github.ref_name == 'mcall-crazzy-call' || github.head_ref == 'mcall-crazzy-call'
+        run: node scripts/test-crazzy-call.mjs
