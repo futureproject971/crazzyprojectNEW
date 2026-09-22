@@ -53,7 +53,7 @@ export function AuthPage({
 
       <section className="crz-auth-card">
         <a className="crz-auth-brand" href="/">
-          <img src="/brand/crazzy-logo-navbar.png" alt="CRAZZY PROJECT" />
+          <img src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT" />
         </a>
 
         <div className="crz-auth-heading">
