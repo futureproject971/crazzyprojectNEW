@@ -9,6 +9,7 @@ import {
   startCampaignWorker,
   startWorkerHeartbeat,
 } from "./modules/campaigns.js";
+import { startBuilderWorker } from "./modules/server-builder.js";
 import {
   deployCommands,
   installCommandHandlers,
@@ -31,6 +32,7 @@ const client = new Client({
 installCommandHandlers(client, supabase, config);
 
 let stopCampaigns = null;
+let stopBuilder = null;
 let stopHeartbeat = null;
 
 client.once("ready", async () => {
@@ -44,12 +46,14 @@ client.once("ready", async () => {
 
   stopHeartbeat = startWorkerHeartbeat(client, supabase, config);
   stopCampaigns = startCampaignWorker(client, supabase, config);
+  stopBuilder = startBuilderWorker(client, supabase, config);
 });
 
 async function shutdown(signal) {
   console.log("[core] shutdown requested: " + signal);
 
   stopCampaigns?.();
+  stopBuilder?.();
   stopHeartbeat?.();
 
   try {
