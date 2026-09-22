@@ -53,11 +53,11 @@ export function SupportListPage() {
         credentials: "same-origin",
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload?.error || "Não foi possível carregar seus tickets.");
+      if (!response.ok) throw new Error(payload?.error || "Teus tickets não apareceram agora.");
       setSnapshot(payload as SupportSnapshot);
       setState("ready");
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Falha ao carregar tickets.");
+      setError(loadError instanceof Error ? loadError.message : "O suporte deu uma engasgada.");
       setState("error");
     }
   };
@@ -69,7 +69,7 @@ export function SupportListPage() {
   if (state === "loading") {
     return (
       <main className="crz-support-page crz-support-state">
-        <LoadingState label="Carregando seus tickets..." />
+        <LoadingState label="Puxando tuas conversas..." />
       </main>
     );
   }
@@ -78,8 +78,8 @@ export function SupportListPage() {
     return (
       <main className="crz-support-page crz-support-state">
         <ErrorState
-          title="Seus tickets não carregaram"
-          description={error || "Tente novamente."}
+          title="Teus tickets não entraram no mapa"
+          description={error || "Mete mais uma tentativa."}
           onRetry={() => void load()}
         />
       </main>
@@ -92,8 +92,8 @@ export function SupportListPage() {
         <div className="crz-container crz-support-hero__inner">
           <div>
             <small>M13 • CRAZZY SUPPORT</small>
-            <h1>Central de suporte</h1>
-            <p>Abra tickets, envie arquivos e acompanhe cada resposta em uma thread privada.</p>
+            <h1>QG do suporte</h1>
+            <p>Abre a treta, manda arquivo e acompanha tudo numa conversa privada.</p>
           </div>
           <a className="crz-button crz-button--primary crz-button--md" href="/tickets/novo">
             + Abrir ticket
@@ -105,9 +105,9 @@ export function SupportListPage() {
         <section className="crz-support-stats">
           {[
             ["Total", snapshot.stats.total, "ticket"],
-            ["Em atendimento", snapshot.stats.open, "community"],
-            ["Aguardando suporte", snapshot.stats.waitingStaff, "shield"],
-            ["Sua vez", snapshot.stats.waitingUser, "lightning"],
+            ["Tão contigo agora", snapshot.stats.open, "community"],
+            ["Na fila do suporte", snapshot.stats.waitingStaff, "shield"],
+            ["A bola tá contigo", snapshot.stats.waitingUser, "lightning"],
           ].map(([label, value, icon]) => (
             <Panel className="crz-support-stat" key={String(label)}>
               <NeonIcon name={icon as "ticket" | "community" | "shield" | "lightning"} size={26} />
@@ -122,8 +122,8 @@ export function SupportListPage() {
         <Panel className="crz-support-list-panel">
           <header>
             <div>
-              <small>MEUS TICKETS</small>
-              <h2>Conversas de suporte</h2>
+              <small>MEUS CORRES</small>
+              <h2>Papos com o suporte</h2>
             </div>
             <Badge tone="blue">{snapshot.tickets.length}</Badge>
           </header>
@@ -131,9 +131,9 @@ export function SupportListPage() {
           {!snapshot.tickets.length ? (
             <EmptyState
               icon={<NeonIcon name="ticket" size={42} />}
-              title="Nenhum ticket aberto"
-              description="Quando precisar de ajuda, abra um ticket. Você pode anexar imagens, vídeos, áudios, PDF e TXT."
-              action={<a className="crz-button crz-button--primary crz-button--md" href="/tickets/novo">Abrir primeiro ticket</a>}
+              title="Nenhuma treta aberta"
+              description="Deu ruim? Abre um ticket e joga imagem, vídeo, áudio, PDF ou TXT junto."
+              action={<a className="crz-button crz-button--primary crz-button--md" href="/tickets/novo">ABRIR O PRIMEIRO</a>}
             />
           ) : (
             <div className="crz-support-ticket-list">
@@ -150,7 +150,7 @@ export function SupportListPage() {
                         <Badge tone={status.tone}>{status.label}</Badge>
                       </div>
                       <strong>{ticket.subject}</strong>
-                      <p>{ticket.lastMessagePreview || "Ticket criado. Aguardando primeira atualização."}</p>
+                      <p>{ticket.lastMessagePreview || "Ticket nasceu. Agora tá esperando o primeiro retorno."}</p>
                       <footer>
                         <span>{date(ticket.updatedAt)}</span>
                         {ticket.context.product && <span>{ticket.context.product.name}</span>}
