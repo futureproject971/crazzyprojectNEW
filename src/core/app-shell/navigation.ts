@@ -29,7 +29,7 @@ export const clientNavigation: ShellNavItem[] = [
 export const adminNavigation: ShellNavItem[] = [
   { id: "admin", label: "Control", href: "/admin#inicio", icon: "/icons/home.svg" },
   { id: "products", label: "Produtos", href: "/admin/produtos", icon: "/icons/shopping-bag.svg" },
-  { id: "categories", label: "Categorias", href: "/admin/categorias", icon: "/icons/gamepad.svg" },
+  { id: "categories", label: "Categorias", href: "/admin/categorias", icon: "/icons/neon-v2/gamepad.svg" },
   { id: "payments", label: "Pagamentos", href: "/admin#pagamentos", icon: "/icons/credit-card.svg" },
   { id: "fulfillment", label: "Entregas", href: "/admin#fulfillment", icon: "/icons/package.svg" },
   { id: "discord", label: "Discord", href: "/admin#discord", icon: "/icons/users.svg" },
