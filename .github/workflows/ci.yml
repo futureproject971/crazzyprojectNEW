@@ -120,6 +120,10 @@ jobs:
         if: github.ref_name == 'm28-sales-manager' || github.head_ref == 'm28-sales-manager'
         run: node scripts/test-m28-sales-manager.mjs
 
+      - name: Test M29 Payments Manager
+        if: github.ref_name == 'm29-payments-manager-clean' || github.head_ref == 'm29-payments-manager-clean'
+        run: node scripts/test-m29-payments-manager.mjs
+
       - name: Test CRAZZY CALL transplant
         if: github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns' || github.ref_name == 'm-discord-bot-core-builder' || github.head_ref == 'm-discord-bot-core-builder'
         run: node scripts/test-crazzy-call.mjs
