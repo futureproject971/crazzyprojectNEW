@@ -799,3 +799,150 @@ Fonte visual: Pink.
 - [x] iniciar M14 — CRAZZY COMMUNITY
 - [ ] concluir M14 — CRAZZY COMMUNITY
 - [ ] iniciar M15 — CRAZZY REVIEWS
+
+
+---
+
+# ✅ CHECKLIST ATUAL — 2026-09-22
+> Esta seção é a fonte atual quando os checkboxes antigos acima estiverem desatualizados.
+
+## VISUAL GLOBAL
+- [x] cards premium navy/dark glass
+- [x] degradê e glow azul sutil
+- [x] evitar azul chapado
+- [x] não sobrescrever wallpapers/fotos/artes/banners/galerias/thumbs/vídeos/roleta/raspadinha
+
+## M28 — CRAZZY SALES MANAGER
+- [x] visão de vendas
+- [x] payment status
+- [x] fulfillment status
+- [x] entitlement status
+- [x] Discord role status
+- [x] tutorial unlock status
+- [x] delivery log
+- [x] detalhes sem keys/credenciais
+- [x] TypeScript
+- [x] build
+- [x] security smoke
+- [x] merge na main
+
+## CRAZZY CALL
+- [x] Supabase schema
+- [x] RLS
+- [x] LiveKit integration code
+- [x] mic
+- [x] câmera
+- [x] screen share
+- [x] múltiplos streams
+- [x] player selecionável
+- [x] PiP nativo
+- [x] fullscreen
+- [x] chat
+- [x] lobby
+- [x] host/co-host
+- [x] kick
+- [x] lock
+- [x] admin
+- [x] transplantado para a branch atual
+- [ ] finalizar integração com main atual
+- [ ] LiveKit Cloud real
+- [ ] teste 2 usuários
+- [ ] teste voz/vídeo/tela/PiP real
+- [ ] CI final
+- [ ] merge
+
+## CRAZZY COMMUNITY — SOCIAL UNIFICADO
+- [x] chat existente
+- [x] voice dock CRAZZY CALL criado
+- [x] criar sala dentro da Comunidade
+- [x] entrar por código
+- [x] listar salas recentes
+- [x] estados live/waiting/ended
+- [x] atalhos MIC/CAM/TELA/PiP
+- [ ] QA visual com referência Discord-like
+- [ ] refinar participantes/salas dentro da experiência social
+- [ ] CI/merge
+
+## DISCORD BOT CORE — 1 BOT / 1 TOKEN / 1 DISCLOUD
+- [x] decisão definitiva registrada
+- [x] Campaign DM bot analisado
+- [x] Server Builder SAFE MODE analisado
+- [ ] criar worker único
+- [ ] uma conexão Gateway
+- [ ] um token
+- [ ] um deploy Discloud
+- [ ] módulos independentes dentro do mesmo processo
+- [ ] commands central registry
+- [ ] Campaigns module
+- [ ] Server Builder module
+- [ ] Discord Bridge module
+- [ ] Notify module
+- [ ] Support module
+- [ ] Security Alerts module
+- [ ] heartbeat worker
+- [ ] health/status no site
+- [ ] logs por módulo sem secrets
+
+## DISCORD CAMPAIGN CENTER
+- [x] migration aplicada
+- [x] templates em banco
+- [x] fila de campanhas
+- [x] deliveries/log
+- [x] worker status
+- [x] queue RPC
+- [x] cancel RPC
+- [x] claim RPC service-role only
+- [x] progress RPC service-role only
+- [x] finish RPC service-role only
+- [x] heartbeat RPC service-role only
+- [x] API admin
+- [x] foundation de preview Discord
+- [ ] editor final no site
+- [ ] preview ao vivo lado a lado
+- [ ] título
+- [ ] descrição
+- [ ] imagem
+- [ ] thumbnail
+- [ ] botão/link
+- [ ] footer
+- [ ] cor
+- [ ] templates salvar/editar/remover
+- [ ] carregar template
+- [ ] teste para mim
+- [ ] todos
+- [ ] somente online
+- [ ] por cargo
+- [ ] usuário único
+- [ ] agendamento
+- [ ] progresso em tempo real/polling
+- [ ] cancelar
+- [ ] histórico
+- [ ] status do worker
+- [ ] guild/membros/online
+- [ ] roles carregadas do bot
+
+## DISCORD SERVER BUILDER
+- [x] ZIP analisado
+- [x] SAFE MODE append-only preservado
+- [x] /preview-tema identificado
+- [x] /montar-servidor identificado
+- [x] template de categorias/canais identificado
+- [x] cargos de tema identificados
+- [ ] migrar para módulo do Bot Core
+- [ ] usar mesmo token do restante
+- [ ] preview no painel site
+- [ ] diff antes de criar
+- [ ] botão executar no admin
+- [ ] progresso
+- [ ] relatório
+- [ ] histórico
+- [ ] editor template/tema
+- [ ] garantir zero DELETE/rename/move/perms de canais existentes em SAFE MODE
+
+## REGRA
+- [x] não hospedar 3/4 bots separados
+- [x] mesmo token para módulos Discord
+- [x] site controla
+- [x] Supabase coordena
+- [x] Discloud executa Gateway/worker
+- [ ] concluir implementação e substituir bots separados
