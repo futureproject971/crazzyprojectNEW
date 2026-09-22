@@ -599,20 +599,40 @@ Fonte visual: Pink.
 - [x] checkout proof/QR/API key/webhook secret ocultos
 - [x] Edge Function purincash-payment v7
 - [x] RPCs admin-only / anon bloqueado
-- [ ] smoke M29 PASS
+- [x] smoke M29 PASS
+- [x] TypeScript PASS
+- [x] production build PASS
+- [x] GitHub Actions PASS
+- [x] PR #46 M29
+- [x] merge M29 — bf5fab5
+
+## 🟡 M30 — CRAZZY FINANCE — IMPLEMENTADO / QA FINAL
+- [x] /admin/finance
+- [x] receita por período
+- [x] receita por método
+- [x] taxas reais por pagamento
+- [x] regra estimada de taxa por método
+- [x] histórico de vigência das regras
+- [x] taxa fixa + percentual
+- [x] não precificado quando taxa desconhecida
+- [x] líquido parcial quando faltam custos
+- [x] líquido estimado somente quando custos estão cobertos
+- [x] reembolso concluído
+- [x] reembolso pendente
+- [x] chargeback perdido
+- [x] disputa aberta / exposição
+- [x] retenções / holds
+- [x] gráfico diário
+- [x] custos por transação
+- [x] sem taxa PurinCash inventada
+- [x] RLS admin-only
+- [x] RPCs SECURITY INVOKER
+- [ ] smoke M30 PASS
 - [ ] TypeScript PASS
 - [ ] production build PASS
 - [ ] GitHub Actions PASS
-- [ ] PR M29
-- [ ] merge M29
-
-## ❌ M30 — CRAZZY FINANCE
-- [ ] receita
-- [ ] taxas
-- [ ] líquido
-- [ ] reembolso
-- [ ] chargeback
-- [ ] gateway fees
+- [ ] PR M30
+- [ ] merge M30
 
 ## ❌ M31 — CRAZZY CUSTOMER 360
 - [ ] Discord ID
