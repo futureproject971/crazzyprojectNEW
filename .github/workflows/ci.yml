@@ -121,11 +121,11 @@ jobs:
         run: node scripts/test-m28-sales-manager.mjs
 
       - name: Test CRAZZY CALL transplant
-        if: github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns'
+        if: (github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns' || github.ref_name == 'm-discord-bot-core-builder' || github.head_ref == 'm-discord-bot-core-builder')
         run: node scripts/test-crazzy-call.mjs
 
       - name: Check unified Discord bot syntax
-        if: github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns'
+        if: (github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns' || github.ref_name == 'm-discord-bot-core-builder' || github.head_ref == 'm-discord-bot-core-builder')
         run: |
           node --check apps/discord-bot/src/index.js
           node --check apps/discord-bot/src/config.js
@@ -135,5 +135,5 @@ jobs:
           node --check apps/discord-bot/src/modules/commands.js
 
       - name: Test unified Discord integration
-        if: github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns'
+        if: (github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns' || github.ref_name == 'm-discord-bot-core-builder' || github.head_ref == 'm-discord-bot-core-builder')
         run: node scripts/test-discord-integration.mjs
