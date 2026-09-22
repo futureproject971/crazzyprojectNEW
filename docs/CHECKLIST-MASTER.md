@@ -576,16 +576,35 @@ Fonte visual: Pink.
 - [ ] tutorial
 - [ ] delivery log
 
-## ❌ M29 — CRAZZY PAYMENTS
-- [ ] PIX
-- [ ] cartão
-- [ ] LTC
-- [ ] webhooks
-- [ ] transações
-- [ ] reembolso
-- [ ] disputes
-- [ ] evidências
-- [ ] reconciliação
+## 🟡 M29 — CRAZZY PAYMENTS — IMPLEMENTADO / QA FINAL
+- [x] /admin/pagamentos
+- [x] PIX
+- [x] cartão
+- [x] LTC
+- [x] liga/desliga por método
+- [x] transações
+- [x] filtros por status/método/cliente/payment/charge/idempotency
+- [x] webhooks/eventos operacionais
+- [x] payment events
+- [x] idempotência visível sem expor segredo
+- [x] divergências
+- [x] reconciliação manual contra PurinCash
+- [x] value check antes de fulfillment
+- [x] fulfillment idempotente reaproveitado
+- [x] status inseguro exige revisão manual
+- [x] casos de reembolso
+- [x] refund case NÃO movimenta dinheiro automaticamente
+- [x] disputes
+- [x] evidências
+- [x] checkout proof/QR/API key/webhook secret ocultos
+- [x] Edge Function purincash-payment v7
+- [x] RPCs admin-only / anon bloqueado
+- [ ] smoke M29 PASS
+- [ ] TypeScript PASS
+- [ ] production build PASS
+- [ ] GitHub Actions PASS
+- [ ] PR M29
+- [ ] merge M29
 
 ## ❌ M30 — CRAZZY FINANCE
 - [ ] receita
