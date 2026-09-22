@@ -64,9 +64,17 @@ export function CallExperience({ code }: { code: string }) {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) {
-      const next = "/call/" + encodeURIComponent(code);
+    const next = "/call/" + encodeURIComponent(code);
+    if (!user || !user.discord.connected) {
       window.location.assign("/login?next=" + encodeURIComponent(next));
+      return;
+    }
+    if (user.discord.guildId && !user.discord.guildMember) {
+      window.location.assign(
+        "/login?next=" +
+          encodeURIComponent(next) +
+          "&error=discord_guild_required"
+      );
       return;
     }
     void loadPreview();
@@ -117,7 +125,7 @@ export function CallExperience({ code }: { code: string }) {
     );
   }
 
-  if (!user) return null;
+  if (!user || !user.discord.connected) return null;
 
   if (state === "error" || !preview) {
     return (
