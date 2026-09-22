@@ -18,12 +18,33 @@ create table if not exists public.stock_batches (
 alter table public.stock_batches enable row level security;
 
 drop policy if exists "Admins read stock batches" on public.stock_batches;
+drop policy if exists "Admins insert stock batches" on public.stock_batches;
+drop policy if exists "Admins update stock batches" on public.stock_batches;
+
 create policy "Admins read stock batches"
 on public.stock_batches for select to authenticated
 using (private.has_role((select auth.uid()),'admin'::app_role));
 
+create policy "Admins insert stock batches"
+on public.stock_batches for insert to authenticated
+with check (
+  private.has_role((select auth.uid()),'admin'::app_role)
+  and imported_by=(select auth.uid())
+);
+
+create policy "Admins update stock batches"
+on public.stock_batches for update to authenticated
+using (
+  private.has_role((select auth.uid()),'admin'::app_role)
+  and imported_by=(select auth.uid())
+)
+with check (
+  private.has_role((select auth.uid()),'admin'::app_role)
+  and imported_by=(select auth.uid())
+);
+
 revoke all on public.stock_batches from anon, authenticated;
-grant select on public.stock_batches to authenticated;
+grant select,insert,update on public.stock_batches to authenticated;
 
 alter table public.stock_items
   add column if not exists content_hash text,
@@ -104,12 +125,21 @@ create table if not exists public.stock_events (
 alter table public.stock_events enable row level security;
 
 drop policy if exists "Admins read stock events" on public.stock_events;
+drop policy if exists "Admins insert stock events" on public.stock_events;
+
 create policy "Admins read stock events"
 on public.stock_events for select to authenticated
 using (private.has_role((select auth.uid()),'admin'::app_role));
 
+create policy "Admins insert stock events"
+on public.stock_events for insert to authenticated
+with check (
+  private.has_role((select auth.uid()),'admin'::app_role)
+  and actor_user_id=(select auth.uid())
+);
+
 revoke all on public.stock_events from anon, authenticated;
-grant select on public.stock_events to authenticated;
+grant select,insert on public.stock_events to authenticated;
 
 create index if not exists stock_events_plan_created_idx
   on public.stock_events(product_plan_id,created_at desc);
