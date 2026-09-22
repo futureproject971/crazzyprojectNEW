@@ -827,10 +827,10 @@ begin
 end;
 $$;
 
-revoke all on public.call_rooms from anon;
-revoke all on public.call_participants from anon;
-revoke all on public.call_messages from anon;
-revoke all on public.call_events from anon;
+revoke all on public.call_rooms from anon, authenticated;
+revoke all on public.call_participants from anon, authenticated;
+revoke all on public.call_messages from anon, authenticated;
+revoke all on public.call_events from anon, authenticated;
 
 grant select on public.call_rooms to authenticated;
 grant select on public.call_participants to authenticated;
@@ -916,4 +916,22 @@ grant execute on function public.set_call_participant_role(uuid,uuid,text) to au
 grant execute on function public.kick_call_participant(uuid,uuid) to authenticated;
 grant execute on function public.end_call_room(uuid) to authenticated;
 grant execute on function public.send_call_message(uuid,text) to authenticated;
+
+
+-- ============================================================
+-- TABLE PRIVILEGE HARDENING
+-- ============================================================
+
+-- CRAZZY CALL table privilege hardening.
+-- Browser clients may read rows allowed by RLS, but all writes must go through RPC/API.
+
+revoke all on public.call_rooms from anon, authenticated;
+revoke all on public.call_participants from anon, authenticated;
+revoke all on public.call_messages from anon, authenticated;
+revoke all on public.call_events from anon, authenticated;
+
+grant select on public.call_rooms to authenticated;
+grant select on public.call_participants to authenticated;
+grant select on public.call_messages to authenticated;
+grant select on public.call_events to authenticated;
 
