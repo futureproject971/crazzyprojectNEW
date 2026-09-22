@@ -40,7 +40,7 @@ export function HelpPage() {
         const payload = await response.json();
 
         if (!response.ok) {
-          throw new Error(payload?.error || "Não foi possível pesquisar.");
+          throw new Error(payload?.error || "A busca deu uma engasgada.");
         }
 
         setResult({
@@ -54,7 +54,7 @@ export function HelpPage() {
         setError(
           requestError instanceof Error
             ? requestError.message
-            : "Falha ao carregar a Central de Ajuda."
+            : "A Central de Ajuda tropeçou. Já já volta pro mapa."
         );
         setState("error");
       }
@@ -79,11 +79,11 @@ export function HelpPage() {
       <div className="crz-container">
         <PageHeader
           eyebrow="CRAZZY HELP"
-          title="Como podemos ajudar?"
-          description="Pesquise respostas rápidas e tutoriais públicos da CRAZZY PROJECT em um único lugar."
+          title="Travou? Joga a dúvida aqui."
+          description="Manda a dúvida e a gente caça resposta, tutorial e atalho sem te fazer rodar o mapa inteiro."
           actions={
             <a className="crz-button crz-button--secondary crz-button--sm" href="/tickets">
-              Abrir ticket
+              CHAMAR O SUPORTE
             </a>
           }
         />
@@ -94,7 +94,7 @@ export function HelpPage() {
             <input
               value={query}
               onChange={event => setQuery(event.target.value.slice(0, 120))}
-              placeholder="Ex.: como usar meu cupom?"
+              placeholder="Ex.: como eu uso esse cupom aqui?"
               autoComplete="off"
             />
             {query && (
@@ -105,7 +105,7 @@ export function HelpPage() {
           </div>
 
           <div className="crz-help-quick-search">
-            <span>BUSCAS RÁPIDAS</span>
+            <span>ATALHOS RÁPIDOS</span>
             <div>
               {quickSearches.map(item => (
                 <button type="button" key={item} onClick={() => setQuery(item)}>
@@ -119,14 +119,14 @@ export function HelpPage() {
         {state === "loading" && (
           <section className="crz-help-state">
             <span className="crz-spinner" />
-            <p>Pesquisando...</p>
+            <p>Caçando a resposta...</p>
           </section>
         )}
 
         {state === "error" && (
           <section className="crz-help-state">
             <NeonIcon name="shield" size={38} />
-            <strong>Não foi possível pesquisar agora</strong>
+            <strong>A busca bugou por um segundo</strong>
             <p>{error}</p>
           </section>
         )}
@@ -135,28 +135,28 @@ export function HelpPage() {
           <>
             <section className="crz-help-overview">
               <div>
-                <small>{searched ? "RESULTADOS" : "CENTRAL DE AJUDA"}</small>
+                <small>{searched ? "RESULTADOS" : "QG DE AJUDA"}</small>
                 <strong>{count}</strong>
-                <span>{searched ? "resultado(s) encontrado(s)" : "conteúdos disponíveis"}</span>
+                <span>{searched ? "coisa(s) útil(eis) achada(s)" : "atalhos na mesa"}</span>
               </div>
               <div>
                 <small>FAQ</small>
                 <strong>{result.faqs.length}</strong>
-                <span>respostas rápidas</span>
+                <span>resposta sem enrolação</span>
               </div>
               <div>
                 <small>ACADEMY</small>
                 <strong>{result.tutorials.length}</strong>
-                <span>tutorial(is) público(s)</span>
+                <span>tutorial(is) na pista</span>
               </div>
             </section>
 
             {count === 0 ? (
               <section className="crz-help-empty">
                 <NeonIcon name="ticket" size={42} />
-                <strong>Nenhuma resposta encontrada</strong>
+                <strong>Nada bateu com essa busca</strong>
                 <p>
-                  Tente outras palavras ou abra um ticket para falar com o suporte.
+                  Tenta outra palavra. Se continuar zoado, chama o suporte que a gente entra no round contigo.
                 </p>
                 <a className="crz-button crz-button--primary crz-button--md" href="/tickets/novo">
                   Abrir ticket
@@ -168,7 +168,7 @@ export function HelpPage() {
                   <header>
                     <div>
                       <small>FAQ</small>
-                      <h2>Respostas rápidas</h2>
+                      <h2>Resposta sem enrolação</h2>
                     </div>
                     {categories.length > 0 && (
                       <span>{categories.slice(0, 3).join(" • ")}</span>
@@ -194,13 +194,13 @@ export function HelpPage() {
                 <aside className="crz-help-tutorials">
                   <header>
                     <small>CRAZZY ACADEMY</small>
-                    <h2>Tutoriais públicos</h2>
+                    <h2>Tutoriais pra meter ficha</h2>
                   </header>
 
                   {!result.tutorials.length ? (
                     <div className="crz-help-tutorials__empty">
                       <NeonIcon name="book" size={32} />
-                      <span>Nenhum tutorial público combina com esta busca.</span>
+                      <span>Nenhum tutorial casou com essa busca.</span>
                     </div>
                   ) : (
                     <div className="crz-help-tutorial-list">
@@ -224,7 +224,7 @@ export function HelpPage() {
                   )}
 
                   <a className="crz-button crz-button--secondary crz-button--sm" href="/academy">
-                    Abrir CRAZZY ACADEMY
+                    COLAR NA CRAZZY ACADEMY
                   </a>
                 </aside>
               </div>
@@ -233,13 +233,13 @@ export function HelpPage() {
             <section className="crz-help-support">
               <NeonIcon name="ticket" size={31} />
               <div>
-                <strong>Ainda precisa de ajuda?</strong>
+                <strong>Ainda tá pegando fogo?</strong>
                 <span>
-                  Abra um ticket e acompanhe a conversa pelo próprio site.
+                  Abre um ticket e fica no papo por aqui mesmo.
                 </span>
               </div>
               <a className="crz-button crz-button--primary crz-button--sm" href="/tickets/novo">
-                Novo ticket
+                CHAMAR AGORA
               </a>
             </section>
           </>
