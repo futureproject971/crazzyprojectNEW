@@ -88,9 +88,9 @@ function OrdersList({
     return (
       <EmptyState
         icon={<NeonIcon name="ticket" size={38} />}
-        title="Nenhuma compra ainda"
-        description="Seus pedidos e pagamentos aparecerão aqui."
-        action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">Ver produtos</a>}
+        title="Nada comprado ainda"
+        description="Quando fechar uma compra, ela cai aqui no teu QG."
+        action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">VER O ARSENAL</a>}
       />
     );
   }
@@ -153,11 +153,11 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
         credentials: "same-origin",
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload?.error || "Não foi possível carregar o painel.");
+      if (!response.ok) throw new Error(payload?.error || "Teu QG não respondeu agora.");
       setSnapshot(payload as ClientHubSnapshot);
       setState("ready");
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Falha ao carregar o painel.");
+      setError(loadError instanceof Error ? loadError.message : "O painel deu uma engasgada.");
       setState("error");
     }
   };
@@ -181,7 +181,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
         await linkDiscord("/painel?tab=discord");
       }
     } catch (syncFailure) {
-      setSyncError(syncFailure instanceof Error ? syncFailure.message : "Não foi possível abrir o Discord.");
+      setSyncError(syncFailure instanceof Error ? syncFailure.message : "O Discord não abriu agora.");
       setSyncing(false);
     }
   };
@@ -189,7 +189,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
   if (state === "loading") {
     return (
       <main className="crz-hub-page crz-hub-state">
-        <LoadingState label="Montando seu painel CRAZZY..." />
+        <LoadingState label="Montando teu QG CRAZZY..." />
       </main>
     );
   }
@@ -198,8 +198,8 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
     return (
       <main className="crz-hub-page crz-hub-state">
         <ErrorState
-          title="Seu painel não carregou"
-          description={error || "Tente novamente."}
+          title="Teu QG não entrou no mapa"
+          description={error || "Mete mais uma tentativa."}
           onRetry={() => void load()}
         />
       </main>
@@ -221,7 +221,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
             <div>
               <small>CRAZZY CLIENT HUB</small>
               <h1>Salve, {snapshot.profile.username}</h1>
-              <p>Compras, produtos, tutoriais, entregas e Discord em um só lugar.</p>
+              <p>Compra, produto, tutorial, entrega e Discord no mesmo QG. Sem caça ao tesouro.</p>
             </div>
           </div>
 
@@ -258,8 +258,8 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
           <div className="crz-hub-sidebar__support">
             <NeonIcon name="ticket" size={23} />
             <div>
-              <strong>Precisa de ajuda?</strong>
-              <span>Abra um ticket com contexto da sua compra.</span>
+              <strong>Deu ruim em alguma coisa?</strong>
+              <span>Chama o suporte e já leva o contexto da compra junto.</span>
             </div>
             <span>Support Desk entra no M13</span>
           </div>
@@ -270,8 +270,8 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
             <>
               <div className="crz-hub-stats">
                 {[
-                  ["Compras pagas", snapshot.stats.completedPayments, "lightning"],
-                  ["Produtos ativos", snapshot.stats.activeProducts, "cube"],
+                  ["Compras fechadas", snapshot.stats.completedPayments, "lightning"],
+                  ["Arsenal ativo", snapshot.stats.activeProducts, "cube"],
                   ["Tutoriais", snapshot.stats.tutorials, "book"],
                   ["Cargos Discord", snapshot.stats.roleGrants, "community"],
                 ].map(([label, value, icon]) => (
@@ -290,15 +290,15 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                   <header>
                     <div>
                       <small>ACESSOS</small>
-                      <h2>Produtos ativos</h2>
+                      <h2>Arsenal ativo</h2>
                     </div>
-                    <button type="button" onClick={() => setTab("products")}>Ver todos →</button>
+                    <button type="button" onClick={() => setTab("products")}>VER TUDO →</button>
                   </header>
 
                   {!activeProducts.length ? (
                     <div className="crz-hub-mini-empty">
                       <NeonIcon name="cube" size={30} />
-                      <span>Nenhum entitlement ativo ainda.</span>
+                      <span>Ainda não tem acesso ativo por aqui.</span>
                     </div>
                   ) : (
                     <div className="crz-hub-product-list">
@@ -322,9 +322,9 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                   <header>
                     <div>
                       <small>DISCORD</small>
-                      <h2>Status da conexão</h2>
+                      <h2>Como tá a conexão</h2>
                     </div>
-                    <button type="button" onClick={() => setTab("discord")}>Detalhes →</button>
+                    <button type="button" onClick={() => setTab("discord")}>VER DETALHES →</button>
                   </header>
 
                   <div className="crz-hub-discord-card">
@@ -336,15 +336,15 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                       )}
                     </div>
                     <div>
-                      <strong>{snapshot.discord.username || "Discord não conectado"}</strong>
+                      <strong>{snapshot.discord.username || "Discord fora do squad"}</strong>
                       <span>
                         {!snapshot.discord.connected
-                          ? "Conecte para sincronizar identidade e cargos."
+                          ? "Conecta e puxa identidade + cargos pro mesmo mapa."
                           : !snapshot.discord.guildConfigured
-                            ? "Servidor oficial ainda não configurado."
+                            ? "Servidor oficial ainda não entrou no round."
                             : snapshot.discord.guildMember
-                              ? "Membro do servidor oficial verificado."
-                              : "Conta conectada, fora do servidor no último sync."}
+                              ? "Tá no servidor oficial e verificado."
+                              : "Conta conectada, mas fora do servidor no último sync."}
                       </span>
                     </div>
                   </div>
@@ -354,10 +354,10 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
               <Panel className="crz-hub-panel">
                 <header>
                   <div>
-                    <small>ATIVIDADE RECENTE</small>
-                    <h2>Compras e pedidos</h2>
+                    <small>O QUE ROLOU AGORA</small>
+                    <h2>Compras e corre</h2>
                   </div>
-                  <button type="button" onClick={() => setTab("orders")}>Histórico →</button>
+                  <button type="button" onClick={() => setTab("orders")}>VER HISTÓRICO →</button>
                 </header>
                 <OrdersList
                   orders={snapshot.orders.slice(0, 4)}
@@ -372,7 +372,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
               <header>
                 <div>
                   <small>HISTÓRICO</small>
-                  <h2>Minhas compras</h2>
+                  <h2>Meu histórico de compra</h2>
                 </div>
                 <Badge tone="blue">{snapshot.stats.payments} pagamentos</Badge>
               </header>
@@ -385,7 +385,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
               <header>
                 <div>
                   <small>ENTITLEMENTS</small>
-                  <h2>Meus produtos</h2>
+                  <h2>Meu arsenal</h2>
                 </div>
                 <Badge tone="green">{activeProducts.length} ativos</Badge>
               </header>
@@ -393,9 +393,9 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
               {!snapshot.entitlements.length ? (
                 <EmptyState
                   icon={<NeonIcon name="cube" size={38} />}
-                  title="Nenhum produto liberado"
-                  description="Após o fulfillment, seu direito de acesso aparece aqui automaticamente."
-                  action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">Ver produtos</a>}
+                  title="Arsenal vazio por enquanto"
+                  description="Entregou no servidor, teu acesso aparece aqui sozinho."
+                  action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">VER O ARSENAL</a>}
                 />
               ) : (
                 <div className="crz-hub-entitlement-grid">
@@ -414,7 +414,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                       </div>
                       <footer>
                         <span>Início: {date(item.startsAt)}</span>
-                        <span>{item.expiresAt ? "Expira: " + date(item.expiresAt) : "Sem expiração"}</span>
+                        <span>{item.expiresAt ? "Expira: " + date(item.expiresAt) : "Sem relógio correndo"}</span>
                       </footer>
                     </article>
                   ))}
@@ -427,8 +427,8 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
             <Panel className="crz-hub-panel">
               <header>
                 <div>
-                  <small>ACESSO LIBERADO</small>
-                  <h2>Meus tutoriais</h2>
+                  <small>ACESSO NA MÃO</small>
+                  <h2>Meus guias</h2>
                 </div>
                 <Badge tone="blue">{snapshot.tutorials.length}</Badge>
               </header>
@@ -436,8 +436,8 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
               {!snapshot.tutorials.length ? (
                 <EmptyState
                   icon={<NeonIcon name="book" size={38} />}
-                  title="Nenhum tutorial liberado"
-                  description="Tutoriais associados aos seus produtos aparecerão aqui."
+                  title="Nenhum guia destravado"
+                  description="Tutorial do teu produto aparece aqui quando destravar."
                 />
               ) : (
                 <div className="crz-hub-tutorial-list">
@@ -447,7 +447,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                         {item.productImage ? <img src={item.productImage} alt="" /> : <NeonIcon name="book" size={31} />}
                       </div>
                       <div>
-                        <small>TUTORIAL LIBERADO</small>
+                        <small>GUIA DESTRAVADO</small>
                         <strong>{item.productName}</strong>
                         <span>
                           {item.entitlementStatus === "active"
@@ -472,14 +472,14 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                   <small>FULFILLMENT</small>
                   <h2>Entregas</h2>
                 </div>
-                <a href="/biblioteca">Abrir Biblioteca →</a>
+                <a href="/biblioteca">ABRIR MINHA BAG →</a>
               </header>
 
               {!snapshot.orders.length && !snapshot.rewardDeliveries.length ? (
                 <EmptyState
                   icon={<NeonIcon name="shield" size={38} />}
-                  title="Nenhuma entrega registrada"
-                  description="Quando uma entrega for concluída, você poderá revelá-la com segurança na CRAZZY LIBRARY."
+                  title="Nada entregue ainda"
+                  description="Quando a entrega fechar, tu revela com segurança na CRAZZY LIBRARY."
                 />
               ) : (
                 <div className="crz-hub-delivery-list">
@@ -508,7 +508,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
 
               <div className="crz-hub-sensitive-note">
                 <NeonIcon name="shield" size={23} />
-                <span>Conteúdo sensível nunca é retornado pelo Client Hub. Use a CRAZZY LIBRARY para revelar ou copiar com auditoria.</span>
+                <span>Segredo não passeia pelo QG. Pra revelar ou copiar, usa a CRAZZY LIBRARY com auditoria.</span>
               </div>
             </Panel>
           )}
