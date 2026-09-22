@@ -1,5 +1,31 @@
 # CRAZZY PROJECT — MASTER CHECKLIST
 
+## 🔒 PEDIDOS FIXADOS PELO DONO — NÃO ESQUECER
+
+- [x] **Cards do site com fundo premium**: navy/dark glass, degradê, brilho azul suave e profundidade. **Não aplicar sobre wallpaper, fotos, capas, banners, thumbnails, galerias, vídeos, roleta/raspadinha ou outras artes.**
+- [x] **CRAZZY CALL**: voz, vídeo, compartilhamento de tela, múltiplas transmissões, fullscreen e Picture-in-Picture nativo do navegador.
+- [x] **CRAZZY Community integrada ao CALL**: chat estilo Discord + acesso a salas de voz/vídeo/tela dentro da própria experiência da Comunidade. `/call` continua existindo como acesso direto.
+- [x] **Campaign Center no site**: sistema de divulgação Discord deve ser controlado pelo admin do CRAZZY PROJECT.
+- [x] **Preview da embed em tempo real** dentro do site antes do disparo.
+- [x] **Templates centralizados** no Supabase, sem depender de `templates.json` local como fonte principal.
+- [x] **Públicos de campanha**: todos, somente online, cargo específico e teste individual.
+- [x] **Agendamento, fila, progresso, cancelamento e histórico** dos disparos.
+- [x] **Teste para a própria DM** do administrador antes de disparar em massa.
+- [x] **Worker continua na Discloud**, pois o bot precisa permanecer conectado ao Discord Gateway 24/7.
+- [x] **UM ÚNICO BOT DISCORD CRAZZY PROJECT**: um token, um processo/worker na Discloud e módulos internos. Não hospedar vários bots separados.
+- [ ] Migrar para esse bot único todos os sistemas Discord existentes e futuros:
+  - [x] Campanhas/DM
+  - [ ] Discord Bridge de cargos/entitlements
+  - [ ] Notificações do site
+  - [ ] Tickets/suporte
+  - [ ] Alertas do Security Sentinel
+  - [ ] Slash commands administrativos
+  - [ ] Outras automações Discord futuras
+- [x] Os comandos antigos de divulgação devem continuar disponíveis, mas usando a mesma base/fila do site.
+- [x] Mesmo bot, mesma guild, mesmo Supabase e **mesmo token Discord** para todos os módulos.
+- [x] Token Discord e Supabase service-role **somente na Discloud/server**, nunca no navegador.
+
+
 Última atualização: 2026-09-21
 
 ## ✅ INTEGRADO
