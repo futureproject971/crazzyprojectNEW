@@ -31,7 +31,7 @@ function dateTime(value: string | null | undefined) {
 }
 
 function dateOnly(value: string) {
-  const date = new Date(value + "T12:00:00");
+  const date = new Date(value.length <= 10 ? value + "T12:00:00" : value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString("pt-BR", {
     day: "2-digit",
