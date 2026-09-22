@@ -35,7 +35,7 @@ export const adminNavigation: ShellNavItem[] = [
   { id: "sales", label: "Vendas", href: "/admin/vendas", icon: "/icons/shopping-cart.svg" },
   { id: "payments", label: "Pagamentos", href: "/admin#pagamentos", icon: "/icons/credit-card.svg" },
   { id: "fulfillment", label: "Entregas", href: "/admin#fulfillment", icon: "/icons/package.svg" },
-  { id: "discord", label: "Discord", href: "/admin#discord", icon: "/icons/users.svg" },
+  { id: "discord", label: "Discord", href: "/admin/discord", icon: "/icons/users.svg" },
   { id: "campaigns", label: "Campanhas", href: "/admin/campanhas", icon: "/icons/flame.svg" },
   { id: "calls", label: "CRAZZY CALL", href: "/admin/calls", icon: "/icons/headset.svg" },
   { id: "stock", label: "Estoque", href: "/admin/estoque", icon: "/icons/package.svg" },
