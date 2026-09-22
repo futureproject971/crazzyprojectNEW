@@ -4,6 +4,7 @@ import {
   Routes,
   SlashCommandBuilder,
 } from "discord.js";
+import { handleBuilderInteraction } from "./server-builder.js";
 import {
   buildCampaignComponents,
   buildCampaignEmbed,
@@ -30,6 +31,14 @@ function definitions() {
       .addStringOption((option) =>
         option.setName("template").setDescription("Nome do template salvo no CRAZZY PROJECT").setRequired(false)
       ),
+    new SlashCommandBuilder()
+      .setName("preview-tema")
+      .setDescription("Mostra o preview do Server Builder SAFE MODE")
+      .setDefaultMemberPermissions(manage),
+    new SlashCommandBuilder()
+      .setName("montar-servidor")
+      .setDescription("Cria somente a estrutura que estiver faltando")
+      .setDefaultMemberPermissions(manage),
     new SlashCommandBuilder()
       .setName("predef")
       .setDescription("Gerencia templates do Campaign Center")
@@ -127,14 +136,22 @@ export async function deployCommands(config) {
 
 export function installCommandHandlers(client, supabase, config) {
   client.on("interactionCreate", async (interaction) => {
-    if (!interaction.isChatInputCommand()) return;
-
     try {
+      if (interaction.isButton() && interaction.customId.startsWith("builder:")) {
+        return handleBuilderInteraction(interaction, supabase, config);
+      }
+
+      if (!interaction.isChatInputCommand()) return;
+
       if (!hasAdminAccess(interaction, config)) {
         return interaction.reply({
           ephemeral: true,
           content: "❌ Você não tem permissão para usar este comando.",
         });
+      }
+
+      if (["preview-tema", "montar-servidor"].includes(interaction.commandName)) {
+        return handleBuilderInteraction(interaction, supabase, config);
       }
 
       if (interaction.commandName === "disparar") {
