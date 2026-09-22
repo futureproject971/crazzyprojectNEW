@@ -92,14 +92,18 @@ export function AuthPage({
               )}
             </div>
             <div className="crz-auth-current__actions">
-              {!user.discord.connected && discordEnabled && (
-                <button
-                  type="button"
-                  onClick={() => void linkDiscord(nextPath)}
-                >
-                  Conectar Discord
-                </button>
-              )}
+              {discordEnabled &&
+                (!user.discord.connected ||
+                  initialError === "discord_guild_required") && (
+                  <button
+                    type="button"
+                    onClick={() => void linkDiscord(nextPath)}
+                  >
+                    {user.discord.connected
+                      ? "ATUALIZAR DISCORD"
+                      : "CONECTAR DISCORD"}
+                  </button>
+                )}
               <a href={nextPath}>Continuar →</a>
             </div>
           </div>
