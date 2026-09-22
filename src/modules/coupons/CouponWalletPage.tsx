@@ -50,7 +50,7 @@ export function CouponWalletPage() {
     const payload = await response.json().catch(() => ({}));
     setLoading(false);
     if (!response.ok) {
-      setNotice(payload?.error || "Não foi possível carregar seus cupons.");
+      setNotice(payload?.error || "Teus cupons não apareceram agora.");
       return;
     }
     setAuthenticated(payload.authenticated === true);
@@ -69,7 +69,7 @@ export function CouponWalletPage() {
   const apply = (coupon: CustomerCoupon) => {
     if (coupon.status !== "available") return;
     setCouponCode(coupon.code);
-    setNotice("Cupom " + coupon.code + " aplicado ao carrinho.");
+    setNotice("Cupom " + coupon.code + " entrou na bag.");
   };
 
   return (
@@ -77,15 +77,15 @@ export function CouponWalletPage() {
       <div className="crz-container">
         <PageHeader
           eyebrow="CRAZZY COUPONS"
-          title="Meus cupons"
-          description="Cupons ganhos em promoções, Rewards, Roleta, Raspadinha e Drops ficam organizados aqui."
-          actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">Voltar ao CLUB</a>}
+          title="Meus cupons 🔥"
+          description="Cupom de promo, missão, roleta, raspadinha e drop cai tudo aqui. Sem bolso furado."
+          actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">VOLTAR PRO CLUB</a>}
         />
 
         <section className="crz-coupons-summary">
-          <div><small>DISPONÍVEIS</small><strong>{available}</strong><span>prontos para usar</span></div>
-          <div><small>TOTAL</small><strong>{coupons.length}</strong><span>na sua carteira</span></div>
-          <div><small>VALIDAÇÃO</small><strong>SERVER</strong><span>desconto confirmado no checkout</span></div>
+          <div><small>PRONTOS PRA USAR</small><strong>{available}</strong><span>já dá pra meter no checkout</span></div>
+          <div><small>TOTAL</small><strong>{coupons.length}</strong><span>na tua bag de desconto</span></div>
+          <div><small>VALIDAÇÃO</small><strong>SERVER</strong><span>desconto batido no servidor</span></div>
         </section>
 
         {notice && <div className="crz-coupons-notice">{notice}</div>}
@@ -93,8 +93,8 @@ export function CouponWalletPage() {
         {!authenticated && !loading ? (
           <section className="crz-coupons-empty">
             <NeonIcon name="verified" size={42} />
-            <strong>Entre para ver seus cupons</strong>
-            <p>Seus cupons pessoais ficam vinculados à sua conta CRAZZY.</p>
+            <strong>Entra aí pra abrir tua bag de cupons</strong>
+            <p>Cupom teu fica preso na tua conta CRAZZY. Sem sumiço.</p>
             <a className="crz-button crz-button--primary crz-button--md" href="/login">Entrar</a>
           </section>
         ) : (
@@ -110,17 +110,17 @@ export function CouponWalletPage() {
                   {item === "all" ? "Todos" : statusLabel(item)}
                 </button>
               ))}
-              <button type="button" onClick={() => void load()}>↻ Atualizar</button>
+              <button type="button" onClick={() => void load()}>↻ PUXAR DE NOVO</button>
             </div>
 
             {loading ? (
-              <section className="crz-coupons-empty"><span className="crz-spinner" /><p>Carregando cupons...</p></section>
+              <section className="crz-coupons-empty"><span className="crz-spinner" /><p>Puxando teus cupons...</p></section>
             ) : !filtered.length ? (
               <section className="crz-coupons-empty">
                 <NeonIcon name="featured" size={38} />
-                <strong>Nenhum cupom nesta categoria</strong>
-                <p>Ganhe novos cupons no CRAZZY LUCK ou em campanhas especiais.</p>
-                <a className="crz-button crz-button--primary crz-button--sm" href="/club/luck">Ir para CRAZZY LUCK</a>
+                <strong>Nada nessa gaveta</strong>
+                <p>Vai no CRAZZY LUCK ou fica de olho nas campanhas pra encher essa bag.</p>
+                <a className="crz-button crz-button--primary crz-button--sm" href="/club/luck">COLAR NO CRAZZY LUCK</a>
               </section>
             ) : (
               <section className="crz-coupons-grid">
@@ -140,18 +140,18 @@ export function CouponWalletPage() {
 
                     <div className="crz-coupon-card__meta">
                       <span>
-                        <small>Pedido mínimo</small>
-                        <strong>{coupon.min_order_value > 0 ? brl(coupon.min_order_value) : "Sem mínimo"}</strong>
+                        <small>Mínimo pra entrar</small>
+                        <strong>{coupon.min_order_value > 0 ? brl(coupon.min_order_value) : "Sem mínimo. Manda bala."}</strong>
                       </span>
                       <span>
                         <small>Validade</small>
-                        <strong>{coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString("pt-BR") : "Sem expiração"}</strong>
+                        <strong>{coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString("pt-BR") : "Sem relógio correndo"}</strong>
                       </span>
                     </div>
 
                     {coupon.products.length > 0 && (
                       <div className="crz-coupon-card__products">
-                        <small>Válido para</small>
+                        <small>Vale em</small>
                         <span>{coupon.products.map((product) => product.name).join(", ")}</span>
                       </div>
                     )}
@@ -164,7 +164,7 @@ export function CouponWalletPage() {
                         disabled={coupon.status !== "available"}
                         onClick={() => apply(coupon)}
                       >
-                        {coupon.status === "available" ? "Usar no carrinho" : statusLabel(coupon.status)}
+                        {coupon.status === "available" ? "JOGAR NA BAG" : statusLabel(coupon.status)}
                       </button>
                     </footer>
                   </article>
