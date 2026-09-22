@@ -579,7 +579,7 @@ begin
     p_delivery_mode,
     nullif(btrim(coalesce(p_discord_role_id,'')),''),
     nullif(btrim(coalesce(p_discord_role_name,'')),''),
-    upper(nullif(btrim(coalesce(p_discord_role_color,'')),''),
+    upper(nullif(btrim(coalesce(p_discord_role_color,'')),'')),
     p_discord_role_position,
     p_entitlement_duration_minutes,
     nullif(btrim(coalesce(p_supplier_provider,'')),''),
