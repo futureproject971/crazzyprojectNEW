@@ -1,0 +1,197 @@
+xt_);
++    if (hr == DXGI_ERROR_UNSUPPORTED)
++        hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_WARP, nullptr, 0, levels, 2, D3D11_SDK_VERSION, &sd, &swapChain_, &device_, &fl, &context_);
+     if (FAILED(hr)) return false;
+     CreateRenderTarget();
+     return true;
+@@ -246,27 +232,20 @@
+ void MainWindow::CreateRenderTarget() {
+     ID3D11Texture2D* back = nullptr;
+     swapChain_->GetBuffer(0, IID_PPV_ARGS(&back));
+-    if (back) {
+-        device_->CreateRenderTargetView(back, nullptr, &renderTarget_);
+-        back->Release();
+-    }
++    if (back) { device_->CreateRenderTargetView(back, nullptr, &renderTarget_); back->Release(); }
+ }
+ 
+ void MainWindow::CleanupRenderTarget() {
+-    if (renderTarget_) {
+-        renderTarget_->Release();
+-        renderTarget_ = nullptr;
+-    }
++    if (renderTarget_) { renderTarget_->Release(); renderTarget_ = nullptr; }
+ }
+ 
+ void MainWindow::ApplyStyle() {
+     auto& s = ImGui::GetStyle();
+-    s.WindowRounding = 18.0f;
++    s.WindowRounding = 20.0f;
+     s.ChildRounding = 16.0f;
+     s.FrameRounding = 10.0f;
+     s.PopupRounding = 16.0f;
+-    s.ScrollbarRounding = 20.0f;
+-    s.TabRounding = 10.0f;
++    s.ScrollbarRounding = 18.0f;
+     s.WindowPadding = { 18, 18 };
+     s.FramePadding = { 12, 10 };
+     s.ItemSpacing = { 10, 10 };
+@@ -276,34 +255,25 @@
+     s.PopupBorderSize = 1.0f;
+ 
+     auto* c = s.Colors;
+-    c[ImGuiCol_WindowBg] = ImVec4(0.015f, 0.025f, 0.055f, 1.0f);
++    c[ImGuiCol_WindowBg] = ImVec4(0.010f, 0.018f, 0.042f, 1.0f);
+     c[ImGuiCol_ChildBg] = PANEL;
+-    c[ImGuiCol_PopupBg] = ImVec4(0.035f, 0.055f, 0.12f, 0.98f);
+-    c[ImGuiCol_Border] = PANEL_BORDER;
+-    c[ImGuiCol_BorderShadow] = ImVec4(0, 0, 0, 0);
+-    c[ImGuiCol_FrameBg] = PANEL_SOFT;
+-    c[ImGuiCol_FrameBgHovered] = ImVec4(0.08f, 0.14f, 0.28f, 1.0f);
+-    c[ImGuiCol_FrameBgActive] = ImVec4(0.10f, 0.18f, 0.35f, 1.0f);
+-    c[ImGuiCol_TitleBg] = PANEL;
+-    c[ImGuiCol_TitleBgActive] = PANEL;
+-    c[ImGuiCol_MenuBarBg] = PANEL;
+-    c[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.03f, 0.06f, 0.75f);
+-    c[ImGuiCol_ScrollbarGrab] = ImVec4(0.16f, 0.32f, 0.72f, 0.9f);
+-    c[ImGuiCol_ScrollbarGrabHovered] = ACCENT_BRIGHT;
+-    c[ImGuiCol_ScrollbarGrabActive] = ACCENT;
+-    c[ImGuiCol_CheckMark] = ACCENT_BRIGHT;
+-    c[ImGuiCol_Button] = ACCENT;
+-    c[ImGuiCol_ButtonHovered] = ACCENT_BRIGHT;
+-    c[ImGuiCol_ButtonActive] = ImVec4(0.03f, 0.22f, 0.78f, 1.0f);
+-    c[ImGuiCol_Header] = ImVec4(0.06f, 0.17f, 0.48f, 1.0f);
+-    c[ImGuiCol_HeaderHovered] = ImVec4(0.08f, 0.22f, 0.60f, 1.0f);
+-    c[ImGuiCol_HeaderActive] = ImVec4(0.10f, 0.28f, 0.72f, 1.0f);
+-    c[ImGuiCol_Separator] = ImVec4(0.15f, 0.28f, 0.55f, 0.85f);
+-    c[ImGuiCol_Text] = TEXT_MAIN;
++    c[ImGuiCol_PopupBg] = ImVec4(0.025f, 0.042f, 0.095f, 0.99f);
++    c[ImGuiCol_Border] = BORDER;
++    c[ImGuiCol_FrameBg] = PANEL_2;
++    c[ImGuiCol_FrameBgHovered] = ImVec4(0.07f, 0.13f, 0.25f, 1.0f);
++    c[ImGuiCol_FrameBgActive] = ImVec4(0.08f, 0.17f, 0.32f, 1.0f);
++    c[ImGuiCol_Button] = BLUE;
++    c[ImGuiCol_ButtonHovered] = BLUE_HOVER;
++    c[ImGuiCol_ButtonActive] = ImVec4(0.03f, 0.21f, 0.72f, 1.0f);
++    c[ImGuiCol_Header] = BLUE_SOFT;
++    c[ImGuiCol_HeaderHovered] = ImVec4(0.07f, 0.23f, 0.62f, 1.0f);
++    c[ImGuiCol_HeaderActive] = BLUE;
+     c[ImGuiCol_TextDisabled] = TEXT_MUTED;
+-    c[ImGuiCol_ResizeGrip] = ACCENT_DIM;
+-    c[ImGuiCol_ResizeGripHovered] = ACCENT_BRIGHT;
+-    c[ImGuiCol_ResizeGripActive] = ACCENT;
++    c[ImGuiCol_Separator] = ImVec4(0.14f, 0.27f, 0.56f, 0.80f);
++    c[ImGuiCol_ScrollbarBg] = ImVec4(0.01f, 0.02f, 0.04f, 0.80f);
++    c[ImGuiCol_ScrollbarGrab] = BLUE_SOFT;
++    c[ImGuiCol_ScrollbarGrabHovered] = BLUE_HOVER;
++    c[ImGuiCol_ScrollbarGrabActive] = BLUE;
+ }
+ 
+ void MainWindow::RefreshProducts() {
+@@ -311,8 +281,7 @@
+         catalog_.Replace(api_->FetchMyProducts());
+         Logger::Info(L"Catalog synchronized from " + api_->Name());
+     } catch (...) {
+-        Logger::Error(L"Catalog sync failed");
+-        ShowInfoModal(L"Falha de sincronização", L"Não foi possível sincronizar os produtos agora. Tente novamente em instantes.");
++        ShowInfoModal(L"Falha de sincronização", L"Não foi possível carregar seus produtos agora.");
+     }
+ }
+ 
+@@ -325,271 +294,253 @@
+     ImGuiViewport* vp = ImGui::GetMainViewport();
+     ImGui::SetNextWindowPos(vp->WorkPos);
+     ImGui::SetNextWindowSize(vp->WorkSize);
+-    ImGui::SetNextWindowBgAlpha(1.0f);
+     ImGui::Begin("##root", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
+ 
+     DrawBackgroundDecor();
+     DrawTitleBar();
+-    DrawSidebar();
+-    ImGui::SameLine();
+-    DrawContent();
++    if (loggedIn_) DrawLibrary(); else DrawLogin();
+     DrawModals();
+ 
+     ImGui::End();
+ }
+ 
+ void MainWindow::DrawBackgroundDecor() {
+-    ImDrawList* draw = ImGui::GetWindowDrawList();
+-    const ImVec2 pos = ImGui::GetWindowPos();
+-    const ImVec2 size = ImGui::GetWindowSize();
+-    const ImVec2 max(pos.x + size.x, pos.y + size.y);
+-
+-    draw->AddRectFilledMultiColor(pos, max,
+-        IM_COL32(3, 8, 24, 255), IM_COL32(4, 10, 34, 255),
+-        IM_COL32(2, 8, 24, 255), IM_COL32(5, 16, 44, 255));
+-    draw->AddRect(pos, max, IM_COL32(25, 96, 255, 130), 18.0f, 0, 1.2f);
+-    draw->AddLine(ImVec2(pos.x, pos.y + TITLE_HEIGHT), ImVec2(max.x, pos.y + TITLE_HEIGHT), IM_COL32(35, 103, 255, 125), 1.0f);
+-    draw->AddCircleFilled(ImVec2(pos.x + 420, pos.y + 120), 180.0f, IM_COL32(10, 76, 255, 18), 96);
+-    draw->AddCircleFilled(ImVec2(max.x - 160, pos.y + 170), 120.0f, IM_COL32(12, 58, 186, 16), 96);
++    auto* draw = ImGui::GetWindowDrawList();
++    const ImVec2 p = ImGui::GetWindowPos();
++    const ImVec2 s = ImGui::GetWindowSize();
++    const ImVec2 m(p.x + s.x, p.y + s.y);
++    draw->AddRectFilledMultiColor(p, m, IM_COL32(2,7,22,255), IM_COL32(5,13,38,255), IM_COL32(2,8,24,255), IM_COL32(4,16,45,255));
++    draw->AddCircleFilled(ImVec2(p.x + 270, p.y + 180), 230, IM_COL32(8,70,255,20), 80);
++    draw->AddCircleFilled(ImVec2(m.x - 180, p.y + 190), 180, IM_COL32(12,68,210,16), 80);
++    draw->AddRect(p, m, IM_COL32(28,106,255,120), 22.0f, 0, 1.2f);
+ }
+ 
+ void MainWindow::DrawTitleBar() {
+-    ImGui::SetCursorPos(ImVec2(14, 10));
+-    ImGui::BeginChild("titlebar", ImVec2(0, TITLE_HEIGHT - 14.0f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+-
+-    bool titleButtonHovered = false;
+-    if (CircleIconButton("##close", IM_COL32(255, 95, 86, 255), "", "Fechar")) PostMessageW(hwnd_, WM_CLOSE, 0, 0);
+-    titleButtonHovered |= ImGui::IsItemHovered();
+-    ImGui::SameLine(0.0f, 8.0f);
+-    if (CircleIconButton("##min", IM_COL32(255, 189, 46, 255), "", "Minimizar")) ShowWindow(hwnd_, SW_MINIMIZE);
+-    titleButtonHovered |= ImGui::IsItemHovered();
+-    ImGui::SameLine(0.0f, 8.0f);
+-    if (CircleIconButton("##max", IM_COL32(39, 201, 63, 255), "", maximized_ ? "Restaurar" : "Maximizar")) ToggleMaximize();
+-    titleButtonHovered |= ImGui::IsItemHovered();
+-
+-    ImGui::SetCursorPosX(120.0f);
+-    ImGui::TextColored(ACCENT_BRIGHT, "CRAZZY");
+-    ImGui::SameLine(0.0f, 5.0f);
+-    ImGui::Text("PROJECT");
+-    ImGui::SameLine(0.0f, 12.0f);
+-    ImGui::TextDisabled("MULTILOADER v0.3");
+-
+-    const char* label = SectionLabel(section_);
+-    const ImVec2 labelSize = ImGui::CalcTextSize(label);
+-    const float centerX = (ImGui::GetWindowWidth() - labelSize.x) * 0.5f;
+-    ImGui::SetCursorPosX(centerX);
+-    ImGui::TextColored(TEXT_MUTED, "%s", label);
+-
+-    ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 330.0f);
+-    ImGui::TextDisabled("Tema CRAZZY PROJECT • Azul Neon");
+-    ImGui::SameLine();
+-    if (ImGui::Button("ATUALIZAR", ImVec2(120, 30))) RefreshProducts();
++    ImGui::SetCursorPos(ImVec2(OUTER, 10));
++    ImGui::BeginChild("topbar", ImVec2(0, TOPBAR_H - 8), false, ImGuiWindowFlags_NoScrollbar);
+ 
+-    const bool hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
+-    if (!titleButtonHovered && hovered && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 0.0f)) {
+-        RequestWindowMove();
+-    }
+-    if (!titleButtonHovered && hovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+-        ToggleMaximize();
+-    }
++    bool dotHover = false;
++    if (CircleButton("##close", IM_COL32(255,95,86,255), "Fechar")) PostMessageW(hwnd_, WM_CLOSE, 0, 0);
++    dotHover |= ImGui::IsItemHovered();
++    ImGui::SameLine(0, 8);
++    if (CircleButton("##min", IM_COL32(255,189,46,255), "Minimizar")) ShowWindow(hwnd_, SW_MINIMIZE);
++    dotHover |= ImGui::IsItemHovered();
++    ImGui::SameLine(0, 8);
++    if (CircleButton("##max", IM_COL32(39,201,63,255), maximized_ ? "Restaurar" : "Maximizar")) ToggleMaximize();
++    dotHover |= ImGui::IsItemHovered();
++
++    ImGui::SetCursorPos(ImVec2(90, 10));
++    ImGui::TextColored(BLUE_HOVER, "CRAZZY"); ImGui::SameLine(0, 5); ImGui::Text("PROJECT");
++    ImGui::SameLine(0, 10); ImGui::TextDisabled("MULTILOADER v0.5");
++
++    if (loggedIn_) {
