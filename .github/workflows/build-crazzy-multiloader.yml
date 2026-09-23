@@ -24,26 +24,12 @@ jobs:
           [IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\multiloader-v03.zip", [Convert]::FromBase64String($b64))
           Expand-Archive -Path "$env:GITHUB_WORKSPACE\multiloader-v03.zip" -DestinationPath "$env:GITHUB_WORKSPACE\multiloader-v05" -Force
 
-      - name: Apply V0.5 focused UI
+      - name: Install V0.5 focused UI
         shell: pwsh
         run: |
           $root = "$env:GITHUB_WORKSPACE\multiloader-v05\CRAZZY_MULTILOADER_V0_2"
           Copy-Item "tools/multiloader-build/v05/MainWindow.h" (Join-Path $root "src\ui\MainWindow.h") -Force
-
-          $patch = (Get-Content "tools/multiloader-build/v05.patch.00" -Raw) +
-                   (Get-Content "tools/multiloader-build/v05.patch.01" -Raw) +
-                   (Get-Content "tools/multiloader-build/v05.patch.02" -Raw) +
-                   (Get-Content "tools/multiloader-build/v05.patch.03" -Raw)
-
-          $patch = $patch.Replace("--- /mnt/data/cm_v03_clean/CRAZZY_MULTILOADER_V0_2/src/ui/MainWindow.cpp", "--- a/src/ui/MainWindow.cpp")
-          $patch = $patch.Replace("+++ /mnt/data/cm_v05/CRAZZY_MULTILOADER_V0_2/src/ui/MainWindow.cpp", "+++ b/src/ui/MainWindow.cpp")
-          Set-Content "$env:GITHUB_WORKSPACE\v05.patch" $patch -Encoding utf8
-
-          Push-Location $root
-          $patchExe = "C:\Program Files\Git\usr\bin\patch.exe"
-          & $patchExe -p1 -u -i "$env:GITHUB_WORKSPACE\v05.patch"
-          if ($LASTEXITCODE -ne 0) { throw "V0.5 focused UI patch failed" }
-          Pop-Location
+          Copy-Item "tools/multiloader-build/v05/MainWindow.cpp" (Join-Path $root "src\ui\MainWindow.cpp") -Force
 
       - name: Apply Windows build compatibility fixes
         shell: pwsh
