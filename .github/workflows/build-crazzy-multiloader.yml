@@ -1,4 +1,4 @@
-name: Build CRAZZY Multiloader
+name: Build CRAZZY Multiloader V0.3
 
 on:
   push:
@@ -16,44 +16,50 @@ jobs:
       - name: Checkout build branch
         uses: actions/checkout@v4
 
-      - name: Restore source ZIP
+      - name: Restore V0.3 source ZIP
         shell: pwsh
         run: |
-          $parts = 1..6 | ForEach-Object { Get-Content "tools/multiloader-build/source.part$_" -Raw }
+          $parts = 0..3 | ForEach-Object { Get-Content ("tools/multiloader-build/v03.part{0:D2}" -f $_) -Raw }
           $b64 = ($parts -join "")
-          [IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\multiloader-source.zip", [Convert]::FromBase64String($b64))
-          Expand-Archive -Path "$env:GITHUB_WORKSPACE\multiloader-source.zip" -DestinationPath "$env:GITHUB_WORKSPACE\multiloader-source" -Force
+          [IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\multiloader-v03.zip", [Convert]::FromBase64String($b64))
+          Expand-Archive -Path "$env:GITHUB_WORKSPACE\multiloader-v03.zip" -DestinationPath "$env:GITHUB_WORKSPACE\multiloader-v03" -Force
 
-      - name: Apply Windows build fixes
+      - name: Apply Windows build compatibility fixes
         shell: pwsh
         run: |
-          $root = "$env:GITHUB_WORKSPACE\multiloader-source\CRAZZY_MULTILOADER_V0_2"
+          $root = "$env:GITHUB_WORKSPACE\multiloader-v03\CRAZZY_MULTILOADER_V0_2"
 
           $cmake = Join-Path $root "CMakeLists.txt"
           $text = Get-Content $cmake -Raw
           $needle = "target_compile_options(CrazzyDemoLoader PRIVATE /W4 /permissive- /EHsc /utf-8)"
-          $replacement = @"
+          if ($text.Contains($needle) -and -not $text.Contains('/MANIFEST:NO')) {
+            $replacement = @"
           target_compile_options(CrazzyDemoLoader PRIVATE /W4 /permissive- /EHsc /utf-8)
-              set_target_properties(CrazzyMultiloader CrazzyUpdater CrazzyDemoLoader PROPERTIES LINK_FLAGS "/MANIFEST:NO")
+          set_target_properties(CrazzyMultiloader CrazzyUpdater CrazzyDemoLoader PROPERTIES LINK_FLAGS "/MANIFEST:NO")
           "@
-          if (-not $text.Contains($needle)) { throw "Could not patch manifest linker settings." }
-          $text = $text.Replace($needle, $replacement.Trim())
-          Set-Content $cmake $text -Encoding UTF8
+            $text = $text.Replace($needle, $replacement.Trim())
+            Set-Content $cmake $text -Encoding UTF8
+          }
 
-          $statusHeader = Join-Path $root "src\update\ProductUpdater.h"
-          $statusText = Get-Content $statusHeader -Raw
-          $statusText = $statusText.Replace("GetMessage() const", "ReadMessage() const")
-          Set-Content $statusHeader $statusText -Encoding UTF8
-
-          $mainWindow = Join-Path $root "src\ui\MainWindow.cpp"
-          $uiText = Get-Content $mainWindow -Raw
-          $uiText = $uiText.Replace(".GetMessage()", ".ReadMessage()")
-          Set-Content $mainWindow $uiText -Encoding UTF8
+          $files = @(
+            (Join-Path $root "src\ui\MainWindow.cpp"),
+            (Join-Path $root "demo\DemoLoader.cpp")
+          )
+          foreach ($file in $files) {
+            $t = Get-Content $file -Raw
+            if (-not $t.Contains("#include <windowsx.h>")) {
+              $t = $t.Replace("#include <windows.h>", "#include <windows.h>`r`n#include <windowsx.h>")
+              if (-not $t.Contains("#include <windowsx.h>")) {
+                $t = "#include <windowsx.h>`r`n" + $t
+              }
+              Set-Content $file $t -Encoding UTF8
+            }
+          }
 
       - name: Configure CMake
         shell: pwsh
         run: |
-          cmake -S "$env:GITHUB_WORKSPACE\multiloader-source\CRAZZY_MULTILOADER_V0_2" -B "$env:GITHUB_WORKSPACE\multiloader-build" -A x64
+          cmake -S "$env:GITHUB_WORKSPACE\multiloader-v03\CRAZZY_MULTILOADER_V0_2" -B "$env:GITHUB_WORKSPACE\multiloader-build" -A x64
 
       - name: Build Release
         shell: pwsh
@@ -80,6 +86,6 @@ jobs:
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
-          name: CRAZZY-MULTILOADER-V0.2-WINDOWS
+          name: CRAZZY-MULTILOADER-V0.3-WINDOWS
           path: dist
           if-no-files-found: error
