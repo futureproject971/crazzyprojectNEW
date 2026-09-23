@@ -1,0 +1,59 @@
+name: Build CRAZZY Multiloader
+
+on:
+  push:
+    branches:
+      - multiloader-build-temp
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout build branch
+        uses: actions/checkout@v4
+
+      - name: Restore source ZIP
+        shell: pwsh
+        run: |
+          $parts = 1..6 | ForEach-Object { Get-Content "tools/multiloader-build/source.part$_" -Raw }
+          $b64 = ($parts -join "")
+          [IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\multiloader-source.zip", [Convert]::FromBase64String($b64))
+          Expand-Archive -Path "$env:GITHUB_WORKSPACE\multiloader-source.zip" -DestinationPath "$env:GITHUB_WORKSPACE\multiloader-source" -Force
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          cmake -S "$env:GITHUB_WORKSPACE\multiloader-source\CRAZZY_MULTILOADER_V0_2" -B "$env:GITHUB_WORKSPACE\multiloader-build" -A x64
+
+      - name: Build Release
+        shell: pwsh
+        run: |
+          cmake --build "$env:GITHUB_WORKSPACE\multiloader-build" --config Release --parallel
+
+      - name: Inspect binaries
+        shell: pwsh
+        run: |
+          Get-ChildItem "$env:GITHUB_WORKSPACE\multiloader-build\Release" -Filter *.exe | Select-Object Name,Length
+          Get-FileHash "$env:GITHUB_WORKSPACE\multiloader-build\Release\CrazzyMultiloader.exe" -Algorithm SHA256
+
+      - name: Package binaries
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "$env:GITHUB_WORKSPACE\dist" | Out-Null
+          Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\CrazzyMultiloader.exe" "$env:GITHUB_WORKSPACE\dist\"
+          Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\CrazzyUpdater.exe" "$env:GITHUB_WORKSPACE\dist\"
+          Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\CrazzyDemoLoader.exe" "$env:GITHUB_WORKSPACE\dist\"
+          if (Test-Path "$env:GITHUB_WORKSPACE\multiloader-build\Release\mock_releases") {
+            Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\mock_releases" "$env:GITHUB_WORKSPACE\dist\mock_releases" -Recurse
+          }
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: CRAZZY-MULTILOADER-V0.2-WINDOWS
+          path: dist
+          if-no-files-found: error
