@@ -1,0 +1,204 @@
+--- /mnt/data/cm_v03_clean/CRAZZY_MULTILOADER_V0_2/src/ui/MainWindow.cpp	2026-09-23 19:46:17.000000000 +0000
++++ /mnt/data/cm_v05/CRAZZY_MULTILOADER_V0_2/src/ui/MainWindow.cpp	2026-09-23 20:47:09.371392432 +0000
+@@ -9,31 +9,32 @@
+ #include <array>
+ #include <cstring>
+ #include <filesystem>
++#include <windowsx.h>
+ 
+ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+ 
+ namespace crazzy {
+ namespace {
+-constexpr ImVec4 ACCENT(0.07f, 0.33f, 1.00f, 1.00f);
+-constexpr ImVec4 ACCENT_BRIGHT(0.23f, 0.52f, 1.00f, 1.00f);
+-constexpr ImVec4 ACCENT_DIM(0.05f, 0.17f, 0.42f, 1.00f);
+-constexpr ImVec4 SUCCESS(0.18f, 0.93f, 0.62f, 1.00f);
+-constexpr ImVec4 WARNING(1.00f, 0.70f, 0.22f, 1.00f);
+-constexpr ImVec4 DANGER(1.00f, 0.32f, 0.32f, 1.00f);
+-constexpr ImVec4 PANEL(0.03f, 0.05f, 0.11f, 1.00f);
+-constexpr ImVec4 PANEL_SOFT(0.05f, 0.08f, 0.16f, 1.00f);
+-constexpr ImVec4 PANEL_BORDER(0.12f, 0.30f, 0.72f, 0.85f);
+-constexpr ImVec4 TEXT_MAIN(0.95f, 0.97f, 1.00f, 1.00f);
+-constexpr ImVec4 TEXT_MUTED(0.53f, 0.62f, 0.80f, 1.00f);
+-constexpr float TITLE_HEIGHT = 56.0f;
+-constexpr float SIDEBAR_WIDTH = 248.0f;
++constexpr ImVec4 BLUE(0.05f, 0.28f, 1.00f, 1.00f);
++constexpr ImVec4 BLUE_HOVER(0.18f, 0.50f, 1.00f, 1.00f);
++constexpr ImVec4 BLUE_SOFT(0.06f, 0.16f, 0.38f, 1.00f);
++constexpr ImVec4 PANEL(0.025f, 0.040f, 0.085f, 1.00f);
++constexpr ImVec4 PANEL_2(0.040f, 0.060f, 0.115f, 1.00f);
++constexpr ImVec4 BORDER(0.12f, 0.36f, 0.98f, 0.86f);
++constexpr ImVec4 TEXT_MUTED(0.52f, 0.61f, 0.78f, 1.00f);
++constexpr ImVec4 GREEN(0.18f, 0.88f, 0.60f, 1.00f);
++constexpr ImVec4 YELLOW(1.00f, 0.70f, 0.22f, 1.00f);
++constexpr ImVec4 RED(1.00f, 0.33f, 0.33f, 1.00f);
++constexpr float TOPBAR_H = 58.0f;
++constexpr float SIDEBAR_W = 220.0f;
++constexpr float OUTER = 18.0f;
+ 
+ std::string U(const std::wstring& s) { return utf::ToUtf8(s); }
+ 
+ std::string MaskKey(const std::wstring& key) {
+     auto k = U(key);
+-    if (k.size() <= 8) return "••••••••";
+-    return k.substr(0, 4) + "-••••-••••-" + k.substr(k.size() - 4);
++    if (k.size() <= 8) return "********";
++    return k.substr(0, 4) + "-****-****-" + k.substr(k.size() - 4);
+ }
+ 
+ const char* StateText(update::TaskState s) {
+@@ -48,36 +49,29 @@
+     }
+ }
+ 
+-const char* SectionLabel(MainWindow::Section section) {
+-    switch (section) {
+-        case MainWindow::Section::Home: return "INÍCIO";
+-        case MainWindow::Section::Products: return "MEUS PRODUTOS";
+-        case MainWindow::Section::Updates: return "ATUALIZAÇÕES";
+-        case MainWindow::Section::Downloads: return "DOWNLOADS";
+-        case MainWindow::Section::Account: return "CONTA";
+-        case MainWindow::Section::Settings: return "CONFIGURAÇÕES";
+-        default: return "CRAZZY";
+-    }
++bool CircleButton(const char* id, ImU32 fill, const char* tooltip) {
++    const ImVec2 p = ImGui::GetCursorScreenPos();
++    const float d = 14.0f;
++    ImGui::InvisibleButton(id, ImVec2(d, d));
++    auto* draw = ImGui::GetWindowDrawList();
++    draw->AddCircleFilled(ImVec2(p.x + 7.0f, p.y + 7.0f), 7.0f, fill);
++    if (ImGui::IsItemHovered()) {
++        draw->AddCircle(ImVec2(p.x + 7.0f, p.y + 7.0f), 9.0f, IM_COL32(255,255,255,65), 24, 1.2f);
++        ImGui::SetTooltip("%s", tooltip);
++    }
++    return ImGui::IsItemClicked();
++}
++
++ImVec4 AccentFor(const Product& p) {
++    const auto g = U(p.game);
++    if (g == "VALORANT") return ImVec4(0.92f, 0.20f, 0.31f, 1.0f);
++    if (g == "RUST") return ImVec4(0.91f, 0.42f, 0.18f, 1.0f);
++    if (g == "CS2") return ImVec4(0.93f, 0.66f, 0.24f, 1.0f);
++    return BLUE_HOVER;
+ }
+ 
+-bool CircleIconButton(const char* id, ImU32 fill, const char* glyph, const char* tooltip = nullptr) {
+-    ImDrawList* draw = ImGui::GetWindowDrawList();
+-    const ImVec2 p = ImGui::GetCursorScreenPos();
+-    const float size = 14.0f;
+-    const float radius = size * 0.5f;
+-    ImGui::InvisibleButton(id, ImVec2(size, size));
+-    const bool hovered = ImGui::IsItemHovered();
+-    const bool clicked = ImGui::IsItemClicked();
+-    draw->AddCircleFilled(ImVec2(p.x + radius, p.y + radius), radius, fill);
+-    if (hovered) {
+-        draw->AddCircle(ImVec2(p.x + radius, p.y + radius), radius + 2.0f, IM_COL32(255, 255, 255, 70), 24, 1.5f);
+-        if (tooltip) ImGui::SetTooltip("%s", tooltip);
+-    }
+-    if (glyph && *glyph) {
+-        const ImVec2 textSize = ImGui::CalcTextSize(glyph);
+-        draw->AddText(ImVec2(p.x + radius - textSize.x * 0.5f, p.y + radius - textSize.y * 0.5f - 1.0f), IM_COL32(0, 0, 0, hovered ? 230 : 180), glyph);
+-    }
+-    return clicked;
++void DrawPanelOutline(ImDrawList* draw, const ImVec2& min, const ImVec2& max, float r) {
++    draw->AddRect(min, max, IM_COL32(31, 105, 255, 115), r, 0, 1.0f);
+ }
+ }
+ 
+@@ -85,8 +79,8 @@
+     : instance_(instance), api_(std::move(api)) {}
+ 
+ MainWindow::~MainWindow() {
+-    for (auto& [_, t] : tasks_) {
+-        if (t && t->worker.joinable()) t->worker.request_stop();
++    for (auto& [_, task] : tasks_) {
++        if (task && task->worker.joinable()) task->worker.request_stop();
+     }
+ }
+ 
+@@ -96,7 +90,7 @@
+     RegisterClassExW(&wc);
+ 
+     const DWORD style = WS_POPUP | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+-    hwnd_ = CreateWindowExW(WS_EX_APPWINDOW, wc.lpszClassName, L"CRAZZY MULTILOADER", style, 100, 80, 1380, 860, nullptr, nullptr, instance_, this);
++    hwnd_ = CreateWindowExW(WS_EX_APPWINDOW, wc.lpszClassName, L"CRAZZY MULTILOADER", style, 120, 90, 1280, 780, nullptr, nullptr, instance_, this);
+     if (!hwnd_) return 1;
+ 
+     if (!CreateDeviceD3D(hwnd_)) {
+@@ -138,7 +132,7 @@
+         DrawUi();
+         ImGui::Render();
+ 
+-        const float clear[4] = { 0.008f, 0.015f, 0.035f, 1.0f };
++        const float clear[4] = { 0.005f, 0.010f, 0.025f, 1.0f };
+         context_->OMSetRenderTargets(1, &renderTarget_, nullptr);
+         context_->ClearRenderTargetView(renderTarget_, clear);
+         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+@@ -166,33 +160,27 @@
+ 
+ LRESULT MainWindow::WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
+     if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wp, lp)) return true;
+-
+     switch (msg) {
+-        case WM_NCCALCSIZE:
+-            return 0;
++        case WM_NCCALCSIZE: return 0;
+         case WM_NCHITTEST: {
+             const LRESULT hit = DefWindowProcW(hwnd, msg, wp, lp);
+             if (hit != HTCLIENT) return hit;
+-
+             if (!IsZoomed(hwnd)) {
+-                constexpr LONG border = 8;
+-                RECT rc{};
+-                GetWindowRect(hwnd, &rc);
+-                const POINT pt{ GET_X_LPARAM(lp), GET_Y_LPARAM(lp) };
+-
+-                const bool left = pt.x >= rc.left && pt.x < rc.left + border;
+-                const bool right = pt.x <= rc.right && pt.x > rc.right - border;
+-                const bool top = pt.y >= rc.top && pt.y < rc.top + border;
+-                const bool bottom = pt.y <= rc.bottom && pt.y > rc.bottom - border;
+-
+-                if (top && left) return HTTOPLEFT;
+-                if (top && right) return HTTOPRIGHT;
+-                if (bottom && left) return HTBOTTOMLEFT;
+-                if (bottom && right) return HTBOTTOMRIGHT;
+-                if (left) return HTLEFT;
+-                if (right) return HTRIGHT;
+-                if (top) return HTTOP;
+-                if (bottom) return HTBOTTOM;
++                constexpr LONG b = 8;
++                RECT rc{}; GetWindowRect(hwnd, &rc);
++                POINT pt{ GET_X_LPARAM(lp), GET_Y_LPARAM(lp) };
++                const bool l = pt.x >= rc.left && pt.x < rc.left + b;
++                const bool r = pt.x <= rc.right && pt.x > rc.right - b;
++                const bool t = pt.y >= rc.top && pt.y < rc.top + b;
++                const bool bo = pt.y <= rc.bottom && pt.y > rc.bottom - b;
++                if (t && l) return HTTOPLEFT;
++                if (t && r) return HTTOPRIGHT;
++                if (bo && l) return HTBOTTOMLEFT;
++                if (bo && r) return HTBOTTOMRIGHT;
++                if (l) return HTLEFT;
++                if (r) return HTRIGHT;
++                if (t) return HTTOP;
++                if (bo) return HTBOTTOM;
+             }
+             return HTCLIENT;
+         }
+@@ -224,13 +212,11 @@
+     sd.Windowed = TRUE;
+     sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+ 
+-    UINT flags = 0;
+     D3D_FEATURE_LEVEL fl;
+     const D3D_FEATURE_LEVEL levels[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
+-    HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flags, levels, 2, D3D11_SDK_VERSION, &sd, &swapChain_, &device_, &fl, &context_);
+-    if (hr == DXGI_ERROR_UNSUPPORTED) {
+-        hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_WARP, nullptr, flags, levels, 2, D3D11_SDK_VERSION, &sd, &swapChain_, &device_, &fl, &context_);
+-    }
++    HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, levels, 2, D3D11_SDK_VERSION, &sd, &swapChain_, &device_, &fl, &context_);
++    if (hr == DXGI_ERROR_UNSUPPORTED)
++        hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_WARP, nullptr, 0, levels, 2, D3D11_SDK_VERSION, &sd, &swapChain_, &device_, &fl, &context_);
+     if (FAILED(hr)) return false;
+     CreateRenderTarget();
+     return true;
