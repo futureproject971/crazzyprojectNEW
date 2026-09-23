@@ -1,0 +1,196 @@
+   ImGui::SetCursorPos(ImVec2(ImGui::GetWindowWidth() - 260, 6));
++        if (ImGui::Button("ATUALIZAR", ImVec2(118, 30))) RefreshProducts();
++        ImGui::SameLine();
++        if (ImGui::Button("SAIR", ImVec2(92, 30))) loggedIn_ = false;
++    }
++
++    const bool hover = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
++    if (!dotHover && hover && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 0.0f)) RequestWindowMove();
++    if (!dotHover && hover && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) ToggleMaximize();
+     ImGui::EndChild();
+ }
+ 
+-void MainWindow::DrawSidebar() {
+-    ImGui::SetCursorPos(ImVec2(18, TITLE_HEIGHT + 14.0f));
+-    ImGui::BeginChild("sidebar", ImVec2(SIDEBAR_WIDTH, ImGui::GetContentRegionAvail().y - 18.0f), true);
++void MainWindow::DrawLogin() {
++    const ImVec2 avail = ImGui::GetContentRegionAvail();
++    const float w = 470.0f;
++    const float h = 410.0f;
++    ImGui::SetCursorPos(ImVec2((ImGui::GetWindowWidth() - w) * 0.5f, TOPBAR_H + (avail.y - h) * 0.42f));
++    ImGui::BeginChild("login", ImVec2(w, h), true, ImGuiWindowFlags_NoScrollbar);
+ 
+-    ImDrawList* draw = ImGui::GetWindowDrawList();
++    auto* draw = ImGui::GetWindowDrawList();
+     const ImVec2 p = ImGui::GetWindowPos();
+     const ImVec2 s = ImGui::GetWindowSize();
+-    draw->AddRectFilledMultiColor(p, ImVec2(p.x + s.x, p.y + 80), IM_COL32(7, 20, 56, 255), IM_COL32(3, 9, 28, 255), IM_COL32(7, 20, 56, 255), IM_COL32(3, 9, 28, 255));
+-    draw->AddRect(ImVec2(p.x + 1, p.y + 1), ImVec2(p.x + s.x - 1, p.y + s.y - 1), IM_COL32(28, 96, 255, 80), 16.0f);
+-
+-    ImGui::TextColored(ACCENT_BRIGHT, "CRAZZY");
+-    ImGui::SameLine();
+-    ImGui::Text("PROJECT");
+-    ImGui::TextDisabled("MULTILOADER • premium client");
+-    ImGui::Spacing();
+-    ImGui::Separator();
+-    ImGui::Spacing();
++    draw->AddRectFilledMultiColor(p, ImVec2(p.x+s.x, p.y+120), IM_COL32(8,32,96,160), IM_COL32(4,14,42,120), IM_COL32(8,32,96,25), IM_COL32(4,14,42,20));
++    DrawPanelOutline(draw, p, ImVec2(p.x+s.x, p.y+s.y), 16.0f);
+ 
+-    struct MenuEntry { const char* label; Section section; };
+-    const MenuEntry menus[] = {
+-        {"INÍCIO", Section::Home},
+-        {"MEUS PRODUTOS", Section::Products},
+-        {"ATUALIZAÇÕES", Section::Updates},
+-        {"DOWNLOADS", Section::Downloads},
+-        {"CONTA", Section::Account},
+-        {"CONFIGURAÇÕES", Section::Settings}
+-    };
+-
+-    for (const auto& menu : menus) {
+-        const bool selected = section_ == menu.section;
+-        if (selected) {
+-            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.05f, 0.25f, 0.82f, 0.90f));
+-            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.08f, 0.32f, 0.92f, 0.90f));
+-            ImGui::PushStyleColor(ImGuiCol_Text, ACCENT_BRIGHT);
+-        }
+-        if (ImGui::Selectable(menu.label, selected, 0, ImVec2(-1, 42))) section_ = menu.section;
+-        if (selected) {
+-            ImGui::PopStyleColor(3);
+-        }
++    ImGui::Dummy(ImVec2(0, 18));
++    const char* logo = "CRAZZY PROJECT";
++    const float logoX = (ImGui::GetWindowWidth() - ImGui::CalcTextSize(logo).x) * 0.5f;
++    ImGui::SetCursorPosX(logoX);
++    ImGui::TextColored(BLUE_HOVER, "%s", logo);
++
++    ImGui::Dummy(ImVec2(0, 12));
++    ImGui::SetWindowFontScale(1.45f);
++    const char* title = "CRAZZY MULTILOADER";
++    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(title).x) * 0.5f);
++    ImGui::TextUnformatted(title);
++    ImGui::SetWindowFontScale(1.0f);
++
++    ImGui::Dummy(ImVec2(0, 6));
++    ImGui::TextDisabled("Entre para ver somente os produtos adquiridos e suas keys.");
++    ImGui::Dummy(ImVec2(0, 28));
++
++    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
++    if (ImGui::Button("ENTRAR COM DISCORD", ImVec2(-1, 50))) {
++        loggedIn_ = true;
++        RefreshProducts();
+     }
++    ImGui::PopStyleVar();
+ 
+-    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 110);
++    ImGui::Dummy(ImVec2(0, 16));
+     ImGui::Separator();
+-    ImGui::TextDisabled("AMBIENTE");
+-    ImGui::TextWrapped("%s", U(api_->Name()).c_str());
+-    ImGui::TextDisabled("STATUS");
+-    ImGui::TextColored(SUCCESS, "● CONECTADO");
++    ImGui::Dummy(ImVec2(0, 14));
++    ImGui::TextDisabled("LOGIN SEGURO");
++    ImGui::TextWrapped("A versão final vai usar o mesmo Discord OAuth do site. A senha do Discord nunca entra no Multiloader.");
++    ImGui::Dummy(ImVec2(0, 8));
++    ImGui::TextColored(GREEN, "Conta -> Produtos adquiridos -> Keys -> Iniciar");
+     ImGui::EndChild();
+ }
+ 
+-void MainWindow::DrawContent() {
+-    ImGui::BeginChild("content", ImVec2(0, 0), false);
+-    ImGui::Text("%s", SectionLabel(section_));
+-    ImGui::SameLine();
+-    ImGui::TextColored(ACCENT_BRIGHT, "• TUDO NUM LUGAR SÓ");
+-    ImGui::TextDisabled("Mesmo visual da CRAZZY PROJECT: key, atualização e execução num lugar só.");
++void MainWindow::DrawSidebar() {
++    ImGui::BeginChild("sidebar", ImVec2(SIDEBAR_W, 0), true, ImGuiWindowFlags_NoScrollbar);
++    ImGui::TextColored(BLUE_HOVER, "CRAZZY"); ImGui::SameLine(0,4); ImGui::Text("PROJECT");
++    ImGui::TextDisabled("MULTILOADER");
++    ImGui::Dummy(ImVec2(0, 12));
+     ImGui::Separator();
+-    ImGui::Spacing();
++    ImGui::Dummy(ImVec2(0, 10));
+ 
+-    if (section_ != Section::Products) {
+-        ImGui::Dummy(ImVec2(0, 16));
+-        ImGui::BeginChild("placeholder", ImVec2(0, 240), true);
+-        ImGui::TextColored(ACCENT_BRIGHT, "%s", SectionLabel(section_));
+-        ImGui::Spacing();
+-        ImGui::TextWrapped("Esta área já está reservada no layout premium do CRAZZY MULTILOADER V0.3. O foco desta etapa foi deixar a experiência principal de produtos, keys e updates muito mais premium.");
+-        ImGui::Spacing();
+-        ImGui::TextDisabled("Próxima conexão: integração real com a API do site, histórico de downloads e gestão de conta.");
+-        ImGui::EndChild();
+-        ImGui::EndChild();
+-        return;
+-    }
++    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.05f,0.24f,0.76f,1.0f));
++    ImGui::Selectable("MEUS PRODUTOS", true, 0, ImVec2(-1, 42));
++    ImGui::PopStyleColor();
++
++    ImGui::Dummy(ImVec2(0, 10));
++    ImGui::TextDisabled("SOMENTE O ESSENCIAL");
++    ImGui::TextWrapped("Produtos que sua conta possui, keys e botão para iniciar.");
++
++    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 116);
++    ImGui::Separator();
++    ImGui::TextDisabled("CONTA");
++    ImGui::Text("Discord conectado");
++    ImGui::TextColored(GREEN, "ATIVA");
++    ImGui::EndChild();
++}
+ 
+-    const float gap = 16.0f;
++void MainWindow::DrawLibrary() {
++    ImGui::SetCursorPos(ImVec2(OUTER, TOPBAR_H + 18));
++    ImGui::BeginChild("body", ImVec2(0, -OUTER), false);
++    DrawSidebar();
++    ImGui::SameLine(0, 14);
++
++    ImGui::BeginChild("library", ImVec2(0, 0), false);
++    ImGui::TextColored(BLUE_HOVER, "MEUS PRODUTOS");
++    ImGui::SetWindowFontScale(1.35f);
++    ImGui::TextUnformatted("PRODUTOS ADQUIRIDOS");
++    ImGui::SetWindowFontScale(1.0f);
++    ImGui::TextDisabled("Aqui aparece apenas o que pertence à sua conta.");
++    ImGui::Separator();
++    ImGui::Dummy(ImVec2(0, 8));
++
++    const float gap = 14.0f;
+     const float cardW = (ImGui::GetContentRegionAvail().x - gap) * 0.5f;
+     int i = 0;
+     for (auto& p : catalog_.Items()) {
+-        if (i % 2) ImGui::SameLine(0.0f, gap);
+-        ImGui::BeginGroup();
+-        ImGui::BeginChild(("card##" + U(p.id)).c_str(), ImVec2(cardW, 330), true);
++        if (i % 2) ImGui::SameLine(0, gap);
++        ImGui::BeginChild(("card##" + U(p.id)).c_str(), ImVec2(cardW, 310), true, ImGuiWindowFlags_NoScrollbar);
+         DrawProductCard(p);
+         ImGui::EndChild();
+-        ImGui::EndGroup();
+         ++i;
+     }
+-    if (catalog_.Items().empty()) {
+-        ImGui::Spacing();
+-        ImGui::TextDisabled("Nenhum produto disponível para esta conta.");
+-    }
++    if (catalog_.Items().empty()) ImGui::TextDisabled("Nenhum produto adquirido nesta conta.");
+ 
+     ImGui::EndChild();
++    ImGui::EndChild();
+ }
+ 
+ void MainWindow::DrawProductCard(Product& p) {
+-    ImDrawList* draw = ImGui::GetWindowDrawList();
+-    const ImVec2 pos = ImGui::GetWindowPos();
+-    const ImVec2 size = ImGui::GetWindowSize();
+-    draw->AddRectFilledMultiColor(pos, ImVec2(pos.x + size.x, pos.y + 62), IM_COL32(8, 24, 72, 155), IM_COL32(4, 11, 35, 155), IM_COL32(8, 24, 72, 80), IM_COL32(4, 11, 35, 80));
+-    draw->AddRect(ImVec2(pos.x + 1, pos.y + 1), ImVec2(pos.x + size.x - 1, pos.y + size.y - 1), IM_COL32(28, 104, 255, 70), 16.0f, 0, 1.0f);
++    const ImVec4 accent = AccentFor(p);
++    auto* draw = ImGui::GetWindowDrawList();
++    const ImVec2 win = ImGui::GetWindowPos();
++    const ImVec2 sz = ImGui::GetWindowSize();
++    draw->AddRectFilledMultiColor(win, ImVec2(win.x + sz.x, win.y + 76), ImGui::GetColorU32(ImVec4(accent.x,accent.y,accent.z,0.28f)), IM_COL32(10,16,34,110), IM_COL32(8,12,26,0), IM_COL32(8,12,26,0));
+ 
+-    ImGui::TextColored(ACCENT_BRIGHT, "%s", U(p.game).c_str());
++    ImGui::TextColored(accent, "%s", U(p.game).c_st
