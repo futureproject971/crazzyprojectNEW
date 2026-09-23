@@ -35,6 +35,17 @@
 @import "../modules/call/styles.css";
 @import "../modules/discord-campaigns/styles.css";
 @import "../modules/discord-bot-core/styles.css";
+@import "../modules/customer-360/styles.css";
+@import "../modules/support-desk/styles.css";
+@import "../modules/community-mod/styles.css";
+@import "../modules/resellers/styles.css";
+@import "../modules/club-manager/styles.css";
+@import "../modules/reward-manager/styles.css";
+@import "../modules/luck-manager/styles.css";
+@import "../modules/coupon-manager/styles.css";
+@import "../modules/integrations/styles.css";
+@import "../modules/fulfillment-manager/styles.css";
+@import "../modules/discord-bridge/styles.css";
 @import "../core/design-system/styles/card-surfaces.css";
 
 :root {

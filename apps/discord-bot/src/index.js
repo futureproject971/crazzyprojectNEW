@@ -10,6 +10,7 @@ import {
   startWorkerHeartbeat,
 } from "./modules/campaigns.js";
 import { startBuilderWorker } from "./modules/server-builder.js";
+import { startDiscordRoleBridge } from "./modules/role-bridge.js";
 import {
   deployCommands,
   installCommandHandlers,
@@ -33,6 +34,7 @@ installCommandHandlers(client, supabase, config);
 
 let stopCampaigns = null;
 let stopBuilder = null;
+let stopRoleBridge = null;
 let stopHeartbeat = null;
 
 client.once("ready", async () => {
@@ -47,6 +49,7 @@ client.once("ready", async () => {
   stopHeartbeat = startWorkerHeartbeat(client, supabase, config);
   stopCampaigns = startCampaignWorker(client, supabase, config);
   stopBuilder = startBuilderWorker(client, supabase, config);
+  stopRoleBridge = startDiscordRoleBridge(client, supabase, config);
 });
 
 async function shutdown(signal) {
@@ -54,6 +57,7 @@ async function shutdown(signal) {
 
   stopCampaigns?.();
   stopBuilder?.();
+  stopRoleBridge?.();
   stopHeartbeat?.();
 
   try {
