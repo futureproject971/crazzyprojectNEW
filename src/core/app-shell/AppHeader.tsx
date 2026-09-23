@@ -106,7 +106,9 @@ export function AppHeader({
           { id: "admin-products", label: "Produtos", onSelect: () => go("/admin/produtos") },
           { id: "admin-orders", label: "Pedidos", onSelect: () => go("/admin/pedidos") },
           { id: "admin-users", label: "Usuários", onSelect: () => go("/admin/usuarios") },
-          { id: "admin-settings", label: "Configurações", onSelect: () => go("/admin/configuracoes") },
+          { id: "admin-notifications", label: "Notificações", onSelect: () => go("/admin/notificacoes") },
+          { id: "admin-security", label: "Security Sentinel", onSelect: () => go("/admin/security") },
+          { id: "admin-settings", label: "Configurações", onSelect: () => go("/admin/integracoes") },
           { id: "admin-signout", label: "Sair", danger: true, onSelect: () => void signOut() },
         ]
       : [
@@ -116,6 +118,7 @@ export function AppHeader({
           { id: "client-tickets", label: "Meus Tickets", onSelect: () => go("/tickets") },
           { id: "client-club", label: "CRAZZY CLUB", onSelect: () => go("/club") },
           { id: "client-coupons", label: "Meus Cupons", onSelect: () => go("/painel/cupons") },
+          { id: "client-notifications", label: "Notificações", onSelect: () => go("/painel/notificacoes") },
           { id: "client-tutorial", label: "Tutorial", onSelect: () => go("/academy") },
           { id: "client-profile", label: "Meu Perfil", onSelect: () => go("/perfil") },
           { id: "client-signout", label: "Sair", danger: true, onSelect: () => void signOut() },

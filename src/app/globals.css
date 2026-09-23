@@ -46,6 +46,10 @@
 @import "../modules/integrations/styles.css";
 @import "../modules/fulfillment-manager/styles.css";
 @import "../modules/discord-bridge/styles.css";
+@import "../modules/notifications/styles.css";
+@import "../modules/tutorial-studio/styles.css";
+@import "../modules/security-sentinel/styles.css";
+@import "../core/pwa/styles.css";
 @import "../core/design-system/styles/card-surfaces.css";
 
 :root {

@@ -11,6 +11,8 @@ import {
 } from "./modules/campaigns.js";
 import { startBuilderWorker } from "./modules/server-builder.js";
 import { startDiscordRoleBridge } from "./modules/role-bridge.js";
+import { startNotificationWorker } from "./modules/notifications.js";
+import { startSecuritySentinel } from "./modules/security-sentinel.js";
 import {
   deployCommands,
   installCommandHandlers,
@@ -35,6 +37,8 @@ installCommandHandlers(client, supabase, config);
 let stopCampaigns = null;
 let stopBuilder = null;
 let stopRoleBridge = null;
+let stopNotifications = null;
+let stopSecurity = null;
 let stopHeartbeat = null;
 
 client.once("ready", async () => {
@@ -50,6 +54,8 @@ client.once("ready", async () => {
   stopCampaigns = startCampaignWorker(client, supabase, config);
   stopBuilder = startBuilderWorker(client, supabase, config);
   stopRoleBridge = startDiscordRoleBridge(client, supabase, config);
+  stopNotifications = startNotificationWorker(client, supabase, config);
+  stopSecurity = startSecuritySentinel(client, supabase, config);
 });
 
 async function shutdown(signal) {
@@ -58,6 +64,8 @@ async function shutdown(signal) {
   stopCampaigns?.();
   stopBuilder?.();
   stopRoleBridge?.();
+  stopNotifications?.();
+  stopSecurity?.();
   stopHeartbeat?.();
 
   try {
