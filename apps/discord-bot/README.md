@@ -1,78 +1,161 @@
 # CRAZZY PROJECT Discord Bot
 
-Bot oficial único do CRAZZY PROJECT.
+Bot oficial único do **CRAZZY PROJECT**.
 
-## Regra
+## Regra de infraestrutura
 
-Use **um único Discord bot token** e **um único processo na Discloud**.
+Use **um único Discord application/client, um único bot token e um único processo na Discloud**.
 
-Novos sistemas Discord entram como módulos em `src/modules`. Não crie outro bot.
+Todos os sistemas Discord entram como módulos em `src/modules`. Não crie bots separados para Campaigns, Bridge, Notify ou Security.
 
-## Módulos já migrados
+## Módulos ativos no mesmo Bot Core
 
-### Campanhas/DM
+### Campaigns / DM
 
-- Campanhas/DM
-- /disparar
-- /dispararonline
-- /predef
+- `/disparar`
+- `/dispararonline`
+- `/predef`
 - fila do site
 - templates Supabase
 - heartbeat para o Campaign Center
-- progresso/cancelamento/histórico
+- progresso / cancelamento / histórico
 
 ### Server Builder
 
-- /preview-tema
-- /montar-servidor
-- painel /admin/discord
+- `/preview-tema`
+- `/montar-servidor`
+- painel `/admin/discord`
 - template e tema compartilhados pelo Supabase
-- fila e histórico de execução
+- fila e histórico
 - SAFE MODE append-only
-- não apaga, renomeia, move, reposiciona ou altera permissões de canal/categoria existente
-- cria apenas recursos que estiverem faltando
+- não apaga, renomeia, move, reposiciona ou altera permissões de recursos existentes
 
-## Variáveis Discloud
+### Discord Bridge
 
-Copie `.env.example` e configure no ambiente da aplicação:
+- fila de grant/revoke de cargos
+- retry
+- entitlement do site continua sendo a fonte de direitos
+- cargo Discord manual não concede produto pago
 
-- DISCORD_BOT_TOKEN
-- DISCORD_CLIENT_ID
-- DISCORD_GUILD_ID
-- SUPABASE_URL
-- SUPABASE_SERVICE_ROLE_KEY
-- CRAZZY_DISCORD_WORKER_ID
-- CRAZZY_SITE_URL
+### Notify
 
-O token do Discord e a service role nunca devem ficar no frontend/site.
+- fila de notificações Discord
+- DM opcional para notificações do site
+- pacing configurável
 
-## Migrar templates do bot antigo
+### Security Sentinel
 
-Se você ainda possui o `templates.json` antigo:
+- entrega alertas no canal privado configurado
+- `CRITICAL` pode mencionar somente o cargo de segurança configurado
+- falha do Discord não derruba checkout, auth ou fulfillment
+
+## Validação antes de iniciar
+
+`npm start` executa automaticamente `npm run check` primeiro.
+
+O check cobre:
+- Bot Core
+- configuração
+- cliente Supabase
+- Campaigns
+- Commands
+- Server Builder
+- Role Bridge
+- Notify
+- Security Sentinel
+
+Se qualquer arquivo tiver erro de sintaxe, a aplicação não inicia com código quebrado.
+
+## Variáveis da aplicação Discloud
+
+Configure os valores de produção diretamente nas variáveis de ambiente da aplicação. **Não envie um arquivo `.env` com segredos.**
+
+Obrigatórias:
+
+- `DISCORD_BOT_TOKEN`
+- `DISCORD_CLIENT_ID`
+- `DISCORD_GUILD_ID`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Configuração:
+
+- `CRAZZY_DISCORD_WORKER_ID=main`
+- `CRAZZY_SITE_URL=https://SEU-SITE.com`
+- `DISCORD_DM_DELAY_MS=1500`
+
+Opcionais:
+
+- `DISCORD_ADMIN_USER_IDS`
+- `DISCORD_ADMIN_ROLE_IDS`
+
+O token Discord e a Supabase service role são **somente server-side**.
+
+## Deploy correto na Discloud
+
+A aplicação a enviar é **esta pasta `apps/discord-bot`**, não o monorepo inteiro.
+
+Quando essa pasta é usada como raiz do pacote, a estrutura fica:
+
+```text
+discord-bot/
+├── discloud.config
+├── package.json
+├── .discloudignore
+├── src/
+└── config/
+```
+
+Config atual:
+
+- `TYPE=bot`
+- `MAIN=src/index.js`
+- `START=npm start`
+- `RAM=384`
+- `VERSION=latest`
+- `AUTORESTART=true`
+
+### Upload manual / CLI
+
+Compacte **o conteúdo** de `apps/discord-bot` de forma que `discloud.config` fique na raiz do ZIP.
+
+Também é possível entrar nessa pasta e usar a CLI da Discloud:
+
+```bash
+cd apps/discord-bot
+npm run check
+discloud up
+```
+
+### Integração GitHub da Discloud
+
+A integração GitHub espera `discloud.config` na raiz do repositório selecionado. Como o CRAZZY PROJECT é um monorepo e o bot está em `apps/discord-bot`, prefira o upload/CLI desta pasta enquanto não houver uma estratégia específica de deploy de subdiretório.
+
+## Sinal de saúde esperado
+
+Após iniciar corretamente, o Bot Core deve gravar heartbeat em `discord_campaign_worker_status`.
+
+O painel `/admin/integracoes` deve mudar o Bot Core para online, e `/admin/discord-bridge` passa a mostrar o worker ativo.
+
+Se não houver heartbeat, trate o bot como **offline**, mesmo que o processo apareça como iniciado na hospedagem.
+
+## Segurança
+
+- nunca commitar `.env`;
+- nunca expor service role no site;
+- nunca enviar token Discord ao navegador;
+- nunca logar secrets, keys de produto ou conteúdo entregue;
+- use somente a guild configurada;
+- Security Sentinel usa canal/cargo configurados no Supabase, sem hardcode;
+- roles pagas são solicitadas pelo Fulfillment/Bridge, não por comandos manuais de produto.
+
+## Templates legados
+
+Se ainda existir um `templates.json` antigo:
 
 1. coloque temporariamente o arquivo na pasta do bot;
-2. execute:
-   `npm run import-legacy-templates -- templates.json`
+2. execute `npm run import-legacy-templates -- templates.json`;
 3. confirme os templates no Campaign Center;
 4. remova o arquivo local.
 
-Depois disso o Supabase passa a ser a fonte de verdade.
-
-## Deploy Discloud
-
-A pasta `apps/discord-bot` é uma aplicação independente para deploy na Discloud.
-
-- main: `src/index.js`
-- autorestart: ligado
-- Node 22+
-- RAM inicial: 384 MB
-
-## Próximos módulos do mesmo bot
-
-- roles / Discord Bridge
-- notify
-- support
-- security alerts
-- demais slash commands
-
-Todos usarão o mesmo client Discord já conectado.
+Depois disso o Supabase é a fonte de verdade.
