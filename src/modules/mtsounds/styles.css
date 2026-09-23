@@ -98,3 +98,18 @@ html[data-theme="light"] .crz-mtsounds-footer-note strong {color:#102033}
   .crz-mtsounds-frame-shell > header span {display:none}
   .crz-mtsounds-frame-shell > header {grid-template-columns:1fr auto}
 }
+
+.crz-mtsounds-external {
+  min-height:calc(100vh - 210px);
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:10px;
+  padding:28px;
+  text-align:center;
+  background:radial-gradient(circle at 50% 34%,rgba(0,93,255,.12),transparent 32%),#02050a
+}
+.crz-mtsounds-external strong {color:#edf5ff;font-size:12px}
+.crz-mtsounds-external p {max-width:500px;margin:0 0 6px;color:#71859c;font-size:8px;line-height:1.55}
+html[data-theme="light"] .crz-mtsounds-external {background:#f4f8fd}
+html[data-theme="light"] .crz-mtsounds-external strong {color:#102033}
