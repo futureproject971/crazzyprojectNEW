@@ -97,7 +97,7 @@ export async function GET() {
       },
       {
         id: "mtsounds",
-        name: "MT Sounds • Partner",
+        name: "MTSOUNDS • Partner",
         state: mtSoundsHealth.reachable ? "ready" : "offline",
         detail: mtSoundsHealth.reachable
           ? "Parceiro respondeu em " + mtSoundsHealth.latencyMs + "ms • modo " + mtSounds.mode + "."

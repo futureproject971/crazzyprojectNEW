@@ -1,5 +1,5 @@
 "use client";
-import {useCallback,useEffect,useMemo,useState} from "react";
+import {useCallback,useEffect,useState} from "react";
 import {Badge,PageHeader} from "@/core/design-system";
 type Row=Record<string,any>;
 const money=(c:number)=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format((Number(c)||0)/100);
@@ -51,7 +51,7 @@ export function PartnerManagerPage(){
     const r=await fetch("/api/admin/partners",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"payout_available",partnerId:selected.id,reference})});
     const p=await r.json().catch(()=>({}));
     setNotice(r.ok?"Payout registrado: "+money(Number(p.amount_cents||0)):"Falha: "+(p.detail||p.error||"erro"));
-    if(r.ok)await load();
+    if(r.ok){setSelected(null);await load();}
   };
 
   if(state==="loading")return <main className="crz-partner-state"><span className="crz-spinner"/></main>;
@@ -85,7 +85,7 @@ export function PartnerManagerPage(){
         </>}
 
         {selected&&<section className="crz-partner-payout"><header><strong>Financeiro do parceiro</strong><small>Disponível agora: {money(Number(selected.totals?.available_cents||0))}</small></header><button className="crz-button crz-button--primary crz-button--sm" disabled={Number(selected.totals?.available_cents||0)<=0} onClick={()=>void payAvailable()}>Pagar saldo disponível</button></section>}
-        {selected&&<section className="crz-partner-rules"><header><strong>Planos que geram comissão</strong><small>Somente entrega automática pode ser ativada.</small></header>{data.plans.map((plan:Row)=>{const rule=ruleFor(plan.id);return <button key={plan.id} disabled={!plan.commission_eligible} className={rule?.enabled?"is-on":""} onClick={()=>void toggleRule(plan)}><span><strong>{plan.product_name} • {plan.name}</strong><small>{plan.delivery_mode} • R$ {Number(plan.price).toFixed(2)}</small></span><Badge tone={!plan.commission_eligible?"neutral":rule?.enabled?"green":"blue"}>{!plan.commission_eligible?"NÃO ELEGÍVEL":rule?.enabled?"15% ON":"OFF"}</Badge></button>})}</section>}
+        {selected&&<section className="crz-partner-rules"><header><strong>Planos que geram comissão</strong><small>Somente entrega automática pode ser ativada.</small></header>{data.plans.map((plan:Row)=>{const rule=ruleFor(plan.id);return <button key={plan.id} disabled={!plan.commission_eligible} className={rule?.enabled?"is-on":""} onClick={()=>void toggleRule(plan)}><span><strong>{plan.product_name} • {plan.name}</strong><small>{plan.delivery_mode} • R$ {Number(plan.price).toFixed(2)}</small></span><Badge tone={!plan.commission_eligible?"neutral":rule?.enabled?"green":"blue"}>{!plan.commission_eligible?"NÃO ELEGÍVEL":rule?.enabled?String(Number(rule?.commission_percent??selected.commission_percent??0))+"% ON":"OFF"}</Badge></button>})}</section>}
         {notice&&<p className="crz-partner-notice">{notice}</p>}
       </section>
     </div>

@@ -13,6 +13,7 @@ const protectedPrefixes = [
   "/comunidade",
   "/call",
   "/admin",
+  "/parceiro",
 ];
 
 const protectedApiPrefixes = [
