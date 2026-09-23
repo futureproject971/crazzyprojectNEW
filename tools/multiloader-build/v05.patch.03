@@ -1,0 +1,159 @@
+r());
+     ImGui::Text("%s", U(p.name).c_str());
+     ImGui::TextDisabled("%s", U(p.description).c_str());
+-    ImGui::Spacing();
++    ImGui::Dummy(ImVec2(0, 6));
+ 
++    ImGui::Columns(2, nullptr, false);
+     ImGui::TextDisabled("PLANO");
+-    ImGui::SameLine(120);
+     ImGui::Text("%s", U(p.plan).c_str());
++    ImGui::NextColumn();
+     ImGui::TextDisabled("EXPIRA");
+-    ImGui::SameLine(120);
+     ImGui::Text("%s", U(p.expiresAt).c_str());
++    ImGui::Columns(1);
+ 
+     ImGui::Separator();
+     ImGui::TextDisabled("SUA KEY");
+     const bool reveal = revealKeys_[p.id];
+     std::string key = reveal ? U(p.licenseKey) : MaskKey(p.licenseKey);
+     std::array<char, 512> keyBuf{};
+-    const auto copyLen = (std::min)(key.size(), keyBuf.size() - 1);
++    const auto copyLen = (std::min)(key.size(), keyBuf.size()-1);
+     std::memcpy(keyBuf.data(), key.data(), copyLen);
+-    ImGui::PushItemWidth(-202);
++    ImGui::PushItemWidth(-1);
+     ImGui::InputText(("##key" + U(p.id)).c_str(), keyBuf.data(), keyBuf.size(), ImGuiInputTextFlags_ReadOnly);
+     ImGui::PopItemWidth();
++
++    const float half = (ImGui::GetContentRegionAvail().x - 8.0f) * 0.5f;
++    if (ImGui::Button(((reveal ? "OCULTAR##" : "MOSTRAR##") + U(p.id)).c_str(), ImVec2(half, 36))) revealKeys_[p.id] = !reveal;
+     ImGui::SameLine();
+-    const std::string revealLabel = (reveal ? "OCULTAR##" : "MOSTRAR##") + U(p.id);
+-    if (ImGui::Button(revealLabel.c_str(), ImVec2(88, 0))) revealKeys_[p.id] = !reveal;
+-    ImGui::SameLine();
+-    const std::string copyLabel = "COPIAR KEY##" + U(p.id);
+-    if (ImGui::Button(copyLabel.c_str())) ImGui::SetClipboardText(U(p.licenseKey).c_str());
++    if (ImGui::Button(("COPIAR KEY##" + U(p.id)).c_str(), ImVec2(-1, 36))) ImGui::SetClipboardText(U(p.licenseKey).c_str());
+ 
+-    ImGui::Spacing();
+     RuntimeTask* t = TaskFor(p.id);
+     if (t && t->status.state != update::TaskState::Idle) {
+-        auto state = t->status.state.load();
+-        ImGui::TextColored(state == update::TaskState::Failed ? DANGER : SUCCESS, "%s", StateText(state));
++        const auto state = t->status.state.load();
++        ImGui::TextColored(state == update::TaskState::Failed ? RED : BLUE_HOVER, "%s", StateText(state));
+         if (state == update::TaskState::Downloading) {
+-            auto total = t->status.total.load();
+-            auto done = t->status.received.load();
+-            float fraction = total ? static_cast<float>(done) / static_cast<float>(total) : 0.0f;
+-            ImGui::ProgressBar(fraction, ImVec2(-1, 18));
++            const auto total = t->status.total.load();
++            const auto done = t->status.received.load();
++            const float frac = total ? static_cast<float>(done)/static_cast<float>(total) : 0.0f;
++            ImGui::ProgressBar(frac, ImVec2(-1, 16));
+         }
+-        ImGui::TextDisabled("%s", U(t->status.ReadMessage()).c_str());
+         if (state == update::TaskState::Completed && t->autoLaunch && !t->launchIssued) {
+             t->launchIssued = true;
+             p.installedVersion = t->targetVersion;
+             p.updateRequired = false;
+             LaunchProduct(p);
+         }
++    } else if (p.maintenance) {
++        ImGui::TextColored(YELLOW, "MANUTENCAO");
++    } else if (p.revoked) {
++        ImGui::TextColored(RED, "LICENCA INDISPONIVEL");
++    } else if (p.expired) {
++        ImGui::TextColored(YELLOW, "EXPIRADO");
++    } else if (p.updateRequired) {
++        ImGui::TextColored(BLUE_HOVER, "NOVA VERSAO: %s", U(p.latestVersion).c_str());
+     } else {
+-        if (p.maintenance) {
+-            ImGui::TextColored(WARNING, "🔧 MANUTENÇÃO");
+-            ImGui::TextDisabled("%s", U(p.maintenanceMessage).c_str());
+-        } else if (p.revoked) {
+-            ImGui::TextColored(DANGER, "LICENÇA INDISPONÍVEL");
+-            ImGui::TextDisabled("Verifique sua conta ou o suporte CRAZZY PROJECT.");
+-        } else if (p.expired) {
+-            ImGui::TextColored(WARNING, "EXPIRADO");
+-            ImGui::TextDisabled("Renove a licença no site para continuar usando.");
+-        } else if (p.updateRequired) {
+-            ImGui::TextColored(WARNING, "NOVA VERSÃO  %s → %s", U(p.installedVersion).c_str(), U(p.latestVersion).c_str());
+-            ImGui::TextDisabled("Clique para atualizar e abrir automaticamente.");
+-        } else {
+-            ImGui::TextColored(SUCCESS, "● ATUALIZADO  %s", U(p.latestVersion).c_str());
+-            ImGui::TextDisabled("Pronto para iniciar.");
+-        }
++        ImGui::TextColored(GREEN, "ATUALIZADO");
+     }
+ 
+-    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 58);
++    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 52);
+     const bool blocked = p.maintenance || p.revoked || p.expired || (t && t->status.state != update::TaskState::Idle && t->status.state != update::TaskState::Completed && t->status.state != update::TaskState::Failed);
+     if (blocked) ImGui::BeginDisabled();
+     if (p.updateRequired) {
+-        if (ImGui::Button(("ATUALIZAR E INICIAR##" + U(p.id)).c_str(), ImVec2(-1, 42))) pendingUpdateProduct_ = &p;
++        if (ImGui::Button(("ATUALIZAR E INICIAR##" + U(p.id)).c_str(), ImVec2(-1, 38))) pendingUpdateProduct_ = &p;
+     } else {
+-        if (ImGui::Button(("INICIAR##" + U(p.id)).c_str(), ImVec2(-1, 42))) LaunchProduct(p);
++        if (ImGui::Button(("INICIAR##" + U(p.id)).c_str(), ImVec2(-1, 38))) LaunchProduct(p);
+     }
+     if (blocked) ImGui::EndDisabled();
+ }
+ 
+ void MainWindow::DrawModals() {
+-    if (pendingUpdateProduct_) ImGui::OpenPopup("ATUALIZAÇÃO DISPONÍVEL");
+-    if (ImGui::BeginPopupModal("ATUALIZAÇÃO DISPONÍVEL", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
++    if (pendingUpdateProduct_) ImGui::OpenPopup("ATUALIZACAO DISPONIVEL");
++    if (ImGui::BeginPopupModal("ATUALIZACAO DISPONIVEL", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+         auto* p = pendingUpdateProduct_;
+         if (p) {
+-            ImGui::TextColored(ACCENT_BRIGHT, "%s", U(p->name).c_str());
+-            ImGui::Spacing();
+-            ImGui::Text("%s  →  %s", U(p->installedVersion).c_str(), U(p->latestVersion).c_str());
++            ImGui::TextColored(BLUE_HOVER, "%s", U(p->name).c_str());
++            ImGui::Text("%s -> %s", U(p->installedVersion).c_str(), U(p->latestVersion).c_str());
+             ImGui::Spacing();
+-            ImGui::TextWrapped("Ao confirmar, o CRAZZY MULTILOADER baixa a release nova, valida o SHA-256, preserva a antiga até a troca terminar e abre o produto atualizado automaticamente.");
++            ImGui::TextWrapped("Baixar a versão nova, validar e abrir automaticamente?");
+             ImGui::Spacing();
+-            if (ImGui::Button("OK, ATUALIZAR E ABRIR", ImVec2(240, 42))) {
++            if (ImGui::Button("ATUALIZAR E ABRIR", ImVec2(210, 40))) {
+                 Product copy = *p;
+                 pendingUpdateProduct_ = nullptr;
+                 ImGui::CloseCurrentPopup();
+                 BeginUpdate(std::move(copy), true);
+             }
+             ImGui::SameLine();
+-            if (ImGui::Button("AGORA NÃO", ImVec2(120, 42))) {
++            if (ImGui::Button("CANCELAR", ImVec2(110, 40))) {
+                 pendingUpdateProduct_ = nullptr;
+                 ImGui::CloseCurrentPopup();
+             }
+@@ -600,13 +551,11 @@
+     if (infoModal_.open) ImGui::OpenPopup(infoModal_.popupId.c_str());
+     if (ImGui::BeginPopupModal(infoModal_.popupId.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+         infoModal_.open = false;
+-        ImGui::TextColored(ACCENT_BRIGHT, "%s", U(infoModal_.title).c_str());
++        ImGui::TextColored(BLUE_HOVER, "%s", U(infoModal_.title).c_str());
+         ImGui::Spacing();
+         ImGui::TextWrapped("%s", U(infoModal_.message).c_str());
+         ImGui::Spacing();
+-        if (ImGui::Button(U(infoModal_.primaryLabel).c_str(), ImVec2(120, 40))) {
+-            ImGui::CloseCurrentPopup();
+-        }
++        if (ImGui::Button(U(infoModal_.primaryLabel).c_str(), ImVec2(120, 40))) ImGui::CloseCurrentPopup();
+         ImGui::EndPopup();
+     }
+ }
+@@ -630,7 +579,7 @@
+ void MainWindow::LaunchProduct(const Product& p) {
+     if (p.maintenance || p.expired || p.revoked) return;
+     if (!std::filesystem::exists(p.executablePath)) {
+-        ShowInfoModal(L"Produto não instalado", L"Produto não instalado ainda. Use atualizar/instalar antes de iniciar.");
++        ShowInfoModal(L"Produto não instalado", L"Atualize/instale o produto antes de iniciar.");
+         return;
+     }
+     if (!platform::LaunchElevated(p.executablePath)) {
