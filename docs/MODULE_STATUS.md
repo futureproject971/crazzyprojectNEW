@@ -1,5 +1,6 @@
 # CRAZZY PROJECT — Module Status
 
+> **STATUS:** este arquivo contém histórico e requisitos. Para o estado atual do projeto em 2026-09-23, use [STATUS-ATUAL.md](./STATUS-ATUAL.md) como fonte rápida de verdade.\n\n
 ## M00 — CRAZZY DESIGN SYSTEM
 Status: **APROVADO E INTEGRADO**
 

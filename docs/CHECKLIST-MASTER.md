@@ -1,5 +1,6 @@
 # CRAZZY PROJECT — MASTER CHECKLIST
 
+> **STATUS:** este arquivo contém histórico e requisitos. Para o estado atual do projeto em 2026-09-23, use [STATUS-ATUAL.md](./STATUS-ATUAL.md) como fonte rápida de verdade.\n\n
 ## 🔒 PEDIDOS FIXADOS PELO DONO — NÃO ESQUECER
 
 - [x] **Cards do site com fundo premium**: navy/dark glass, degradê, brilho azul suave e profundidade. **Não aplicar sobre wallpaper, fotos, capas, banners, thumbnails, galerias, vídeos, roleta/raspadinha ou outras artes.**
