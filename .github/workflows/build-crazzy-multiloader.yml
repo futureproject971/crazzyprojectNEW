@@ -24,10 +24,12 @@ jobs:
           [IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\multiloader-source.zip", [Convert]::FromBase64String($b64))
           Expand-Archive -Path "$env:GITHUB_WORKSPACE\multiloader-source.zip" -DestinationPath "$env:GITHUB_WORKSPACE\multiloader-source" -Force
 
-      - name: Fix explicit manifest linking
+      - name: Apply Windows build fixes
         shell: pwsh
         run: |
-          $cmake = "$env:GITHUB_WORKSPACE\multiloader-source\CRAZZY_MULTILOADER_V0_2\CMakeLists.txt"
+          $root = "$env:GITHUB_WORKSPACE\multiloader-source\CRAZZY_MULTILOADER_V0_2"
+
+          $cmake = Join-Path $root "CMakeLists.txt"
           $text = Get-Content $cmake -Raw
           $needle = "target_compile_options(CrazzyDemoLoader PRIVATE /W4 /permissive- /EHsc /utf-8)"
           $replacement = @"
@@ -37,6 +39,16 @@ jobs:
           if (-not $text.Contains($needle)) { throw "Could not patch manifest linker settings." }
           $text = $text.Replace($needle, $replacement.Trim())
           Set-Content $cmake $text -Encoding UTF8
+
+          $statusHeader = Join-Path $root "src\update\ProductUpdater.h"
+          $statusText = Get-Content $statusHeader -Raw
+          $statusText = $statusText.Replace("GetMessage() const", "ReadMessage() const")
+          Set-Content $statusHeader $statusText -Encoding UTF8
+
+          $mainWindow = Join-Path $root "src\ui\MainWindow.cpp"
+          $uiText = Get-Content $mainWindow -Raw
+          $uiText = $uiText.Replace(".GetMessage()", ".ReadMessage()")
+          Set-Content $mainWindow $uiText -Encoding UTF8
 
       - name: Configure CMake
         shell: pwsh
