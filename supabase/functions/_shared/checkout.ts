@@ -11,6 +11,7 @@ export interface CheckoutCartItem {
   productImage?: string | null;
   planName?: string;
   price?: number;
+  resellerDiscountPercent?: number;
   skinsCount?: number | null;
   planCode?: string | null;
 }
@@ -54,17 +55,22 @@ export async function calculateServerTotal(
 
   const { data: resellerData } = await supabaseAdmin
     .from("resellers")
-    .select("id, discount_percent, total_purchases")
+    .select("id, discount_percent, total_purchases, expires_at")
     .eq("user_id", userId)
     .eq("active", true)
     .maybeSingle();
 
+  const activeReseller =
+    resellerData && (!resellerData.expires_at || new Date(resellerData.expires_at).getTime() > Date.now())
+      ? resellerData
+      : null;
+
   let resellerAllowedProductIds: string[] | null = null;
-  if (resellerData) {
+  if (activeReseller) {
     const { data: resellerProducts } = await supabaseAdmin
       .from("reseller_products")
       .select("product_id")
-      .eq("reseller_id", resellerData.id);
+      .eq("reseller_id", activeReseller.id);
     const ids = (resellerProducts || []).map((p: any) => p.product_id);
     resellerAllowedProductIds = ids.length > 0 ? ids : null;
   }
@@ -193,9 +199,10 @@ export async function calculateServerTotal(
       return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Preço inválido no catálogo" };
     }
 
-    if (resellerData && (!resellerAllowedProductIds || resellerAllowedProductIds.includes(planData.product_id))) {
-      const discountPercent = Math.max(0, Math.min(100, Number(resellerData.discount_percent || 0)));
-      unitPriceCents = Math.round(unitPriceCents * (1 - discountPercent / 100));
+    let resellerDiscountPercent = 0;
+    if (activeReseller && (!resellerAllowedProductIds || resellerAllowedProductIds.includes(planData.product_id))) {
+      resellerDiscountPercent = Math.max(0, Math.min(100, Number(activeReseller.discount_percent || 0)));
+      unitPriceCents = Math.round(unitPriceCents * (1 - resellerDiscountPercent / 100));
     }
 
     subtotal += unitPriceCents * qty;
@@ -207,6 +214,7 @@ export async function calculateServerTotal(
       planName: planData.name,
       planCode: planData.plan_code || null,
       price: unitPriceCents / 100,
+      resellerDiscountPercent,
       quantity: qty,
     });
   }
@@ -437,6 +445,7 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
     productName: string;
     planName: string;
     price: number;
+    resellerDiscountPercent?: number;
     quantity: number;
     type?: string;
     lztItemId?: string;
@@ -447,10 +456,15 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
   // Check if buyer is a reseller
   const { data: resellerData } = await supabaseAdmin
     .from("resellers")
-    .select("id, discount_percent, total_purchases")
+    .select("id, discount_percent, total_purchases, expires_at")
     .eq("user_id", payment.user_id)
     .eq("active", true)
     .maybeSingle();
+
+  const activeFulfillmentReseller =
+    resellerData && (!resellerData.expires_at || new Date(resellerData.expires_at).getTime() > Date.now())
+      ? resellerData
+      : null;
 
   for (let itemIndex = 0; itemIndex < cartItems.length; itemIndex++) {
     const item = cartItems[itemIndex];
@@ -469,7 +483,7 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
 
     // Regular product fulfillment
     let originalPrice = item.price || 0;
-    if (resellerData) {
+    if (activeFulfillmentReseller && Number(item.resellerDiscountPercent || 0) > 0) {
       const { data: planData } = await supabaseAdmin
         .from("product_plans")
         .select("price")
@@ -545,21 +559,19 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
         });
       }
 
-      if (resellerData && stockId) {
-        await supabaseAdmin.from("reseller_purchases").insert({
-          reseller_id: resellerData.id,
+      if (activeFulfillmentReseller && Number(item.resellerDiscountPercent || 0) > 0) {
+        const { error: resellerLedgerError } = await supabaseAdmin.from("reseller_purchases").insert({
+          reseller_id: activeFulfillmentReseller.id,
           product_plan_id: item.planId,
           stock_item_id: stockId,
           original_price: originalPrice,
           paid_price: item.price || 0,
+          payment_id: payment.id,
+          payment_item_index: itemIndex,
+          payment_unit_index: i,
         });
-
-        const { error: resellerIncrementError } = await supabaseAdmin.rpc(
-          "increment_reseller_purchases",
-          { _reseller_id: resellerData.id },
-        );
-        if (resellerIncrementError) {
-          console.error("[checkout] failed to increment reseller purchases", resellerIncrementError);
+        if (resellerLedgerError && resellerLedgerError.code !== "23505") {
+          console.error("[checkout] reseller ledger insert failed", resellerLedgerError.code);
         }
       }
     }

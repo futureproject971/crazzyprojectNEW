@@ -11,9 +11,8 @@ export const visitorNavigation: ShellNavItem[] = [
   { id: "call", label: "CRAZZY CALL", href: "/call", icon: "/icons/headset.svg" },
   { id: "club", label: "CLUB", href: "/club", icon: "/icons/crown.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
-  { id: "help", label: "Ajuda", href: "/help", icon: "/icons/book.svg" },
-  { id: "ticket", label: "Ticket", href: "/tickets", icon: "/icons/headset.svg" },
-  { id: "mtsounds", label: "MT Sounds", href: "/mtsounds", icon: "/icons/bolt.svg" },
+  { id: "support", label: "Ticket", subtitle: "Suporte prioritário", href: "/tickets", icon: "/icons/headset.svg" },
+  { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
 ];
 
 export const clientNavigation: ShellNavItem[] = [
@@ -23,9 +22,9 @@ export const clientNavigation: ShellNavItem[] = [
   { id: "accounts", label: "Contas", href: "/contas", icon: "/icons/package.svg" },
   { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
   { id: "call", label: "CRAZZY CALL", href: "/call", icon: "/icons/headset.svg" },
-  { id: "help", label: "Ajuda", href: "/help", icon: "/icons/book.svg" },
-  { id: "support", label: "Suporte", href: "/tickets", icon: "/icons/headset.svg" },
+  { id: "support", label: "Ticket", subtitle: "Suporte prioritário", href: "/tickets", icon: "/icons/headset.svg" },
   { id: "notifications", label: "Avisos", href: "/painel/notificacoes", icon: "/icons/flame.svg" },
+  { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
 ];
 
@@ -43,6 +42,7 @@ export const adminNavigation: ShellNavItem[] = [
   { id: "stock", label: "Estoque", href: "/admin/estoque", icon: "/icons/package.svg" },
   { id: "academy", label: "Tutoriais", href: "/admin/academy", icon: "/icons/book.svg" },
   { id: "customers", label: "Clientes", href: "/admin/clientes", icon: "/icons/users.svg" },
+  { id: "partners", label: "Parceiros", href: "/admin/parceiros", icon: "/icons/crown.svg" },
   { id: "support-desk", label: "Suporte", href: "/admin/suporte", icon: "/icons/headset.svg" },
   { id: "appearance", label: "Aparência", href: "/admin/aparencia", icon: "/icons/diamond.svg" },
   { id: "integrations", label: "Integrações", href: "/admin/integracoes", icon: "/icons/bolt.svg" },

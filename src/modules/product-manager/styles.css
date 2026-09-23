@@ -229,3 +229,5 @@ html[data-theme="light"] .crz-pm-create-plan select {
 @media(max-width:620px){
   .crz-pm-create-plan {grid-template-columns:1fr}
 }
+
+.crz-pm-ghost-note{grid-column:1/-1;border:1px solid rgba(120,84,255,.22);border-radius:8px;padding:8px 9px;color:#b8c7ff;background:rgba(77,38,180,.09);font-size:6.8px;line-height:1.45}

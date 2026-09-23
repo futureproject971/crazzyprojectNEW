@@ -15,7 +15,7 @@ export async function GET(){
   if(!admin)return NextResponse.json({error:"FORBIDDEN"},{status:403});
 
   const [resellersResult,productsResult]=await Promise.all([
-    supabase.from("resellers").select("*").order("created_at",{ascending:false}).limit(500),
+    supabase.from("resellers").select("*",{count:"exact"}).order("created_at",{ascending:false}).limit(500),
     supabase.from("products").select("id,name,slug,active,image_url").order("name"),
   ]);
   if(resellersResult.error||productsResult.error)return NextResponse.json({error:"RESELLERS_UNAVAILABLE"},{status:500});
@@ -28,7 +28,7 @@ export async function GET(){
     userIds.length?supabase.from("profiles").select("user_id,username,avatar_url,banned").in("user_id",userIds):Promise.resolve({data:[],error:null}),
     userIds.length?supabase.from("discord_identities").select("user_id,discord_user_id,username,global_name,avatar_url,guild_member").in("user_id",userIds):Promise.resolve({data:[],error:null}),
     resellerIds.length?supabase.from("reseller_products").select("reseller_id,product_id").in("reseller_id",resellerIds):Promise.resolve({data:[],error:null}),
-    resellerIds.length?supabase.from("reseller_purchases").select("reseller_id,paid_price,created_at").in("reseller_id",resellerIds):Promise.resolve({data:[],error:null}),
+    resellerIds.length?supabase.rpc("admin_reseller_purchase_totals",{p_reseller_ids:resellerIds}):Promise.resolve({data:[],error:null}),
   ]);
 
   const profileMap=new Map((profilesResult.data||[]).map(item=>[item.user_id,item]));
@@ -36,7 +36,7 @@ export async function GET(){
   const allowedMap=new Map<string,string[]>();
   for(const item of allowedResult.data||[]){const list=allowedMap.get(item.reseller_id)||[];list.push(item.product_id);allowedMap.set(item.reseller_id,list)}
   const purchaseMap=new Map<string,{count:number;total:number}>();
-  for(const item of purchasesResult.data||[]){const current=purchaseMap.get(item.reseller_id)||{count:0,total:0};current.count+=1;current.total+=Number(item.paid_price||0);purchaseMap.set(item.reseller_id,current)}
+  for(const item of purchasesResult.data||[]){purchaseMap.set(item.reseller_id,{count:Number(item.count||0),total:Number(item.total||0)})}
 
   return NextResponse.json({
     resellers:resellers.map(item=>{
@@ -59,6 +59,8 @@ export async function GET(){
       };
     }),
     products:(productsResult.data||[]).filter(item=>item.active),
+    totalResellers:resellersResult.count||resellers.length,
+    truncated:(resellersResult.count||0)>resellers.length,
   },{headers:{"Cache-Control":"private, no-store"}});
 }
 

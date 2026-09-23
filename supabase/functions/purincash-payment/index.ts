@@ -386,7 +386,62 @@ function replayCheckout(payment: any) {
   return json({ error: "Esta tentativa de checkout já foi usada. Inicie uma nova tentativa." }, 409);
 }
 
+async function reserveCheckoutInventory(supabaseAdmin: any, paymentId: string, checkout: any) {
+  const { data, error } = await supabaseAdmin.rpc("reserve_checkout_stock", {
+    p_payment_id: paymentId,
+    p_cart_snapshot: checkout.cartSnapshot,
+    p_ttl_minutes: 60,
+  });
+
+  if (!error) return { ok: true as const, data };
+
+  const message = String(error.message || error.code || "STOCK_RESERVATION_FAILED");
+  if (message.includes("OUT_OF_STOCK")) {
+    return {
+      ok: false as const,
+      status: 409,
+      error: "Um dos planos acabou de esgotar. Atualize o carrinho e tente novamente.",
+    };
+  }
+
+  console.error("[purincash] stock reservation failed", paymentId, message);
+  return {
+    ok: false as const,
+    status: 500,
+    error: "Não foi possível reservar o estoque com segurança.",
+  };
+}
+
+async function releaseCheckoutInventory(supabaseAdmin: any, paymentId: string) {
+  const { error } = await supabaseAdmin.rpc("release_checkout_stock", {
+    p_payment_id: paymentId,
+  });
+  if (error) {
+    console.warn("[purincash] stock reservation release failed", paymentId, error.message);
+  }
+}
+
+async function extendCheckoutInventory(
+  supabaseAdmin: any,
+  paymentId: string,
+  expiresAt: string | null | undefined,
+) {
+  if (!expiresAt) return;
+
+  const parsed = new Date(expiresAt);
+  if (Number.isNaN(parsed.getTime())) return;
+
+  const { error } = await supabaseAdmin.rpc("extend_checkout_stock", {
+    p_payment_id: paymentId,
+    p_expires_at: parsed.toISOString(),
+  });
+  if (error) {
+    console.warn("[purincash] stock reservation expiry sync failed", paymentId, error.message);
+  }
+}
+
 async function failCheckoutAttempt(supabaseAdmin: any, paymentId: string) {
+  await releaseCheckoutInventory(supabaseAdmin, paymentId);
   await supabaseAdmin
     .from("payments")
     .update({ status: "FAILED", updated_at: new Date().toISOString() })
@@ -885,6 +940,16 @@ Deno.serve(async (req) => {
     if (reservation.error) return json({ error: reservation.error }, 500);
     if (!reservation.created) return replayCheckout(reservation.payment);
 
+    const inventory = await reserveCheckoutInventory(
+      supabaseAdmin,
+      internalPaymentId,
+      checkout,
+    );
+    if (!inventory.ok) {
+      await failCheckoutAttempt(supabaseAdmin, internalPaymentId);
+      return json({ error: inventory.error }, inventory.status);
+    }
+
     const customer = await getCustomer();
     const { response, body: provider } = await purincashRequest(PURINCASH_API_KEY, "/charges", {
       method: "POST",
@@ -901,6 +966,8 @@ Deno.serve(async (req) => {
       await failCheckoutAttempt(supabaseAdmin, internalPaymentId);
       return json({ error: provider?.error || "Erro ao criar cobrança PIX" }, response.status || 502);
     }
+
+    await extendCheckoutInventory(supabaseAdmin, internalPaymentId, provider?.expiresAt || null);
 
     const persistedCart = await attachCheckoutProof(CHECKOUT_SIGNING_SECRET, {
       paymentId: internalPaymentId,
@@ -978,6 +1045,16 @@ Deno.serve(async (req) => {
     if (reservation.error) return json({ error: reservation.error }, 500);
     if (!reservation.created) return replayCheckout(reservation.payment);
 
+    const inventory = await reserveCheckoutInventory(
+      supabaseAdmin,
+      internalPaymentId,
+      checkout,
+    );
+    if (!inventory.ok) {
+      await failCheckoutAttempt(supabaseAdmin, internalPaymentId);
+      return json({ error: inventory.error }, inventory.status);
+    }
+
     const customer = await getCustomer();
     const siteUrl = (Deno.env.get("PUBLIC_SITE_URL") || Deno.env.get("SITE_URL") || "").replace(/\/$/, "");
     const requestBody: Record<string, unknown> = {
@@ -1000,6 +1077,8 @@ Deno.serve(async (req) => {
       await failCheckoutAttempt(supabaseAdmin, internalPaymentId);
       return json({ error: provider?.error || "Erro ao criar pagamento por cartão" }, response.status || 502);
     }
+
+    await extendCheckoutInventory(supabaseAdmin, internalPaymentId, provider?.expiresAt || null);
 
     const persistedCart = await attachCheckoutProof(CHECKOUT_SIGNING_SECRET, {
       paymentId: internalPaymentId,
@@ -1068,6 +1147,16 @@ Deno.serve(async (req) => {
     if (reservation.error) return json({ error: reservation.error }, 500);
     if (!reservation.created) return replayCheckout(reservation.payment);
 
+    const inventory = await reserveCheckoutInventory(
+      supabaseAdmin,
+      internalPaymentId,
+      checkout,
+    );
+    if (!inventory.ok) {
+      await failCheckoutAttempt(supabaseAdmin, internalPaymentId);
+      return json({ error: inventory.error }, inventory.status);
+    }
+
     const customer = await getCustomer();
     const { response, body: provider } = await purincashRequest(PURINCASH_API_KEY, "/payments", {
       method: "POST",
@@ -1084,6 +1173,8 @@ Deno.serve(async (req) => {
       await failCheckoutAttempt(supabaseAdmin, internalPaymentId);
       return json({ error: provider?.error || "Erro ao criar pagamento em Litecoin" }, response.status || 502);
     }
+
+    await extendCheckoutInventory(supabaseAdmin, internalPaymentId, provider?.expiresAt || null);
 
     const persistedCart = await attachCheckoutProof(CHECKOUT_SIGNING_SECRET, {
       paymentId: internalPaymentId,

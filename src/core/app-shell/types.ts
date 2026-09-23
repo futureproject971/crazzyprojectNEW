@@ -8,6 +8,7 @@ export type ShellNavItem = {
   href: string;
   icon: string;
   badge?: string;
+  subtitle?: string;
 };
 
 export type AppShellProps = {

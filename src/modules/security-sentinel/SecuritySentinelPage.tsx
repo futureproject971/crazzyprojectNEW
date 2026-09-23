@@ -1,5 +1,5 @@
 "use client";
-import {useCallback,useEffect,useMemo,useState} from "react";
+import {useCallback,useEffect,useState} from "react";
 import {Badge,PageHeader} from "@/core/design-system";
 
 type Row=Record<string,any>;
@@ -38,12 +38,7 @@ export function SecuritySentinelPage(){
     return()=>clearInterval(t);
   },[]);
 
-  const stats=useMemo(()=>({
-    critical:data?.events?.filter((x:Row)=>x.severity==="critical"&&x.status!=="resolved").length||0,
-    high:data?.events?.filter((x:Row)=>x.severity==="high"&&x.status!=="resolved").length||0,
-    open:data?.events?.filter((x:Row)=>x.status==="open").length||0,
-    resolved:data?.events?.filter((x:Row)=>x.status==="resolved").length||0
-  }),[data]);
+  const stats=data?.stats||{critical:0,high:0,open:0,resolved:0};
 
   const setStatus=async(id:string,status:string)=>{
     const r=await fetch("/api/admin/security",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"set_status",eventId:id,status})});

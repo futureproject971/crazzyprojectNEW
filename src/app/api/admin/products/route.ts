@@ -17,6 +17,7 @@ const PLAN_CODES = new Set([
 ]);
 const DELIVERY_MODES = new Set([
   "internal_stock",
+  "ghost_stock",
   "purincash_supplier",
   "lzt_account",
   "manual",

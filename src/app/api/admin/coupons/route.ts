@@ -21,7 +21,7 @@ export async function GET(){
     supabase.from("products").select("id,name,slug,active,image_url").eq("active",true).order("name"),
     supabase.from("coupon_products").select("coupon_id,product_id"),
     supabase.from("coupon_users").select("coupon_id,user_id"),
-    supabase.from("coupon_usage").select("coupon_id,user_id,created_at").order("created_at",{ascending:false}).limit(1000),
+    supabase.rpc("admin_coupon_usage_counts"),
   ]);
   if([coupons,products,links,users,usage].some(x=>x.error))return NextResponse.json({error:"COUPON_MANAGER_UNAVAILABLE"},{status:500});
 
@@ -36,7 +36,7 @@ export async function GET(){
   const userMap=new Map<string,any[]>();
   for(const item of users.data||[]){const list=userMap.get(item.coupon_id)||[];list.push({...item,profile:profileMap.get(item.user_id)||null});userMap.set(item.coupon_id,list)}
   const usageMap=new Map<string,number>();
-  for(const item of usage.data||[])usageMap.set(item.coupon_id,(usageMap.get(item.coupon_id)||0)+1);
+  for(const item of usage.data||[])usageMap.set(item.coupon_id,Number(item.uses||0));
 
   return NextResponse.json({
     coupons:(coupons.data||[]).map(item=>({...item,product_ids:productMap.get(item.id)||[],users:userMap.get(item.id)||[],real_uses:usageMap.get(item.id)||0})),

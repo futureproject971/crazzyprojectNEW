@@ -1,6 +1,6 @@
 "use client";
 
-import {useCallback,useEffect,useMemo,useState} from "react";
+import {useCallback,useEffect,useState} from "react";
 import {Badge,PageHeader} from "@/core/design-system";
 
 type Row=Record<string,any>;
@@ -38,12 +38,7 @@ export function DiscordBridgePage(){
     return()=>clearInterval(t);
   },[]);
 
-  const stats=useMemo(()=>({
-    pending:data?.grants?.filter((x:Row)=>["pending","processing"].includes(x.status)).length||0,
-    failed:data?.grants?.filter((x:Row)=>x.status==="failed").length||0,
-    granted:data?.grants?.filter((x:Row)=>x.status==="granted").length||0,
-    revoke:data?.grants?.filter((x:Row)=>x.desired_state==="revoked"&&x.status!=="revoked").length||0
-  }),[data]);
+  const stats=data?.stats||{pending:0,failed:0,granted:0,revoke:0};
 
   const online=Boolean(data?.worker?.connected&&data.worker.last_seen_at&&Date.now()-new Date(data.worker.last_seen_at).getTime()<45000);
 

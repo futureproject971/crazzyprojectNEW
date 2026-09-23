@@ -23,6 +23,20 @@ export function MtSoundsPage() {
   const [frameFailed, setFrameFailed] = useState(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const via = String(params.get("via") || "").trim().toLowerCase();
+    if (via) {
+      void fetch("/api/referral/capture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: via, source: "mtsounds" }),
+      }).finally(() => {
+        params.delete("via");
+        const next = params.toString() ? "/mtsounds?" + params.toString() : "/mtsounds";
+        window.history.replaceState({}, "", next);
+      });
+    }
+
     let active = true;
 
     void fetch("/api/mtsounds", { cache: "no-store" })
@@ -72,20 +86,12 @@ export function MtSoundsPage() {
       <div className="crz-container crz-mtsounds-container">
         <PageHeader
           eyebrow="M46 • PARCEIRO CRAZZY"
-          title="MT Sounds"
-          description="Integração compatível e isolada, pronta para trocar para o source nativo quando ele for entregue."
+          title="MTSOUNDS"
+          description="MTSOUNDS integrado dentro da CRAZZY PROJECT, com fallback externo somente se o parceiro bloquear o embed."
           actions={
             <div className="crz-mtsounds-actions">
               <Badge tone="green">GRÁTIS</Badge>
               <Badge tone={badge.tone}>{badge.text}</Badge>
-              <a
-                className="crz-button crz-button--secondary crz-button--sm"
-                href={partnerUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Abrir em nova aba
-              </a>
             </div>
           }
         />
@@ -93,7 +99,7 @@ export function MtSoundsPage() {
         <section className="crz-mtsounds-notice">
           <NeonIcon name="community" size={29} />
           <div>
-            <strong>Ferramenta de parceiro isolada</strong>
+            <strong>MTSOUNDS dentro da CRAZZY PROJECT</strong>
             <span>
               Nenhum login, token ou dado privado da CRAZZY PROJECT é enviado para o app parceiro.
             </span>
@@ -107,7 +113,7 @@ export function MtSoundsPage() {
               <i className="is-yellow" />
               <i className="is-green" />
             </div>
-            <span>MT SOUNDS • M46 COMPAT</span>
+            <span>MTSOUNDS • M46 COMPAT</span>
             <strong>
               {externalOnly
                 ? "MODO EXTERNO"
@@ -123,7 +129,7 @@ export function MtSoundsPage() {
             {externalOnly ? (
               <div className="crz-mtsounds-external">
                 <NeonIcon name="community" size={42} />
-                <strong>MT Sounds está configurado para abrir externamente</strong>
+                <strong>MTSOUNDS está configurado para abrir externamente</strong>
                 <p>
                   Esse modo evita iframe quando o parceiro aplica bloqueio de embed ou política de segurança própria.
                 </p>
@@ -133,7 +139,7 @@ export function MtSoundsPage() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Abrir MT Sounds
+                  Abrir MTSOUNDS
                 </a>
               </div>
             ) : (
@@ -141,7 +147,7 @@ export function MtSoundsPage() {
                 {!loaded && (
                   <div className="crz-mtsounds-loading">
                     <span className="crz-spinner" />
-                    <strong>{frameFailed ? "O embed não confirmou carregamento" : "Carregando MT Sounds"}</strong>
+                    <strong>{frameFailed ? "O embed não confirmou carregamento" : "Carregando MTSOUNDS"}</strong>
                     <p>
                       {frameFailed
                         ? "O parceiro pode estar offline ou bloqueando iframe. Use a abertura externa sem perder a rota CRAZZY."
@@ -163,7 +169,7 @@ export function MtSoundsPage() {
                 <iframe
                   className={loaded ? "is-loaded" : ""}
                   src={partnerUrl}
-                  title="MT Sounds"
+                  title="MTSOUNDS"
                   onLoad={() => {
                     setLoaded(true);
                     setFrameFailed(false);
@@ -181,7 +187,7 @@ export function MtSoundsPage() {
         <section className="crz-mtsounds-footer-note">
           <NeonIcon name="shield" size={25} />
           <div>
-            <strong>M46 fechado em modo compatibilidade</strong>
+            <strong>MTSOUNDS • integração CRAZZY ativa</strong>
             <span>
               A migração 100% nativa do código continua sendo uma troca de implementação quando o source/repo original estiver disponível, sem mudar a rota pública.
             </span>

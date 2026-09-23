@@ -1,5 +1,9 @@
 function safe(value,max=900){
-  return String(value??"").replace(/<@&\\d+>/g,"[role]").slice(0,max);
+  return String(value??"")
+    .replace(/<@&\\d+>/g,"[role]")
+    .replace(/@everyone/gi,"@\u200beveryone")
+    .replace(/@here/gi,"@\u200bhere")
+    .slice(0,max);
 }
 
 async function finish(supabase,id,success,error=null){
@@ -34,7 +38,7 @@ export function startSecuritySentinel(client,supabase,config){
           "Categoria: "+safe(event.category,80)+" • Fonte: "+safe(event.source,80)+" • Ocorrências: "+Number(event.occurrences||1),
           "Event ID: "+event.id
         ].join("\\n");
-        await channel.send({content:content.slice(0,1900),allowedMentions:{roles:event.severity==="critical"&&roleId?[roleId]:[],users:[],repliedUser:false}});
+        await channel.send({content:content.slice(0,1900),allowedMentions:{parse:[],roles:event.severity==="critical"&&roleId?[roleId]:[],users:[],repliedUser:false}});
         await finish(supabase,event.id,true);
       }catch(error){
         await finish(supabase,event.id,false,String(error?.code||error?.message||"SECURITY_ALERT_FAILED").slice(0,180));

@@ -8,15 +8,19 @@ function slugify(value:string){
 }
 
 export function TutorialStudioPage(){
-  const [data,setData]=useState<any>({tutorials:[],products:[]});
+  const [data,setData]=useState<any>({tutorials:[],products:[],plans:[]});
   const [state,setState]=useState<"loading"|"ready"|"error">("loading");
   const [selected,setSelected]=useState<Row|null>(null);
   const [title,setTitle]=useState("");
   const [slug,setSlug]=useState("");
   const [summary,setSummary]=useState("");
   const [category,setCategory]=useState("Geral");
-  const [accessType,setAccessType]=useState<"public"|"product">("public");
+  const [accessType,setAccessType]=useState<"public"|"product"|"plan">("public");
   const [productIds,setProductIds]=useState<string[]>([]);
+  const [planIds,setPlanIds]=useState<string[]>([]);
+  const [subtitle,setSubtitle]=useState("");
+  const [coverUrl,setCoverUrl]=useState("");
+  const [sortOrder,setSortOrder]=useState("0");
   const [blocksText,setBlocksText]=useState('[{"type":"title","content":{"text":"Comece aqui"}},{"type":"text","content":{"text":"Explique o passo."}}]');
   const [active,setActive]=useState(true);
   const [featured,setFeatured]=useState(false);
@@ -37,14 +41,14 @@ export function TutorialStudioPage(){
 
   const fresh=()=>{
     setSelected(null);setTitle("");setSlug("");setSummary("");setCategory("Geral");setAccessType("public");
-    setProductIds([]);setActive(true);setFeatured(false);setMinutes("5");
+    setProductIds([]);setPlanIds([]);setSubtitle("");setCoverUrl("");setSortOrder("0");setActive(true);setFeatured(false);setMinutes("5");
     setBlocksText('[{"type":"title","content":{"text":"Comece aqui"}},{"type":"text","content":{"text":"Explique o passo."}}]');
     setNotice("");
   };
 
   const choose=(t:Row)=>{
     setSelected(t);setTitle(t.title||"");setSlug(t.slug||"");setSummary(t.summary||"");setCategory(t.category||"Geral");
-    setAccessType(t.access_type==="product"?"product":"public");setProductIds(t.product_ids||[]);
+    setAccessType((t.plan_ids||[]).length?"plan":t.access_type==="product"?"product":"public");setProductIds(t.product_ids||[]);setPlanIds(t.plan_ids||[]);setSubtitle(t.subtitle||"");setCoverUrl(t.cover_url||"");setSortOrder(String(t.sort_order||0));
     setActive(t.active!==false);setFeatured(Boolean(t.featured));setMinutes(String(t.estimated_minutes||5));
     setBlocksText(JSON.stringify((t.blocks||[]).map((b:Row)=>({type:b.block_type,content:b.content})),null,2));
   };
@@ -52,7 +56,7 @@ export function TutorialStudioPage(){
   const save=async()=>{
     let blocks:any[]=[];
     try{const parsed=JSON.parse(blocksText);if(!Array.isArray(parsed))throw new Error();blocks=parsed}catch{return setNotice("Blocks precisa ser um JSON array válido.")}
-    const payload={id:selected?.id||null,title,slug:slug||slugify(title),summary,category,accessType,productIds:accessType==="product"?productIds:[],blocks,active,featured,estimatedMinutes:Number(minutes)||5,sortOrder:selected?.sort_order||0};
+    const payload={id:selected?.id||null,title,slug:slug||slugify(title),subtitle,coverUrl,summary,category,accessType,productIds:accessType==="product"?productIds:[],planIds:accessType==="plan"?planIds:[],blocks,active,featured,estimatedMinutes:Number(minutes)||5,sortOrder:Number(sortOrder)||0};
     const r=await fetch("/api/admin/academy",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
     const p=await r.json().catch(()=>({}));
     setNotice(r.ok?"Tutorial salvo.":"Falha: "+(p.detail||p.error||"TUTORIAL_SAVE_FAILED"));
@@ -81,18 +85,22 @@ export function TutorialStudioPage(){
         <header><div><small>{selected?"EDITAR":"NOVO TUTORIAL"}</small><h2>{title||"Sem título"}</h2></div></header>
         <label><span>Título</span><input value={title} onChange={e=>{setTitle(e.target.value);if(!selected)setSlug(slugify(e.target.value))}}/></label>
         <label><span>Slug</span><input value={slug} onChange={e=>setSlug(e.target.value)}/></label>
+        <label><span>Subtítulo</span><input value={subtitle} onChange={e=>setSubtitle(e.target.value)}/></label>
+        <label><span>Capa URL</span><input value={coverUrl} onChange={e=>setCoverUrl(e.target.value)}/></label>
         <label><span>Resumo</span><textarea value={summary} onChange={e=>setSummary(e.target.value)}/></label>
         <div className="crz-tutorialstudio-row">
           <label><span>Categoria</span><input value={category} onChange={e=>setCategory(e.target.value)}/></label>
           <label><span>Minutos</span><input type="number" min="1" max="600" value={minutes} onChange={e=>setMinutes(e.target.value)}/></label>
+          <label><span>Ordem</span><input type="number" value={sortOrder} onChange={e=>setSortOrder(e.target.value)}/></label>
         </div>
         <div className="crz-tutorialstudio-row">
-          <label><span>Acesso</span><select value={accessType} onChange={e=>setAccessType(e.target.value==="product"?"product":"public")}><option value="public">Público</option><option value="product">Por produto</option></select></label>
+          <label><span>Acesso</span><select value={accessType} onChange={e=>setAccessType(e.target.value==="plan"?"plan":e.target.value==="product"?"product":"public")}><option value="public">Público</option><option value="product">Por produto</option><option value="plan">Por plano específico</option></select></label>
           <label className="is-check"><input type="checkbox" checked={active} onChange={e=>setActive(e.target.checked)}/><span>Ativo</span></label>
           <label className="is-check"><input type="checkbox" checked={featured} onChange={e=>setFeatured(e.target.checked)}/><span>Destaque</span></label>
         </div>
 
         {accessType==="product"&&<section className="crz-tutorialstudio-products"><header><strong>Produtos com acesso</strong></header><div>{data.products.map((p:Row)=><label key={p.id}><input type="checkbox" checked={productIds.includes(p.id)} onChange={e=>setProductIds(current=>e.target.checked?[...current,p.id]:current.filter(id=>id!==p.id))}/><span>{p.name}</span></label>)}</div></section>}
+        {accessType==="plan"&&<section className="crz-tutorialstudio-products"><header><strong>Planos com acesso</strong></header><div>{data.plans.map((p:Row)=>{const product=data.products.find((x:Row)=>x.id===p.product_id);return <label key={p.id}><input type="checkbox" checked={planIds.includes(p.id)} onChange={e=>setPlanIds(current=>e.target.checked?[...current,p.id]:current.filter(id=>id!==p.id))}/><span>{product?.name||"Produto"} • {p.name}</span></label>})}</div></section>}
 
         <label><span>Blocks JSON</span><textarea className="is-code" value={blocksText} onChange={e=>setBlocksText(e.target.value)}/></label>
         <p className="crz-tutorialstudio-help">Tipos aceitos: title, subtitle, text, image, video, gallery, checklist, shortcut, code, file, button, info, attention, important, success, separator e step.</p>
