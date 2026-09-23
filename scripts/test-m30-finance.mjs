@@ -99,16 +99,29 @@ for (const required of [
   }
 }
 
-for (const forbiddenSeed of [
-  "insert into public.finance_fee_rules",
+const migrationLower = migration.toLowerCase();
+
+const hardcodedFeeSeed =
+  /insert\s+into\s+public\.finance_fee_rules[\s\S]{0,900}?values\s*\(\s*['"](?:pix|card|crypto)['"]/i;
+
+if (hardcodedFeeSeed.test(migration)) {
+  throw new Error("Finance migration must not seed hardcoded gateway fee rules");
+}
+
+for (const forbiddenLiteral of [
   "values('pix'",
   "values ('pix'",
-  "0.50",
-  "1.99",
+  "values('card'",
+  "values ('card'",
+  "values('crypto'",
+  "values ('crypto'",
+  "purincash 0,50",
+  "purincash 1,99",
+  "taxa oficial",
 ]) {
-  if (migration.toLowerCase().includes(forbiddenSeed.toLowerCase())) {
+  if (migrationLower.includes(forbiddenLiteral)) {
     throw new Error(
-      "Finance migration must not seed invented gateway pricing: " + forbiddenSeed
+      "Finance migration must not contain invented gateway pricing: " + forbiddenLiteral
     );
   }
 }
