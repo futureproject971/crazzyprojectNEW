@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { Badge, PageHeader } from "@/core/design-system";
 import type { Customer360Row, Customer360Snapshot } from "./types";
 
@@ -27,7 +26,6 @@ function tone(status:string):"green"|"blue"|"pink"|"gold"|"neutral"{
 }
 
 export function Customer360Page(){
-  const searchParams=useSearchParams();
   const [customers,setCustomers]=useState<Customer360Row[]>([]);
   const [selected,setSelected]=useState<Customer360Row|null>(null);
   const [detail,setDetail]=useState<Customer360Snapshot|null>(null);
@@ -66,7 +64,8 @@ export function Customer360Page(){
   },[]);
 
   useEffect(()=>{
-    const userId=searchParams.get("userId");
+    const params=new URLSearchParams(window.location.search);
+    const userId=params.get("userId");
     if(userId&&/^[0-9a-f-]{36}$/i.test(userId)){
       setState("ready");
       void loadDetail({user_id:userId});
