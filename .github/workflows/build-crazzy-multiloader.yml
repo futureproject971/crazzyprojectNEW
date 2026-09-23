@@ -1,4 +1,4 @@
-name: Build CRAZZY Multiloader V0.4
+name: Build CRAZZY Multiloader V0.5
 
 on:
   push:
@@ -22,34 +22,33 @@ jobs:
           $parts = 0..3 | ForEach-Object { Get-Content ("tools/multiloader-build/v03.part{0:D2}" -f $_) -Raw }
           $b64 = ($parts -join "")
           [IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\multiloader-v03.zip", [Convert]::FromBase64String($b64))
-          Expand-Archive -Path "$env:GITHUB_WORKSPACE\multiloader-v03.zip" -DestinationPath "$env:GITHUB_WORKSPACE\multiloader-v04" -Force
+          Expand-Archive -Path "$env:GITHUB_WORKSPACE\multiloader-v03.zip" -DestinationPath "$env:GITHUB_WORKSPACE\multiloader-v05" -Force
 
-      - name: Apply V0.4 blueprint rebuild patch
+      - name: Apply V0.5 focused UI
         shell: pwsh
         run: |
-          $root = "$env:GITHUB_WORKSPACE\multiloader-v04\CRAZZY_MULTILOADER_V0_2"
-          $patch = (Get-Content "tools/multiloader-build/v04.patch.00" -Raw) + (Get-Content "tools/multiloader-build/v04.patch.01" -Raw) + (Get-Content "tools/multiloader-build/v04.patch.02" -Raw)
-          $patch = $patch.Replace("--- /mnt/data/cm_v03_orig/CRAZZY_MULTILOADER_V0_2/src/ui/MainWindow.cpp", "--- a/src/ui/MainWindow.cpp")
-          $patch = $patch.Replace("+++ /mnt/data/cm_v03/CRAZZY_MULTILOADER_V0_2/src/ui/MainWindow.cpp", "+++ b/src/ui/MainWindow.cpp")
-          Set-Content "$env:GITHUB_WORKSPACE\v04.patch" $patch -Encoding utf8
+          $root = "$env:GITHUB_WORKSPACE\multiloader-v05\CRAZZY_MULTILOADER_V0_2"
+          Copy-Item "tools/multiloader-build/v05/MainWindow.h" (Join-Path $root "src\ui\MainWindow.h") -Force
+
+          $patch = (Get-Content "tools/multiloader-build/v05.patch.00" -Raw) +
+                   (Get-Content "tools/multiloader-build/v05.patch.01" -Raw) +
+                   (Get-Content "tools/multiloader-build/v05.patch.02" -Raw) +
+                   (Get-Content "tools/multiloader-build/v05.patch.03" -Raw)
+
+          $patch = $patch.Replace("--- /mnt/data/cm_v03_clean/CRAZZY_MULTILOADER_V0_2/src/ui/MainWindow.cpp", "--- a/src/ui/MainWindow.cpp")
+          $patch = $patch.Replace("+++ /mnt/data/cm_v05/CRAZZY_MULTILOADER_V0_2/src/ui/MainWindow.cpp", "+++ b/src/ui/MainWindow.cpp")
+          Set-Content "$env:GITHUB_WORKSPACE\v05.patch" $patch -Encoding utf8
 
           Push-Location $root
           $patchExe = "C:\Program Files\Git\usr\bin\patch.exe"
-          & $patchExe -p1 -u -i "$env:GITHUB_WORKSPACE\v04.patch"
-          if ($LASTEXITCODE -ne 0) { throw "V0.4 visual patch failed" }
+          & $patchExe -p1 -u -i "$env:GITHUB_WORKSPACE\v05.patch"
+          if ($LASTEXITCODE -ne 0) { throw "V0.5 focused UI patch failed" }
           Pop-Location
-
-          $main = Join-Path $root "src\ui\MainWindow.cpp"
-          $t = Get-Content $main -Raw
-          $t = $t.Replace("draw->AddRect(min + ImVec2(1,1),", "draw->AddRect(ImVec2(min.x + 1.0f, min.y + 1.0f),")
-          $replacement = "const ImVec2 ws = ImGui::GetWindowSize();" + [Environment]::NewLine + "    const ImVec2 max(min.x + ws.x, min.y + ws.y);"
-          $t = $t.Replace("const ImVec2 max = min + ImGui::GetWindowSize();", $replacement)
-          Set-Content $main $t -Encoding utf8
 
       - name: Apply Windows build compatibility fixes
         shell: pwsh
         run: |
-          $root = "$env:GITHUB_WORKSPACE\multiloader-v04\CRAZZY_MULTILOADER_V0_2"
+          $root = "$env:GITHUB_WORKSPACE\multiloader-v05\CRAZZY_MULTILOADER_V0_2"
           $cmake = Join-Path $root "CMakeLists.txt"
           $text = Get-Content $cmake -Raw
           $needle = "target_compile_options(CrazzyDemoLoader PRIVATE /W4 /permissive- /EHsc /utf-8)"
@@ -69,7 +68,7 @@ jobs:
       - name: Configure CMake
         shell: pwsh
         run: |
-          cmake -S "$env:GITHUB_WORKSPACE\multiloader-v04\CRAZZY_MULTILOADER_V0_2" -B "$env:GITHUB_WORKSPACE\multiloader-build" -A x64
+          cmake -S "$env:GITHUB_WORKSPACE\multiloader-v05\CRAZZY_MULTILOADER_V0_2" -B "$env:GITHUB_WORKSPACE\multiloader-build" -A x64
 
       - name: Build Release
         shell: pwsh
@@ -86,9 +85,9 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force "$env:GITHUB_WORKSPACE\dist" | Out-Null
-          Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\CrazzyMultiloader.exe" "$env:GITHUB_WORKSPACE\dist\CrazzyMultiloader_V0_4.exe"
-          Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\CrazzyUpdater.exe" "$env:GITHUB_WORKSPACE\dist\CrazzyUpdater_V0_4.exe"
-          Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\CrazzyDemoLoader.exe" "$env:GITHUB_WORKSPACE\dist\CrazzyDemoLoader_V0_4.exe"
+          Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\CrazzyMultiloader.exe" "$env:GITHUB_WORKSPACE\dist\CrazzyMultiloader_V0_5.exe"
+          Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\CrazzyUpdater.exe" "$env:GITHUB_WORKSPACE\dist\CrazzyUpdater_V0_5.exe"
+          Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\CrazzyDemoLoader.exe" "$env:GITHUB_WORKSPACE\dist\CrazzyDemoLoader_V0_5.exe"
           if (Test-Path "$env:GITHUB_WORKSPACE\multiloader-build\Release\mock_releases") {
             Copy-Item "$env:GITHUB_WORKSPACE\multiloader-build\Release\mock_releases" "$env:GITHUB_WORKSPACE\dist\mock_releases" -Recurse
           }
@@ -96,6 +95,6 @@ jobs:
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
-          name: CRAZZY-MULTILOADER-V0.4-WINDOWS
+          name: CRAZZY-MULTILOADER-V0.5-WINDOWS
           path: dist
           if-no-files-found: error
