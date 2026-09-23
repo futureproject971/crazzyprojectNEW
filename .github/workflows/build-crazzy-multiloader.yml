@@ -32,8 +32,11 @@ jobs:
           $patch = $patch.Replace("--- /mnt/data/cm_v03_orig/CRAZZY_MULTILOADER_V0_2/src/ui/MainWindow.cpp", "--- a/src/ui/MainWindow.cpp")
           $patch = $patch.Replace("+++ /mnt/data/cm_v03/CRAZZY_MULTILOADER_V0_2/src/ui/MainWindow.cpp", "+++ b/src/ui/MainWindow.cpp")
           Set-Content "$env:GITHUB_WORKSPACE\v04.patch" $patch -Encoding utf8
+
           Push-Location $root
-          git apply --whitespace=nowarn "$env:GITHUB_WORKSPACE\v04.patch"
+          $patchExe = "C:\Program Files\Git\usr\bin\patch.exe"
+          & $patchExe -p1 -u -i "$env:GITHUB_WORKSPACE\v04.patch"
+          if ($LASTEXITCODE -ne 0) { throw "V0.4 visual patch failed" }
           Pop-Location
 
           $main = Join-Path $root "src\ui\MainWindow.cpp"
