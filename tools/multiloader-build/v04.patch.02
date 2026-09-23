@@ -1,0 +1,10 @@
+         ImGui::Spacing();
+         ImGui::TextWrapped("%s", U(infoModal_.message).c_str());
+         ImGui::Spacing();
+-        if (ImGui::Button(U(infoModal_.primaryLabel).c_str(), ImVec2(120, 40))) {
+-            ImGui::CloseCurrentPopup();
+-        }
++        if (ImGui::Button(U(infoModal_.primaryLabel).c_str(), ImVec2(120, 40))) ImGui::CloseCurrentPopup();
+         ImGui::EndPopup();
+     }
+ }
