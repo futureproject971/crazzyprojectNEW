@@ -10,12 +10,15 @@ const protectedPrefixes = [
   "/perfil",
   "/tickets",
   "/chat",
+  "/comunidade",
   "/call",
   "/admin",
 ];
 
 const protectedApiPrefixes = [
   "/api/admin",
+  "/api/call",
+  "/api/community",
   "/api/checkout",
   "/api/notifications",
   "/api/partner",

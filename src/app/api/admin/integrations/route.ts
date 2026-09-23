@@ -20,7 +20,7 @@ export async function GET() {
 
   const [payments, credentials, workers, mtSoundsHealth] = await Promise.all([
     supabase.from("payment_settings").select("method,label,enabled,updated_at").order("method"),
-    supabase.from("system_credentials").select("env_key,value").in("env_key", ["DISCORD_GUILD_ID","LZT_MARKET_TOKEN"]),
+    supabase.from("system_credentials").select("env_key,value").in("env_key", ["DISCORD_GUILD_ID","DISCORD_INVITE_URL","LZT_MARKET_TOKEN"]),
     supabase.from("discord_campaign_worker_status").select("worker_id,connected,last_seen_at,guild_id,guild_name,bot_tag,version,last_error").order("last_seen_at",{ascending:false}).limit(1).maybeSingle(),
     probeMtSounds(mtSounds.url),
   ]);
@@ -53,6 +53,14 @@ export async function GET() {
         detail: configured.get("DISCORD_GUILD_ID")
           ? "Servidor oficial configurado para Auth, Bot Core e Bridge."
           : "DISCORD_GUILD_ID ainda não está configurado.",
+      },
+      {
+        id: "discord-invite",
+        name: "Discord • Convite oficial",
+        state: configured.get("DISCORD_INVITE_URL") ? "ready" : "missing",
+        detail: configured.get("DISCORD_INVITE_URL")
+          ? "Convite oficial configurado para o gate de entrada no servidor."
+          : "Configure um convite discord.gg ou discord.com/invite para concluir o gate.",
       },
       {
         id: "discord-oauth",
@@ -129,4 +137,33 @@ export async function GET() {
       },
     ],
   }, { headers: { "Cache-Control": "private, no-store" } });
+}
+
+
+export async function POST(request: Request) {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
+
+  const { data: isAdmin, error: adminError } = await supabase.rpc("is_current_admin");
+  if (adminError || isAdmin !== true) {
+    return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+  }
+
+  const body = await request.json().catch(() => ({}));
+  if (body?.action !== "set_discord_invite") {
+    return NextResponse.json({ error: "INVALID_ACTION" }, { status: 400 });
+  }
+
+  const inviteUrl = String(body?.inviteUrl || "").trim();
+  const { data, error } = await supabase.rpc("admin_set_discord_invite_url", {
+    p_invite_url: inviteUrl,
+  });
+  if (error) {
+    return NextResponse.json(
+      { error: "INVALID_DISCORD_INVITE", detail: String(error.message || "").slice(0, 160) },
+      { status: 400 }
+    );
+  }
+  return NextResponse.json({ ok: data === true });
 }

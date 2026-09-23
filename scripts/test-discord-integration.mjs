@@ -62,6 +62,7 @@ for (const [name, body] of [
     p_failed: 0,
     p_skipped: 0,
   }],
+  ["admin_set_discord_invite_url", { p_invite_url: "https://discord.gg/anonymous-test" }],
   ["queue_discord_builder_job", { p_guild_id: null }],
   ["cancel_discord_builder_job", { p_job_id: zero }],
   ["claim_discord_builder_job", { p_worker_id: "anon" }],
@@ -111,6 +112,16 @@ for (const file of [
   }
 }
 console.log("[PASS] site/client integration does not reference bot/service secrets");
+
+const integrationsApi = await readFile("src/app/api/admin/integrations/route.ts", "utf8");
+const integrationsUi = await readFile("src/modules/integrations/IntegrationsPage.tsx", "utf8");
+for (const required of ["DISCORD_INVITE_URL","admin_set_discord_invite_url","set_discord_invite"]) {
+  if (!integrationsApi.includes(required)) throw new Error("Integrations API missing " + required);
+}
+if (!integrationsUi.includes("discord-invite") || !integrationsUi.includes("Configurar convite")) {
+  throw new Error("Integrations UI must configure the official Discord invite");
+}
+console.log("[PASS] official Discord invite can be configured from the admin integrations panel");
 
 const botConfig = await readFile("apps/discord-bot/src/config.js", "utf8");
 if (!botConfig.includes("DISCORD_BOT_TOKEN")) {

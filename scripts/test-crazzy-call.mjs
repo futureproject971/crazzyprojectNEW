@@ -81,6 +81,14 @@ for (const file of clientFiles) {
 }
 console.log("[PASS] client CRAZZY CALL files do not reference server secrets");
 
+const authMiddleware = await readFile("src/lib/supabase/middleware.ts", "utf8");
+for (const required of ['"/call"','"/api/call"',"discord_identities","guild_member"]) {
+  if (!authMiddleware.includes(required)) {
+    throw new Error("CRAZZY CALL global Discord/guild gate missing " + required);
+  }
+}
+console.log("[PASS] CRAZZY CALL page and API namespace require Discord guild membership");
+
 const pip = await readFile("src/modules/call/usePictureInPicture.ts", "utf8");
 for (const required of [
   "pictureInPictureEnabled",
