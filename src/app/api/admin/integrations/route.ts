@@ -77,7 +77,7 @@ export async function GET() {
         id: "discord-worker",
         name: "Discord Bot Core",
         state: workerOnline ? "ready" : worker ? "offline" : "missing",
-        detail: workerOnline
+        detail: workerOnline && worker
           ? (worker.bot_tag || "Bot") + " online em " + (worker.guild_name || "guild oficial") + "."
           : worker
             ? "Worker conhecido, mas heartbeat está offline ou antigo."
