@@ -49,6 +49,7 @@
 @import "../modules/notifications/styles.css";
 @import "../modules/tutorial-studio/styles.css";
 @import "../modules/security-sentinel/styles.css";
+@import "../modules/appearance-manager/styles.css";
 @import "../core/pwa/styles.css";
 @import "../core/design-system/styles/card-surfaces.css";
 

@@ -43,6 +43,7 @@ export const adminNavigation: ShellNavItem[] = [
   { id: "academy", label: "Tutoriais", href: "/admin/academy", icon: "/icons/book.svg" },
   { id: "customers", label: "Clientes", href: "/admin/clientes", icon: "/icons/users.svg" },
   { id: "support-desk", label: "Suporte", href: "/admin/suporte", icon: "/icons/headset.svg" },
+  { id: "appearance", label: "Aparência", href: "/admin/aparencia", icon: "/icons/diamond.svg" },
   { id: "integrations", label: "Integrações", href: "/admin/integracoes", icon: "/icons/bolt.svg" },
   { id: "notifications", label: "Avisos", href: "/admin/notificacoes", icon: "/icons/flame.svg" },
   { id: "security", label: "Security", href: "/admin/security", icon: "/icons/shield-check.svg" },
