@@ -5,10 +5,10 @@ function errorCode(error){
 }
 
 async function finish(supabase,config,id,success,error=null){
-  const {data,err}=await supabase.rpc("finish_discord_notification_job",{
+  const {data,error}=await supabase.rpc("finish_discord_notification_job",{
     p_job_id:id,p_worker_id:config.workerId,p_success:success,p_error:error
   });
-  if(err||data!==true)console.error("[notify] finish failed",id,err?.message||data);
+  if(error||data!==true)console.error("[notify] finish failed",id,error?.message||data);
 }
 
 export function startNotificationWorker(client,supabase,config){
