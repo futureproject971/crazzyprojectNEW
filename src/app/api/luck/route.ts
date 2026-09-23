@@ -8,6 +8,7 @@ function publicPlayError(message: string) {
   if (message.includes("PAYMENT_NOT_CONFIRMED")) return { status: 409, error: "O pagamento desta jogada ainda não foi confirmado." };
   if (message.includes("PAYMENT_AMOUNT_INVALID")) return { status: 409, error: "O valor confirmado não corresponde à jogada." };
   if (message.includes("PAYMENT_ALREADY_USED")) return { status: 409, error: "Este pagamento já foi utilizado." };
+  if (message.includes("PAYMENT_PURPOSE_INVALID")) return { status: 409, error: "Este pagamento não pertence a esta jogada CRAZZY LUCK." };
   if (message.includes("CAMPAIGN_UNAVAILABLE")) return { status: 404, error: "Esta campanha não está disponível." };
   if (message.includes("PRIZE_UNAVAILABLE")) return { status: 409, error: "Os prêmios desta campanha estão temporariamente indisponíveis." };
   return { status: 400, error: "Não foi possível concluir a jogada agora." };
