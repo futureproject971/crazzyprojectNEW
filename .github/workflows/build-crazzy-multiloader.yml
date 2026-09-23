@@ -54,7 +54,7 @@ jobs:
           $text = Get-Content $cmake -Raw
           $needle = "target_compile_options(CrazzyDemoLoader PRIVATE /W4 /permissive- /EHsc /utf-8)"
           if ($text.Contains($needle) -and -not $text.Contains('/MANIFEST:NO')) {
-            $replacement = "target_compile_options(CrazzyDemoLoader PRIVATE /W4 /permissive- /EHsc /utf-8)" + [Environment]::NewLine + "set_target_properties(CrazzyMultiloader CrazzyUpdater CrazzyDemoLoader PROPERTIES LINK_FLAGS \"/MANIFEST:NO\")"
+            $replacement = 'target_compile_options(CrazzyDemoLoader PRIVATE /W4 /permissive- /EHsc /utf-8)' + [Environment]::NewLine + 'set_target_properties(CrazzyMultiloader CrazzyUpdater CrazzyDemoLoader PROPERTIES LINK_FLAGS "/MANIFEST:NO")'
             $text = $text.Replace($needle, $replacement)
             Set-Content $cmake $text -Encoding UTF8
           }
