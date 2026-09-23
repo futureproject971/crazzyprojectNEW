@@ -100,6 +100,9 @@ jobs:
         if: github.ref_name == 'm23-1-mtsounds-clean'
         run: node scripts/test-m23-1-mtsounds.mjs
 
+      - name: Test M46 MT Sounds compat
+        run: node scripts/test-m46-mtsounds.mjs
+
       - name: Test M24 Control Center
         if: github.ref_name == 'm24-control-center-work'
         run: node scripts/test-m24-control-center.mjs

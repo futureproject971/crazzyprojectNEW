@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getMtSoundsRuntimeConfig, probeMtSounds } from "@/lib/mtsounds/config";
 
 function bool(value: string | undefined) {
   return Boolean(value && value.trim());
@@ -15,10 +16,13 @@ export async function GET() {
     return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
   }
 
-  const [payments, credentials, workers] = await Promise.all([
+  const mtSounds = getMtSoundsRuntimeConfig();
+
+  const [payments, credentials, workers, mtSoundsHealth] = await Promise.all([
     supabase.from("payment_settings").select("method,label,enabled,updated_at").order("method"),
     supabase.from("system_credentials").select("env_key,value").in("env_key", ["DISCORD_GUILD_ID","LZT_MARKET_TOKEN"]),
     supabase.from("discord_campaign_worker_status").select("worker_id,connected,last_seen_at,guild_id,guild_name,bot_tag,version,last_error").order("last_seen_at",{ascending:false}).limit(1).maybeSingle(),
+    probeMtSounds(mtSounds.url),
   ]);
 
   if (payments.error || credentials.error) {
@@ -31,7 +35,6 @@ export async function GET() {
   const worker = workers.data || null;
   const workerAge = worker?.last_seen_at ? Date.now() - new Date(worker.last_seen_at).getTime() : Infinity;
   const workerOnline = Boolean(worker?.connected && Number.isFinite(workerAge) && workerAge < 45_000);
-
   const paymentMap = new Map((payments.data || []).map(item => [item.method, item]));
 
   return NextResponse.json({
@@ -83,6 +86,20 @@ export async function GET() {
             ? "Worker conhecido, mas heartbeat está offline ou antigo."
             : "Nenhum heartbeat do worker foi recebido ainda.",
         meta: worker ? { version: worker.version, lastSeenAt: worker.last_seen_at, lastError: worker.last_error } : null,
+      },
+      {
+        id: "mtsounds",
+        name: "MT Sounds • Partner",
+        state: mtSoundsHealth.reachable ? "ready" : "offline",
+        detail: mtSoundsHealth.reachable
+          ? "Parceiro respondeu em " + mtSoundsHealth.latencyMs + "ms • modo " + mtSounds.mode + "."
+          : "Parceiro não respondeu ao health check. A rota CRAZZY mantém fallback para abertura externa.",
+        meta: {
+          mode: mtSounds.mode,
+          source: mtSounds.source,
+          httpStatus: mtSoundsHealth.status,
+          latencyMs: mtSoundsHealth.latencyMs,
+        },
       },
       {
         id: "lzt",
