@@ -1,0 +1,328 @@
+aw = ImGui::GetWindowDrawList();
+     const ImVec2 p = ImGui::GetWindowPos();
+     const ImVec2 s = ImGui::GetWindowSize();
+-    draw->AddRectFilledMultiColor(p, ImVec2(p.x + s.x, p.y + 80), IM_COL32(7, 20, 56, 255), IM_COL32(3, 9, 28, 255), IM_COL32(7, 20, 56, 255), IM_COL32(3, 9, 28, 255));
+-    draw->AddRect(ImVec2(p.x + 1, p.y + 1), ImVec2(p.x + s.x - 1, p.y + s.y - 1), IM_COL32(28, 96, 255, 80), 16.0f);
++    draw->AddRectFilledMultiColor(p, ImVec2(p.x + s.x, p.y + 96.0f), IM_COL32(8, 24, 68, 180), IM_COL32(4, 11, 32, 180), IM_COL32(8, 24, 68, 70), IM_COL32(4, 11, 32, 70));
++    AddPanelOutline(draw, p, ImVec2(p.x + s.x, p.y + s.y), 20.0f);
+ 
+     ImGui::TextColored(ACCENT_BRIGHT, "CRAZZY");
+     ImGui::SameLine();
+     ImGui::Text("PROJECT");
+-    ImGui::TextDisabled("MULTILOADER • premium client");
++    ImGui::TextDisabled("ALL YOUR LOADERS IN ONE PLACE");
++    ImGui::Spacing();
++    SmallBadge("PREMIUM DESKTOP APP", ImVec4(0.03f, 0.15f, 0.58f, 1.0f), -1);
+     ImGui::Spacing();
+     ImGui::Separator();
+     ImGui::Spacing();
+ 
+-    struct MenuEntry { const char* label; Section section; };
++    struct MenuEntry { const char* label; const char* icon; Section section; };
+     const MenuEntry menus[] = {
+-        {"INÍCIO", Section::Home},
+-        {"MEUS PRODUTOS", Section::Products},
+-        {"ATUALIZAÇÕES", Section::Updates},
+-        {"DOWNLOADS", Section::Downloads},
+-        {"CONTA", Section::Account},
+-        {"CONFIGURAÇÕES", Section::Settings}
++        {"INÍCIO", "◈", Section::Home},
++        {"MEUS PRODUTOS", "▣", Section::Products},
++        {"ATUALIZAÇÕES", "↻", Section::Updates},
++        {"DOWNLOADS", "↓", Section::Downloads},
++        {"CONTA", "◎", Section::Account},
++        {"CONFIGURAÇÕES", "⚙", Section::Settings}
+     };
+ 
+     for (const auto& menu : menus) {
+         const bool selected = section_ == menu.section;
++        ImGui::PushID(menu.label);
+         if (selected) {
+-            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.05f, 0.25f, 0.82f, 0.90f));
+-            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.08f, 0.32f, 0.92f, 0.90f));
+-            ImGui::PushStyleColor(ImGuiCol_Text, ACCENT_BRIGHT);
+-        }
+-        if (ImGui::Selectable(menu.label, selected, 0, ImVec2(-1, 42))) section_ = menu.section;
+-        if (selected) {
+-            ImGui::PopStyleColor(3);
++            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.05f, 0.24f, 0.78f, 1.0f));
++            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.08f, 0.30f, 0.92f, 1.0f));
++            ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.08f, 0.30f, 0.92f, 1.0f));
+         }
++        std::string line = std::string(menu.icon) + "   " + menu.label;
++        if (ImGui::Selectable(line.c_str(), selected, 0, ImVec2(-1, 40))) section_ = menu.section;
++        if (selected) ImGui::PopStyleColor(3);
++        ImGui::PopID();
+     }
+ 
+-    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 110);
++    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 164.0f);
+     ImGui::Separator();
+-    ImGui::TextDisabled("AMBIENTE");
++    ImGui::TextDisabled("FONTE");
+     ImGui::TextWrapped("%s", U(api_->Name()).c_str());
+     ImGui::TextDisabled("STATUS");
+     ImGui::TextColored(SUCCESS, "● CONECTADO");
++    ImGui::Spacing();
++    SmallBadge("SEGURO E ESTÁVEL", ImVec4(0.03f, 0.12f, 0.30f, 1.0f), -1);
+     ImGui::EndChild();
+ }
+ 
+ void MainWindow::DrawContent() {
+-    ImGui::BeginChild("content", ImVec2(0, 0), false);
+-    ImGui::Text("%s", SectionLabel(section_));
+-    ImGui::SameLine();
+-    ImGui::TextColored(ACCENT_BRIGHT, "• TUDO NUM LUGAR SÓ");
+-    ImGui::TextDisabled("Mesmo visual da CRAZZY PROJECT: key, atualização e execução num lugar só.");
+-    ImGui::Separator();
+-    ImGui::Spacing();
++    ImGui::BeginChild("content", ImVec2(0, 0), false, ImGuiWindowFlags_NoScrollbar);
+ 
+     if (section_ != Section::Products) {
+-        ImGui::Dummy(ImVec2(0, 16));
+-        ImGui::BeginChild("placeholder", ImVec2(0, 240), true);
++        BeginGlassPanel("placeholder_main", ImVec2(0, 0));
+         ImGui::TextColored(ACCENT_BRIGHT, "%s", SectionLabel(section_));
+         ImGui::Spacing();
+-        ImGui::TextWrapped("Esta área já está reservada no layout premium do CRAZZY MULTILOADER V0.3. O foco desta etapa foi deixar a experiência principal de produtos, keys e updates muito mais premium.");
++        ImGui::TextWrapped("O rebuild V0.4 está priorizando o coração do produto: experiência premium de biblioteca, key, update e launch. Esta aba já está preparada para receber integração real do site e módulos extras do ecossistema CRAZZY PROJECT.");
+         ImGui::Spacing();
+-        ImGui::TextDisabled("Próxima conexão: integração real com a API do site, histórico de downloads e gestão de conta.");
+-        ImGui::EndChild();
++        SmallBadge("PRÓXIMO PASSO: API REAL", ImVec4(0.04f, 0.18f, 0.60f, 1.0f), 220.0f);
++        EndGlassPanel();
+         ImGui::EndChild();
+         return;
+     }
+ 
++    BeginGlassPanel("hero", ImVec2(0, 168));
++    ImGui::BeginGroup();
++    ImGui::TextColored(ACCENT_BRIGHT, "CRAZZY MULTILOADER");
++    ImGui::SetWindowFontScale(1.60f);
++    ImGui::TextUnformatted("TUDO NUM LUGAR SÓ");
++    ImGui::SetWindowFontScale(1.0f);
++    ImGui::TextDisabled("Keys • Updates • Launch • Premium Experience");
++    ImGui::Spacing();
++    ImGui::TextWrapped("O launcher do ecossistema CRAZZY PROJECT foi redesenhado para ficar no mesmo nível visual do blueprint: desktop app premium, limpo, forte e pronto para escalar com o site.");
++    ImGui::EndGroup();
++
++    const float rightX = ImGui::GetWindowWidth() - 390.0f;
++    ImGui::SetCursorPos(ImVec2(rightX, 22.0f));
++    BeginGlassPanel("hero_stats", ImVec2(356, 126));
++    const int totalProducts = static_cast<int>(catalog_.Items().size());
++    int needUpdate = 0; int maintenance = 0;
++    for (const auto& p : catalog_.Items()) {
++        if (p.updateRequired) ++needUpdate;
++        if (p.maintenance) ++maintenance;
++    }
++    ImGui::TextDisabled("VISÃO GERAL");
++    ImGui::Separator();
++    ImGui::Columns(3, nullptr, false);
++    ImGui::TextColored(ACCENT_BRIGHT, "%d", totalProducts); ImGui::TextDisabled("PRODUTOS"); ImGui::NextColumn();
++    ImGui::TextColored(ACCENT_BRIGHT, "%d", needUpdate); ImGui::TextDisabled("UPDATES"); ImGui::NextColumn();
++    ImGui::TextColored(ACCENT_BRIGHT, "%d", maintenance); ImGui::TextDisabled("MANUT.");
++    ImGui::Columns(1);
++    ImGui::Spacing();
++    SmallBadge("WINDOWS DESKTOP APP", ImVec4(0.04f, 0.14f, 0.48f, 1.0f), -1);
++    EndGlassPanel();
++    EndGlassPanel();
++
++    ImGui::Spacing();
+     const float gap = 16.0f;
+-    const float cardW = (ImGui::GetContentRegionAvail().x - gap) * 0.5f;
++    const float railWidth = 300.0f;
++    const float leftWidth = ImGui::GetContentRegionAvail().x - railWidth - gap;
++
++    BeginGlassPanel("products_grid", ImVec2(leftWidth, 0));
++    ImGui::Text("MEUS PRODUTOS");
++    ImGui::SameLine();
++    ImGui::TextColored(ACCENT_BRIGHT, "• BIBLIOTECA PRIVADA");
++    ImGui::TextDisabled("Cada card precisa entregar clareza: produto, plano, expiração, key e ação principal.");
++    ImGui::Spacing();
++
++    const float cardGap = 14.0f;
++    const float cardW = (ImGui::GetContentRegionAvail().x - cardGap) * 0.5f;
+     int i = 0;
+     for (auto& p : catalog_.Items()) {
+-        if (i % 2) ImGui::SameLine(0.0f, gap);
++        if (i % 2) ImGui::SameLine(0.0f, cardGap);
+         ImGui::BeginGroup();
+-        ImGui::BeginChild(("card##" + U(p.id)).c_str(), ImVec2(cardW, 330), true);
++        ImGui::BeginChild(("card##" + U(p.id)).c_str(), ImVec2(cardW, 350), false, ImGuiWindowFlags_NoScrollbar);
+         DrawProductCard(p);
+         ImGui::EndChild();
+         ImGui::EndGroup();
+@@ -483,6 +582,57 @@
+         ImGui::Spacing();
+         ImGui::TextDisabled("Nenhum produto disponível para esta conta.");
+     }
++    EndGlassPanel();
++
++    ImGui::SameLine(0.0f, gap);
++    BeginGlassPanel("right_rail", ImVec2(railWidth, 0));
++    ImGui::Text("ECOSSISTEMA");
++    ImGui::SameLine();
++    ImGui::TextColored(ACCENT_BRIGHT, "CRAZZY PROJECT");
++    ImGui::TextDisabled("Direção visual baseada no blueprint oficial.");
++    ImGui::Spacing();
++    SmallBadge("JOGOS", ImVec4(0.04f, 0.12f, 0.40f, 1.0f), 82.0f); ImGui::SameLine();
++    SmallBadge("FERRAMENTAS", ImVec4(0.04f, 0.12f, 0.40f, 1.0f), 120.0f); ImGui::SameLine();
++    SmallBadge("COMUNIDADE", ImVec4(0.04f, 0.12f, 0.40f, 1.0f), 110.0f);
++    ImGui::Spacing();
++    ImGui::Separator();
++
++    BeginGlassPanel("update_flow", ImVec2(0, 178));
++    ImGui::Text("UPDATE FLOW");
++    ImGui::TextDisabled("Fluxo seguro e auditável");
++    ImGui::Spacing();
++    ImGui::BulletText("Nova versão disponível");
++    ImGui::BulletText("Download autorizado");
++    ImGui::BulletText("Validação SHA-256");
++    ImGui::BulletText("Troca atômica / rollback");
++    ImGui::BulletText("Abrir automaticamente a nova versão");
++    EndGlassPanel();
++
++    ImGui::Spacing();
++    BeginGlassPanel("key_exp", ImVec2(0, 194));
++    ImGui::Text("KEY EXPERIENCE");
++    ImGui::TextDisabled("Simples para o cliente");
++    ImGui::Spacing();
++    ImGui::BulletText("Key mascarada por padrão");
++    ImGui::BulletText("Mostrar / ocultar rapidamente");
++    ImGui::BulletText("Copiar key com um clique");
++    ImGui::BulletText("Sem ir e voltar do site");
++    ImGui::Spacing();
++    SmallBadge("SEGURO E ESTÁVEL", ImVec4(0.03f, 0.12f, 0.32f, 1.0f), -1);
++    EndGlassPanel();
++
++    ImGui::Spacing();
++    BeginGlassPanel("notes", ImVec2(0, 172));
++    ImGui::Text("DESIGN NOTES");
++    ImGui::TextDisabled("Regras da interface final");
++    ImGui::Spacing();
++    ImGui::BulletText("Visual escuro com glow azul neon");
++    ImGui::BulletText("Cards grandes e muito legíveis");
++    ImGui::BulletText("Botão primário forte e central");
++    ImGui::BulletText("Mesma linguagem do site CRAZZY PROJECT");
++    ImGui::BulletText("Desktop app premium, não utilitário genérico");
++    EndGlassPanel();
++    EndGlassPanel();
+ 
+     ImGui::EndChild();
+ }
+@@ -491,43 +641,62 @@
+     ImDrawList* draw = ImGui::GetWindowDrawList();
+     const ImVec2 pos = ImGui::GetWindowPos();
+     const ImVec2 size = ImGui::GetWindowSize();
+-    draw->AddRectFilledMultiColor(pos, ImVec2(pos.x + size.x, pos.y + 62), IM_COL32(8, 24, 72, 155), IM_COL32(4, 11, 35, 155), IM_COL32(8, 24, 72, 80), IM_COL32(4, 11, 35, 80));
+-    draw->AddRect(ImVec2(pos.x + 1, pos.y + 1), ImVec2(pos.x + size.x - 1, pos.y + size.y - 1), IM_COL32(28, 104, 255, 70), 16.0f, 0, 1.0f);
++    const ImVec2 max(pos.x + size.x, pos.y + size.y);
++    const ImVec4 accent = ProductAccent(p);
++    const ImU32 accent32 = ToU32(accent);
++
++    draw->AddRectFilled(pos, max, IM_COL32(5, 9, 22, 255), 18.0f);
++    draw->AddRectFilledMultiColor(pos, ImVec2(max.x, pos.y + 86.0f), IM_COL32((int)(accent.x*255), (int)(accent.y*255), (int)(accent.z*255), 92), IM_COL32(16, 18, 32, 120), IM_COL32((int)(accent.x*255), (int)(accent.y*255), (int)(accent.z*255), 18), IM_COL32(16, 18, 32, 20));
++    AddPanelOutline(draw, pos, max, 18.0f);
++
++    draw->AddRectFilled(ImVec2(pos.x + 16, pos.y + 18), ImVec2(pos.x + 76, pos.y + 78), IM_COL32(8, 12, 24, 230), 12.0f);
++    draw->AddRect(ImVec2(pos.x + 16, pos.y + 18), ImVec2(pos.x + 76, pos.y + 78), accent32, 12.0f, 0, 1.0f);
++    draw->AddText(ImVec2(pos.x + 34, pos.y + 34), IM_COL32(255,255,255,235), ProductGlyph(p));
+ 
+-    ImGui::TextColored(ACCENT_BRIGHT, "%s", U(p.game).c_str());
++    ImGui::SetCursorPos(ImVec2(92, 12));
++    ImGui::TextColored(accent, "%s", U(p.game).c_str());
+     ImGui::Text("%s", U(p.name).c_str());
+     ImGui::TextDisabled("%s", U(p.description).c_str());
+-    ImGui::Spacing();
+ 
++    const char* stateLabel = ProductStateLabel(p);
++    ImVec2 stateSize = ImGui::CalcTextSize(stateLabel);
++    const ImVec2 chipMin(max.x - stateSize.x - 34.0f, pos.y + 18.0f);
++    const ImVec2 chipMax(max.x - 18.0f, pos.y + 42.0f);
++    draw->AddRectFilled(chipMin, chipMax, ImGui::GetColorU32(ProductStateColor(p)), 8.0f);
++    draw->AddText(ImVec2(chipMin.x + 10.0f, chipMin.y + 5.0f), IM_COL32(255,255,255,255), stateLabel);
++
++    ImGui::SetCursorPosY(98.0f);
++    ImGui::Columns(2, nullptr, false);
+     ImGui::TextDisabled("PLANO");
+-    ImGui::SameLine(120);
+     ImGui::Text("%s", U(p.plan).c_str());
++    ImGui::NextColumn();
+     ImGui::TextDisabled("EXPIRA");
+-    ImGui::SameLine(120);
+     ImGui::Text("%s", U(p.expiresAt).c_str());
++    ImGui::Columns(1);
+ 
++    ImGui::Spacing();
+     ImGui::Separator();
++    ImGui::Spacing();
+     ImGui::TextDisabled("SUA KEY");
++
+     const bool reveal = revealKeys_[p.id];
+     std::string key = reveal ? U(p.licenseKey) : MaskKey(p.licenseKey);
+     std::array<char, 512> keyBuf{};
+     const auto copyLen = (std::min)(key.size(), keyBuf.size() - 1);
+     std::memcpy(keyBuf.data(), key.data(), copyLen);
+-    ImGui::PushItemWidth(-202);
++
++    ImGui::PushItemWidth(-1);
+     ImGui::InputText(("##key" + U(p.id)).c_str(), keyBuf.data(), keyBuf.size(), ImGuiInputTextFlags_ReadOnly);
+     ImGui::PopItemWidth();
++    if (ImGui::Button(((reveal ? "OCULTAR##" : "MOSTRAR##") + U(p.id)).c_str(), ImVec2((ImGui::GetContentRegionAvail().x - 8.0f) * 0.5f, 36))) revealKeys_[p.id] = !reveal;
+     ImGui::SameLine();
+-    const std::string revealLabel = (reveal ? "OCULTAR##" : "MOSTRAR##") + U(p.id);
+-    if (ImGui::Button(revealLabel.c_str(), ImVec2(88, 0))) revealKeys_[p.id] = !reveal;
+-    ImGui::SameLine();
+-    const std::string copyLabel = "COPIAR KEY##" + U(p.id);
+-    if (ImGui::Button(copyLabel.c_str())) ImGui::SetClipboardText(U(p.licenseKey).c_str());
++    if (ImGui::Button(("COPIAR KEY##" + U(p.id)).c_str(), ImVec2(-1, 36))) ImGui::SetClipboardText(U(p.licenseKey).c_str());
+ 
+     ImGui::Spacing();
+     RuntimeTask* t = TaskFor(p.id);
+     if (t && t->status.state != update::TaskState::Idle) {
+         auto state = t->status.state.load();
+-        ImGui::TextColored(state == update::TaskState::Failed ? DANGER : SUCCESS, "%s", StateText(state));
++        ImGui::TextColored(state == update::TaskState::Failed ? DANGER : ACCENT_BRIGHT, "%s", StateText(state));
+         if (state == update::TaskState::Downloading) {
+             auto total = t->status.total.load();
+             auto done = t->status.received.load();
+@@ -552,21 +721,21 @@
+             ImGui::TextColored(WARNING, "EXPIRADO");
+             ImGui::TextDisabled("Renove a licença no site para continuar usando.");
+         } else if (p.updateRequired) {
+-            ImGui::TextColored(WARNING, "NOVA VERSÃO  %s → %s", U(p.installedVersion).c_str(), U(p.latestVersion).c_str());
+-            ImGui::TextDisabled("Clique para atualizar e abrir automaticamente.");
++            ImGui::TextColored(ACCENT_BRIGHT, "NOVA VERSÃO  %s → %s", U(p.installedVersion).c_str(), U(p.latestVersion).c_str());
++            ImGui::TextDisabled("Atualiza e abre automaticamente.");
+         } else {
+             ImGui::TextColored(SUCCESS, "● ATUALIZADO  %s", U(p.latestVersion).c_str());
+             ImGui::TextDisabled("Pronto para iniciar.");
+         }
+     }
+ 
+-    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 58);
++    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 54.0f);
+     const bool blocked = p.maintenance || p.revoked || p.expired || (t && t->status.state != update::TaskState::Idle && t->status.state != update::TaskState::Completed && t->status.state != update::TaskState::Failed);
+     if (blocked) ImGui::BeginDisabled();
+     if (p.updateRequired) {
+-        if (ImGui::Button(("ATUALIZAR E INICIAR##" + U(p.id)).c_str(), ImVec2(-1, 42))) pendingUpdateProduct_ = &p;
++        if (ImGui::Button(("ATUALIZAR E INICIAR##" + U(p.id)).c_str(), ImVec2(-1, 40))) pendingUpdateProduct_ = &p;
+     } else {
+-        if (ImGui::Button(("INICIAR##" + U(p.id)).c_str(), ImVec2(-1, 42))) LaunchProduct(p);
++        if (ImGui::Button(("INICIAR##" + U(p.id)).c_str(), ImVec2(-1, 40))) LaunchProduct(p);
+     }
+     if (blocked) ImGui::EndDisabled();
+ }
+@@ -580,9 +749,9 @@
+             ImGui::Spacing();
+             ImGui::Text("%s  →  %s", U(p->installedVersion).c_str(), U(p->latestVersion).c_str());
+             ImGui::Spacing();
+-            ImGui::TextWrapped("Ao confirmar, o CRAZZY MULTILOADER baixa a release nova, valida o SHA-256, preserva a antiga até a troca terminar e abre o produto atualizado automaticamente.");
++            ImGui::TextWrapped("Ao confirmar, o CRAZZY MULTILOADER baixa a release nova, valida o SHA-256, preserva a antiga até a troca terminar, aplica rollback se necessário e abre o produto atualizado automaticamente.");
+             ImGui::Spacing();
+-            if (ImGui::Button("OK, ATUALIZAR E ABRIR", ImVec2(240, 42))) {
++            if (ImGui::Button("OK, ATUALIZAR E ABRIR", ImVec2(250, 42))) {
+                 Product copy = *p;
+                 pendingUpdateProduct_ = nullptr;
+                 ImGui::CloseCurrentPopup();
+@@ -604,9 +773,7 @@
