@@ -412,6 +412,185 @@ Deno.serve(async (req) => {
     });
   }
 
+  if (action === "staff-snapshot" && req.method === "GET") {
+    if (!staff) return json({ error: "STAFF_REQUIRED" }, 403);
+
+    const statusFilter = cleanText(url.searchParams.get("status"), 30);
+    const priorityFilter = cleanText(url.searchParams.get("priority"), 30);
+    const queryText = cleanText(url.searchParams.get("q"), 120);
+
+    let ticketQuery = admin
+      .from("support_tickets")
+      .select("id,user_id,category,subject,status,priority,product_id,product_plan_id,entitlement_id,order_ticket_id,library_delivery_id,assigned_to,last_message_at,closed_at,created_at,updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(200);
+
+    if (statusFilter) ticketQuery = ticketQuery.eq("status", statusFilter);
+    if (priorityFilter) ticketQuery = ticketQuery.eq("priority", priorityFilter);
+    if (queryText) ticketQuery = ticketQuery.ilike("subject", "%" + queryText.replace(/[%_]/g, "") + "%");
+
+    const { data: tickets, error } = await ticketQuery;
+    if (error) return json({ error: "SUPPORT_STAFF_SNAPSHOT_FAILED" }, 500);
+
+    const rows = tickets || [];
+    const ticketIds = rows.map((item: any) => item.id);
+    const userIds = [...new Set(rows.map((item: any) => item.user_id).filter(Boolean))];
+
+    const [{ data: profiles }, { data: identities }, { data: messages }, { data: attachments }] =
+      await Promise.all([
+        userIds.length
+          ? admin.from("profiles").select("user_id,username,avatar_url,banned").in("user_id", userIds)
+          : Promise.resolve({ data: [] }),
+        userIds.length
+          ? admin.from("discord_identities").select("user_id,discord_user_id,username,global_name,avatar_url,guild_member").in("user_id", userIds)
+          : Promise.resolve({ data: [] }),
+        ticketIds.length
+          ? admin.from("support_messages")
+              .select("ticket_id,message,sender_role,created_at")
+              .in("ticket_id", ticketIds)
+              .order("created_at", { ascending: false })
+          : Promise.resolve({ data: [] }),
+        ticketIds.length
+          ? admin.from("support_attachments")
+              .select("ticket_id,id")
+              .in("ticket_id", ticketIds)
+              .eq("status", "ready")
+          : Promise.resolve({ data: [] }),
+      ]);
+
+    const profileMap = new Map((profiles || []).map((item: any) => [item.user_id, item]));
+    const identityMap = new Map((identities || []).map((item: any) => [item.user_id, item]));
+    const latestMessage = new Map<string, any>();
+    for (const message of messages || []) {
+      if (!latestMessage.has(message.ticket_id)) latestMessage.set(message.ticket_id, message);
+    }
+    const attachmentCount = new Map<string, number>();
+    for (const attachment of attachments || []) {
+      attachmentCount.set(attachment.ticket_id, (attachmentCount.get(attachment.ticket_id) || 0) + 1);
+    }
+
+    const safeTickets = rows.map((ticket: any) => {
+      const profile = profileMap.get(ticket.user_id);
+      const identity = identityMap.get(ticket.user_id);
+      const last = latestMessage.get(ticket.id);
+      return {
+        id: ticket.id,
+        userId: ticket.user_id,
+        category: ticket.category,
+        subject: ticket.subject,
+        status: ticket.status,
+        priority: ticket.priority,
+        assignedTo: ticket.assigned_to,
+        lastMessageAt: ticket.last_message_at,
+        closedAt: ticket.closed_at,
+        createdAt: ticket.created_at,
+        updatedAt: ticket.updated_at,
+        lastMessagePreview: last?.message ? String(last.message).slice(0, 180) : null,
+        lastSenderRole: last?.sender_role || null,
+        attachmentCount: attachmentCount.get(ticket.id) || 0,
+        customer: {
+          username: profile?.username || null,
+          avatarUrl: profile?.avatar_url || identity?.avatar_url || null,
+          banned: Boolean(profile?.banned),
+          discordUserId: identity?.discord_user_id || null,
+          discordUsername: identity?.global_name || identity?.username || null,
+          guildMember: Boolean(identity?.guild_member),
+        },
+      };
+    });
+
+    return json({
+      tickets: safeTickets,
+      stats: {
+        total: safeTickets.length,
+        waitingStaff: safeTickets.filter((item: any) => item.status === "waiting_staff").length,
+        waitingUser: safeTickets.filter((item: any) => item.status === "waiting_user").length,
+        urgent: safeTickets.filter((item: any) => item.priority === "urgent").length,
+        unassigned: safeTickets.filter((item: any) => !item.assignedTo && !["resolved","closed"].includes(item.status)).length,
+      },
+      staffUserId: caller.id,
+    });
+  }
+
+  if (action === "staff-update" && req.method === "POST") {
+    if (!staff) return json({ error: "STAFF_REQUIRED" }, 403);
+
+    const body = await req.json().catch(() => ({}));
+    const ticketId = String(body?.ticket_id || "");
+    if (!isUuid(ticketId)) return json({ error: "INVALID_TICKET" }, 400);
+
+    const ticket = await getAccessibleTicket(admin, ticketId, caller.id, true);
+    if (!ticket) return json({ error: "TICKET_NOT_FOUND" }, 404);
+
+    const allowedStatuses = new Set(["open","waiting_staff","waiting_user","resolved","closed"]);
+    const allowedPriorities = new Set(["low","normal","high","urgent"]);
+    const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    const changed: Record<string, unknown> = {};
+
+    if (body?.status !== undefined) {
+      const nextStatus = cleanText(body.status, 30);
+      if (!allowedStatuses.has(nextStatus)) return json({ error: "INVALID_STATUS" }, 400);
+      patch.status = nextStatus;
+      changed.status = nextStatus;
+      patch.closed_at = ["resolved","closed"].includes(nextStatus) ? new Date().toISOString() : null;
+    }
+
+    if (body?.priority !== undefined) {
+      const nextPriority = cleanText(body.priority, 30);
+      if (!allowedPriorities.has(nextPriority)) return json({ error: "INVALID_PRIORITY" }, 400);
+      patch.priority = nextPriority;
+      changed.priority = nextPriority;
+    }
+
+    if (body?.assignee !== undefined) {
+      const rawAssignee = body.assignee;
+      let assignee: string | null = null;
+
+      if (rawAssignee === "me") {
+        assignee = caller.id;
+      } else if (rawAssignee === null || rawAssignee === "") {
+        assignee = null;
+      } else if (isUuid(rawAssignee)) {
+        const { data: targetRoles } = await admin
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", rawAssignee);
+        const target = (targetRoles || []).map((item: any) => String(item.role || ""));
+        if (!isStaff(target)) return json({ error: "ASSIGNEE_NOT_STAFF" }, 400);
+        assignee = rawAssignee;
+      } else {
+        return json({ error: "INVALID_ASSIGNEE" }, 400);
+      }
+
+      patch.assigned_to = assignee;
+      changed.assigned_to = assignee;
+    }
+
+    if (Object.keys(changed).length === 0) {
+      return json({ success: true, ticket });
+    }
+
+    const { data: updated, error: updateError } = await admin
+      .from("support_tickets")
+      .update(patch)
+      .eq("id", ticket.id)
+      .select("*")
+      .single();
+
+    if (updateError || !updated) return json({ error: "TICKET_UPDATE_FAILED" }, 500);
+
+    await admin.from("support_ticket_events").insert({
+      ticket_id: ticket.id,
+      actor_user_id: caller.id,
+      event_type: "staff_update",
+      from_status: ticket.status,
+      to_status: updated.status,
+      metadata: changed,
+    });
+
+    return json({ success: true, ticket: updated });
+  }
+
   if (action === "create" && req.method === "POST") {
     const body = await req.json().catch(() => ({}));
     const category = cleanText(body?.category, 30);

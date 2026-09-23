@@ -500,6 +500,170 @@ Deno.serve(async (req) => {
     });
   }
 
+  if (action === "mod-snapshot" && req.method === "GET") {
+    if (!staff) return json({ error: "STAFF_REQUIRED" }, 403);
+
+    const { data: rows, error } = await admin
+      .from("community_messages")
+      .select("id,channel_id,user_id,reply_to_message_id,body,deleted_at,edited_at,created_at,updated_at,community_channels(slug,name)")
+      .order("created_at", { ascending: false })
+      .limit(200);
+
+    if (error) return json({ error: "COMMUNITY_MOD_SNAPSHOT_FAILED" }, 500);
+
+    const userIds = [...new Set((rows || []).map((item: any) => item.user_id).filter(Boolean))];
+
+    const [{ data: profiles }, { data: identities }, { data: roles }, { data: actions }] =
+      await Promise.all([
+        userIds.length
+          ? admin.from("profiles").select("user_id,username,avatar_url,banned,banned_at,banned_reason").in("user_id", userIds)
+          : Promise.resolve({ data: [] }),
+        userIds.length
+          ? admin.from("discord_identities").select("user_id,discord_user_id,username,global_name,avatar_url,guild_member").in("user_id", userIds)
+          : Promise.resolve({ data: [] }),
+        userIds.length
+          ? admin.from("user_roles").select("user_id,role").in("user_id", userIds)
+          : Promise.resolve({ data: [] }),
+        admin.from("community_moderation_actions")
+          .select("id,actor_user_id,target_user_id,message_id,action,reason,created_at")
+          .order("created_at", { ascending: false })
+          .limit(100),
+      ]);
+
+    const profileMap = new Map((profiles || []).map((item: any) => [item.user_id, item]));
+    const identityMap = new Map((identities || []).map((item: any) => [item.user_id, item]));
+    const roleMap = new Map<string, string[]>();
+    for (const item of roles || []) {
+      const list = roleMap.get(item.user_id) || [];
+      list.push(String(item.role || ""));
+      roleMap.set(item.user_id, list);
+    }
+
+    return json({
+      messages: (rows || []).map((item: any) => {
+        const profile = profileMap.get(item.user_id);
+        const identity = identityMap.get(item.user_id);
+        const channel = Array.isArray(item.community_channels)
+          ? item.community_channels[0]
+          : item.community_channels;
+        return {
+          id: item.id,
+          userId: item.user_id,
+          body: item.deleted_at ? null : item.body,
+          deleted: Boolean(item.deleted_at),
+          deletedAt: item.deleted_at,
+          editedAt: item.edited_at,
+          createdAt: item.created_at,
+          channel: {
+            slug: channel?.slug || "unknown",
+            name: channel?.name || "Canal",
+          },
+          author: {
+            username: profile?.username || null,
+            avatarUrl: profile?.avatar_url || identity?.avatar_url || null,
+            banned: Boolean(profile?.banned),
+            bannedAt: profile?.banned_at || null,
+            bannedReason: profile?.banned_reason || null,
+            discordUserId: identity?.discord_user_id || null,
+            discordUsername: identity?.global_name || identity?.username || null,
+            guildMember: Boolean(identity?.guild_member),
+            roles: roleMap.get(item.user_id) || [],
+          },
+        };
+      }),
+      actions: actions || [],
+      viewer: {
+        userId: caller.id,
+        roles: callerRoles,
+      },
+    });
+  }
+
+  if (action === "mod-action" && req.method === "POST") {
+    if (!staff) return json({ error: "STAFF_REQUIRED" }, 403);
+
+    const body = await req.json().catch(() => ({}));
+    const moderationAction = cleanText(body?.moderation_action, 40);
+    const reason = cleanText(body?.reason, 500);
+    if (!reason || reason.length < 3) return json({ error: "REASON_REQUIRED" }, 400);
+
+    if (moderationAction === "delete_message") {
+      const messageId = String(body?.message_id || "");
+      if (!isUuid(messageId)) return json({ error: "INVALID_MESSAGE" }, 400);
+
+      const { data: message } = await admin
+        .from("community_messages")
+        .select("id,user_id,deleted_at")
+        .eq("id", messageId)
+        .maybeSingle();
+
+      if (!message) return json({ error: "MESSAGE_NOT_FOUND" }, 404);
+
+      if (!message.deleted_at) {
+        const now = new Date().toISOString();
+        await admin
+          .from("community_messages")
+          .update({ deleted_at: now, updated_at: now })
+          .eq("id", message.id);
+      }
+
+      await admin.from("community_moderation_actions").insert({
+        actor_user_id: caller.id,
+        target_user_id: message.user_id,
+        message_id: message.id,
+        action: "delete_message",
+        reason,
+      });
+
+      return json({ success: true });
+    }
+
+    if (moderationAction === "ban_user" || moderationAction === "unban_user") {
+      const targetUserId = String(body?.target_user_id || "");
+      if (!isUuid(targetUserId)) return json({ error: "INVALID_TARGET" }, 400);
+      if (targetUserId === caller.id) return json({ error: "CANNOT_MODERATE_SELF" }, 409);
+
+      const targetRoles = await getRoles(admin, targetUserId);
+      const callerIsAdmin = callerRoles.includes("admin");
+      if (targetRoles.includes("admin") && !callerIsAdmin) {
+        return json({ error: "TARGET_PROTECTED" }, 403);
+      }
+
+      const { data: targetProfile } = await admin
+        .from("profiles")
+        .select("user_id,banned")
+        .eq("user_id", targetUserId)
+        .maybeSingle();
+
+      if (!targetProfile) return json({ error: "TARGET_NOT_FOUND" }, 404);
+
+      const banning = moderationAction === "ban_user";
+      const now = new Date().toISOString();
+      const { error: updateError } = await admin
+        .from("profiles")
+        .update({
+          banned: banning,
+          banned_at: banning ? now : null,
+          banned_reason: banning ? reason : null,
+          updated_at: now,
+        })
+        .eq("user_id", targetUserId);
+
+      if (updateError) return json({ error: "MODERATION_UPDATE_FAILED" }, 500);
+
+      await admin.from("community_moderation_actions").insert({
+        actor_user_id: caller.id,
+        target_user_id: targetUserId,
+        action: moderationAction,
+        reason,
+      });
+
+      return json({ success: true, banned: banning });
+    }
+
+    return json({ error: "INVALID_MODERATION_ACTION" }, 400);
+  }
+
   if (action === "profile" && req.method === "GET") {
     const targetId = url.searchParams.get("user_id") || "";
     if (!isUuid(targetId)) return json({ error: "INVALID_PROFILE" }, 400);

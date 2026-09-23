@@ -1,5 +1,6 @@
 # CRAZZY PROJECT — MASTER ROADMAP V2
 
+> **STATUS:** este arquivo contém histórico e requisitos. Para o estado atual do projeto em 2026-09-23, use [STATUS-ATUAL.md](./STATUS-ATUAL.md) como fonte rápida de verdade.\n\n
 Atualizado em 2026-09-21 após auditoria dos projetos antigos, PurinCash, Discord, tutoriais, entrega digital e MT Sounds.
 
 ## Regra central

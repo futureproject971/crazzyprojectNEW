@@ -77,7 +77,7 @@ export function AppHeader({
   userName?: string;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, allowThemeToggle } = useTheme();
   const { totalQuantity, hydrated } = useCart();
   const {
     user,
@@ -106,7 +106,9 @@ export function AppHeader({
           { id: "admin-products", label: "Produtos", onSelect: () => go("/admin/produtos") },
           { id: "admin-orders", label: "Pedidos", onSelect: () => go("/admin/pedidos") },
           { id: "admin-users", label: "Usuários", onSelect: () => go("/admin/usuarios") },
-          { id: "admin-settings", label: "Configurações", onSelect: () => go("/admin/configuracoes") },
+          { id: "admin-notifications", label: "Notificações", onSelect: () => go("/admin/notificacoes") },
+          { id: "admin-security", label: "Security Sentinel", onSelect: () => go("/admin/security") },
+          { id: "admin-settings", label: "Configurações", onSelect: () => go("/admin/integracoes") },
           { id: "admin-signout", label: "Sair", danger: true, onSelect: () => void signOut() },
         ]
       : [
@@ -116,6 +118,7 @@ export function AppHeader({
           { id: "client-tickets", label: "Meus Tickets", onSelect: () => go("/tickets") },
           { id: "client-club", label: "CRAZZY CLUB", onSelect: () => go("/club") },
           { id: "client-coupons", label: "Meus Cupons", onSelect: () => go("/painel/cupons") },
+          { id: "client-notifications", label: "Notificações", onSelect: () => go("/painel/notificacoes") },
           { id: "client-tutorial", label: "Tutorial", onSelect: () => go("/academy") },
           { id: "client-profile", label: "Meu Perfil", onSelect: () => go("/perfil") },
           { id: "client-signout", label: "Sair", danger: true, onSelect: () => void signOut() },
@@ -139,15 +142,17 @@ export function AppHeader({
         </div>
 
         <div className="crz-shell-header__account" aria-label="Conta e acesso">
-          <button
-            type="button"
-            className="crz-shell-theme"
-            onClick={toggleTheme}
-            aria-label={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}
-            title={theme === "dark" ? "Tema claro" : "Tema escuro"}
-          >
-            <span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
-          </button>
+          {allowThemeToggle && (
+            <button
+              type="button"
+              className="crz-shell-theme"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}
+              title={theme === "dark" ? "Tema claro" : "Tema escuro"}
+            >
+              <span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
+            </button>
+          )}
           {!user ? (
             <>
               <a href="/login" className="crz-shell-auth crz-shell-auth--compact">
@@ -220,14 +225,16 @@ export function AppHeader({
             onNavigate={() => setMobileOpen(false)}
           />
 
-          <button
-            type="button"
-            className="crz-shell-mobile__theme"
-            onClick={toggleTheme}
-          >
-            <span>{theme === "dark" ? "☀" : "☾"}</span>
-            {theme === "dark" ? "Usar tema claro" : "Usar tema escuro"}
-          </button>
+          {allowThemeToggle && (
+            <button
+              type="button"
+              className="crz-shell-mobile__theme"
+              onClick={toggleTheme}
+            >
+              <span>{theme === "dark" ? "☀" : "☾"}</span>
+              {theme === "dark" ? "Usar tema claro" : "Usar tema escuro"}
+            </button>
+          )}
 
           <div className="crz-shell-mobile__account">
             {!user ? (

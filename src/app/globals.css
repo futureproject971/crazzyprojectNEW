@@ -32,9 +32,26 @@
 @import "../modules/stock-manager/styles.css";
 @import "../modules/sales-manager/styles.css";
 @import "../modules/payments-manager/styles.css";
+@import "../modules/finance-manager/styles.css";
 @import "../modules/call/styles.css";
 @import "../modules/discord-campaigns/styles.css";
 @import "../modules/discord-bot-core/styles.css";
+@import "../modules/customer-360/styles.css";
+@import "../modules/support-desk/styles.css";
+@import "../modules/community-mod/styles.css";
+@import "../modules/resellers/styles.css";
+@import "../modules/club-manager/styles.css";
+@import "../modules/reward-manager/styles.css";
+@import "../modules/luck-manager/styles.css";
+@import "../modules/coupon-manager/styles.css";
+@import "../modules/integrations/styles.css";
+@import "../modules/fulfillment-manager/styles.css";
+@import "../modules/discord-bridge/styles.css";
+@import "../modules/notifications/styles.css";
+@import "../modules/tutorial-studio/styles.css";
+@import "../modules/security-sentinel/styles.css";
+@import "../modules/appearance-manager/styles.css";
+@import "../core/pwa/styles.css";
 @import "../core/design-system/styles/card-surfaces.css";
 
 :root {

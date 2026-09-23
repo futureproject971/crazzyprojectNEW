@@ -4,6 +4,7 @@ import { AuthProvider } from "@/modules/auth/AuthProvider";
 import { CartProvider } from "@/modules/cart/CartProvider";
 import { PublicInteractionGuard } from "@/core/security/PublicInteractionGuard";
 import { ThemeProvider } from "@/core/theme/ThemeProvider";
+import { PwaRegister } from "@/core/pwa";
 import "./globals.css";
 
 const inter = Inter({
@@ -39,6 +40,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} ${orbitron.variable} ${poppins.variable}`}>
+        <PwaRegister />
         <PublicInteractionGuard />
         <ThemeProvider>
           <AuthProvider>
