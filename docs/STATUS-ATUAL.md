@@ -2,8 +2,8 @@
 
 Atualizado em: 2026-09-23  
 Repositório oficial: `futureproject971/crazzyprojectNEW`  
-Branch de consolidação atual: `modules-m31-m44-ops`  
-PR de consolidação: **#50 — draft**  
+Branch de consolidação: **mergeada na `main`**  
+PR de consolidação: **#50 — MERGED**  
 Nome oficial obrigatório: **CRAZZY PROJECT**
 
 > Este arquivo é a fonte rápida de verdade para status. CHECKLIST-MASTER, ROADMAP e MODULE_STATUS preservam histórico e requisitos, mas podem conter trechos antigos.
@@ -20,9 +20,9 @@ A `main` já contém o núcleo M00→M29, incluindo os merges posteriores de:
 
 A PR legada do CALL **#38 foi encerrada sem merge** porque foi substituída pelo CALL/Auth mais novo já presente na base atual.
 
-## 2. PR #50 — CONSOLIDAÇÃO EM QA
+## 2. PR #50 — CONSOLIDAÇÃO MERGEADA
 
-A branch `modules-m31-m44-ops` contém, além da main:
+A `main` agora contém:
 
 - **M30 — CRAZZY Finance**
   - receita, taxas reais/estimadas, líquido, refunds, chargebacks, holds;
@@ -159,27 +159,30 @@ O Security Advisor ainda lista funções `SECURITY DEFINER` expostas a anon/auth
 ## 7. PRS LEGADAS
 
 - **#38 CRAZZY CALL**: fechada, superseded.
-- **#47 M30 Finance**: conteúdo Finance foi transplantado seletivamente para #50; fechar após QA verde.
-- **#48 Hero Valorant**: hero foi transplantado seletivamente para #50; fechar após QA verde.
-- **#50**: PR canônica atual de consolidação, mantida em draft até gates verdes.
+- **#47 M30 Finance**: fechada como superseded após transplante seletivo para #50.
+- **#48 Hero Valorant**: fechada como superseded após transplante seletivo para #50.
+- **#50**: mergeada na `main` após gates verdes.
 
-## 8. PRÓXIMO GATE
+## 8. GATE ATUAL DE PRODUÇÃO
 
-Antes de mergear #50:
+Concluído:
+- PR #50 mergeada;
 - TypeScript PASS;
 - Next production build PASS;
 - smoke M30 PASS;
 - Bot Core syntax PASS;
 - Vercel preview PASS;
+- deploy Vercel da main `5bb945a`: SUCCESS;
 - advisors revisados;
-- nenhuma regressão de Auth/CALL/Checkout/Support.
+- #38, #47 e #48 fechadas como superseded.
 
-Depois do merge:
-- fechar #47/#48;
-- deploy/heartbeat Discloud;
-- Discord OAuth;
-- LiveKit;
-- catálogo/estoque;
+Próximos passos operacionais:
+- deploy/heartbeat do Bot Core na Discloud;
+- Discord OAuth ponta a ponta;
+- LiveKit ponta a ponta;
+- configurar Security Sentinel no Discord;
+- catálogo/planos reais;
+- estoque real;
 - PurinCash controlado;
-- E2E completo;
+- E2E completo de compra;
 - só então abrir o site para clientes reais.

@@ -121,19 +121,15 @@ jobs:
         run: node scripts/test-m28-sales-manager.mjs
 
       - name: Test M29 Payments Manager
-        if: github.ref_name == 'm29-payments-manager-clean' || github.head_ref == 'm29-payments-manager-clean'
         run: node scripts/test-m29-payments-manager.mjs
 
       - name: Test M30 Finance
-        if: github.head_ref == 'modules-m31-m44-ops' || github.ref_name == 'modules-m31-m44-ops' || github.head_ref == 'm30-finance' || github.ref_name == 'm30-finance'
         run: node scripts/test-m30-finance.mjs
 
-      - name: Test CRAZZY CALL transplant
-        if: github.ref_name == 'm-discord-campaigns' || github.head_ref == 'm-discord-campaigns' || github.ref_name == 'm-discord-bot-core-builder' || github.head_ref == 'm-discord-bot-core-builder' || github.head_ref == 'auth-discord-crazzy-call'
+      - name: Test CRAZZY CALL security
         run: node scripts/test-crazzy-call.mjs
 
       - name: Test Discord CRAZZY CALL auth
-        if: github.head_ref == 'auth-discord-crazzy-call' || github.ref_name == 'auth-discord-crazzy-call'
         run: node scripts/test-discord-call-auth.mjs
 
       - name: Check unified Discord bot syntax
