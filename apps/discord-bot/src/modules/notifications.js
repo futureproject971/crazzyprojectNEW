@@ -4,9 +4,9 @@ function errorCode(error){
   return String(error?.code||error?.message||"DISCORD_DM_FAILED").slice(0,160);
 }
 
-async function finish(supabase,config,id,success,error=null){
+async function finish(supabase,config,id,success,failure=null){
   const {data,error}=await supabase.rpc("finish_discord_notification_job",{
-    p_job_id:id,p_worker_id:config.workerId,p_success:success,p_error:error
+    p_job_id:id,p_worker_id:config.workerId,p_success:success,p_error:failure
   });
   if(error||data!==true)console.error("[notify] finish failed",id,error?.message||data);
 }
