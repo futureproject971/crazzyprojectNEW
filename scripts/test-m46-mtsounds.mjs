@@ -10,7 +10,8 @@ for (const required of [
   "M46 COMPAT",
   "sandbox=",
   "referrerPolicy=",
-  "M46 fechado em modo compatibilidade",
+  "MTSOUNDS • integração CRAZZY ativa",
+  "/api/referral/capture",
 ]) {
   if (!page.includes(required)) throw new Error("M46 page missing " + required);
 }
@@ -34,5 +35,8 @@ if (!config.includes("AbortController")) {
 if (!api.includes("Cache-Control")) {
   throw new Error("M46 status endpoint should be cheaply cacheable");
 }
+if (!page.includes('mode: "embed"') || !page.includes('mode === "external"')) {
+  throw new Error("M46 must preserve controlled embed/external fallback modes");
+}
 
-console.log("[PASS] M46 MT Sounds compatibility module");
+console.log("[PASS] M46 MTSOUNDS CRAZZY integration module");

@@ -1,30 +1,39 @@
 const { readFile } = await import("node:fs/promises");
 
 const middleware = await readFile("src/lib/supabase/middleware.ts", "utf8");
-if (!middleware.includes('"/call"')) {
-  throw new Error("CRAZZY CALL must be protected by auth middleware");
+for (const required of ['"/call"','"/admin"',"discord_identities","guild_member"]) {
+  if (!middleware.includes(required)) {
+    throw new Error("Discord-only middleware gate missing " + required);
+  }
 }
-console.log("[PASS] /call is protected by auth middleware");
+console.log("[PASS] private routes require authenticated Discord guild membership");
 
 const provider = await readFile("src/modules/auth/AuthProvider.tsx", "utf8");
 for (const required of [
-  'provider === "discord"',
-  'scopes: provider === "discord" ? "identify email guilds"',
-  'provider: "discord"',
-  'linkIdentity',
+  'signIn:(provider:"discord"',
+  'provider:"discord"',
+  'scopes:"identify email guilds"',
+  "linkIdentity",
+  "googleEnabled:false",
 ]) {
   if (!provider.includes(required)) {
     throw new Error("Discord OAuth provider flow missing " + required);
   }
 }
-console.log("[PASS] Discord OAuth uses identify/email/guilds and supports account linking");
+if (provider.includes('provider:"google"') || provider.includes('signIn("google"')) {
+  throw new Error("Google must not be an authentication provider in Discord-only mode");
+}
+console.log("[PASS] Discord is the only OAuth provider and requests identify/email/guilds");
 
 const callback = await readFile("src/app/auth/callback/route.ts", "utf8");
 for (const required of [
   "exchangeCodeForSession",
-  'expectedProvider === "discord"',
+  'expectedProvider !== "discord"',
   "auth-discord-sync",
   "provider_token",
+  "guildCheckConfigured",
+  "guildMember",
+  "/entrar/servidor",
 ]) {
   if (!callback.includes(required)) {
     throw new Error("Discord callback missing " + required);
@@ -33,7 +42,7 @@ for (const required of [
 if (/provider_token[^\n]{0,120}(insert|upsert|update)/i.test(callback)) {
   throw new Error("Provider token must not be persisted by callback");
 }
-console.log("[PASS] callback exchanges PKCE code and syncs Discord without persisting provider token");
+console.log("[PASS] callback exchanges PKCE code, syncs Discord and enforces official guild");
 
 const sync = await readFile("supabase/functions/auth-discord-sync/index.ts", "utf8");
 for (const required of [
@@ -52,31 +61,15 @@ if (/provider_token\s*[:,][^\n]*(insert|upsert)/i.test(sync)) {
 }
 console.log("[PASS] Discord identity/guild sync stays server-side");
 
-const hub = await readFile("src/modules/call/CallHubPage.tsx", "utf8");
-if (!hub.includes("!user || !user.discord.connected")) {
-  throw new Error("CRAZZY CALL hub must require Discord identity");
-}
-if (!hub.includes("user.discord.guildId && !user.discord.guildMember")) {
-  throw new Error("CRAZZY CALL hub must honor configured guild membership");
-}
-console.log("[PASS] CRAZZY CALL hub requires Discord and honors guild membership");
-
-const experience = await readFile("src/modules/call/CallExperience.tsx", "utf8");
-if (!experience.includes("!user || !user.discord.connected")) {
-  throw new Error("CRAZZY CALL room must require Discord identity");
-}
-if (!experience.includes("discord_guild_required")) {
-  throw new Error("CRAZZY CALL room must surface guild membership requirement");
-}
-console.log("[PASS] direct room links redirect through Discord auth");
-
 const authPage = await readFile("src/modules/auth/AuthPage.tsx", "utf8");
-if (!authPage.includes("/brand/crazzy-logo-hero.png")) {
-  throw new Error("Login must use the official CRAZZY PROJECT logo");
+for (const required of [
+  "/brand/crazzy-logo-hero.png",
+  "ENTRAR COM DISCORD",
+  "VERIFICAR DISCORD",
+  "Discord é a identidade da CRAZZY PROJECT",
+]) {
+  if (!authPage.includes(required)) throw new Error("Discord login UI missing " + required);
 }
-if (!authPage.includes("ATUALIZAR DISCORD")) {
-  throw new Error("Login must support Discord re-sync");
-}
-console.log("[PASS] login uses official branding and supports Discord re-sync");
+console.log("[PASS] login is Discord-only and uses official CRAZZY PROJECT branding");
 
-console.log("[PASS] Discord Auth + CRAZZY CALL gate smoke");
+console.log("[PASS] Discord Auth + CRAZZY CALL guild gate smoke");
