@@ -42,7 +42,7 @@ export function StoreShowcase() {
           <NeonSectionIcon src="/icons/neon-v2/cube.svg" />
           <div>
             <h2 id="store-title">Explore Nossa Loja</h2>
-            <p>Categorias publicadas diretamente no catálogo CRAZZY PROJECT.</p>
+            <p>Encontre produtos por jogo e categoria.</p>
           </div>
         </div>
         <a href="/categorias" className="section-link">Ver todas as categorias →</a>
@@ -73,8 +73,8 @@ export function StoreShowcase() {
         </div>
       ) : (
         <div className="crz-discovery-empty">
-          <strong>Categorias aguardando produtos</strong>
-          <p>As categorias aparecem automaticamente quando tiverem produtos ativos.</p>
+          <strong>Explore a loja</strong>
+          <p>Veja todos os produtos disponíveis.</p>
         </div>
       )}
     </section>
