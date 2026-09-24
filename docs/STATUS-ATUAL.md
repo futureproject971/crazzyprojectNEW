@@ -8,6 +8,49 @@ Nome oficial obrigatório: **CRAZZY PROJECT**
 
 > Este arquivo é a fonte rápida de verdade para status. CHECKLIST-MASTER, ROADMAP e MODULE_STATUS preservam histórico e requisitos, mas podem conter trechos antigos.
 
+## 0. ATUALIZAÇÃO 2026-09-24 — PR #53 RELEASE CANDIDATE
+
+PR ativa:
+- **#53 — Commerce hardening: Discord gate, MTSOUNDS, partners, ghost stock and Luck**
+- base: `main` em `5196e799`;
+- estado: **READY FOR REVIEW / MERGEABLE**;
+- produção ainda não alterada enquanto os blockers externos abaixo não forem resolvidos.
+
+Incluído na #53:
+- login somente com Discord;
+- guild gate obrigatório nas páginas privadas;
+- guild gate também nas APIs privadas de Client Hub, Library, Profile, Support, Academy progress e Reviews elegíveis;
+- ações autenticadas de Luck, Rewards e Reviews passam pelo guild gate;
+- tela `/entrar/servidor`;
+- convite oficial configurável pelo admin;
+- MTSOUNDS priorizado dentro da CRAZZY PROJECT;
+- Partner Manager e comissões por plano;
+- ghost stock e reseller expiry/idempotência;
+- Tutorial Studio por plano;
+- Luck paga vinculada ao pagamento;
+- hardening de Fulfillment/Discord Bridge em refund/dispute;
+- Security Sentinel protegido contra `@everyone/@here`;
+- sincronização `guildMemberAdd/guildMemberRemove` no Bot Core;
+- migrations aplicadas que estavam apenas no histórico do Supabase sincronizadas de volta para o Git;
+- deploy do Bot Core preparado para Discloud via GitHub com `discloud.config` também na raiz do monorepo.
+
+Validações do release candidate:
+- TypeScript: PASS;
+- Next production build: PASS;
+- Full Module Regression: PASS;
+- Unified Bot Core syntax/tests: PASS;
+- Vercel Preview: PASS.
+
+Blockers atuais antes do squash merge para produção:
+1. preencher `DISCORD_INVITE_URL` com o convite permanente oficial da CRAZZY PROJECT;
+2. subir o Unified Discord Bot Core na Discloud;
+3. confirmar heartbeat fresco em `discord_campaign_worker_status`;
+4. depois do merge, testar OAuth + entrar/sair da guild no domínio de produção.
+
+Observação:
+- nenhuma URL permanente oficial da CRAZZY PROJECT foi encontrada no histórico; não reutilizar `discord.gg/ftstore`, pois pertence ao projeto antigo Future Store/Future Cheats.
+
+
 ## 1. MAIN JÁ INTEGRADA
 
 A `main` já contém o núcleo M00→M29, incluindo os merges posteriores de:
