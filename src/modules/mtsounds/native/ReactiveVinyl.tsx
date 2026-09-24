@@ -18,7 +18,7 @@ const clamp=(value:number,min:number,max:number)=>Math.min(max,Math.max(min,valu
 
 export default function ReactiveVinyl({size="hero",showSignal=true,className=""}:Props){
   const orbitRef=useRef<HTMLDivElement>(null);
-  const discRef=useRef<HTMLImageElement>(null);
+  const discRef=useRef<HTMLDivElement>(null);
   const rafRef=useRef<number|null>(null);
   const lastFrameRef=useRef(0);
   const angleRef=useRef(0);
@@ -28,6 +28,7 @@ export default function ReactiveVinyl({size="hero",showSignal=true,className=""}
   const levelRef=useRef(0);
   const fxRef=useRef(1);
   const [playing,setPlaying]=useState(false);
+  const [artworkReady,setArtworkReady]=useState(false);
 
   useEffect(()=>{
     const run=(now:number)=>{
@@ -115,13 +116,27 @@ export default function ReactiveVinyl({size="hero",showSignal=true,className=""}
   >
     <span className="vinyl-reactor" aria-hidden="true"/>
     <span className="vinyl-groove-ring" aria-hidden="true"/>
-    <img
-      ref={discRef}
-      className="vinyl-disc"
-      src="https://raw.githubusercontent.com/futureproject971/mtsounds/main/public/assets/mtsounds-vinyl-full.webp"
-      alt="Disco de vinil MTSound's"
-      draggable={false}
-    />
+    <div ref={discRef} className="vinyl-disc-shell">
+      <span className={`vinyl-fallback ${artworkReady?"":"is-visible"}`} aria-hidden="true">
+        <svg viewBox="0 0 100 100" role="presentation">
+          <circle cx="50" cy="50" r="48" fill="#08080b" stroke="#c084fc" strokeWidth="1.4"/>
+          <circle cx="50" cy="50" r="39" fill="none" stroke="rgba(255,255,255,.16)" strokeWidth=".7"/>
+          <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(192,132,252,.2)" strokeWidth=".8"/>
+          <circle cx="50" cy="50" r="18" fill="#511178" stroke="#d8b4fe" strokeWidth="1"/>
+          <circle cx="50" cy="50" r="3.4" fill="#f7f3fa"/>
+          <text x="50" y="53.8" textAnchor="middle" fill="#ffffff" fontSize="9" fontWeight="800" fontFamily="Arial, sans-serif">MT</text>
+        </svg>
+      </span>
+      <img
+        className="vinyl-disc"
+        src="/mtsounds/assets/mtsounds-vinyl-full.webp"
+        alt="Disco de vinil MTSound's"
+        draggable={false}
+        onLoad={()=>setArtworkReady(true)}
+        onError={()=>setArtworkReady(false)}
+        style={{opacity:artworkReady?1:0}}
+      />
+    </div>
     <span className="vinyl-center-glow" aria-hidden="true"/>
     {showSignal&&<div className="signal-row" aria-hidden="true">
       {Array.from({length:18},(_,i)=><i key={i} style={{animationDelay:`${i*47}ms`}}/> )}
