@@ -8,6 +8,7 @@ const tests = [
   "scripts/test-m11-library.mjs",
   "scripts/test-m12-profile.mjs",
   "scripts/test-m13-support.mjs",
+  "scripts/test-m13-support-realtime.mjs",
   "scripts/test-m14-community.mjs",
   "scripts/test-m17-rewards.mjs",
   "scripts/test-m18-luck.mjs",

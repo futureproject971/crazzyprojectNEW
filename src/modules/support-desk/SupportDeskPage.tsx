@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge, PageHeader } from "@/core/design-system";
 import type { SupportDeskPayload, SupportDeskThread, SupportDeskTicket } from "./types";
+import type { SupportMessage } from "@/modules/support";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 function dateTime(value:string|null|undefined){
   if(!value)return"—";
@@ -29,6 +31,9 @@ export function SupportDeskPage(){
   const [message,setMessage]=useState("");
   const [busy,setBusy]=useState<string|null>(null);
   const [notice,setNotice]=useState("");
+  const selectedIdRef=useRef<string|null>(null);
+  const messagesRef=useRef<HTMLDivElement|null>(null);
+  const realtimeTimer=useRef<number|null>(null);
 
   const load=useCallback(async()=>{
     try{
@@ -46,21 +51,86 @@ export function SupportDeskPage(){
     }catch{setState("error")}
   },[priority,query,status]);
 
+  const refreshThread=useCallback(async(ticketId:string)=>{
+    const response=await fetch("/api/support/"+encodeURIComponent(ticketId),{cache:"no-store"});
+    const payload=await response.json().catch(()=>({}));
+    if(!response.ok||!payload.ticket)throw new Error("THREAD_FAILED");
+    setThread(payload as SupportDeskThread);
+  },[]);
+
   const loadThread=useCallback(async(ticket:SupportDeskTicket)=>{
     setSelected(ticket);
+    selectedIdRef.current=ticket.id;
     setThread(null);
     setThreadLoading(true);
     setNotice("");
     try{
-      const response=await fetch("/api/support/"+encodeURIComponent(ticket.id),{cache:"no-store"});
-      const payload=await response.json().catch(()=>({}));
-      if(!response.ok||!payload.ticket)throw new Error();
-      setThread(payload as SupportDeskThread);
+      await refreshThread(ticket.id);
     }catch{setNotice("Não foi possível abrir este ticket.")}
     finally{setThreadLoading(false)}
-  },[]);
+  },[refreshThread]);
 
-  useEffect(()=>{void load()},[]);
+  useEffect(()=>{void load()},[load]);
+
+  useEffect(()=>{
+    const supabase=createBrowserSupabaseClient();
+
+    const schedule=(ticketId?:string)=>{
+      if(realtimeTimer.current)window.clearTimeout(realtimeTimer.current);
+      realtimeTimer.current=window.setTimeout(()=>{
+        realtimeTimer.current=null;
+        void load();
+        if(ticketId&&selectedIdRef.current===ticketId){
+          void refreshThread(ticketId).catch(()=>setNotice("Falha ao atualizar conversa em tempo real."));
+        }
+      },120);
+    };
+
+    const channel=supabase
+      .channel("support-desk-live")
+      .on(
+        "postgres_changes",
+        {event:"INSERT",schema:"public",table:"support_messages"},
+        (payload:any)=>schedule(String((payload.new as {ticket_id?:unknown})?.ticket_id||""))
+      )
+      .on(
+        "postgres_changes",
+        {event:"INSERT",schema:"public",table:"support_attachments"},
+        (payload:any)=>schedule(String((payload.new as {ticket_id?:unknown})?.ticket_id||""))
+      )
+      .on(
+        "postgres_changes",
+        {event:"UPDATE",schema:"public",table:"support_tickets"},
+        (payload:any)=>schedule(String((payload.new as {id?:unknown})?.id||""))
+      )
+      .subscribe();
+
+    const fallback=window.setInterval(()=>{
+      if(document.visibilityState!=="visible")return;
+      void load();
+      if(selectedIdRef.current){
+        void refreshThread(selectedIdRef.current).catch(()=>undefined);
+      }
+    },30000);
+
+    return()=>{
+      if(realtimeTimer.current){
+        window.clearTimeout(realtimeTimer.current);
+        realtimeTimer.current=null;
+      }
+      window.clearInterval(fallback);
+      void supabase.removeChannel(channel);
+    };
+  },[load,refreshThread]);
+
+  useEffect(()=>{
+    if(!thread?.messages.length)return;
+    window.requestAnimationFrame(()=>{
+      if(messagesRef.current){
+        messagesRef.current.scrollTo({top:messagesRef.current.scrollHeight,behavior:"smooth"});
+      }
+    });
+  },[thread?.messages.length]);
 
   const updateTicket=async(patch:Record<string,unknown>)=>{
     if(!selected||busy)return;
@@ -70,8 +140,9 @@ export function SupportDeskPage(){
       const payload=await response.json().catch(()=>({}));
       if(!response.ok)throw new Error(payload.error||"UPDATE_FAILED");
       setNotice("Ticket atualizado.");
+      setSelected(current=>current?{...current,...patch} as SupportDeskTicket:current);
       await load();
-      await loadThread(selected);
+      await refreshThread(selected.id);
     }catch{setNotice("Não foi possível atualizar o ticket.")}
     finally{setBusy(null)}
   };
@@ -83,10 +154,25 @@ export function SupportDeskPage(){
       const response=await fetch("/api/support/"+encodeURIComponent(selected.id)+"/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:message.trim()})});
       const payload=await response.json().catch(()=>({}));
       if(!response.ok)throw new Error(payload.error||"MESSAGE_FAILED");
+      const sentId=String(payload.messageId||("local-"+Date.now()));
+      const knownStaff=
+        thread?.messages.find(item=>item.senderRole==="staff")?.sender||
+        {id:null,name:"CRAZZY Support",avatarUrl:null};
+      const optimisticMessage:SupportMessage={
+        id:sentId,
+        senderRole:"staff",
+        message:message.trim(),
+        editedAt:null,
+        createdAt:new Date().toISOString(),
+        sender:knownStaff,
+      };
+      setThread(current=>{
+        if(!current||current.messages.some(item=>item.id===sentId))return current;
+        return {...current,messages:[...current.messages,optimisticMessage]};
+      });
       setMessage("");
       setNotice("Resposta enviada.");
-      await load();
-      await loadThread(selected);
+      void load();
     }catch{setNotice("Não foi possível enviar a resposta.")}
     finally{setBusy(null)}
   };
@@ -153,7 +239,7 @@ export function SupportDeskPage(){
             </select>
           </div>
 
-          <div className="crz-supportdesk-messages">
+          <div ref={messagesRef} className="crz-supportdesk-messages">
             {thread.messages.map(item=><article key={item.id} className={"is-"+item.senderRole}><header><strong>{item.sender.name}</strong><span>{dateTime(item.createdAt)}</span></header><p>{item.message}</p></article>)}
             {!thread.messages.length&&<em>Sem mensagens.</em>}
           </div>
