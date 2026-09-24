@@ -425,9 +425,9 @@ export function CommunityPage() {
       <section className="crz-community-hero">
         <div className="crz-container crz-community-hero__inner">
           <div>
-            <small>M14 • CRAZZY COMMUNITY</small>
+            <small>CRAZZY COMMUNITY</small>
             <h1>Comunidade</h1>
-            <p>Texto, voz, vídeo e compartilhamento de tela no mesmo ecossistema CRAZZY PROJECT.</p>
+            <p>Converse, compartilhe e participe da comunidade CRAZZY PROJECT.</p>
           </div>
 
           <div className="crz-community-live">
@@ -468,7 +468,7 @@ export function CommunityPage() {
             <NeonIcon name="shield" size={25} />
             <div>
               <strong>Comunidade segura</strong>
-              <span>Sem keys automáticas no chat. Mídias privadas e mensagens vinculadas à sua conta.</span>
+              <span>Respeite a comunidade e evite compartilhar dados sensíveis no chat.</span>
             </div>
           </Panel>
         </aside>
