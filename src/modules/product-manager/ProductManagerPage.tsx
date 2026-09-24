@@ -287,6 +287,70 @@ export function ProductManagerPage() {
     setNotice("");
   };
 
+  const copyText = async (value: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setNotice(`${label} copiado.`);
+    } catch {
+      setNotice(`Não consegui copiar ${label.toLowerCase()} automaticamente.`);
+    }
+  };
+
+  const syncCurrentProduct = async () => {
+    if (!productDraft) return;
+    await load(true, productDraft.id, planDraft?.id || null);
+    setNotice("Produto sincronizado com o banco.");
+  };
+
+  const saveEditorChanges = async () => {
+    if (!productDraft || busy) return;
+    setBusy(true);
+    setNotice("");
+
+    try {
+      const productResponse = await fetch("/api/admin/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "product",
+          product: {
+            ...productDraft,
+            tutorial_ids: productDraft.tutorials.map(item => item.id),
+          },
+        }),
+      });
+      const productPayload = await productResponse.json().catch(() => ({}));
+      if (!productResponse.ok) {
+        throw new Error(productPayload?.error || "Falha ao salvar produto.");
+      }
+
+      if (planDraft) {
+        const planResponse = await fetch("/api/admin/products", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            kind: "plan",
+            plan: {
+              ...planDraft,
+              tutorial_ids: planDraft.tutorials.map(item => item.id),
+            },
+          }),
+        });
+        const planPayload = await planResponse.json().catch(() => ({}));
+        if (!planResponse.ok) {
+          throw new Error(planPayload?.error || "Produto salvo, mas o plano selecionado falhou.");
+        }
+      }
+
+      await load(true, productDraft.id, planDraft?.id || null);
+      setNotice("Alterações salvas.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Falha ao salvar alterações.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const toggleProductTutorial = (id: string) => {
     if (!productDraft) return;
     const exists = productDraft.tutorials.some(item => item.id === id);
@@ -383,8 +447,10 @@ export function ProductManagerPage() {
 
       const createdPlanId = String(payload.created.id);
       setCreatingPlan(false);
+      setExpandedPlanId(createdPlanId);
+      setEditorTab("fields");
       await load(true, productDraft.id, createdPlanId);
-      setNotice("Plano criado desativado. Revise entrega, preço, estoque e automações antes de ativar.");
+      setNotice("Variação criada. Agora configure preço, estoque e visibilidade.");
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Falha ao criar plano.");
     } finally {
@@ -518,11 +584,13 @@ export function ProductManagerPage() {
         throw new Error(payload?.error || "Falha ao adicionar estoque.");
       }
 
-      setStockNotice(
-        `${payload.batch.accepted_count} key(s) adicionada(s). ${payload.batch.duplicate_count} duplicada(s) ignorada(s).`
-      );
+      const stockMessage =
+        `${payload.batch.accepted_count} key(s) adicionada(s). ${payload.batch.duplicate_count} duplicada(s) ignorada(s).`;
+      setStockNotice(stockMessage);
+      setNotice(stockMessage);
       setStockText("");
-      await load(true);
+      setStockModalOpen(false);
+      await load(true, productDraft?.id || null, planDraft.id);
     } catch (error) {
       setStockNotice(error instanceof Error ? error.message : "Falha ao adicionar estoque.");
     } finally {
