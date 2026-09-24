@@ -588,3 +588,287 @@ textarea:focus-visible {
   font-size: 13px !important;
   line-height: 1.5 !important;
 }
+
+
+/* PASS 3: admin operational modules
+   Admin screens must be dense, not microscopic. */
+
+/* FINANCE */
+.crz-finance-method-card > header strong,
+.crz-finance-chart-card header strong,
+.crz-finance-payments header strong,
+.crz-finance-holds header strong,
+.crz-finance-summary strong,
+.crz-finance-risk-strip strong,
+.crz-finance-hold-list strong {
+  font-size: 13px !important;
+}
+.crz-finance-presets button,
+.crz-finance-toolbar > select,
+.crz-finance-custom-range input,
+.crz-finance-custom-range span,
+.crz-finance-warning strong,
+.crz-finance-warning span,
+.crz-finance-notice,
+.crz-finance-summary small,
+.crz-finance-summary span,
+.crz-finance-risk-strip small,
+.crz-finance-risk-strip span,
+.crz-finance-risk-strip > button,
+.crz-finance-method-card > header small,
+.crz-finance-method-metrics span,
+.crz-finance-fee-editor span,
+.crz-finance-method-metrics strong,
+.crz-finance-fee-editor input,
+.crz-finance-method-card > footer > span,
+.crz-finance-method-card button,
+.crz-finance-payments button,
+.crz-finance-hold-actions button,
+.crz-finance-chart-card header small,
+.crz-finance-payments header small,
+.crz-finance-holds header small,
+.crz-finance-chart-card header > span,
+.crz-finance-payments header > span,
+.crz-finance-bar-value span,
+.crz-finance-bar-value small,
+.crz-finance-bar-column > b,
+.crz-finance-payment-head,
+.crz-finance-payment-table article strong,
+.crz-finance-payment-table article small,
+.crz-finance-empty,
+.crz-finance-hold-list small,
+.crz-finance-hold-list span,
+.crz-finance-footnote {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-finance-fee-editor input,
+.crz-finance-custom-range input,
+.crz-finance-toolbar > select {
+  min-height: 36px;
+}
+
+/* STOCK MANAGER */
+.crz-stock-summary small,
+.crz-stock-summary span,
+.crz-stock-notice,
+.crz-stock-plan-list small,
+.crz-stock-plan-list em,
+.crz-stock-plan-head small,
+.crz-stock-plan-head span,
+.crz-stock-plan-metrics span,
+.crz-stock-import header small,
+.crz-stock-items header small,
+.crz-stock-history header small,
+.crz-stock-import-fields label > span,
+.crz-stock-import-foot > span,
+.crz-stock-items header > button,
+.crz-stock-items-row,
+.crz-stock-items-row.is-head,
+.crz-stock-items-row code,
+.crz-stock-items-row b,
+.crz-stock-items-row button,
+.crz-stock-empty,
+.crz-stock-history article > div > div:not(.crz-stock-empty),
+.crz-stock-history article > div small,
+.crz-stock-history time {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-stock-search input,
+.crz-stock-import textarea,
+.crz-stock-import-fields input {
+  font-size: 13px !important;
+}
+.crz-stock-plan-list strong,
+.crz-stock-plan-list b,
+.crz-stock-import header strong,
+.crz-stock-items header strong,
+.crz-stock-history header strong,
+.crz-stock-empty strong,
+.crz-stock-history article > div strong {
+  font-size: 13px !important;
+}
+
+/* PAYMENTS */
+.crz-payments-methods small,
+.crz-payments-methods span,
+.crz-payments-methods button,
+.crz-payments-summary small,
+.crz-payments-summary span,
+.crz-payments-notice,
+.crz-payments-row--head,
+.crz-payments-row--item small,
+.crz-payments-pagination span,
+.crz-payments-pagination button,
+.crz-payments-detail-actions button,
+.crz-payments-case-list button,
+.crz-payments-detail-head small,
+.crz-payments-detail-section header small,
+.crz-payments-detail-head span,
+.crz-payments-detail-grid span,
+.crz-payments-detail-grid strong,
+.crz-payments-detail-section header strong,
+.crz-payments-event-list strong,
+.crz-payments-case-list strong,
+.crz-payments-event-list small,
+.crz-payments-case-list small,
+.crz-payments-event-list em,
+.crz-payments-case-list em,
+.crz-payments-secret-note,
+.crz-payments-empty,
+.crz-payments-detail-empty {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-payments-methods strong,
+.crz-payments-row--item strong,
+.crz-payments-total strong,
+.crz-payments-detail-empty strong {
+  font-size: 13px !important;
+}
+.crz-payments-toolbar input,
+.crz-payments-toolbar select {
+  font-size: 13px !important;
+  min-height: 38px;
+}
+
+/* SALES */
+.crz-sales-summary small,
+.crz-sales-summary span,
+.crz-sales-notice,
+.crz-sales-row--head,
+.crz-sales-row--sale small,
+.crz-sales-empty span,
+.crz-sales-detail-empty span,
+.crz-sales-pagination span,
+.crz-sales-pagination button,
+.crz-sales-detail-head small,
+.crz-sales-detail-section header small,
+.crz-sales-detail-head span,
+.crz-sales-alerts p,
+.crz-sales-detail-grid span,
+.crz-sales-detail-grid strong,
+.crz-sales-detail-section header strong,
+.crz-sales-detail-list article strong,
+.crz-sales-detail-list article small,
+.crz-sales-detail-list article b,
+.crz-sales-detail-list em,
+.crz-sales-secret-note {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-sales-row--sale strong,
+.crz-sales-total strong,
+.crz-sales-empty strong,
+.crz-sales-detail-empty strong {
+  font-size: 13px !important;
+}
+.crz-sales-search input,
+.crz-sales-toolbar select {
+  font-size: 13px !important;
+  min-height: 38px;
+}
+
+/* CONTROL CENTER */
+.crz-control-state p,
+.crz-control-health small,
+.crz-control-health span,
+.crz-control-health em,
+.crz-control-panel small,
+.crz-control-manual header small,
+.crz-control-list small,
+.crz-control-list b,
+.crz-control-list a,
+.crz-control-empty,
+.crz-control-manual > header > span,
+.crz-control-manual__list article p,
+.crz-control-manual__list article em,
+.crz-control-manual__actions button,
+.crz-control-generated {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-control-list strong,
+.crz-control-manual__list article strong {
+  font-size: 13px !important;
+}
+
+/* CATEGORY MANAGER */
+.crz-cm-notice,
+.crz-cm-list-head > span,
+.crz-cm-editor-head small,
+.crz-cm-preview > small,
+.crz-cm-list-head > button,
+.crz-cm-list small,
+.crz-cm-editor-head span,
+.crz-cm-form label > span,
+.crz-cm-actions > button,
+.crz-cm-actions > a,
+.crz-cm-preview article > p,
+.crz-cm-preview article > em,
+.crz-category-directory__body small,
+.crz-category-directory__body p,
+.crz-category-directory__body > span,
+.crz-category-directory__state button {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-cm-list strong,
+.crz-cm-preview article > strong,
+.crz-category-directory__state strong {
+  font-size: 13px !important;
+}
+.crz-cm-create input,
+.crz-cm-create textarea,
+.crz-cm-create select,
+.crz-cm-form input,
+.crz-cm-form textarea,
+.crz-cm-form select,
+.crz-cm-search input,
+.crz-category-directory__search input {
+  font-size: 13px !important;
+}
+
+/* APPEARANCE / WHITE LABEL */
+.crz-appearance-editor > header span,
+.crz-appearance-editor > label > span,
+.crz-appearance-color button,
+.crz-appearance-toggles small,
+.crz-appearance-notice,
+.crz-appearance-preview > header small,
+.crz-appearance-preview__frame span,
+.crz-appearance-preview__frame p,
+.crz-appearance-preview__frame button,
+.crz-appearance-preview dl,
+.crz-appearance-section > header span,
+.crz-appearance-section label > span,
+.crz-appearance-asset-field > span,
+.crz-appearance-upload {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-appearance-toggles strong,
+.crz-appearance-section > header strong {
+  font-size: 13px !important;
+}
+
+/* FULFILLMENT */
+.crz-fulfillment-stats small,
+.crz-fulfillment-list small,
+.crz-fulfillment-detail > header small,
+.crz-fulfillment-detail > header span,
+.crz-fulfillment-kv small,
+.crz-fulfillment-detail section p,
+.crz-fulfillment-detail section small,
+.crz-fulfillment-detail section em,
+.crz-fulfillment-detail footer a {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-fulfillment-list strong,
+.crz-fulfillment-list b,
+.crz-fulfillment-detail h2,
+.crz-fulfillment-kv strong {
+  font-size: 13px !important;
+}
