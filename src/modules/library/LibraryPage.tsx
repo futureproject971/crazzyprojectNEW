@@ -216,7 +216,7 @@ export function LibraryPage() {
       <section className="crz-library-hero">
         <div className="crz-container crz-library-hero__inner">
           <div>
-            <small>M11 • CRAZZY LIBRARY</small>
+            <small>CRAZZY LIBRARY</small>
             <h1>Suas entregas, sob seu controle</h1>
             <p>
               Keys, contas e links ficam mascarados até você pedir a revelação segura.
@@ -393,7 +393,7 @@ export function LibraryPage() {
 
                     <footer>
                       {delivery.tutorialAvailable ? (
-                        <span className="is-info">📖 Tutorial liberado • viewer no M22</span>
+                        <span className="is-info">📖 Tutorial disponível</span>
                       ) : (
                         <span>Sem tutorial associado</span>
                       )}
