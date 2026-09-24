@@ -66,7 +66,8 @@ export async function GET(request: NextRequest) {
       return loginError(request, "discord_guild_not_configured");
     }
     if (sync?.guildMember !== true) {
-      await supabase.auth.signOut();
+      // Keep the authenticated Discord session alive while the guild gate waits for the Bot Core.
+      // Middleware still blocks every private page/API until discord_identities.guild_member=true.
       return guildGate(request, next);
     }
 

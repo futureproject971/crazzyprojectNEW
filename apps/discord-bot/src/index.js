@@ -13,7 +13,7 @@ import { startBuilderWorker } from "./modules/server-builder.js";
 import { startDiscordRoleBridge } from "./modules/role-bridge.js";
 import { startNotificationWorker } from "./modules/notifications.js";
 import { startSecuritySentinel } from "./modules/security-sentinel.js";
-import { ensureOfficialDiscordInvite } from "./modules/guild-gate.js";
+import { ensureOfficialDiscordInvite, startPendingGuildVerifier } from "./modules/guild-gate.js";
 import {
   deployCommands,
   installCommandHandlers,
@@ -75,6 +75,7 @@ let stopRoleBridge = null;
 let stopNotifications = null;
 let stopSecurity = null;
 let stopHeartbeat = null;
+let stopGuildGateVerifier = null;
 
 client.once("ready", async () => {
   console.log("[core] CRAZZY PROJECT bot online as " + client.user.tag);
@@ -86,6 +87,7 @@ client.once("ready", async () => {
   }
 
   await ensureOfficialDiscordInvite(client, supabase, config);
+  stopGuildGateVerifier = startPendingGuildVerifier(client, supabase, config);
   stopHeartbeat = startWorkerHeartbeat(client, supabase, config);
   stopCampaigns = startCampaignWorker(client, supabase, config);
   stopBuilder = startBuilderWorker(client, supabase, config);
@@ -103,6 +105,7 @@ async function shutdown(signal) {
   stopNotifications?.();
   stopSecurity?.();
   stopHeartbeat?.();
+  stopGuildGateVerifier?.();
 
   try {
     await supabase
