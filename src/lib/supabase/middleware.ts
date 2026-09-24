@@ -21,10 +21,35 @@ const protectedApiPrefixes = [
   "/api/call",
   "/api/community",
   "/api/checkout",
+  "/api/client-hub",
+  "/api/library",
   "/api/notifications",
   "/api/partner",
+  "/api/profile",
   "/api/reseller",
+  "/api/reviews/eligible",
+  "/api/support",
+  "/api/academy/progress",
 ];
+
+function isConditionallyProtectedApi(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const action = request.nextUrl.searchParams.get("action") || "";
+
+  if (pathname === "/api/luck") {
+    return request.method !== "GET" || action === "history";
+  }
+
+  if (pathname === "/api/rewards") {
+    return action !== "catalog";
+  }
+
+  if (pathname === "/api/reviews") {
+    return request.method !== "GET";
+  }
+
+  return false;
+}
 
 function matchesPrefix(pathname:string,prefixes:string[]){
   return prefixes.some(prefix=>pathname===prefix||pathname.startsWith(prefix+"/"));
@@ -62,7 +87,7 @@ export async function updateAuthSession(request: NextRequest) {
 
   const pathname=request.nextUrl.pathname;
   const pageProtected=matchesPrefix(pathname,protectedPrefixes);
-  const apiProtected=matchesPrefix(pathname,protectedApiPrefixes);
+  const apiProtected=matchesPrefix(pathname,protectedApiPrefixes)||isConditionallyProtectedApi(request);
   if(!pageProtected&&!apiProtected)return response;
 
   const { data, error } = await supabase.auth.getClaims();
