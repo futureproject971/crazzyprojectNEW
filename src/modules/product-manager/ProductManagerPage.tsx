@@ -569,9 +569,26 @@ export function ProductManagerPage() {
 
                   <div className="crz-pm-plan-tabs">
                     {productDraft.plans.map(plan => (
-                      <button type="button" key={plan.id} className={selectedPlanId === plan.id ? "is-active" : ""} onClick={() => selectPlan(plan)}>
-                        <strong>{plan.name}</strong><small>R$ {Number(plan.price).toFixed(2)} • estoque {plan.available_stock}</small>
-                      </button>
+                      <div className={"crz-pm-plan-tab-wrap " + (selectedPlanId === plan.id ? "is-active" : "")} key={plan.id}>
+                        <button
+                          type="button"
+                          className="crz-pm-plan-tab-main"
+                          onClick={() => selectPlan(plan)}
+                        >
+                          <strong>{plan.name}</strong>
+                          <small>R$ {Number(plan.price).toFixed(2)}</small>
+                          <span className={"crz-pm-plan-stock " + (plan.available_stock > 0 ? "is-ok" : "is-empty")}>
+                            {plan.available_stock > 0 ? plan.available_stock + " key(s)" : "SEM STOCK"}
+                          </span>
+                        </button>
+                        <a
+                          className="crz-pm-plan-restock"
+                          href={"/admin/estoque?planId=" + encodeURIComponent(plan.id) + "&repor=1"}
+                          title={"Repor keys de " + plan.name}
+                        >
+                          + REPOR KEYS
+                        </a>
+                      </div>
                     ))}
                   </div>
 
@@ -691,6 +708,24 @@ export function ProductManagerPage() {
                           })}
                         </div>
                       </section>
+
+                      <div className="crz-pm-stock-by-variation">
+                        <div>
+                          <small>STOCK DA VARIAÇÃO</small>
+                          <strong>{planDraft.name}</strong>
+                          <span>
+                            {planDraft.available_stock > 0
+                              ? planDraft.available_stock + " key(s) disponível(is)"
+                              : "Sem keys disponíveis"}
+                          </span>
+                        </div>
+                        <a
+                          className="crz-button crz-button--secondary crz-button--sm"
+                          href={"/admin/estoque?planId=" + encodeURIComponent(planDraft.id) + "&repor=1"}
+                        >
+                          + REPOR STOCK DE KEYS
+                        </a>
+                      </div>
 
                       <div className="crz-pm-plan-footer">
                         <div className="crz-pm-switch-row">
