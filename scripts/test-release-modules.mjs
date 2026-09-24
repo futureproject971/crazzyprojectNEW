@@ -113,6 +113,16 @@ const bridge = await readFile("apps/discord-bot/src/modules/role-bridge.js", "ut
 if (!/grant|revoke/i.test(bridge)) throw new Error("M44 bridge lacks grant/revoke handling");
 
 const security = await readFile("apps/discord-bot/src/modules/security-sentinel.js", "utf8");
-if (!/CRITICAL/.test(security)) throw new Error("M47 security worker lacks CRITICAL handling");
+for (const required of [
+  'event.severity==="critical"',
+  "allowedMentions",
+  "DISCORD_SECURITY_ROLE_ID",
+  "@everyone",
+  "@here",
+]) {
+  if (!security.includes(required)) {
+    throw new Error("M47 security worker missing critical alert protection: " + required);
+  }
+}
 
 console.log("[PASS] M31-M47 release artifact audit");
