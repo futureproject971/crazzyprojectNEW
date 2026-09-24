@@ -54,6 +54,9 @@ export function ProductManagerPage() {
   const [planDraft, setPlanDraft] = useState<ManagerPlan | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [stockText, setStockText] = useState("");
+  const [stockBusy, setStockBusy] = useState(false);
+  const [stockNotice, setStockNotice] = useState("");
   const [creatingProduct, setCreatingProduct] = useState(false);
   const [creatingPlan, setCreatingPlan] = useState(false);
   const [newProduct, setNewProduct] = useState({
@@ -114,6 +117,11 @@ export function ProductManagerPage() {
     void load(false);
   }, []);
 
+  const stockItems = useMemo(
+    () => stockText.split(/\\r?\\n/).map(item => item.trim()).filter(Boolean),
+    [stockText]
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!catalog) return [];
@@ -130,12 +138,16 @@ export function ProductManagerPage() {
     const first = product.plans[0] || null;
     setSelectedPlanId(first?.id || null);
     setPlanDraft(first ? clonePlan(first) : null);
+    setStockText("");
+    setStockNotice("");
     setNotice("");
   };
 
   const selectPlan = (plan: ManagerPlan) => {
     setSelectedPlanId(plan.id);
     setPlanDraft(clonePlan(plan));
+    setStockText("");
+    setStockNotice("");
     setNotice("");
   };
 
@@ -285,6 +297,53 @@ export function ProductManagerPage() {
     } finally {
       setBusy(false);
     }
+  };
+
+  const importPlanStock = async () => {
+    if (!planDraft || stockBusy || !stockItems.length || stockItems.length > 5000) return;
+
+    setStockBusy(true);
+    setStockNotice("");
+
+    try {
+      const response = await fetch("/api/admin/stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productPlanId: planDraft.id,
+          items: stockItems,
+          source: "product-manager",
+          note: productDraft ? `Produto: ${productDraft.name} • Plano: ${planDraft.name}` : `Plano: ${planDraft.name}`,
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload?.batch) {
+        throw new Error(payload?.error || "Falha ao adicionar estoque.");
+      }
+
+      setStockNotice(
+        `${payload.batch.accepted_count} key(s) adicionada(s). ${payload.batch.duplicate_count} duplicada(s) ignorada(s).`
+      );
+      setStockText("");
+      await load(true);
+    } catch (error) {
+      setStockNotice(error instanceof Error ? error.message : "Falha ao adicionar estoque.");
+    } finally {
+      setStockBusy(false);
+    }
+  };
+
+  const prepareAutomaticStock = () => {
+    if (!planDraft) return;
+    setPlanDraft({
+      ...planDraft,
+      delivery_mode: "internal_stock",
+      automation_flags: {
+        ...planDraft.automation_flags,
+        auto_delivery: true,
+      },
+    });
+    setStockNotice("Entrega automática preparada. Salve o plano para publicar essa configuração.");
   };
 
   if (state === "loading" && !catalog) {
@@ -462,6 +521,79 @@ export function ProductManagerPage() {
                         <label><span>Cor</span><div className="crz-pm-color"><input type="color" value={planDraft.accent_color || productDraft.accent_color || "#1687ff"} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /><input value={planDraft.accent_color || ""} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /></div></label>
                         <label><span>Duração entitlement (min)</span><input type="number" value={planDraft.entitlement_duration_minutes ?? ""} onChange={e => setPlanDraft({...planDraft,entitlement_duration_minutes:e.target.value ? Number(e.target.value) : null})} placeholder="vazio = sem expiração" /></label>
                         <label><span>Ordem</span><input type="number" value={planDraft.sort_order} onChange={e => setPlanDraft({...planDraft,sort_order:Number(e.target.value)})} /></label>
+                      </div>
+
+                      <div className="crz-pm-stock-section">
+                        <header className="crz-pm-stock-head">
+                          <div>
+                            <small>ESTOQUE DESTE PLANO</small>
+                            <strong>Keys separadas por plano, sem misturar produtos</strong>
+                            <span>Cada linha abaixo vira 1 unidade vendável deste plano.</span>
+                          </div>
+                          <div className="crz-pm-stock-head__actions">
+                            <Badge tone={planDraft.available_stock > 0 ? "green" : "pink"}>
+                              {planDraft.available_stock} DISPONÍVEL
+                            </Badge>
+                            <a className="crz-button crz-button--secondary crz-button--sm" href="/admin/estoque">
+                              Estoque avançado
+                            </a>
+                          </div>
+                        </header>
+
+                        <div className="crz-pm-stock-flow">
+                          <div>
+                            <b>1</b>
+                            <span><strong>Crie o plano</strong><small>Ex.: Diário • R$ 10,00</small></span>
+                          </div>
+                          <div>
+                            <b>2</b>
+                            <span><strong>Cole as keys</strong><small>Ex.: 100 linhas = 100 unidades</small></span>
+                          </div>
+                          <div>
+                            <b>3</b>
+                            <span><strong>Cliente compra</strong><small>1 unidade sai deste plano</small></span>
+                          </div>
+                        </div>
+
+                        {planDraft.delivery_mode === "internal_stock" && checkedFlags(planDraft.automation_flags, "auto_delivery") ? (
+                          <div className="crz-pm-stock-ready">✓ Entrega automática pronta para usar o estoque interno deste plano.</div>
+                        ) : (
+                          <div className="crz-pm-stock-warning">
+                            <span>As keys podem ser cadastradas agora, mas para entrega automática o plano precisa usar <strong>Estoque interno</strong> + <strong>Entrega automática</strong>.</span>
+                            <button type="button" onClick={prepareAutomaticStock}>Preparar automaticamente</button>
+                          </div>
+                        )}
+
+                        <label className="crz-pm-stock-import">
+                          <span>Adicionar keys / códigos ao estoque</span>
+                          <textarea
+                            rows={8}
+                            value={stockText}
+                            onChange={event => setStockText(event.target.value)}
+                            placeholder={"KEY-0001\nKEY-0002\nKEY-0003"}
+                            spellCheck={false}
+                          />
+                        </label>
+
+                        <div className="crz-pm-stock-footer">
+                          <div>
+                            <strong>{stockItems.length} key(s) para adicionar</strong>
+                            <small>Máximo de 5.000 por lote. Duplicatas são ignoradas com segurança.</small>
+                          </div>
+                          <button
+                            type="button"
+                            className="crz-button crz-button--primary crz-button--md"
+                            disabled={stockBusy || !stockItems.length || stockItems.length > 5000}
+                            onClick={() => void importPlanStock()}
+                          >
+                            {stockBusy ? "Adicionando..." : "Adicionar ao estoque"}
+                          </button>
+                        </div>
+
+                        {stockItems.length > 5000 && (
+                          <div className="crz-pm-stock-error">Este lote passou de 5.000 linhas. Divida em dois lotes.</div>
+                        )}
+                        {stockNotice && <div className="crz-pm-stock-notice">{stockNotice}</div>}
                       </div>
 
                       <div className="crz-pm-subsection">
