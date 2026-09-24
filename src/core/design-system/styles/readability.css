@@ -1,0 +1,217 @@
+/* CRAZZY PROJECT — global readability + dark-theme contrast pass
+   Keeps the site dark, but avoids crushed blacks, washed-out labels and micro-text. */
+
+:root {
+  --crz-readable-xs: 12px;
+  --crz-readable-sm: 13px;
+  --crz-readable-md: 14px;
+  --crz-readable-lg: 16px;
+}
+
+html {
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-size: 15px;
+  line-height: 1.5;
+  background:
+    radial-gradient(circle at 50% -12%, rgba(25, 110, 255, .15), transparent 38%),
+    linear-gradient(180deg, #08111d 0%, #060c14 100%);
+}
+
+::selection {
+  color: #fff;
+  background: rgba(39, 126, 255, .72);
+}
+
+/* Shared semantic text */
+.crz-field-hint,
+.crz-field-error,
+.crz-progress-meta,
+.crz-tooltip-bubble,
+.crz-section-title p {
+  font-size: var(--crz-readable-xs);
+}
+
+.crz-badge {
+  min-height: 24px;
+  padding-inline: 9px;
+  font-size: 11px;
+  letter-spacing: .01em;
+}
+
+.crz-input,
+.crz-select,
+textarea.crz-input {
+  min-height: 42px;
+  border-color: rgba(117, 161, 221, .48);
+  background: rgba(11, 23, 38, .96);
+  color: #f7fbff;
+}
+
+.crz-input::placeholder,
+textarea::placeholder,
+input::placeholder {
+  color: #8393a8;
+  opacity: 1;
+}
+
+.crz-button--secondary {
+  color: #f4f8ff;
+  background: linear-gradient(180deg, rgba(27, 46, 70, .98), rgba(17, 33, 52, .98));
+  border-color: rgba(116, 164, 231, .56);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045);
+}
+
+.crz-button--secondary:hover:not(:disabled) {
+  color: #fff;
+  border-color: rgba(79, 161, 255, .92);
+  background: linear-gradient(180deg, rgba(34, 70, 113, .98), rgba(21, 47, 78, .98));
+  box-shadow: 0 0 18px rgba(28, 126, 255, .20);
+}
+
+.crz-button--ghost {
+  color: #dce6f3;
+}
+
+.crz-panel,
+.social-panel {
+  border-color: rgba(93, 145, 216, .30);
+}
+
+/* Header */
+.nav-item {
+  color: #eaf1fa;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.nav-item:hover,
+.auth-button:hover {
+  background: rgba(35, 73, 122, .58);
+  border-color: rgba(93, 164, 255, .48);
+}
+
+.auth-button {
+  color: #f7faff;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.nav-badge {
+  width: 14px;
+  min-width: 14px;
+  height: 14px;
+  font-size: 9px;
+}
+
+/* Home + social modules */
+.benefit-copy strong { font-size: 13px; }
+.benefit-copy span { color: #b2becd; font-size: 12px; }
+
+.panel-heading h2,
+.why-heading h2,
+.featured-title-wrap h2,
+.store-title-wrap h2 {
+  font-size: 18px;
+}
+
+.panel-heading p,
+.featured-title-wrap p,
+.store-title-wrap p {
+  color: #aab7c8;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.exclusive-badge {
+  font-size: 11px;
+  padding: 5px 9px;
+}
+
+.feedback-meta { font-size: 11px; }
+.feedback-meta strong { font-size: 12.5px; }
+.feedback-meta > span:last-child { color: #93a2b6; }
+.verified-dot { font-size: 10.5px; }
+.feedback-body p {
+  color: #e6edf6;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.feedback-reactions { color: #a2afc0; font-size: 11px; }
+
+.login-gate-copy,
+.online-counter {
+  color: #b6c2d0;
+  font-size: 12px;
+}
+
+.panel-login-gate button,
+.open-ticket-button,
+.section-link {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chat-avatar { font-size: 10px; }
+.chat-bubble { color: #edf4fd; }
+
+.ticket-category strong,
+.why-item strong {
+  font-size: 12.5px;
+}
+
+.ticket-category small,
+.why-item span {
+  color: #a4b1c2;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+/* Product cards */
+.product-badge { font-size: 10.5px; }
+.product-info strong { font-size: 14px; }
+.product-info span { color: #b0bdcc; font-size: 11.5px; }
+.product-info button { font-size: 12px; font-weight: 700; }
+
+.store-card-footer strong { font-size: 12px; }
+.store-card-footer span { color: #a5b2c2; font-size: 10.5px; }
+
+.footer-brand p,
+.footer-social > span {
+  color: #afbccb;
+  font-size: 11.5px;
+}
+
+/* Generic admin / dashboard readability.
+   Many legacy modules used 6–10px helper text. Keep hierarchy, but never make <small> unreadable. */
+[class^="crz-"] small,
+[class*=" crz-"] small {
+  font-size: 11.5px !important;
+  line-height: 1.35 !important;
+}
+
+[class^="crz-"] :is(input, select, textarea),
+[class*=" crz-"] :is(input, select, textarea) {
+  font-size: 13px;
+}
+
+.crz-state p {
+  color: #aab7c7;
+  font-size: 13px;
+}
+
+/* Stronger keyboard / active visibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  body { font-size: 14px; }
+  .nav-item { font-size: 12px; }
+}

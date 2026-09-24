@@ -54,6 +54,10 @@ export function ProductManagerPage() {
   const [planDraft, setPlanDraft] = useState<ManagerPlan | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [stockText, setStockText] = useState("");
+  const [stockBusy, setStockBusy] = useState(false);
+  const [stockNotice, setStockNotice] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
   const [creatingProduct, setCreatingProduct] = useState(false);
   const [creatingPlan, setCreatingPlan] = useState(false);
   const [newProduct, setNewProduct] = useState({
@@ -114,6 +118,21 @@ export function ProductManagerPage() {
     void load(false);
   }, []);
 
+  const stockItems = useMemo(
+    () => stockText.split(/\r?\n/).map(item => item.trim()).filter(Boolean),
+    [stockText]
+  );
+
+  const productAvailableStock = useMemo(
+    () => productDraft?.plans.reduce((total, plan) => total + Number(plan.available_stock || 0), 0) || 0,
+    [productDraft]
+  );
+
+  const activePlans = useMemo(
+    () => productDraft?.plans.filter(plan => plan.active).length || 0,
+    [productDraft]
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!catalog) return [];
@@ -130,12 +149,16 @@ export function ProductManagerPage() {
     const first = product.plans[0] || null;
     setSelectedPlanId(first?.id || null);
     setPlanDraft(first ? clonePlan(first) : null);
+    setStockText("");
+    setStockNotice("");
     setNotice("");
   };
 
   const selectPlan = (plan: ManagerPlan) => {
     setSelectedPlanId(plan.id);
     setPlanDraft(clonePlan(plan));
+    setStockText("");
+    setStockNotice("");
     setNotice("");
   };
 
@@ -287,6 +310,82 @@ export function ProductManagerPage() {
     }
   };
 
+  const uploadProductImage = async (file: File) => {
+    if (!productDraft || imageUploading) return;
+
+    setImageUploading(true);
+    setNotice("");
+
+    try {
+      const form = new FormData();
+      form.append("file", file);
+
+      const response = await fetch("/api/admin/products/upload", {
+        method: "POST",
+        body: form,
+      });
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok || !payload?.url) {
+        throw new Error(payload?.error || "Falha ao enviar imagem.");
+      }
+
+      setProductDraft(current => current ? { ...current, image_url: String(payload.url) } : current);
+      setNotice("Imagem enviada. Clique em Salvar produto para publicar.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Falha ao enviar imagem.");
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
+  const importPlanStock = async () => {
+    if (!planDraft || stockBusy || !stockItems.length || stockItems.length > 5000) return;
+
+    setStockBusy(true);
+    setStockNotice("");
+
+    try {
+      const response = await fetch("/api/admin/stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productPlanId: planDraft.id,
+          items: stockItems,
+          source: "product-manager",
+          note: productDraft ? `Produto: ${productDraft.name} • Plano: ${planDraft.name}` : `Plano: ${planDraft.name}`,
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload?.batch) {
+        throw new Error(payload?.error || "Falha ao adicionar estoque.");
+      }
+
+      setStockNotice(
+        `${payload.batch.accepted_count} key(s) adicionada(s). ${payload.batch.duplicate_count} duplicada(s) ignorada(s).`
+      );
+      setStockText("");
+      await load(true);
+    } catch (error) {
+      setStockNotice(error instanceof Error ? error.message : "Falha ao adicionar estoque.");
+    } finally {
+      setStockBusy(false);
+    }
+  };
+
+  const prepareAutomaticStock = () => {
+    if (!planDraft) return;
+    setPlanDraft({
+      ...planDraft,
+      delivery_mode: "internal_stock",
+      automation_flags: {
+        ...planDraft.automation_flags,
+        auto_delivery: true,
+      },
+    });
+    setStockNotice("Entrega automática preparada. Salve o plano para publicar essa configuração.");
+  };
+
   if (state === "loading" && !catalog) {
     return <main className="crz-product-manager-page crz-pm-state"><span className="crz-spinner" /><p>Carregando produtos...</p></main>;
   }
@@ -305,8 +404,8 @@ export function ProductManagerPage() {
       <div className="crz-container crz-pm-container">
         <PageHeader
           eyebrow="CRAZZY PRODUCT MANAGER"
-          title="Produtos, planos e automações"
-          description="Configure o que é comercial e operacional sem misturar credenciais ou dados secretos."
+          title="Produtos, planos e estoque"
+          description="Crie, edite e acompanhe cada produto de forma visual. Preço, imagem, planos e estoque ficam no mesmo lugar."
           actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/admin">Control Center</a>}
         />
 
@@ -372,15 +471,51 @@ export function ProductManagerPage() {
               <div className="crz-pm-state"><p>Nenhum produto selecionado.</p></div>
             ) : (
               <>
-                <div className="crz-pm-editor__header">
-                  <div>
-                    <small>PRODUTO</small>
-                    <h2>{productDraft.name}</h2>
-                    <span>{productDraft.game_name}</span>
+                <section className="crz-pm-visual-summary">
+                  <div
+                    className="crz-pm-visual-cover"
+                    style={{ "--accent": productDraft.accent_color || "#1687ff" } as React.CSSProperties}
+                  >
+                    {productDraft.image_url ? (
+                      <img src={productDraft.image_url} alt={productDraft.name} />
+                    ) : (
+                      <span>{productDraft.emoji || "🎮"}</span>
+                    )}
+                    {productDraft.is_new && <b>NOVO</b>}
                   </div>
-                  <button className="crz-button crz-button--primary crz-button--sm" type="button" disabled={busy} onClick={() => void saveProduct()}>
-                    {busy ? "Salvando..." : "Salvar produto"}
-                  </button>
+
+                  <div className="crz-pm-visual-copy">
+                    <div className="crz-pm-visual-kicker">
+                      <Badge tone={productDraft.active ? "green" : "neutral"}>
+                        {productDraft.active ? "PRODUTO ATIVO" : "PRODUTO DESATIVADO"}
+                      </Badge>
+                      <span>{productDraft.game_name}</span>
+                    </div>
+                    <h2>{productDraft.name}</h2>
+                    <p>{productDraft.description || "Adicione uma descrição clara para o cliente entender exatamente o que está comprando."}</p>
+                    <div className="crz-pm-visual-metrics">
+                      <div><small>PLANOS</small><strong>{productDraft.plans.length}</strong><span>{activePlans} ativos</span></div>
+                      <div><small>ESTOQUE TOTAL</small><strong>{productAvailableStock}</strong><span>keys disponíveis</span></div>
+                      <div><small>STATUS</small><strong>{productDraft.status_label || "Sem status"}</strong><span>visível no catálogo</span></div>
+                    </div>
+                  </div>
+
+                  <div className="crz-pm-visual-actions">
+                    <button className="crz-button crz-button--primary crz-button--md" type="button" disabled={busy} onClick={() => void saveProduct()}>
+                      {busy ? "Salvando..." : "Salvar produto"}
+                    </button>
+                    <a className="crz-button crz-button--secondary crz-button--md" href="/admin/estoque">
+                      Gerenciar estoque
+                    </a>
+                  </div>
+                </section>
+
+                <div className="crz-pm-editor__header crz-pm-editor__header--section">
+                  <div>
+                    <small>INFORMAÇÕES DO PRODUTO</small>
+                    <h2>Apresentação e catálogo</h2>
+                    <span>Campos grandes, legíveis e organizados para editar sem caça ao tesouro.</span>
+                  </div>
                 </div>
 
                 <div className="crz-pm-form-grid">
@@ -394,7 +529,33 @@ export function ProductManagerPage() {
                   <label><span>Status interno</span><input value={productDraft.status} onChange={e => setProductDraft({...productDraft,status:e.target.value})} /></label>
                   <label><span>Label de status</span><input value={productDraft.status_label} onChange={e => setProductDraft({...productDraft,status_label:e.target.value})} /></label>
                   <label><span>Ordem</span><input type="number" value={productDraft.sort_order} onChange={e => setProductDraft({...productDraft,sort_order:Number(e.target.value)})} /></label>
-                  <label className="is-wide"><span>Imagem</span><input value={productDraft.image_url || ""} onChange={e => setProductDraft({...productDraft,image_url:e.target.value})} placeholder="https://..." /></label>
+                  <div className="crz-pm-media-field is-wide">
+                    <div className="crz-pm-media-preview" style={{ "--accent": productDraft.accent_color || "#1687ff" } as React.CSSProperties}>
+                      {productDraft.image_url ? <img src={productDraft.image_url} alt="" /> : <span>{productDraft.emoji || "🎮"}</span>}
+                    </div>
+                    <div className="crz-pm-media-controls">
+                      <span>Capa / imagem do produto</span>
+                      <p>Envie PNG, JPG, WEBP ou GIF de até 10 MB. A prévia aparece na hora.</p>
+                      <label className="crz-pm-upload-button">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/gif"
+                          disabled={imageUploading}
+                          onChange={event => {
+                            const file = event.target.files?.[0];
+                            if (file) void uploadProductImage(file);
+                            event.currentTarget.value = "";
+                          }}
+                        />
+                        {imageUploading ? "Enviando..." : "Escolher imagem do PC"}
+                      </label>
+                      <input
+                        value={productDraft.image_url || ""}
+                        onChange={e => setProductDraft({...productDraft,image_url:e.target.value})}
+                        placeholder="Ou cole uma URL https://..."
+                      />
+                    </div>
+                  </div>
                   <label className="is-wide"><span>Descrição</span><textarea value={productDraft.description || ""} onChange={e => setProductDraft({...productDraft,description:e.target.value})} rows={3} /></label>
                   <label className="is-wide"><span>Features</span><textarea value={productDraft.features_text || ""} onChange={e => setProductDraft({...productDraft,features_text:e.target.value})} rows={3} /></label>
                 </div>
@@ -445,7 +606,14 @@ export function ProductManagerPage() {
                   <div className="crz-pm-plan-tabs">
                     {productDraft.plans.map(plan => (
                       <button type="button" key={plan.id} className={selectedPlanId === plan.id ? "is-active" : ""} onClick={() => selectPlan(plan)}>
-                        <strong>{plan.name}</strong><small>R$ {Number(plan.price).toFixed(2)} • estoque {plan.available_stock}</small>
+                        <span className="crz-pm-plan-tab__top">
+                          <strong>{plan.name}</strong>
+                          <i className={plan.active ? "is-live" : "is-off"}>{plan.active ? "ATIVO" : "OFF"}</i>
+                        </span>
+                        <b>R$ {Number(plan.price).toFixed(2)}</b>
+                        <span className="crz-pm-plan-tab__stock">
+                          <em>{plan.available_stock}</em> disponível(is)
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -462,6 +630,79 @@ export function ProductManagerPage() {
                         <label><span>Cor</span><div className="crz-pm-color"><input type="color" value={planDraft.accent_color || productDraft.accent_color || "#1687ff"} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /><input value={planDraft.accent_color || ""} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /></div></label>
                         <label><span>Duração entitlement (min)</span><input type="number" value={planDraft.entitlement_duration_minutes ?? ""} onChange={e => setPlanDraft({...planDraft,entitlement_duration_minutes:e.target.value ? Number(e.target.value) : null})} placeholder="vazio = sem expiração" /></label>
                         <label><span>Ordem</span><input type="number" value={planDraft.sort_order} onChange={e => setPlanDraft({...planDraft,sort_order:Number(e.target.value)})} /></label>
+                      </div>
+
+                      <div className="crz-pm-stock-section">
+                        <header className="crz-pm-stock-head">
+                          <div>
+                            <small>ESTOQUE DESTE PLANO</small>
+                            <strong>Keys separadas por plano, sem misturar produtos</strong>
+                            <span>Cada linha abaixo vira 1 unidade vendável deste plano.</span>
+                          </div>
+                          <div className="crz-pm-stock-head__actions">
+                            <Badge tone={planDraft.available_stock > 0 ? "green" : "pink"}>
+                              {planDraft.available_stock} DISPONÍVEL
+                            </Badge>
+                            <a className="crz-button crz-button--secondary crz-button--sm" href="/admin/estoque">
+                              Estoque avançado
+                            </a>
+                          </div>
+                        </header>
+
+                        <div className="crz-pm-stock-flow">
+                          <div>
+                            <b>1</b>
+                            <span><strong>Crie o plano</strong><small>Ex.: Diário • R$ 10,00</small></span>
+                          </div>
+                          <div>
+                            <b>2</b>
+                            <span><strong>Cole as keys</strong><small>Ex.: 100 linhas = 100 unidades</small></span>
+                          </div>
+                          <div>
+                            <b>3</b>
+                            <span><strong>Cliente compra</strong><small>1 unidade sai deste plano</small></span>
+                          </div>
+                        </div>
+
+                        {planDraft.delivery_mode === "internal_stock" && checkedFlags(planDraft.automation_flags, "auto_delivery") ? (
+                          <div className="crz-pm-stock-ready">✓ Entrega automática pronta para usar o estoque interno deste plano.</div>
+                        ) : (
+                          <div className="crz-pm-stock-warning">
+                            <span>As keys podem ser cadastradas agora, mas para entrega automática o plano precisa usar <strong>Estoque interno</strong> + <strong>Entrega automática</strong>.</span>
+                            <button type="button" onClick={prepareAutomaticStock}>Preparar automaticamente</button>
+                          </div>
+                        )}
+
+                        <label className="crz-pm-stock-import">
+                          <span>Adicionar keys / códigos ao estoque</span>
+                          <textarea
+                            rows={8}
+                            value={stockText}
+                            onChange={event => setStockText(event.target.value)}
+                            placeholder={"KEY-0001\nKEY-0002\nKEY-0003"}
+                            spellCheck={false}
+                          />
+                        </label>
+
+                        <div className="crz-pm-stock-footer">
+                          <div>
+                            <strong>{stockItems.length} key(s) para adicionar</strong>
+                            <small>Máximo de 5.000 por lote. Duplicatas são ignoradas com segurança.</small>
+                          </div>
+                          <button
+                            type="button"
+                            className="crz-button crz-button--primary crz-button--md"
+                            disabled={stockBusy || !stockItems.length || stockItems.length > 5000}
+                            onClick={() => void importPlanStock()}
+                          >
+                            {stockBusy ? "Adicionando..." : "Adicionar ao estoque"}
+                          </button>
+                        </div>
+
+                        {stockItems.length > 5000 && (
+                          <div className="crz-pm-stock-error">Este lote passou de 5.000 linhas. Divida em dois lotes.</div>
+                        )}
+                        {stockNotice && <div className="crz-pm-stock-notice">{stockNotice}</div>}
                       </div>
 
                       <div className="crz-pm-subsection">
