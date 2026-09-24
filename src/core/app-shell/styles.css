@@ -1218,3 +1218,17 @@ html[data-theme="light"] .crz-shell-auth img {
     display: inline-flex;
   }
 }
+
+
+/* White-label global wallpaper. Keeps content readable while allowing full-site branding. */
+.crz-app-shell::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:var(--crz-site-wallpaper-image,none) center/cover no-repeat;
+  opacity:.18;
+  filter:saturate(.95) contrast(1.03);
+}
+.crz-app-shell__content,.crz-shell-footer{position:relative;z-index:1}
