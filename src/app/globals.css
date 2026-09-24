@@ -56,6 +56,7 @@
 @import "../modules/appearance-manager/styles.css";
 @import "../core/pwa/styles.css";
 @import "../core/design-system/styles/card-surfaces.css";
+@import "../core/design-system/styles/readability.css";
 
 :root {
   /* Legacy aliases kept while M02 provisional styles are migrated into CORE. */
