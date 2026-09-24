@@ -1577,3 +1577,172 @@ textarea:focus-visible {
 .crz-supportdesk-compose textarea {
   font-size: 13px !important;
 }
+
+
+/* PASS 7: calls and moderation managers */
+
+/* CRAZZY CALL */
+.crz-call-room-cards article > strong,
+.crz-call-lobby__profile strong,
+.crz-call-room__header strong,
+.crz-call-empty-player strong,
+.crz-call-empty-list strong {
+  font-size: 13px !important;
+}
+.crz-call-auth-gate p,
+.crz-call-hub__notice,
+.crz-call-notice,
+.crz-call-create small,
+.crz-call-my-rooms header small,
+.crz-call-admin__summary small,
+.crz-call-create em,
+.crz-call-my-rooms header button,
+.crz-call-room-cards article code,
+.crz-call-room-cards article small,
+.crz-call-room-cards article > div:last-child button,
+.crz-call-room-card__status b,
+.crz-call-admin__table b,
+.crz-call-empty-list,
+.crz-call-lobby__brand span,
+.crz-call-lobby__card > span,
+.crz-call-lobby__profile small,
+.crz-call-lobby__toggles button,
+.crz-call-lobby__warning,
+.crz-call-lobby__error,
+.crz-call-lobby__privacy,
+.crz-call-room__header > div:first-child > span,
+.crz-call-room__header code,
+.crz-call-room__status,
+.crz-call-room__status b,
+.crz-call-participants > header span,
+.crz-call-chat > header span,
+.crz-call-participants > header b,
+.crz-call-avatar,
+.crz-call-participant-copy > strong,
+.crz-call-participant-copy b,
+.crz-call-participant-copy em,
+.crz-call-media-badges,
+.crz-call-participant-menu button,
+.crz-call-stage__toolbar > div:first-child span,
+.crz-call-stage__toolbar > div:first-child strong,
+.crz-call-stage__toolbar label,
+.crz-call-player-label,
+.crz-call-player-label b,
+.crz-call-player-label em,
+.crz-call-empty-player span,
+.crz-call-previews > span,
+.crz-call-preview strong,
+.crz-call-preview small,
+.crz-call-chat__toggle,
+.crz-call-chat > header small,
+.crz-call-chat__messages strong,
+.crz-call-chat__messages time,
+.crz-call-chat__messages p,
+.crz-call-chat__empty,
+.crz-call-chat__composer button,
+.crz-call-controls button,
+.crz-call-admin__table > header,
+.crz-call-admin__table > article,
+.crz-call-admin__table strong,
+.crz-call-admin__table code,
+.crz-call-admin__table article button {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-call-create input,
+.crz-call-stage__toolbar select,
+.crz-call-chat__composer input {
+  font-size: 13px !important;
+}
+
+/* CUSTOMER 360 */
+.crz-customer360-row--item strong,
+.crz-customer360-kv strong,
+.crz-customer360-stack strong,
+.crz-customer360-stack b {
+  font-size: 13px !important;
+}
+.crz-customer360-notice,
+.crz-customer360-row--head,
+.crz-customer360-row--item small,
+.crz-customer360-detail__head small,
+.crz-customer360-block header span,
+.crz-customer360-detail__head span,
+.crz-customer360-cards small,
+.crz-customer360-cards span,
+.crz-customer360-kv small,
+.crz-customer360-stack small {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-customer360-toolbar input {
+  font-size: 13px !important;
+}
+
+/* COMMUNITY MOD */
+.crz-communitymod-message__head strong,
+.crz-communitymod-message p,
+.crz-communitymod-kv strong {
+  font-size: 13px !important;
+}
+.crz-communitymod-summary small,
+.crz-communitymod-summary span,
+.crz-communitymod-notice,
+.crz-communitymod-message__head span,
+.crz-communitymod-message > small,
+.crz-communitymod-detail > header small,
+.crz-communitymod-detail > header span,
+.crz-communitymod-kv small,
+.crz-communitymod-actions button,
+.crz-communitymod-actions a,
+.crz-communitymod-banreason,
+.crz-communitymod-history small,
+.crz-communitymod-history p {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-communitymod-toolbar input,
+.crz-communitymod-toolbar select {
+  font-size: 13px !important;
+}
+
+/* CLUB / REWARD / LUCK / BONUS / COUPON MANAGERS */
+.crz-clubmanager-grid p,
+.crz-rewardmanager-campaigns strong,
+.crz-rewardmanager-side strong,
+.crz-luckmanager-campaigns strong,
+.crz-luckmanager-prizes strong,
+.crz-couponmanager-list strong,
+.crz-couponmanager-grid strong {
+  font-size: 13px !important;
+}
+.crz-clubmanager-grid small,
+.crz-clubmanager-health small,
+.crz-rewardmanager-stats small,
+.crz-rewardmanager-stats span,
+.crz-rewardmanager-notice,
+.crz-rewardmanager-campaigns small,
+.crz-rewardmanager-campaigns p,
+.crz-rewardmanager-side small,
+.crz-rewardmanager-side em,
+.crz-rewardmanager-side a,
+.crz-rewardmanager-side b,
+.crz-luckmanager-stats small,
+.crz-luckmanager-notice,
+.crz-luckmanager-campaigns small,
+.crz-luckmanager-prizes small,
+.crz-luckmanager-campaigns em,
+.crz-bonusmanager-stats small,
+.crz-bonusmanager-list small,
+.crz-bonusmanager-list em,
+.crz-couponmanager-stats small,
+.crz-couponmanager-toolbar a,
+.crz-couponmanager-notice,
+.crz-couponmanager-list small,
+.crz-couponmanager-detail > header small,
+.crz-couponmanager-detail > header span,
+.crz-couponmanager-grid small,
+.crz-couponmanager-detail section > a {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
