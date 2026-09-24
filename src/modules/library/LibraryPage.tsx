@@ -260,7 +260,7 @@ export function LibraryPage() {
           <Panel className="crz-library-panel">
             <header>
               <div>
-                <small>AUDITORIA</small>
+                <small>HISTÓRICO</small>
                 <h2>Histórico de revelações e cópias</h2>
               </div>
               <Badge tone="blue">{snapshot.history.length}</Badge>
@@ -269,7 +269,7 @@ export function LibraryPage() {
             {!snapshot.history.length ? (
               <EmptyState
                 icon={<NeonIcon name="shield" size={38} />}
-                title="Nenhuma revelação registrada"
+                title="Nenhuma visualização recente"
                 description="Quando você revelar ou copiar uma entrega, o evento aparecerá aqui. O segredo nunca é salvo no histórico."
               />
             ) : (
@@ -292,7 +292,7 @@ export function LibraryPage() {
             <EmptyState
               icon={<NeonIcon name="cube" size={42} />}
               title="Nada nesta categoria ainda"
-              description="As entregas concluídas aparecerão aqui automaticamente."
+              description="Suas entregas concluídas aparecem aqui."
               action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">Ver produtos</a>}
             />
           </div>
