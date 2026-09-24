@@ -91,19 +91,29 @@ export function GlobalMusicProvider({children}:{children:React.ReactNode}){
 
   const previous=useCallback(()=>{
     if(!queue.length)return;
-    setIndex(value=>value<=0?0:value-1);
+    if(index<=0){
+      setIndex(0);
+      postCommand("seekTo");
+      return;
+    }
+    setIndex(index-1);
     setPlaying(true);
-  },[queue.length]);
+  },[queue.length,index,postCommand]);
 
   const next=useCallback(()=>{
     if(!queue.length)return;
-    setIndex(value=>{
-      if(value<0)return 0;
-      if(value>=queue.length-1)return value;
-      return value+1;
-    });
+    if(index<0){
+      setIndex(0);
+      setPlaying(true);
+      return;
+    }
+    if(index>=queue.length-1){
+      setPlaying(false);
+      return;
+    }
+    setIndex(index+1);
     setPlaying(true);
-  },[queue.length]);
+  },[queue.length,index]);
 
   useEffect(()=>{
     const receive=(event:MessageEvent)=>{
@@ -175,7 +185,7 @@ export function GlobalMusicProvider({children}:{children:React.ReactNode}){
   },[postCommand]);
 
   const iframeSrc=current
-    ? `https://www.youtube.com/embed/${encodeURIComponent(current.id)}?enablejsapi=1&playsinline=1&rel=0&autoplay=${playing?1:0}`
+    ? `https://www.youtube.com/embed/${encodeURIComponent(current.id)}?enablejsapi=1&playsinline=1&rel=0&autoplay=0`
     : "";
 
   const value=useMemo<PlayerContextValue>(()=>({
@@ -203,7 +213,7 @@ export function GlobalMusicProvider({children}:{children:React.ReactNode}){
           />
         </div>
         <div className="crz-global-music__meta">
-          <span>{current.source==="youtube-music"?"YOUTUBE MUSIC":"YOUTUBE"} • TOCANDO NO SITE</span>
+          <span>{current.source==="youtube-music"?"YOUTUBE MUSIC":"YOUTUBE"} • MINI PLAYER</span>
           <strong>{current.title}</strong>
           <small>{current.channel}</small>
           <div className="crz-global-music__controls">
