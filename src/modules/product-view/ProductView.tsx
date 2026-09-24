@@ -288,7 +288,7 @@ export function ProductView({
             {activeTab === "description" && (
               <div className="crz-product-info__description">
                 <SectionTitle icon={<NeonIcon name="cube" size={28} />} title="Sobre este produto" description="Tudo o que você precisa saber antes de escolher seu plano." />
-                <p>{product.description || "Sem descrição publicada ainda."}</p>
+                <p>{product.description || "Confira os detalhes deste produto e escolha seu plano."}</p>
                 {product.features_text && <p>{product.features_text}</p>}
               </div>
             )}
@@ -303,7 +303,7 @@ export function ProductView({
             {activeTab === "features" && (
               <div className="crz-product-compatibility">
                 <div>
-                  <SectionTitle icon={<NeonIcon name="gear" size={28} />} title="Recursos publicados" description="Veja os principais recursos disponíveis neste produto." />
+                  <SectionTitle icon={<NeonIcon name="gear" size={28} />} title="Recursos" description="Veja os principais recursos disponíveis neste produto." />
                   {featureLines.length ? (
                     <ul>{featureLines.map((item, index) => <li key={item.label + index}><strong>{item.label}:</strong> {item.value}</li>)}</ul>
                   ) : (
