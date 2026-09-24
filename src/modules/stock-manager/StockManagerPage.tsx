@@ -21,6 +21,7 @@ function statusOf(item: StockManagerItem) {
 function deliveryLabel(value: string) {
   const labels: Record<string, string> = {
     internal_stock: "Estoque interno",
+    ghost_stock: "Estoque Fantasma",
     purincash_supplier: "PurinCash supplier",
     lzt_account: "Conta LZT",
     manual: "Manual",
@@ -28,6 +29,22 @@ function deliveryLabel(value: string) {
   };
   return labels[value] || value;
 }
+
+const sourcePresets = [
+  ["manual", "Manual"],
+  ["reposicao", "Reposição"],
+  ["supplier", "Supplier"],
+  ["migracao", "Migração"],
+  ["teste", "Teste"],
+] as const;
+
+const stockFilters = [
+  ["all", "Todos"],
+  ["available", "Disponíveis"],
+  ["reserved", "Reservadas"],
+  ["used", "Utilizadas"],
+  ["disabled", "Desativadas"],
+] as const;
 
 export function StockManagerPage() {
   const [catalog, setCatalog] = useState<StockManagerCatalog | null>(null);
@@ -37,6 +54,8 @@ export function StockManagerPage() {
   const [itemsTotal, setItemsTotal] = useState(0);
   const [itemsLoading, setItemsLoading] = useState(false);
   const [query, setQuery] = useState("");
+  const [itemQuery, setItemQuery] = useState("");
+  const [itemFilter, setItemFilter] = useState<(typeof stockFilters)[number][0]>("all");
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState("");
   const [importSource, setImportSource] = useState("manual");
@@ -183,10 +202,7 @@ export function StockManagerPage() {
   const toggleDisabled = async (item: StockManagerItem) => {
     if (item.used || busy) return;
 
-    let reason: string | null = null;
-    if (!item.disabled) {
-      reason = window.prompt("Motivo para desativar esta key? (opcional)")?.trim() || null;
-    }
+    const reason = item.disabled ? null : "Desativada pelo administrador";
 
     setBusy(item.id);
     setNotice("");
@@ -357,14 +373,25 @@ export function StockManagerPage() {
                       spellCheck={false}
                       autoComplete="off"
                     />
-                    <div className="crz-stock-import-fields">
-                      <label>
-                        <span>Origem</span>
-                        <input value={importSource} onChange={(event) => setImportSource(event.target.value.slice(0, 80))} placeholder="manual" />
-                      </label>
+                    <div className="crz-stock-import-fields crz-stock-import-fields--guided">
+                      <div className="crz-stock-import-source">
+                        <span>Origem do lote</span>
+                        <div>
+                          {sourcePresets.map(([value,label]) => (
+                            <button
+                              type="button"
+                              key={value}
+                              className={importSource === value ? "is-selected" : ""}
+                              onClick={() => setImportSource(value)}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                       <label>
                         <span>Observação do lote</span>
-                        <input value={importNote} onChange={(event) => setImportNote(event.target.value.slice(0, 500))} placeholder="Opcional" />
+                        <input value={importNote} onChange={(event) => setImportNote(event.target.value.slice(0, 500))} placeholder="Opcional. Ex.: reposição setembro" />
                       </label>
                     </div>
                     <div className="crz-stock-import-foot">
@@ -385,21 +412,44 @@ export function StockManagerPage() {
                   <header>
                     <div>
                       <small>ITENS LOCAIS</small>
-                      <strong>{itemsTotal} item(ns)</strong>
+                      <strong>{itemsTotal} item(ns) • {visibleItems.length} visível(is)</strong>
                     </div>
                     <button type="button" disabled={itemsLoading} onClick={() => void loadItems(selectedPlan.plan_id)}>
                       ↻ Atualizar
                     </button>
                   </header>
 
+                  <div className="crz-stock-item-tools">
+                    <label>
+                      <span>⌕</span>
+                      <input
+                        value={itemQuery}
+                        onChange={(event) => setItemQuery(event.target.value)}
+                        placeholder="Buscar key mascarada, origem..."
+                      />
+                    </label>
+                    <div>
+                      {stockFilters.map(([value,label]) => (
+                        <button
+                          type="button"
+                          key={value}
+                          className={itemFilter === value ? "is-selected" : ""}
+                          onClick={() => setItemFilter(value)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {itemsLoading ? (
                     <div className="crz-stock-empty">Carregando itens...</div>
-                  ) : items.length ? (
+                  ) : visibleItems.length ? (
                     <div className="crz-stock-items-table">
                       <div className="crz-stock-items-row is-head">
                         <span>KEY</span><span>STATUS</span><span>ORIGEM</span><span>DATA</span><span>AÇÃO</span>
                       </div>
-                      {items.map((item) => {
+                      {visibleItems.map((item) => {
                         const status = statusOf(item);
                         return (
                           <div className="crz-stock-items-row" key={item.id}>
@@ -425,8 +475,8 @@ export function StockManagerPage() {
                   ) : (
                     <div className="crz-stock-empty">
                       <NeonIcon name="cube" size={30} />
-                      <strong>Sem estoque local neste plano</strong>
-                      <span>Importe um lote ou configure fornecedor externo no Product Manager.</span>
+                      <strong>{items.length ? "Nenhum item nesse filtro" : "Sem estoque local neste plano"}</strong>
+                      <span>{items.length ? "Troque o filtro ou limpe a busca." : "Importe um lote ou configure fornecedor externo no Product Manager."}</span>
                     </div>
                   )}
                 </section>
