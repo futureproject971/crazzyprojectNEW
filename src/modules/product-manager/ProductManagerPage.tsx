@@ -570,128 +570,199 @@ export function ProductManagerPage() {
 
         {creatingProduct && (
           <div
-            className="crz-pm-create-modal"
+            className="crz-purin-modal"
             role="presentation"
             onMouseDown={event => {
-              if (event.target === event.currentTarget && !busy) setCreatingProduct(false);
+              if (event.target === event.currentTarget && !busy && !imageUploading) setCreatingProduct(false);
             }}
           >
             <section
-              className="crz-pm-create-dialog"
+              className="crz-purin-dialog"
               role="dialog"
               aria-modal="true"
-              aria-labelledby="crz-pm-create-title"
+              aria-labelledby="crz-purin-create-title"
             >
-              <header className="crz-pm-create-dialog__head">
-                <div className="crz-pm-create-dialog__icon">◇</div>
-                <div>
-                  <small>NOVO PRODUTO</small>
-                  <h2 id="crz-pm-create-title">Criar produto</h2>
-                  <p>Crie a base do produto. Depois ele já abre selecionado para você completar capa, descrição, planos e estoque.</p>
+              <header className="crz-purin-dialog__top">
+                <div className="crz-purin-dialog__title">
+                  <span className="crz-purin-dialog__cube">◇</span>
+                  <strong id="crz-purin-create-title">NOVO PRODUTO</strong>
                 </div>
+
+                <div className="crz-purin-dialog__actions">
+                  <button type="button" className="is-muted" disabled>ProductID</button>
+                  <button type="button" className="is-green-outline" disabled>➤ Enviar Embed</button>
+                  <button type="button" className="is-blue-outline" disabled>⤨ Sincronizar</button>
+                  <button
+                    type="button"
+                    className="is-save"
+                    disabled={busy || !newProduct.name.trim() || !newProduct.gameId}
+                    onClick={() => void createProduct()}
+                  >
+                    {busy ? "Criando..." : "Salvar alterações"}
+                  </button>
+                  <button type="button" className="is-icon" disabled>⧉</button>
+                  <button type="button" className="is-icon" disabled>⌘</button>
+                  <button type="button" className="is-danger-icon" disabled>♲</button>
+                </div>
+
                 <button
                   type="button"
+                  className="crz-purin-dialog__close"
                   aria-label="Fechar"
-                  disabled={busy}
+                  disabled={busy || imageUploading}
                   onClick={() => setCreatingProduct(false)}
                 >
                   ×
                 </button>
               </header>
 
-              <div className="crz-pm-create-dialog__body">
-                <div className="crz-pm-create-dialog__grid">
-                  <label>
-                    <span>Nome do produto</span>
-                    <input
-                      autoFocus
-                      value={newProduct.name}
-                      onChange={event => setNewProduct({...newProduct,name:event.target.value.slice(0,120)})}
-                      placeholder="Ex.: VANGUARD EMULATOR"
-                    />
-                  </label>
+              <nav className="crz-purin-tabs" aria-label="Etapas do produto">
+                <button type="button" className="is-active">Geral</button>
+                <button type="button" disabled>Campos</button>
+                <button type="button" disabled>Hooks</button>
+              </nav>
 
-                  <label>
-                    <span>Jogo / categoria</span>
-                    <select
-                      value={newProduct.gameId}
-                      onChange={event => setNewProduct({...newProduct,gameId:event.target.value})}
-                    >
-                      {catalog.games.map(game => (
-                        <option key={game.id} value={game.id}>
-                          {game.name}{game.active ? "" : " (inativa)"}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label>
-                    <span>Emoji</span>
-                    <input
-                      value={newProduct.emoji}
-                      onChange={event => setNewProduct({...newProduct,emoji:event.target.value.slice(0,32)})}
-                      placeholder="🎮"
-                    />
-                  </label>
-
-                  <label>
-                    <span>Cor do produto</span>
-                    <div className="crz-pm-create-dialog__color">
+              <div className="crz-purin-dialog__scroll">
+                <section className="crz-purin-general">
+                  <div className="crz-purin-general__grid">
+                    <label>
+                      <span>Nome</span>
                       <input
-                        type="color"
-                        value={newProduct.accentColor}
-                        onChange={event => setNewProduct({...newProduct,accentColor:event.target.value})}
+                        autoFocus
+                        value={newProduct.name}
+                        onChange={event => setNewProduct({...newProduct,name:event.target.value.slice(0,120)})}
+                        placeholder="Nome do produto"
                       />
+                    </label>
+
+                    <label>
+                      <span>Categoria</span>
+                      <select
+                        value={newProduct.gameId}
+                        onChange={event => setNewProduct({...newProduct,gameId:event.target.value})}
+                      >
+                        {catalog.games.map(game => (
+                          <option key={game.id} value={game.id}>
+                            {game.name}{game.active ? "" : " (inativa)"}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className="crz-purin-media-row">
+                    <div className="crz-purin-media-card">
+                      <span>Ícone</span>
+                      <div className="crz-purin-media-preview is-icon">
+                        {newProduct.iconUrl ? <img src={newProduct.iconUrl} alt="" /> : <b>{newProduct.emoji || "🎮"}</b>}
+                      </div>
+                      <label className="crz-purin-upload">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/gif"
+                          disabled={imageUploading}
+                          onChange={event => {
+                            const file = event.target.files?.[0];
+                            if (file) void uploadProductAsset(file, "icon", "create");
+                            event.currentTarget.value = "";
+                          }}
+                        />
+                        {imageUploading ? "Enviando..." : "Upload"}
+                      </label>
                       <input
-                        value={newProduct.accentColor}
-                        onChange={event => setNewProduct({...newProduct,accentColor:event.target.value.slice(0,7)})}
-                        placeholder="#1687FF"
+                        value={newProduct.iconUrl}
+                        onChange={event => setNewProduct({...newProduct,iconUrl:event.target.value})}
+                        placeholder="ou URL"
                       />
                     </div>
+
+                    <div className="crz-purin-media-card is-banner">
+                      <span>Banner</span>
+                      <div className="crz-purin-media-preview is-banner">
+                        {newProduct.bannerUrl ? <img src={newProduct.bannerUrl} alt="" /> : <b>Banner do produto</b>}
+                      </div>
+                      <label className="crz-purin-upload">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/gif"
+                          disabled={imageUploading}
+                          onChange={event => {
+                            const file = event.target.files?.[0];
+                            if (file) void uploadProductAsset(file, "banner", "create");
+                            event.currentTarget.value = "";
+                          }}
+                        />
+                        {imageUploading ? "Enviando..." : "Upload"}
+                      </label>
+                      <input
+                        value={newProduct.bannerUrl}
+                        onChange={event => setNewProduct({...newProduct,bannerUrl:event.target.value})}
+                        placeholder="ou URL"
+                      />
+                    </div>
+                  </div>
+
+                  <label className="crz-purin-description">
+                    <span>Descrição</span>
+                    <textarea
+                      rows={8}
+                      value={newProduct.description}
+                      onChange={event => setNewProduct({...newProduct,description:event.target.value.slice(0,6000)})}
+                      placeholder="Descrição completa do produto..."
+                    />
                   </label>
-                </div>
 
-                <button
-                  type="button"
-                  className={"crz-pm-create-dialog__toggle " + (newProduct.createDefaultPlans ? "is-on" : "")}
-                  onClick={() => setNewProduct({...newProduct,createDefaultPlans:!newProduct.createDefaultPlans})}
-                >
-                  <i />
-                  <span>
-                    <strong>Criar planos padrão automaticamente</strong>
-                    <small>1 dia, 3 dias, 7 dias, 15 dias, 30 dias, 90 dias e Lifetime.</small>
-                  </span>
-                </button>
+                  <section className="crz-purin-delivery">
+                    <span>Tipo de Entrega</span>
+                    <div>
+                      <button
+                        type="button"
+                        className={!newProduct.autoDelivery ? "is-active" : ""}
+                        onClick={() => setNewProduct({...newProduct,autoDelivery:false})}
+                      >
+                        Manual
+                      </button>
+                      <button
+                        type="button"
+                        className={newProduct.autoDelivery ? "is-active" : ""}
+                        onClick={() => setNewProduct({...newProduct,autoDelivery:true})}
+                      >
+                        Automática
+                      </button>
+                    </div>
+                  </section>
 
-                <div className="crz-pm-create-dialog__flow">
-                  <div><b>1</b><span><strong>Produto</strong><small>nome + categoria</small></span></div>
-                  <div><b>2</b><span><strong>Apresentação</strong><small>capa + descrição</small></span></div>
-                  <div><b>3</b><span><strong>Planos</strong><small>preço + estoque</small></span></div>
-                  <div><b>4</b><span><strong>Publicar</strong><small>ativar quando estiver pronto</small></span></div>
-                </div>
+                  <section className="crz-purin-display">
+                    <div>
+                      <span className="crz-purin-eye">◉</span>
+                      <strong>Exibição</strong>
+                    </div>
+                    <button
+                      type="button"
+                      className={"crz-purin-toggle-row " + (newProduct.hideDeliveryBadge ? "is-on" : "")}
+                      onClick={() => setNewProduct({...newProduct,hideDeliveryBadge:!newProduct.hideDeliveryBadge})}
+                    >
+                      <span>
+                        <strong>Ocultar selo de entrega</strong>
+                        <small>Não mostra "Entrega Automática/Manual" nos embeds.</small>
+                      </span>
+                      <i />
+                    </button>
+                  </section>
+
+                  <button
+                    type="button"
+                    className={"crz-purin-default-plans " + (newProduct.createDefaultPlans ? "is-on" : "")}
+                    onClick={() => setNewProduct({...newProduct,createDefaultPlans:!newProduct.createDefaultPlans})}
+                  >
+                    <i />
+                    <span>
+                      <strong>Criar variações padrão automaticamente</strong>
+                      <small>1 dia, 3 dias, 7 dias, 15 dias, 30 dias, 90 dias e Lifetime.</small>
+                    </span>
+                  </button>
+                </section>
               </div>
-
-              <footer className="crz-pm-create-dialog__foot">
-                <span>O produto nasce desativado para não aparecer incompleto para clientes.</span>
-                <div>
-                  <button
-                    type="button"
-                    className="crz-button crz-button--secondary crz-button--md"
-                    disabled={busy}
-                    onClick={() => setCreatingProduct(false)}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="button"
-                    className="crz-button crz-button--primary crz-button--md"
-                    disabled={busy || !newProduct.name.trim() || !newProduct.gameId}
-                    onClick={() => void createProduct()}
-                  >
-                    {busy ? "Criando..." : "Criar produto"}
-                  </button>
-                </div>
-              </footer>
             </section>
           </div>
         )}
