@@ -43,6 +43,58 @@ const planCodes: Array<[ManagerPlanCode, string]> = [
   ["custom", "Personalizado"],
 ];
 
+const planDurations: Partial<Record<ManagerPlanCode, number | null>> = {
+  "1d": 1440,
+  "3d": 4320,
+  "7d": 10080,
+  "15d": 21600,
+  "30d": 43200,
+  "90d": 129600,
+  lifetime: null,
+  single: null,
+};
+
+const deliveryModeCards: Array<{
+  value: ManagerPlan["delivery_mode"];
+  label: string;
+  description: string;
+}> = [
+  { value: "internal_stock", label: "Estoque interno", description: "Entrega automática por key local" },
+  { value: "ghost_stock", label: "Estoque fantasma", description: "Sempre disponível, entrega via suporte" },
+  { value: "purincash_supplier", label: "PurinCash", description: "Entrega por supplier PurinCash" },
+  { value: "lzt_account", label: "Conta externa", description: "Conta/credencial externa" },
+  { value: "manual", label: "Manual", description: "Equipe conclui a entrega" },
+  { value: "service", label: "Serviço", description: "Produto sem estoque unitário" },
+];
+
+function applyPlanCode(plan: ManagerPlan, code: ManagerPlanCode): ManagerPlan {
+  const duration = code === "custom"
+    ? plan.entitlement_duration_minutes
+    : planDurations[code] ?? null;
+  return {
+    ...plan,
+    plan_code: code,
+    entitlement_duration_minutes: duration,
+  };
+}
+
+function applyDeliveryMode(
+  plan: ManagerPlan,
+  mode: ManagerPlan["delivery_mode"]
+): ManagerPlan {
+  const provider =
+    mode === "purincash_supplier"
+      ? "purincash"
+      : mode === "lzt_account"
+        ? "lzt"
+        : null;
+  return {
+    ...plan,
+    delivery_mode: mode,
+    supplier_provider: provider,
+  };
+}
+
 function cloneProduct(product: ManagerProduct): ManagerProduct {
   return JSON.parse(JSON.stringify(product));
 }
@@ -495,7 +547,21 @@ export function ProductManagerPage() {
                   {creatingPlan && (
                     <div className="crz-pm-create-plan">
                       <label><span>Nome</span><input value={newPlan.name} onChange={event => setNewPlan({...newPlan,name:event.target.value.slice(0,80)})} /></label>
-                      <label><span>Código</span><select value={newPlan.planCode} onChange={event => setNewPlan({...newPlan,planCode:event.target.value as ManagerPlanCode})}>{planCodes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+                      <div className="crz-pm-choice-field crz-pm-create-plan__code">
+                        <span>Período</span>
+                        <div className="crz-pm-chip-grid">
+                          {planCodes.map(([value,label]) => (
+                            <button
+                              type="button"
+                              key={value}
+                              className={newPlan.planCode === value ? "is-selected" : ""}
+                              onClick={() => setNewPlan({...newPlan,planCode:value})}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                       <label><span>Preço inicial</span><input type="number" min="0" step="0.01" value={newPlan.price} onChange={event => setNewPlan({...newPlan,price:Number(event.target.value)})} /></label>
                       <button type="button" className="crz-button crz-button--primary crz-button--sm" disabled={busy || !newPlan.name.trim()} onClick={() => void createPlan()}>{busy ? "Criando..." : "Criar plano"}</button>
                     </div>
@@ -514,13 +580,77 @@ export function ProductManagerPage() {
                       <div className="crz-pm-form-grid">
                         <label><span>Nome do plano</span><input value={planDraft.name} onChange={e => setPlanDraft({...planDraft,name:e.target.value})} /></label>
                         <label><span>Preço</span><input type="number" step="0.01" value={planDraft.price} onChange={e => setPlanDraft({...planDraft,price:Number(e.target.value)})} /></label>
-                        <label><span>Código</span><select value={planDraft.plan_code || "custom"} onChange={e => setPlanDraft({...planDraft,plan_code:e.target.value as ManagerPlanCode})}>{planCodes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-                        <label><span>Modo de entrega</span><select value={planDraft.delivery_mode} onChange={e => setPlanDraft({...planDraft,delivery_mode:e.target.value as ManagerPlan["delivery_mode"]})}>{deliveryModes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+                        <div className="crz-pm-choice-field is-wide">
+                          <span>Período / duração</span>
+                          <div className="crz-pm-chip-grid crz-pm-chip-grid--plans">
+                            {planCodes.map(([value,label]) => (
+                              <button
+                                type="button"
+                                key={value}
+                                className={(planDraft.plan_code || "custom") === value ? "is-selected" : ""}
+                                onClick={() => setPlanDraft(applyPlanCode(planDraft,value))}
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </div>
+                          <small className="crz-pm-field-help">
+                            A duração é preenchida automaticamente. Use “Personalizado” apenas quando precisar de outro tempo.
+                          </small>
+                        </div>
+
+                        <div className="crz-pm-choice-field is-wide">
+                          <span>Modo de entrega</span>
+                          <div className="crz-pm-delivery-grid">
+                            {deliveryModeCards.map(option => {
+                              const selected = planDraft.delivery_mode === option.value;
+                              return (
+                                <button
+                                  type="button"
+                                  key={option.value}
+                                  className={selected ? "is-selected" : ""}
+                                  aria-pressed={selected}
+                                  onClick={() => setPlanDraft(applyDeliveryMode(planDraft,option.value))}
+                                >
+                                  <i />
+                                  <span>
+                                    <strong>{option.label}</strong>
+                                    <small>{option.description}</small>
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
                         {planDraft.delivery_mode==="ghost_stock"&&<div className="crz-pm-ghost-note">👻 Estoque Fantasma: sempre disponível na loja, não consome key e abre entrega por suporte após o pagamento.</div>}
                         <label><span>Emoji</span><input value={planDraft.emoji || ""} onChange={e => setPlanDraft({...planDraft,emoji:e.target.value})} /></label>
                         <label><span>Cor</span><div className="crz-pm-color"><input type="color" value={planDraft.accent_color || productDraft.accent_color || "#1687ff"} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /><input value={planDraft.accent_color || ""} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /></div></label>
-                        <label><span>Duração entitlement (min)</span><input type="number" value={planDraft.entitlement_duration_minutes ?? ""} onChange={e => setPlanDraft({...planDraft,entitlement_duration_minutes:e.target.value ? Number(e.target.value) : null})} placeholder="vazio = sem expiração" /></label>
-                        <label><span>Ordem</span><input type="number" value={planDraft.sort_order} onChange={e => setPlanDraft({...planDraft,sort_order:Number(e.target.value)})} /></label>
+                        {planDraft.plan_code === "custom" ? (
+                          <label>
+                            <span>Duração personalizada (minutos)</span>
+                            <input
+                              type="number"
+                              min="1"
+                              value={planDraft.entitlement_duration_minutes ?? ""}
+                              onChange={e => setPlanDraft({...planDraft,entitlement_duration_minutes:e.target.value ? Number(e.target.value) : null})}
+                              placeholder="Ex.: 2880 = 2 dias"
+                            />
+                          </label>
+                        ) : (
+                          <div className="crz-pm-readonly-card">
+                            <span>Duração automática</span>
+                            <strong>{planDraft.entitlement_duration_minutes ? planDraft.entitlement_duration_minutes.toLocaleString("pt-BR")+" min" : "Sem expiração automática"}</strong>
+                          </div>
+                        )}
+
+                        <div className="crz-pm-choice-field">
+                          <span>Ordem do plano</span>
+                          <div className="crz-pm-stepper">
+                            <button type="button" onClick={() => setPlanDraft({...planDraft,sort_order:planDraft.sort_order-1})}>−</button>
+                            <strong>{planDraft.sort_order}</strong>
+                            <button type="button" onClick={() => setPlanDraft({...planDraft,sort_order:planDraft.sort_order+1})}>＋</button>
+                          </div>
+                        </div>
                       </div>
 
                       <div className="crz-pm-subsection">
@@ -536,7 +666,10 @@ export function ProductManagerPage() {
                       <div className="crz-pm-subsection">
                         <header><small>SUPPLIER</small><strong>Vínculo externo opcional</strong></header>
                         <div className="crz-pm-form-grid">
-                          <label><span>Provider</span><input value={planDraft.supplier_provider || ""} onChange={e => setPlanDraft({...planDraft,supplier_provider:e.target.value})} placeholder="purincash" /></label>
+                          <div className="crz-pm-readonly-card">
+                            <span>Provider</span>
+                            <strong>{planDraft.supplier_provider || "Não usa supplier"}</strong>
+                          </div>
                           <label><span>Produto externo</span><input value={planDraft.supplier_product_id || ""} onChange={e => setPlanDraft({...planDraft,supplier_product_id:e.target.value})} /></label>
                           <label className="is-wide"><span>Variação externa</span><input value={planDraft.supplier_variation_id || ""} onChange={e => setPlanDraft({...planDraft,supplier_variation_id:e.target.value})} /></label>
                         </div>
