@@ -36,6 +36,9 @@ for (const required of [
   "productStockMeta(product)",
   "productPriceRange(product)",
   "Sem estoque",
+  "crz-pm-create-dialog",
+  "await load(true, createdId, null)",
+  "await load(true, productDraft.id, createdPlanId)",
 ]) {
   if (!productManager.includes(required)) {
     throw new Error("Product Manager per-plan stock UX missing: " + required);
@@ -72,6 +75,8 @@ for (const required of [
   ".crz-pm-overview",
   ".crz-pm-overview__stock.is-low",
   ".crz-pm-overview__stock.is-out",
+  ".crz-pm-create-dialog",
+  ".crz-pm-create-dialog__flow",
 ]) {
   if (!productStyles.includes(required)) {
     throw new Error("Product Manager visual style missing: " + required);

@@ -146,9 +146,12 @@ export function ProductManagerPage() {
     price: 0,
   });
 
-  const load = async (preserveSelection = true) => {
+  const load = async (
+    preserveSelection = true,
+    preferredProductId: string | null = null,
+    preferredPlanId: string | null = null
+  ) => {
     setState("loading");
-    setNotice("");
 
     try {
       const response = await fetch("/api/admin/products", { cache: "no-store" });
@@ -165,7 +168,7 @@ export function ProductManagerPage() {
         gameId: current.gameId || next.games.find(game => game.active)?.id || next.games[0]?.id || "",
       }));
 
-      const wantedId = preserveSelection ? selectedProductId : null;
+      const wantedId = preferredProductId ?? (preserveSelection ? selectedProductId : null);
       const selected =
         next.products.find(product => product.id === wantedId) ||
         next.products[0] ||
@@ -174,7 +177,8 @@ export function ProductManagerPage() {
       setSelectedProductId(selected?.id || null);
       setProductDraft(selected ? cloneProduct(selected) : null);
 
-      const wantedPlan = selected?.plans.find(plan => plan.id === selectedPlanId) || selected?.plans[0] || null;
+      const wantedPlanId = preferredPlanId ?? (preserveSelection ? selectedPlanId : null);
+      const wantedPlan = selected?.plans.find(plan => plan.id === wantedPlanId) || selected?.plans[0] || null;
       setSelectedPlanId(wantedPlan?.id || null);
       setPlanDraft(wantedPlan ? clonePlan(wantedPlan) : null);
       setState("ready");
@@ -186,6 +190,23 @@ export function ProductManagerPage() {
   useEffect(() => {
     void load(false);
   }, []);
+
+  useEffect(() => {
+    if (!creatingProduct) return;
+
+    const previousOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !busy) setCreatingProduct(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.documentElement.style.overflow = previousOverflow;
+    };
+  }, [creatingProduct, busy]);
 
   const stockItems = useMemo(
     () => stockText.split(/\r?\n/).map(item => item.trim()).filter(Boolean),
@@ -292,11 +313,14 @@ export function ProductManagerPage() {
       const payload = await response.json().catch(() => ({}));
       if (!response.ok || !payload?.created?.id) throw new Error("Falha ao criar produto.");
 
+      const createdId = String(payload.created.id);
       setCreatingProduct(false);
       setNewProduct(current => ({ ...current, name: "" }));
-      setSelectedProductId(String(payload.created.id));
-      setNotice("Produto criado desativado. Configure os preços antes de ativar.");
-      await load(true);
+      await load(true, createdId, null);
+      setNotice("Produto criado desativado. Agora configure imagem, descrição, preços e estoque.");
+      window.requestAnimationFrame(() => {
+        document.getElementById("pm-editor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Falha ao criar produto.");
     } finally {
@@ -324,10 +348,10 @@ export function ProductManagerPage() {
       const payload = await response.json().catch(() => ({}));
       if (!response.ok || !payload?.created?.id) throw new Error("Falha ao criar plano.");
 
+      const createdPlanId = String(payload.created.id);
       setCreatingPlan(false);
-      setSelectedPlanId(String(payload.created.id));
-      setNotice("Plano criado desativado. Revise entrega, preço e automações antes de ativar.");
-      await load(true);
+      await load(true, productDraft.id, createdPlanId);
+      setNotice("Plano criado desativado. Revise entrega, preço, estoque e automações antes de ativar.");
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Falha ao criar plano.");
     } finally {
@@ -354,8 +378,8 @@ export function ProductManagerPage() {
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || "Falha ao salvar produto.");
-      setNotice("Produto salvo.");
       await load(true);
+      setNotice("Produto salvo.");
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Falha ao salvar produto.");
     } finally {
@@ -382,8 +406,8 @@ export function ProductManagerPage() {
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || "Falha ao salvar plano.");
-      setNotice("Plano salvo.");
       await load(true);
+      setNotice("Plano salvo.");
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Falha ao salvar plano.");
     } finally {
@@ -491,6 +515,134 @@ export function ProductManagerPage() {
         />
 
         {notice && <div className="crz-pm-notice">{notice}</div>}
+
+        {creatingProduct && (
+          <div
+            className="crz-pm-create-modal"
+            role="presentation"
+            onMouseDown={event => {
+              if (event.target === event.currentTarget && !busy) setCreatingProduct(false);
+            }}
+          >
+            <section
+              className="crz-pm-create-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="crz-pm-create-title"
+            >
+              <header className="crz-pm-create-dialog__head">
+                <div className="crz-pm-create-dialog__icon">◇</div>
+                <div>
+                  <small>NOVO PRODUTO</small>
+                  <h2 id="crz-pm-create-title">Criar produto</h2>
+                  <p>Crie a base do produto. Depois ele já abre selecionado para você completar capa, descrição, planos e estoque.</p>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Fechar"
+                  disabled={busy}
+                  onClick={() => setCreatingProduct(false)}
+                >
+                  ×
+                </button>
+              </header>
+
+              <div className="crz-pm-create-dialog__body">
+                <div className="crz-pm-create-dialog__grid">
+                  <label>
+                    <span>Nome do produto</span>
+                    <input
+                      autoFocus
+                      value={newProduct.name}
+                      onChange={event => setNewProduct({...newProduct,name:event.target.value.slice(0,120)})}
+                      placeholder="Ex.: VANGUARD EMULATOR"
+                    />
+                  </label>
+
+                  <label>
+                    <span>Jogo / categoria</span>
+                    <select
+                      value={newProduct.gameId}
+                      onChange={event => setNewProduct({...newProduct,gameId:event.target.value})}
+                    >
+                      {catalog.games.map(game => (
+                        <option key={game.id} value={game.id}>
+                          {game.name}{game.active ? "" : " (inativa)"}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Emoji</span>
+                    <input
+                      value={newProduct.emoji}
+                      onChange={event => setNewProduct({...newProduct,emoji:event.target.value.slice(0,32)})}
+                      placeholder="🎮"
+                    />
+                  </label>
+
+                  <label>
+                    <span>Cor do produto</span>
+                    <div className="crz-pm-create-dialog__color">
+                      <input
+                        type="color"
+                        value={newProduct.accentColor}
+                        onChange={event => setNewProduct({...newProduct,accentColor:event.target.value})}
+                      />
+                      <input
+                        value={newProduct.accentColor}
+                        onChange={event => setNewProduct({...newProduct,accentColor:event.target.value.slice(0,7)})}
+                        placeholder="#1687FF"
+                      />
+                    </div>
+                  </label>
+                </div>
+
+                <button
+                  type="button"
+                  className={"crz-pm-create-dialog__toggle " + (newProduct.createDefaultPlans ? "is-on" : "")}
+                  onClick={() => setNewProduct({...newProduct,createDefaultPlans:!newProduct.createDefaultPlans})}
+                >
+                  <i />
+                  <span>
+                    <strong>Criar planos padrão automaticamente</strong>
+                    <small>1 dia, 3 dias, 7 dias, 15 dias, 30 dias, 90 dias e Lifetime.</small>
+                  </span>
+                </button>
+
+                <div className="crz-pm-create-dialog__flow">
+                  <div><b>1</b><span><strong>Produto</strong><small>nome + categoria</small></span></div>
+                  <div><b>2</b><span><strong>Apresentação</strong><small>capa + descrição</small></span></div>
+                  <div><b>3</b><span><strong>Planos</strong><small>preço + estoque</small></span></div>
+                  <div><b>4</b><span><strong>Publicar</strong><small>ativar quando estiver pronto</small></span></div>
+                </div>
+              </div>
+
+              <footer className="crz-pm-create-dialog__foot">
+                <span>O produto nasce desativado para não aparecer incompleto para clientes.</span>
+                <div>
+                  <button
+                    type="button"
+                    className="crz-button crz-button--secondary crz-button--md"
+                    disabled={busy}
+                    onClick={() => setCreatingProduct(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className="crz-button crz-button--primary crz-button--md"
+                    disabled={busy || !newProduct.name.trim() || !newProduct.gameId}
+                    onClick={() => void createProduct()}
+                  >
+                    {busy ? "Criando..." : "Criar produto"}
+                  </button>
+                </div>
+              </footer>
+            </section>
+          </div>
+        )}
 
         <section className="crz-pm-overview">
           <header className="crz-pm-overview__head">
@@ -601,26 +753,6 @@ export function ProductManagerPage() {
                 {creatingProduct ? "Cancelar" : "+ Produto"}
               </button>
             </div>
-
-            {creatingProduct && (
-              <div className="crz-pm-create-card">
-                <strong>Novo produto</strong>
-                <select value={newProduct.gameId} onChange={event => setNewProduct({...newProduct,gameId:event.target.value})}>
-                  {catalog.games.map(game => <option key={game.id} value={game.id}>{game.name}{game.active ? "" : " (inativa)"}</option>)}
-                </select>
-                <input value={newProduct.name} onChange={event => setNewProduct({...newProduct,name:event.target.value.slice(0,120)})} placeholder="Nome do produto" />
-                <div className="crz-pm-create-inline">
-                  <input value={newProduct.emoji} onChange={event => setNewProduct({...newProduct,emoji:event.target.value.slice(0,32)})} aria-label="Emoji" />
-                  <input type="color" value={newProduct.accentColor} onChange={event => setNewProduct({...newProduct,accentColor:event.target.value})} aria-label="Cor" />
-                </div>
-                <button type="button" className={newProduct.createDefaultPlans ? "is-on" : ""} onClick={() => setNewProduct({...newProduct,createDefaultPlans:!newProduct.createDefaultPlans})}>
-                  <i /> Criar planos padrão 1d → Lifetime
-                </button>
-                <button type="button" className="crz-button crz-button--primary crz-button--sm" disabled={busy || !newProduct.name.trim() || !newProduct.gameId} onClick={() => void createProduct()}>
-                  {busy ? "Criando..." : "Criar produto"}
-                </button>
-              </div>
-            )}
 
             <div className="crz-pm-search">
               <span>⌕</span>
