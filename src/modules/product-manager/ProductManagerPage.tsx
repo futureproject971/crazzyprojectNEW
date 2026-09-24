@@ -758,12 +758,7 @@ export function ProductManagerPage() {
                     type="button"
                     key={product.id}
                     className={"crz-pm-overview__row " + (selectedProductId === product.id ? "is-selected" : "")}
-                    onClick={() => {
-                      selectProduct(product);
-                      window.requestAnimationFrame(() => {
-                        document.getElementById("pm-editor")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                      });
-                    }}
+                    onClick={() => openProductEditor(product, "general")}
                   >
                     <span className="crz-pm-overview__product">
                       <i style={{ "--accent": product.accent_color || "#1687ff" } as React.CSSProperties}>
