@@ -222,7 +222,7 @@ export function CatalogPage({ initialCategory = "all" }: { initialCategory?: str
             <NeonIcon name="shield" size={28} />
             <div>
               <strong>Dados comerciais reais</strong>
-              <span>O checkout recalcula o preço no servidor antes de cobrar.</span>
+              <span>Confira preço, plano e disponibilidade antes de finalizar.</span>
             </div>
           </div>
         </aside>
