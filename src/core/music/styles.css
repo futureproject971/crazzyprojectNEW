@@ -1,0 +1,212 @@
+.crz-global-music{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:9995;
+  width:min(460px,calc(100vw - 28px));
+  color:#f8f7fb;
+  border:1px solid rgba(192,132,252,.25);
+  border-radius:14px;
+  background:rgba(9,9,12,.96);
+  box-shadow:0 28px 80px rgba(0,0,0,.58),0 0 34px rgba(139,50,215,.16);
+  backdrop-filter:blur(20px);
+  overflow:hidden;
+}
+.crz-global-music__player{
+  display:grid;
+  grid-template-columns:160px minmax(0,1fr);
+  gap:12px;
+  align-items:center;
+  padding:10px;
+}
+.crz-global-music__video{
+  position:relative;
+  aspect-ratio:16/9;
+  overflow:hidden;
+  border-radius:9px;
+  background:#000;
+  border:1px solid rgba(255,255,255,.08);
+}
+.crz-global-music__video iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:0;
+}
+.crz-global-music__meta{
+  min-width:0;
+  display:grid;
+  gap:4px;
+}
+.crz-global-music__meta>span{
+  color:#c084fc;
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.08em;
+}
+.crz-global-music__meta>strong{
+  overflow:hidden;
+  color:#fff;
+  font-size:12px;
+  line-height:1.25;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.crz-global-music__meta>small{
+  overflow:hidden;
+  color:#8e8898;
+  font-size:10px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.crz-global-music__controls{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  flex-wrap:wrap;
+  margin-top:4px;
+}
+.crz-global-music__controls button,
+.crz-global-music__drawer button{
+  min-height:28px;
+  padding:0 8px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:7px;
+  color:#eeeaf3;
+  background:#15151b;
+  font:inherit;
+  font-size:9px;
+  font-weight:800;
+  cursor:pointer;
+}
+.crz-global-music__controls button:hover,
+.crz-global-music__drawer button:hover{
+  border-color:rgba(192,132,252,.42);
+  background:#1d1624;
+}
+.crz-global-music__controls .is-main{
+  color:#160a1f;
+  border-color:transparent;
+  background:#c084fc;
+}
+.crz-global-music__drawer{
+  max-height:min(58vh,520px);
+  overflow:auto;
+  border-top:1px solid rgba(255,255,255,.08);
+  background:#0b0b0f;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+.crz-global-music__drawer>section{
+  min-width:0;
+  padding:10px;
+}
+.crz-global-music__drawer>section+section{
+  border-left:1px solid rgba(255,255,255,.07);
+}
+.crz-global-music__drawer header{
+  min-height:30px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  color:#c9c3cf;
+  font-size:9px;
+  letter-spacing:.08em;
+}
+.crz-global-music__list{
+  display:grid;
+  gap:6px;
+  margin-top:5px;
+}
+.crz-global-music__list>button,
+.crz-global-music__saved>button:first-child{
+  width:100%;
+  min-height:52px;
+  padding:5px;
+  display:grid;
+  grid-template-columns:68px minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+  text-align:left;
+}
+.crz-global-music__list>button.is-active{
+  border-color:rgba(192,132,252,.5);
+  background:rgba(139,50,215,.14);
+}
+.crz-global-music__list img,
+.crz-global-music__saved img{
+  width:68px;
+  aspect-ratio:16/9;
+  object-fit:cover;
+  border-radius:5px;
+}
+.crz-global-music__list span,
+.crz-global-music__saved span{
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+.crz-global-music__list b,
+.crz-global-music__saved b{
+  overflow:hidden;
+  color:#f5f2f7;
+  font-size:9px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.crz-global-music__list small,
+.crz-global-music__saved small{
+  overflow:hidden;
+  color:#817b88;
+  font-size:8px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.crz-global-music__list p{
+  margin:8px 0;
+  color:#7f7888;
+  font-size:9px;
+}
+.crz-global-music__saved{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 30px;
+  gap:5px;
+}
+.crz-global-music__saved>button:last-child{
+  min-width:30px;
+  padding:0;
+}
+@media(max-width:700px){
+  .crz-global-music{
+    left:10px;
+    right:10px;
+    bottom:10px;
+    width:auto;
+  }
+  .crz-global-music__player{
+    grid-template-columns:122px minmax(0,1fr);
+  }
+  .crz-global-music__drawer{
+    grid-template-columns:1fr;
+  }
+  .crz-global-music__drawer>section+section{
+    border-left:0;
+    border-top:1px solid rgba(255,255,255,.07);
+  }
+}
+@media(max-width:460px){
+  .crz-global-music__player{
+    grid-template-columns:105px minmax(0,1fr);
+    gap:8px;
+  }
+  .crz-global-music__controls button{
+    min-height:26px;
+    padding-inline:6px;
+    font-size:8px;
+  }
+  .crz-global-music__controls button:last-child{
+    display:none;
+  }
+}
