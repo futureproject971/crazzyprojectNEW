@@ -65,6 +65,9 @@ for (const required of [
   "discord_identities",
   "DISCORD_GUILD_ID",
   "ACCOUNT_BANNED",
+  "CRAZZY_OWNER_DISCORD_ID",
+  'role: "admin"',
+  "ownerMatch",
 ]) {
   if (!sync.includes(required)) {
     throw new Error("Discord sync function missing " + required);
@@ -73,7 +76,7 @@ for (const required of [
 if (/provider_token\s*[:,][^\n]*(insert|upsert)/i.test(sync)) {
   throw new Error("Discord sync must not persist the provider token");
 }
-console.log("[PASS] Discord identity/guild sync stays server-side");
+console.log("[PASS] Discord identity/guild sync stays server-side and owner admin bootstrap is explicit");
 
 const authPage = await readFile("src/modules/auth/AuthPage.tsx", "utf8");
 for (const required of [
