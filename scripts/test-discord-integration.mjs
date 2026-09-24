@@ -209,6 +209,22 @@ for (const required of [
   }
 }
 console.log("[PASS] one Gateway login runs multiple Discord modules and keeps guild membership state fresh");
+const guildGate = await readFile("apps/discord-bot/src/modules/guild-gate.js", "utf8");
+for (const required of [
+  "DISCORD_INVITE_URL",
+  "CreateInstantInvite",
+  "maxAge: 0",
+  "maxUses: 0",
+  '.from("system_credentials")',
+]) {
+  if (!guildGate.includes(required)) {
+    throw new Error("Automatic guild invite setup missing " + required);
+  }
+}
+if (!botIndex.includes("ensureOfficialDiscordInvite")) {
+  throw new Error("Bot Core must run automatic guild invite setup on startup");
+}
+console.log("[PASS] Bot Core auto-configures a permanent official Discord invite when missing");
 
 const preview = await readFile("src/modules/discord-campaigns/DiscordEmbedPreview.tsx", "utf8");
 for (const feature of [
