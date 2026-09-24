@@ -330,3 +330,59 @@ html[data-theme="light"] .crz-discord-schedule { background:#fff;color:#102033; 
   .crz-discord-send-actions { grid-template-columns:1fr; }
   .crz-discord-template-list { grid-template-columns:1fr; }
 }
+
+
+/* 2026-09-24 — readable campaign center on desktop/ultrawide */
+.crz-discord-worker-pill strong{font-size:11px}
+.crz-discord-worker-pill small{font-size:10px}
+.crz-discord-campaign-notice{font-size:12px;line-height:1.45}
+.crz-discord-campaign-stats{gap:10px;margin-bottom:14px}
+.crz-discord-campaign-stats article{min-height:96px}
+.crz-discord-campaign-stats small{font-size:10px}
+.crz-discord-campaign-stats strong{font-size:26px}
+.crz-discord-campaign-stats span{font-size:11px}
+.crz-discord-campaign-editor{padding:15px;gap:12px}
+.crz-discord-campaign-editor header small,
+.crz-discord-template-list header small,
+.crz-discord-campaign-history header small,
+.crz-discord-target-box header small,
+.crz-discord-preview>header span{font-size:10px}
+.crz-discord-campaign-editor header strong,
+.crz-discord-template-list header strong,
+.crz-discord-campaign-history header strong,
+.crz-discord-target-box header strong,
+.crz-discord-preview>header b{font-size:14px}
+.crz-discord-campaign-editor>header button,
+.crz-discord-campaign-history>header button{min-height:36px;font-size:11px}
+.crz-discord-campaign-editor input,
+.crz-discord-campaign-editor textarea,
+.crz-discord-campaign-editor select{padding:10px 11px;font-size:13px}
+.crz-discord-campaign-editor label>span{font-size:11px}
+.crz-discord-template-row button,
+.crz-discord-send-actions button,
+.crz-discord-target-options button,
+.crz-discord-campaign-table button{font-size:11px}
+.crz-discord-template-row button{min-height:40px}
+.crz-discord-target-options button{min-height:42px}
+.crz-discord-estimate{min-height:62px;padding:10px}
+.crz-discord-estimate span{font-size:10px}
+.crz-discord-estimate strong{font-size:20px}
+.crz-discord-estimate small{font-size:10px}
+.crz-discord-schedule{min-height:40px;font-size:11px}
+.crz-discord-send-actions button{min-height:44px}
+.crz-discord-preview__author strong{font-size:13px}
+.crz-discord-preview__author span{font-size:9px}
+.crz-discord-preview__author small{font-size:10px}
+.crz-discord-preview__embed h3{font-size:14px}
+.crz-discord-preview__description{font-size:12px;line-height:1.55}
+.crz-discord-preview__embed footer{font-size:10px}
+.crz-discord-preview__actions span{font-size:11px}
+.crz-discord-preview>p{font-size:10px}
+.crz-discord-template-list>p{font-size:11px}
+.crz-discord-template-list strong{font-size:12px}
+.crz-discord-template-list small{font-size:10px}
+.crz-discord-campaign-table__head{font-size:10px}
+.crz-discord-campaign-table article{font-size:11px}
+.crz-discord-campaign-table strong{font-size:12px}
+.crz-discord-campaign-table small{font-size:10px}
+.crz-discord-campaign-empty{font-size:12px}

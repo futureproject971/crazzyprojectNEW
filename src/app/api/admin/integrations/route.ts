@@ -29,14 +29,16 @@ export async function GET() {
       .catch(() => null),
   ]);
 
-  if (payments.error || credentials.error) {
-    return NextResponse.json({ error: "INTEGRATION_STATUS_UNAVAILABLE" }, { status: 500 });
-  }
+  // Configurações opcionais nunca derrubam a tela inteira.
+  // Cada integração reporta o próprio estado mesmo se uma tabela/serviço estiver indisponível.
+  const paymentSettingsReadable = !payments.error;
+  const credentialsReadable = !credentials.error;
+  const workerStatusReadable = !workers.error;
 
   const configured = new Map(
     (credentials.data || []).map(item => [item.env_key, Boolean(String(item.value || "").trim())])
   );
-  const worker = workers.data || null;
+  const worker = workerStatusReadable ? (workers.data || null) : null;
   const workerAge = worker?.last_seen_at ? Date.now() - new Date(worker.last_seen_at).getTime() : Infinity;
   const workerOnline = Boolean(worker?.connected && Number.isFinite(workerAge) && workerAge < 45_000);
   const paymentMap = new Map((payments.data || []).map(item => [item.method, item]));
@@ -54,18 +56,22 @@ export async function GET() {
       {
         id: "discord-guild",
         name: "Discord • Guild oficial",
-        state: configured.get("DISCORD_GUILD_ID") ? "ready" : "missing",
-        detail: configured.get("DISCORD_GUILD_ID")
-          ? "Servidor oficial configurado para Auth, Bot Core e Bridge."
-          : "DISCORD_GUILD_ID ainda não está configurado.",
+        state: !credentialsReadable ? "offline" : configured.get("DISCORD_GUILD_ID") ? "ready" : "missing",
+        detail: !credentialsReadable
+          ? "O painel não conseguiu ler o cofre de configurações agora. As demais integrações continuam disponíveis."
+          : configured.get("DISCORD_GUILD_ID")
+            ? "Servidor oficial configurado para Auth, Bot Core e Bridge."
+            : "DISCORD_GUILD_ID ainda não está configurado.",
       },
       {
         id: "discord-invite",
         name: "Discord • Convite oficial",
-        state: configured.get("DISCORD_INVITE_URL") ? "ready" : "missing",
-        detail: configured.get("DISCORD_INVITE_URL")
-          ? "Convite oficial configurado para o gate de entrada no servidor."
-          : "Configure um convite discord.gg ou discord.com/invite para concluir o gate.",
+        state: !credentialsReadable ? "offline" : configured.get("DISCORD_INVITE_URL") ? "ready" : "missing",
+        detail: !credentialsReadable
+          ? "O convite não pôde ser verificado porque o cofre de configurações está temporariamente indisponível."
+          : configured.get("DISCORD_INVITE_URL")
+            ? "Convite oficial configurado para o gate de entrada no servidor."
+            : "Configure um convite discord.gg ou discord.com/invite para concluir o gate.",
       },
       {
         id: "discord-oauth",
@@ -92,12 +98,14 @@ export async function GET() {
       {
         id: "discord-worker",
         name: "Discord Bot Core",
-        state: workerOnline ? "ready" : worker ? "offline" : "missing",
-        detail: workerOnline && worker
-          ? (worker.bot_tag || "Bot") + " online em " + (worker.guild_name || "guild oficial") + "."
-          : worker
-            ? "Worker conhecido, mas heartbeat está offline ou antigo."
-            : "Nenhum heartbeat do worker foi recebido ainda.",
+        state: !workerStatusReadable ? "offline" : workerOnline ? "ready" : worker ? "offline" : "missing",
+        detail: !workerStatusReadable
+          ? "Não foi possível consultar o heartbeat do Bot Core agora."
+          : workerOnline && worker
+            ? (worker.bot_tag || "Bot") + " online em " + (worker.guild_name || "guild oficial") + "."
+            : worker
+              ? "Worker conhecido, mas heartbeat está offline ou antigo."
+              : "Nenhum heartbeat do worker foi recebido ainda.",
         meta: worker ? { version: worker.version, lastSeenAt: worker.last_seen_at, lastError: worker.last_error } : null,
       },
       {
@@ -117,10 +125,12 @@ export async function GET() {
       {
         id: "lzt",
         name: "LZT Market",
-        state: configured.get("LZT_MARKET_TOKEN") ? "ready" : "missing",
-        detail: configured.get("LZT_MARKET_TOKEN")
-          ? "Credential cadastrada no cofre da aplicação."
-          : "Token do fornecedor ainda não configurado.",
+        state: !credentialsReadable ? "offline" : configured.get("LZT_MARKET_TOKEN") ? "ready" : "missing",
+        detail: !credentialsReadable
+          ? "O estado da credencial não pôde ser consultado agora."
+          : configured.get("LZT_MARKET_TOKEN")
+            ? "Credential cadastrada no cofre da aplicação."
+            : "Token do fornecedor ainda não configurado.",
       },
       {
         id: "purincash-core",
@@ -134,10 +144,12 @@ export async function GET() {
       {
         id: "pix",
         name: "PurinCash • PIX",
-        state: paymentMap.get("pix")?.enabled ? (purinCashReady ? "enabled" : "partial") : "disabled",
-        detail: paymentMap.get("pix")?.enabled
-          ? (purinCashReady ? "Método liberado para checkout." : "Método marcado como ativo, mas backend PurinCash ainda não está pronto.")
-          : "Método desligado no fail-safe.",
+        state: !paymentSettingsReadable ? "offline" : paymentMap.get("pix")?.enabled ? (purinCashReady ? "enabled" : "partial") : "disabled",
+        detail: !paymentSettingsReadable
+          ? "Não foi possível consultar a configuração do PIX agora."
+          : paymentMap.get("pix")?.enabled
+            ? (purinCashReady ? "Método liberado para checkout." : "Método marcado como ativo, mas backend PurinCash ainda não está pronto.")
+            : "Método desligado no fail-safe.",
       },
       {
         id: "card",

@@ -2,9 +2,11 @@
 import {useCallback,useEffect,useRef,useState} from "react";
 import {useRouter} from "next/navigation";
 import {Badge,NeonIcon} from "@/core/design-system";
+import {useTheme} from "@/core/theme/ThemeProvider";
 
 export function DiscordGuildGatePage({nextPath}:{nextPath:string}){
   const router=useRouter();
+  const {brandName,logoHeroUrl,discordInviteCoverUrl}=useTheme();
   const [inviteUrl,setInviteUrl]=useState<string|null>(null);
   const [loadingInvite,setLoadingInvite]=useState(true);
   const [checking,setChecking]=useState(false);
@@ -69,9 +71,9 @@ export function DiscordGuildGatePage({nextPath}:{nextPath:string}){
   },[checkMembership]);
 
   return <main className="crz-auth-page crz-discord-gate">
-    <div className="crz-auth-backdrop" aria-hidden="true"/>
+    <div className="crz-auth-backdrop" aria-hidden="true" style={discordInviteCoverUrl?{backgroundImage:'linear-gradient(rgba(0,10,28,.38),rgba(0,4,12,.8)),url("'+discordInviteCoverUrl+'")',backgroundSize:"cover",backgroundPosition:"center"}:undefined}/>
     <section className="crz-auth-card crz-discord-gate__card">
-      <a className="crz-auth-brand" href="/"><img src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT"/></a>
+      <a className="crz-auth-brand" href="/"><img src={logoHeroUrl} alt={brandName}/></a>
       <div className="crz-auth-heading">
         <Badge tone={approved?"green":"blue"}>{approved?"ACESSO LIBERADO":"DISCORD REQUIRED"}</Badge>
         <h1>{approved?"Entrada confirmada.":"Falta só entrar no servidor."}</h1>

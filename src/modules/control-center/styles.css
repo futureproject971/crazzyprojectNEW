@@ -128,3 +128,306 @@ html[data-theme="light"] .crz-control-manual__list article {background:#f7fbff}
   .crz-control-manual__list article {grid-template-columns:36px 1fr}
   .crz-control-manual__actions {grid-column:2}
 }
+
+
+/* 2026-09-24 — premium admin hub + readable operational typography */
+.crz-control-page {
+  padding-top: 96px;
+}
+
+.crz-admin-hero {
+  min-height: 190px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(54, 132, 255, .25);
+  border-radius: 18px;
+  padding: 28px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 76% 42%, rgba(0, 83, 255, .25), transparent 34%),
+    linear-gradient(135deg, rgba(5, 15, 31, .98), rgba(3, 9, 19, .99));
+  box-shadow: 0 18px 44px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+.crz-admin-hero__copy {
+  max-width: 780px;
+}
+
+.crz-admin-hero__copy > span,
+.crz-admin-tools > header small {
+  color: #11c8ff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .11em;
+}
+
+.crz-admin-hero h1 {
+  margin: 8px 0 7px;
+  color: #fff;
+  font-size: clamp(36px, 4vw, 58px);
+  line-height: 1;
+  letter-spacing: -.035em;
+}
+
+.crz-admin-hero h1 strong {
+  color: #1c62ff;
+  font-weight: 850;
+}
+
+.crz-admin-hero p,
+.crz-admin-tools > header p,
+.crz-admin-group__head p {
+  color: #9bacc2;
+  line-height: 1.55;
+}
+
+.crz-admin-hero p {
+  max-width: 690px;
+  margin: 0;
+  font-size: 15px;
+}
+
+.crz-admin-hero__badge {
+  min-width: 260px;
+  min-height: 74px;
+  border: 1px solid rgba(60, 145, 255, .42);
+  border-radius: 13px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  background: rgba(6, 22, 46, .76);
+  box-shadow: 0 0 24px rgba(0, 89, 255, .12);
+}
+
+.crz-admin-shield {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  background: #69a8ff;
+  -webkit-mask: url("/icons/shield-check.svg") center / contain no-repeat;
+  mask: url("/icons/shield-check.svg") center / contain no-repeat;
+}
+
+.crz-admin-hero__badge div {
+  display: grid;
+  gap: 4px;
+}
+
+.crz-admin-hero__badge small {
+  color: #4aa4ff;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.crz-admin-hero__badge strong {
+  color: #dceaff;
+  font-size: 14px;
+}
+
+.crz-admin-tools {
+  margin-bottom: 28px;
+}
+
+.crz-admin-tools > header {
+  margin-bottom: 16px;
+}
+
+.crz-admin-tools > header h2 {
+  margin: 6px 0 4px;
+  color: #f3f7ff;
+  font-size: clamp(25px, 2.4vw, 34px);
+  line-height: 1.15;
+}
+
+.crz-admin-tools > header p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.crz-admin-groups {
+  display: grid;
+  gap: 16px;
+}
+
+.crz-admin-group {
+  border: 1px solid rgba(62, 123, 207, .18);
+  border-radius: 14px;
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(7, 16, 29, .94), rgba(4, 10, 19, .98));
+}
+
+.crz-admin-group__head {
+  margin-bottom: 12px;
+}
+
+.crz-admin-group__head h3 {
+  margin: 0 0 3px;
+  color: #eaf3ff;
+  font-size: 18px;
+}
+
+.crz-admin-group__head p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.crz-admin-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.crz-admin-tool {
+  min-height: 82px;
+  border: 1px solid rgba(44, 125, 255, .34);
+  border-radius: 12px;
+  padding: 13px 12px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 28px;
+  gap: 11px;
+  align-items: center;
+  color: inherit;
+  background:
+    radial-gradient(circle at 0 0, rgba(0, 95, 255, .14), transparent 44%),
+    rgba(6, 15, 29, .92);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.crz-admin-tool:hover {
+  transform: translateY(-2px);
+  border-color: rgba(45, 139, 255, .8);
+  background:
+    radial-gradient(circle at 0 0, rgba(0, 106, 255, .23), transparent 46%),
+    rgba(7, 20, 40, .98);
+  box-shadow: 0 10px 24px rgba(0,0,0,.2), 0 0 20px rgba(0, 94, 255, .12);
+}
+
+.crz-admin-tool__icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+  background: linear-gradient(180deg, #50d8ff, #2672ff);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  filter: drop-shadow(0 0 6px rgba(25, 129, 255, .32));
+}
+
+.crz-admin-tool__copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.crz-admin-tool__copy strong {
+  color: #f2f7ff;
+  font-size: 15px;
+}
+
+.crz-admin-tool__copy small {
+  color: #879ab3;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.crz-admin-tool__arrow {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(55, 137, 255, .35);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #9ac8ff;
+  font-size: 23px;
+  line-height: 1;
+}
+
+.crz-control-ops-head {
+  margin-top: 6px;
+}
+
+.crz-control-state strong { font-size: 16px; }
+.crz-control-state p { font-size: 13px; }
+
+.crz-control-health {
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.crz-control-health > div {
+  min-height: 96px;
+  border-radius: 12px;
+  padding: 13px;
+}
+
+.crz-control-health small { font-size: 10px; }
+.crz-control-health strong { font-size: 25px; }
+.crz-control-health span,
+.crz-control-health em { font-size: 11px; }
+
+.crz-control-grid { gap: 12px; }
+.crz-control-panel,
+.crz-control-manual {
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.crz-control-panel small,
+.crz-control-manual header small { font-size: 10px; }
+
+.crz-control-panel h2,
+.crz-control-manual h2 { font-size: 18px; }
+
+.crz-control-list > div {
+  min-height: 58px;
+  padding: 9px 11px;
+}
+
+.crz-control-list strong { font-size: 13px; }
+.crz-control-list small { font-size: 11px; }
+.crz-control-list b,
+.crz-control-list a { font-size: 12px; }
+
+.crz-control-empty {
+  min-height: 105px;
+  font-size: 12px;
+}
+
+.crz-control-manual > header > span { font-size: 11px; }
+.crz-control-manual__list article strong { font-size: 13px; }
+.crz-control-manual__list article p { font-size: 12px; }
+.crz-control-manual__list article em { font-size: 11px; }
+.crz-control-manual__actions button {
+  min-height: 36px;
+  padding-inline: 11px;
+  font-size: 12px;
+}
+
+.crz-control-generated { font-size: 11px; }
+
+@media (max-width: 1180px) {
+  .crz-admin-tool-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+
+@media (max-width: 760px) {
+  .crz-admin-hero {
+    min-height: 0;
+    padding: 22px 18px;
+    display: grid;
+  }
+
+  .crz-admin-hero__badge {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .crz-admin-tool-grid { grid-template-columns: 1fr; }
+  .crz-admin-group { padding: 12px; }
+}

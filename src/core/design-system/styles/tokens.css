@@ -65,12 +65,12 @@
   --crz-font-body: var(--font-inter), Arial, sans-serif;
   --crz-font-ui: var(--font-poppins), var(--font-inter), Arial, sans-serif;
 
-  --crz-font-xs: 11px;
-  --crz-font-sm: 12px;
-  --crz-font-md: 14px;
-  --crz-font-lg: 16px;
-  --crz-font-xl: 20px;
-  --crz-font-2xl: 26px;
+  --crz-font-xs: 13px;
+  --crz-font-sm: 14px;
+  --crz-font-md: 16px;
+  --crz-font-lg: 19px;
+  --crz-font-xl: 24px;
+  --crz-font-2xl: 32px;
 
   --crz-duration-fast: 140ms;
   --crz-duration-base: 190ms;
