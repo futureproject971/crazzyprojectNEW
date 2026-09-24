@@ -118,6 +118,7 @@ Deno.serve(async (req) => {
 
   const guildId = await configValue(admin, "DISCORD_GUILD_ID");
   let guildMember = false;
+  let officialGuildOwner = false;
   let guildCheckConfigured = Boolean(guildId);
 
   if (guildId) {
@@ -126,7 +127,11 @@ Deno.serve(async (req) => {
       return json({ error: "DISCORD_GUILDS_FAILED", provider_status: guildsResponse.status }, 502);
     }
     const guilds = await guildsResponse.json();
-    guildMember = Array.isArray(guilds) && guilds.some((guild: any) => String(guild?.id || "") === guildId);
+    const officialGuild = Array.isArray(guilds)
+      ? guilds.find((guild: any) => String(guild?.id || "") === guildId)
+      : null;
+    guildMember = Boolean(officialGuild);
+    officialGuildOwner = officialGuild?.owner === true;
   }
 
   const now = new Date().toISOString();
@@ -167,9 +172,10 @@ Deno.serve(async (req) => {
     .upsert({ user_id: user.id, role: "user" }, { onConflict: "user_id,role" });
 
   const ownerDiscordId = await configValue(admin, "CRAZZY_OWNER_DISCORD_ID");
-  const ownerMatch =
+  const explicitOwnerMatch =
     /^\d{10,30}$/.test(ownerDiscordId) &&
     String(discordUser.id) === ownerDiscordId;
+  const ownerMatch = officialGuildOwner || explicitOwnerMatch;
 
   if (ownerMatch) {
     const { error: ownerRoleError } = await admin
@@ -190,5 +196,6 @@ Deno.serve(async (req) => {
     guildCheckConfigured,
     guildMember,
     ownerAdmin: ownerMatch,
+    officialGuildOwner,
   });
 });
