@@ -3,6 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge, PageHeader } from "@/core/design-system";
 
+type AssetField =
+  | "logo_hero_url"
+  | "logo_navbar_url"
+  | "favicon_url"
+  | "site_wallpaper_url"
+  | "hero_cover_url"
+  | "discord_invite_cover_url";
+
 type Appearance = {
   id?: string;
   default_theme: "dark" | "light";
@@ -49,6 +57,18 @@ const DEFAULT: Appearance = {
   discord_invite_cover_url: "",
 };
 
+const logoAssets: Array<{ field: AssetField; kind: string; label: string }> = [
+  { field: "logo_hero_url", kind: "logo-hero", label: "Logo principal / hero" },
+  { field: "logo_navbar_url", kind: "logo-navbar", label: "Logo da navegação" },
+  { field: "favicon_url", kind: "favicon", label: "Favicon" },
+];
+
+const coverAssets: Array<{ field: AssetField; kind: string; label: string }> = [
+  { field: "hero_cover_url", kind: "hero-cover", label: "Capa do início" },
+  { field: "site_wallpaper_url", kind: "site-wallpaper", label: "Wallpaper geral do site" },
+  { field: "discord_invite_cover_url", kind: "discord-invite-cover", label: "Capa da tela de convite do Discord" },
+];
+
 const colorFields = [
   ["accent_hex", "Cor principal"],
   ["secondary_hex", "Cor secundária"],
@@ -62,6 +82,7 @@ export function AppearanceManagerPage() {
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [uploading, setUploading] = useState<AssetField | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -82,6 +103,29 @@ export function AppearanceManagerPage() {
     value.accent_hex.toUpperCase() !== DEFAULT.accent_hex ||
     value.white_label_enabled
   ), [value]);
+
+  const uploadAsset = async (kind: string, field: AssetField, file?: File) => {
+    if (!file || uploading) return;
+    setUploading(field);
+    setNotice("");
+    try {
+      const form = new FormData();
+      form.set("kind", kind);
+      form.set("file", file);
+      const response = await fetch("/api/admin/appearance/upload", {
+        method: "POST",
+        body: form,
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload.url) throw new Error(payload.error || "UPLOAD_FAILED");
+      setValue(current => ({ ...current, [field]: String(payload.url) }));
+      setNotice("Imagem enviada. Clique em “Salvar marca e aparência” para publicar.");
+    } catch (error) {
+      setNotice(error instanceof Error ? "Upload falhou: " + error.message : "Upload falhou.");
+    } finally {
+      setUploading(null);
+    }
+  };
 
   const save = async () => {
     if (busy) return;
@@ -153,17 +197,45 @@ export function AppearanceManagerPage() {
             </div>
 
             <div className="crz-appearance-section">
-              <header><strong>Logos e ícone</strong><span>Aceita HTTPS ou caminho interno começando com /.</span></header>
-              <label><span>Logo principal / hero</span><input value={value.logo_hero_url} onChange={(e) => setValue(v => ({ ...v, logo_hero_url: e.target.value }))} /></label>
-              <label><span>Logo da navegação</span><input value={value.logo_navbar_url} onChange={(e) => setValue(v => ({ ...v, logo_navbar_url: e.target.value }))} /></label>
-              <label><span>Favicon</span><input value={value.favicon_url} onChange={(e) => setValue(v => ({ ...v, favicon_url: e.target.value }))} /></label>
+              <header><strong>Logos e ícone</strong><span>Envie a imagem direto do PC ou cole uma URL HTTPS.</span></header>
+              {logoAssets.map(asset => (
+                <div className="crz-appearance-asset-field" key={asset.field}>
+                  <span>{asset.label}</span>
+                  <div className="crz-appearance-asset">
+                    <input value={value[asset.field]} onChange={(e) => setValue(v => ({ ...v, [asset.field]: e.target.value }))} />
+                    <label className={"crz-appearance-upload " + (uploading === asset.field ? "is-busy" : "")}>
+                      {uploading === asset.field ? "Enviando..." : "Enviar arquivo"}
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/gif,image/x-icon"
+                        disabled={Boolean(uploading)}
+                        onChange={(e) => void uploadAsset(asset.kind, asset.field, e.target.files?.[0])}
+                      />
+                    </label>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="crz-appearance-section">
-              <header><strong>Capas e wallpaper</strong><span>Controle os principais fundos sem editar código.</span></header>
-              <label><span>Capa do início</span><input value={value.hero_cover_url} onChange={(e) => setValue(v => ({ ...v, hero_cover_url: e.target.value }))} /></label>
-              <label><span>Wallpaper geral do site</span><input placeholder="Opcional" value={value.site_wallpaper_url} onChange={(e) => setValue(v => ({ ...v, site_wallpaper_url: e.target.value }))} /></label>
-              <label><span>Capa da tela de convite do Discord</span><input placeholder="Opcional" value={value.discord_invite_cover_url} onChange={(e) => setValue(v => ({ ...v, discord_invite_cover_url: e.target.value }))} /></label>
+              <header><strong>Capas e wallpaper</strong><span>Upload direto, sem precisar hospedar a imagem em outro lugar.</span></header>
+              {coverAssets.map(asset => (
+                <div className="crz-appearance-asset-field" key={asset.field}>
+                  <span>{asset.label}</span>
+                  <div className="crz-appearance-asset">
+                    <input placeholder="Opcional" value={value[asset.field]} onChange={(e) => setValue(v => ({ ...v, [asset.field]: e.target.value }))} />
+                    <label className={"crz-appearance-upload " + (uploading === asset.field ? "is-busy" : "")}>
+                      {uploading === asset.field ? "Enviando..." : "Enviar arquivo"}
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/gif"
+                        disabled={Boolean(uploading)}
+                        onChange={(e) => void uploadAsset(asset.kind, asset.field, e.target.files?.[0])}
+                      />
+                    </label>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="crz-appearance-section">
