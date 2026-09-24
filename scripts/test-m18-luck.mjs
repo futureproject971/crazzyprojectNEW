@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-const migration=await fs.readFile("supabase/migrations/20260924171000_crazzy_bonus_arcade.sql","utf8");
+const migration=await fs.readFile("supabase/migrations/20260924172834_crazzy_bonus_arcade.sql","utf8");
 for(const required of ["bonus_cost_cents","private.bonus_debit","BONUS_BALANCE_LOW","prize_type='bonus'","drop function if exists public.play_luck(text,text,uuid)"])if(!migration.includes(required))throw new Error("Arcade bonus migration missing "+required);
 const page=await fs.readFile("src/modules/luck/LuckPage.tsx","utf8");
 for(const required of ["Raspadinha PINK","crz-pink-grid","canvas","/api/bonus","CRAZZY BONUS"])if(!page.includes(required))throw new Error("PINK Arcade UI missing "+required);
