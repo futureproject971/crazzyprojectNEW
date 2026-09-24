@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 export type GlobalTrackSource = "youtube" | "youtube-music";
 
@@ -57,7 +57,7 @@ export function useGlobalMusic(){
   return value;
 }
 
-export function GlobalMusicProvider({children}:{children:React.ReactNode}){
+export function GlobalMusicProvider({children}:{children:ReactNode}){
   const iframeRef=useRef<HTMLIFrameElement>(null);
   const [hydrated,setHydrated]=useState(false);
   const [queue,setQueue]=useState<GlobalTrack[]>([]);
@@ -93,6 +93,11 @@ export function GlobalMusicProvider({children}:{children:React.ReactNode}){
   const postCommand=useCallback((func:string,args:unknown[]=[])=>( 
     iframeRef.current?.contentWindow?.postMessage(JSON.stringify({event:"command",func,args}),"*")
   ),[]);
+
+  useEffect(()=>{
+    if(!current)return;
+    postCommand(playing?"playVideo":"pauseVideo");
+  },[current?.id,playing,postCommand]);
 
   const previous=useCallback(()=>{
     if(!queue.length)return;
@@ -157,10 +162,8 @@ export function GlobalMusicProvider({children}:{children:React.ReactNode}){
 
   const toggle=useCallback(()=>{
     if(!current)return;
-    const nextState=!playing;
-    setPlaying(nextState);
-    postCommand(nextState?"playVideo":"pauseVideo");
-  },[current,playing,postCommand]);
+    setPlaying(value=>!value);
+  },[current]);
 
   const stop=useCallback(()=>{
     setPlaying(false);
@@ -219,7 +222,7 @@ export function GlobalMusicProvider({children}:{children:React.ReactNode}){
           />
         </div>
         <div className="crz-global-music__meta">
-          <span>{current.source==="youtube-music"?"YOUTUBE MUSIC":"YOUTUBE"} • MINI PLAYER</span>
+          <span>{current.source==="youtube-music"?"YOUTUBE MUSIC":"YOUTUBE"} • PIP</span>
           <strong>{current.title}</strong>
           <small>{current.channel}</small>
           <div className="crz-global-music__controls">
