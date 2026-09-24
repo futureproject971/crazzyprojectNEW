@@ -1,12 +1,13 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Drawer, Dropdown, LineIcon } from "@/core/design-system";
 import { useAuth } from "@/modules/auth/AuthProvider";
 import { useCart } from "@/modules/cart/CartProvider";
 import { useTheme } from "@/core/theme/ThemeProvider";
 import { getNavigation } from "./navigation";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import type { ShellMode, ShellNavItem } from "./types";
 
 function ShellIcon({src}:{src:string}){return <span className="crz-shell-icon" aria-hidden="true" style={{WebkitMaskImage:'url("'+src+'")',maskImage:'url("'+src+'")'}}/>}
@@ -19,12 +20,64 @@ function NavLinks({items,activeNav,cartCount,compact=false,onNavigate}:{items:Sh
 
 export function AppHeader({mode="visitor",activeNav="home",cartCount:fallbackCartCount=0,userName="Meu Painel"}:{mode?:ShellMode;activeNav?:string;cartCount?:number;userName?:string}){
  const [mobileOpen,setMobileOpen]=useState(false);
+ const [openTicketCount,setOpenTicketCount]=useState(0);
  const router=useRouter();
  const {totalQuantity,hydrated}=useCart();
  const {user,loading:authLoading,signIn,signOut,discordEnabled}=useAuth();
  const {brandName,logoNavbarUrl}=useTheme();
  const cartCount=hydrated?totalQuantity:fallbackCartCount;
  const effectiveMode:ShellMode=user?(user.role==="admin"?"admin":"client"):(mode==="admin"?"visitor":mode);
+ const refreshOpenTicketCount=useCallback(async()=>{
+  if(effectiveMode!=="admin"){
+   setOpenTicketCount(0);
+   return;
+  }
+  try{
+   const response=await fetch("/api/admin/support/open-count",{cache:"no-store",credentials:"same-origin"});
+   const payload=await response.json().catch(()=>({}));
+   if(response.ok)setOpenTicketCount(Math.max(0,Number(payload?.openCount||0)));
+  }catch{
+   // Badge is non-blocking: keep the last known number on transient failures.
+  }
+ },[effectiveMode]);
+
+ useEffect(()=>{
+  if(effectiveMode!=="admin"){
+   setOpenTicketCount(0);
+   return;
+  }
+
+  void refreshOpenTicketCount();
+  const supabase=createBrowserSupabaseClient();
+  let timer:number|null=null;
+
+  const queueRefresh=()=>{
+   if(timer)window.clearTimeout(timer);
+   timer=window.setTimeout(()=>{
+    timer=null;
+    void refreshOpenTicketCount();
+   },120);
+  };
+
+  const channel=supabase
+   .channel("admin-open-ticket-badge")
+   .on(
+    "postgres_changes",
+    {event:"*",schema:"public",table:"support_tickets"},
+    queueRefresh
+   )
+   .subscribe();
+
+  const fallback=window.setInterval(()=>{
+   if(document.visibilityState==="visible")void refreshOpenTicketCount();
+  },30000);
+
+  return()=>{
+   if(timer)window.clearTimeout(timer);
+   window.clearInterval(fallback);
+   void supabase.removeChannel(channel);
+  };
+ },[effectiveMode,refreshOpenTicketCount]);
  const items=getNavigation(effectiveMode);
  const displayName=user?.username||userName;
  const go=(path:string)=>router.push(path);
@@ -54,7 +107,7 @@ export function AppHeader({mode="visitor",activeNav="home",cartCount:fallbackCar
    <div className="crz-shell-header__main"><Link className="crz-shell-brand" href="/" aria-label={brandName+", início"}><img src={logoNavbarUrl} alt={brandName}/></Link><NavLinks items={items} activeNav={activeNav} cartCount={cartCount}/>{effectiveMode!=="visitor"&&<button type="button" className="crz-shell-search" aria-label="Pesquisar"><ShellIcon src="/icons/search.svg"/></button>}</div>
    <div className="crz-shell-header__account" aria-label="Conta e acesso">
     <Link href={ticketHref} className="crz-shell-auth crz-shell-auth--ticket"><ShellIcon src="/icons/headset.svg"/><span>Ticket</span></Link>
-    {!user?(discordEnabled?<button type="button" className="crz-shell-auth crz-shell-auth--discord" disabled={authLoading} onClick={()=>void signIn("discord",window.location.pathname)}><img src="/icons/brand-discord.svg" alt="" aria-hidden="true"/><span>{authLoading?"Verificando...":"Entrar com Discord"}</span></button>:<Link href="/login" className="crz-shell-auth"><LineIcon name="user" size={14}/><span>Discord indisponível</span></Link>):<Dropdown items={accountItems} trigger={<span className="crz-shell-user"><span className="crz-shell-user__avatar" aria-hidden="true">{user.avatarUrl?<img src={user.avatarUrl} alt=""/>:null}</span><span>{displayName}</span><LineIcon name="user" size={14}/></span>}/>}
+    {!user?(discordEnabled?<button type="button" className="crz-shell-auth crz-shell-auth--discord" disabled={authLoading} onClick={()=>void signIn("discord",window.location.pathname)}><img src="/icons/brand-discord.svg" alt="" aria-hidden="true"/><span>{authLoading?"Verificando...":"Entrar com Discord"}</span></button>:<Link href="/login" className="crz-shell-auth"><LineIcon name="user" size={14}/><span>Discord indisponível</span></Link>):<Dropdown items={accountItems} trigger={<span className="crz-shell-user"><span className="crz-shell-user__avatar" aria-hidden="true">{user.avatarUrl?<img src={user.avatarUrl} alt=""/>:null}{effectiveMode==="admin"&&openTicketCount>0&&<b className="crz-shell-user__ticket-badge">{openTicketCount>99?"99+":openTicketCount}</b>}</span><span>{displayName}</span><LineIcon name="user" size={14}/></span>}/>}
    </div>
    <button type="button" className="crz-shell-menu" aria-label="Abrir menu" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(true)}><span/><span/><span/></button>
   </header>
