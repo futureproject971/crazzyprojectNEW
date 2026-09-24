@@ -201,13 +201,16 @@ export function ProductManagerPage() {
   }, []);
 
   useEffect(() => {
-    if (!creatingProduct) return;
+    if (!creatingProduct && !editorOpen && !stockModalOpen) return;
 
     const previousOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !busy) setCreatingProduct(false);
+      if (event.key !== "Escape" || busy || stockBusy || imageUploading) return;
+      if (stockModalOpen) return setStockModalOpen(false);
+      if (creatingProduct) return setCreatingProduct(false);
+      setEditorOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
 
@@ -215,7 +218,7 @@ export function ProductManagerPage() {
       window.removeEventListener("keydown", onKeyDown);
       document.documentElement.style.overflow = previousOverflow;
     };
-  }, [creatingProduct, busy]);
+  }, [creatingProduct, editorOpen, stockModalOpen, busy, stockBusy, imageUploading]);
 
   const stockItems = useMemo(
     () => stockText.split(/\r?\n/).map(item => item.trim()).filter(Boolean),
