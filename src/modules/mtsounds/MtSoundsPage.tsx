@@ -53,10 +53,10 @@ export function MtSoundsPage() {
             <ReactiveVinyl />
           </div>
           <div className="master-copy">
-            <div className="live-monitor"><span className="monitor-bars"><i/><i/><i/><i/></span> REAGE AO PLAYER</div>
-            <h2>O disco sente<br/>quando o grave bate.</h2>
-            <p>Play faz girar. Pause segura o ângulo. No Studio, cada pancada de grave acelera, pulsa e ilumina o vinil em tempo real.</p>
-            <Link href="/mtsounds/editor" className="btn-primary"><SlidersHorizontal size={18}/> Testar no Studio</Link>
+            <div className="live-monitor"><span className="monitor-bars"><i/><i/><i/><i/></span> VINYL REACTOR</div>
+            <h2>O SOM BATE.<br/>O VINIL RESPONDE.</h2>
+            <p>Ritmo, grave e FX ganham movimento em tempo real. O visual acompanha a faixa sem tirar você da experiência.</p>
+            <Link href="/mtsounds/editor" className="btn-primary"><SlidersHorizontal size={18}/> Abrir MTS Studio</Link>
           </div>
         </section>
 
