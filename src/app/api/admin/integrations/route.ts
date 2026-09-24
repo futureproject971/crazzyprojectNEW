@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getMtSoundsRuntimeConfig, probeMtSounds } from "@/lib/mtsounds/config";
+import { checkoutEdgeUrl } from "@/app/api/checkout/_shared";
 
 function bool(value: string | undefined) {
   return Boolean(value && value.trim());
@@ -18,11 +19,14 @@ export async function GET() {
 
   const mtSounds = getMtSoundsRuntimeConfig();
 
-  const [payments, credentials, workers, mtSoundsHealth] = await Promise.all([
+  const [payments, credentials, workers, mtSoundsHealth, checkoutHealth] = await Promise.all([
     supabase.from("payment_settings").select("method,label,enabled,updated_at").order("method"),
     supabase.from("system_credentials").select("env_key,value").in("env_key", ["DISCORD_GUILD_ID","DISCORD_INVITE_URL","LZT_MARKET_TOKEN"]),
     supabase.from("discord_campaign_worker_status").select("worker_id,connected,last_seen_at,guild_id,guild_name,bot_tag,version,last_error").order("last_seen_at",{ascending:false}).limit(1).maybeSingle(),
     probeMtSounds(mtSounds.url),
+    fetch(checkoutEdgeUrl("config"), { cache: "no-store", headers: { Accept: "application/json" } })
+      .then(async response => response.ok ? await response.json() : null)
+      .catch(() => null),
   ]);
 
   if (payments.error || credentials.error) {
@@ -36,6 +40,7 @@ export async function GET() {
   const workerAge = worker?.last_seen_at ? Date.now() - new Date(worker.last_seen_at).getTime() : Infinity;
   const workerOnline = Boolean(worker?.connected && Number.isFinite(workerAge) && workerAge < 45_000);
   const paymentMap = new Map((payments.data || []).map(item => [item.method, item]));
+  const purinCashReady = checkoutHealth?.ready === true;
 
   return NextResponse.json({
     generatedAt: new Date().toISOString(),
@@ -118,22 +123,37 @@ export async function GET() {
           : "Token do fornecedor ainda não configurado.",
       },
       {
+        id: "purincash-core",
+        name: "PurinCash • Backend",
+        state: purinCashReady ? "ready" : "missing",
+        detail: purinCashReady
+          ? "API key, assinatura de checkout e webhook estão configurados no backend."
+          : "Backend PurinCash ainda não confirmou API key + signing secret + webhook secret.",
+        meta: checkoutHealth ? { cardGate: checkoutHealth.cardGate === true } : null,
+      },
+      {
         id: "pix",
         name: "PurinCash • PIX",
-        state: paymentMap.get("pix")?.enabled ? "enabled" : "disabled",
-        detail: paymentMap.get("pix")?.enabled ? "Método liberado para checkout." : "Método desligado no fail-safe.",
+        state: paymentMap.get("pix")?.enabled ? (purinCashReady ? "enabled" : "partial") : "disabled",
+        detail: paymentMap.get("pix")?.enabled
+          ? (purinCashReady ? "Método liberado para checkout." : "Método marcado como ativo, mas backend PurinCash ainda não está pronto.")
+          : "Método desligado no fail-safe.",
       },
       {
         id: "card",
         name: "PurinCash • Cartão",
-        state: paymentMap.get("card")?.enabled ? "enabled" : "disabled",
-        detail: paymentMap.get("card")?.enabled ? "Método liberado para checkout." : "Método desligado no fail-safe.",
+        state: paymentMap.get("card")?.enabled ? (purinCashReady && checkoutHealth?.cardGate === true ? "enabled" : "partial") : "disabled",
+        detail: paymentMap.get("card")?.enabled
+          ? (purinCashReady && checkoutHealth?.cardGate === true ? "Método liberado para checkout." : "Cartão requer backend pronto e card gate habilitado.")
+          : "Método desligado no fail-safe.",
       },
       {
         id: "crypto",
         name: "PurinCash • Litecoin",
-        state: paymentMap.get("crypto")?.enabled ? "enabled" : "disabled",
-        detail: paymentMap.get("crypto")?.enabled ? "Método liberado para checkout." : "Método desligado no fail-safe.",
+        state: paymentMap.get("crypto")?.enabled ? (purinCashReady ? "enabled" : "partial") : "disabled",
+        detail: paymentMap.get("crypto")?.enabled
+          ? (purinCashReady ? "Método liberado para checkout." : "Método marcado como ativo, mas backend PurinCash ainda não está pronto.")
+          : "Método desligado no fail-safe.",
       },
     ],
   }, { headers: { "Cache-Control": "private, no-store" } });
