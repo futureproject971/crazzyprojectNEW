@@ -510,7 +510,14 @@ export function ProductManagerPage() {
                   </div>
                 </section>
 
-                <div className="crz-pm-editor__header crz-pm-editor__header--section">
+                <nav className="crz-pm-section-nav" aria-label="Seções do produto">
+                  <a href="#pm-geral">Geral</a>
+                  <a href="#pm-planos">Planos & Estoque</a>
+                  <a href="#pm-automacao">Automação</a>
+                  <a href="#pm-academy">Academy</a>
+                </nav>
+
+                <div id="pm-geral" className="crz-pm-editor__header crz-pm-editor__header--section">
                   <div>
                     <small>INFORMAÇÕES DO PRODUTO</small>
                     <h2>Apresentação e catálogo</h2>
@@ -565,7 +572,7 @@ export function ProductManagerPage() {
                   <button type="button" className={productDraft.is_new ? "is-on" : ""} onClick={() => setProductDraft({...productDraft,is_new:!productDraft.is_new})}><i /> Marcar como novo</button>
                 </div>
 
-                <div className="crz-pm-subsection">
+                <div id="pm-automacao" className="crz-pm-subsection crz-pm-anchor-section">
                   <header><small>AUTOMAÇÃO DO PRODUTO</small><strong>Comportamentos padrão</strong></header>
                   <div className="crz-pm-automation">
                     {automationKeys.map(([key,label]) => {
@@ -575,7 +582,7 @@ export function ProductManagerPage() {
                   </div>
                 </div>
 
-                <section className="crz-pm-tutorials">
+                <section id="pm-academy" className="crz-pm-tutorials crz-pm-anchor-section">
                   <header><small>ACADEMY</small><h3>Tutorial por produto</h3></header>
                   <div>
                     {catalog.tutorials.map(tutorial => {
@@ -585,7 +592,7 @@ export function ProductManagerPage() {
                   </div>
                 </section>
 
-                <section className="crz-pm-plans">
+                <section id="pm-planos" className="crz-pm-plans crz-pm-anchor-section">
                   <header>
                     <div><small>PLANOS</small><h3>Configuração de entrega</h3></div>
                     <div className="crz-pm-plans__actions">
