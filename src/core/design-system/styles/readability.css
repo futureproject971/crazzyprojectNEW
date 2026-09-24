@@ -1143,3 +1143,223 @@ textarea:focus-visible {
   font-size: 13px !important;
   line-height: 1.5 !important;
 }
+
+
+/* PASS 5: remaining customer modules */
+
+/* BONUS */
+.crz-bonus-balance small,
+.crz-bonus-grid header span,
+.crz-bonus-plan span,
+.crz-bonus-ledger small,
+.crz-bonus-rules {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* COUPONS */
+.crz-coupons-summary small,
+.crz-coupons-summary span,
+.crz-coupons-notice,
+.crz-coupons-filters button,
+.crz-coupon-card header span,
+.crz-coupon-card header b,
+.crz-coupon-card__meta small,
+.crz-coupon-card__products small,
+.crz-coupon-card__meta strong,
+.crz-coupon-card__products span,
+.crz-coupon-card footer button,
+.crz-coupons-empty p,
+.crz-coupon-picker__head span,
+.crz-coupon-picker__head a,
+.crz-coupon-picker__wallet-link,
+.crz-coupon-picker button strong,
+.crz-coupon-picker button span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-coupon-card__benefit code {
+  font-size: 13px !important;
+}
+
+/* CLUB */
+.crz-club-hero-card__copy > span,
+.crz-club-card small,
+.crz-club-card p,
+.crz-club-security span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-club-hero-card__copy p,
+.crz-club-security strong {
+  font-size: 13px !important;
+}
+
+/* MTSOUNDS */
+.crz-mtsounds-notice strong,
+.crz-mtsounds-footer-note strong,
+.crz-mtsounds-loading strong {
+  font-size: 13px !important;
+}
+.crz-mtsounds-notice span,
+.crz-mtsounds-footer-note span,
+.crz-mtsounds-frame-shell > header span,
+.crz-mtsounds-frame-shell > header strong,
+.crz-mtsounds-loading p,
+.crz-mtsounds-external p {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* NOTIFICATIONS */
+.crz-notify-list strong,
+.crz-notify-admin strong {
+  font-size: 13px !important;
+}
+.crz-notify-summary small,
+.crz-notify-list p,
+.crz-notify-list small,
+.crz-notify-admin small,
+.crz-notify-notice {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* INTERACTIVE DEMO */
+.crz-imgui-toolbar span,
+.crz-imgui-toolbar strong,
+.crz-imgui-sidebar button,
+.crz-imgui-topbar > strong,
+.crz-imgui-section > header,
+.crz-imgui-row,
+.crz-imgui-row--slider strong,
+.crz-imgui-row--select select,
+.crz-imgui-preview > header,
+.crz-imgui-preview > footer,
+.crz-imgui-preview__name,
+.crz-imgui-preview__weapon,
+.crz-imgui-preview__hit,
+.crz-imgui-toast {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-imgui-topbar input[type=text],
+.crz-imgui-topbar input:not([type]) {
+  font-size: 13px !important;
+}
+
+/* STATUS */
+.crz-status-components__list strong,
+.crz-status-no-incidents strong,
+.crz-status-incident-list article > header strong,
+.crz-status-help strong {
+  font-size: 13px !important;
+}
+.crz-status-state p,
+.crz-status-overall p,
+.crz-status-components > header > span,
+.crz-status-components__list span,
+.crz-status-components__list small,
+.crz-status-no-incidents span,
+.crz-status-incident-list time,
+.crz-status-incident-list article > p,
+.crz-status-incident__components span,
+.crz-status-incident__timeline strong,
+.crz-status-incident__timeline p,
+.crz-status-incident__timeline time,
+.crz-status-help span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* ACCOUNTS MARKET */
+.crz-accounts-source span,
+.crz-accounts-games button span,
+.crz-accounts-games button small,
+.crz-accounts-filters > header > span,
+.crz-accounts-results__head > div > span,
+.crz-accounts-filters header p,
+.crz-accounts-field > span,
+.crz-accounts-security-note strong,
+.crz-accounts-security-note span,
+.crz-accounts-results__count span,
+.crz-account-card__live,
+.crz-account-card__title small,
+.crz-account-stat span,
+.crz-account-detail__info span,
+.crz-account-card__footer small,
+.crz-account-card__footer > div span,
+.crz-account-card__footer a,
+.crz-accounts-pagination > div,
+.crz-account-detail__breadcrumb,
+.crz-account-detail__summary > small,
+.crz-account-detail__price-guard small,
+.crz-account-detail__price-guard span,
+.crz-account-detail__actions > a,
+.crz-account-detail__panel--security ul,
+.crz-account-card__status,
+.crz-account-card__preview > span,
+.crz-account-card__preview > small,
+.crz-account-detail__art-copy span,
+.crz-account-detail__price-box small,
+.crz-account-detail__price-box span,
+.crz-account-detail__delivery span,
+.crz-account-detail__cosmetic span,
+.crz-account-detail__cosmetic small,
+.crz-account-detail__inventory-empty span,
+.crz-account-filter-title button,
+.crz-account-filter-section__head > span,
+.crz-account-rank-grid span,
+.crz-account-weapon-grid span,
+.crz-account-switch,
+.crz-account-range > i,
+.crz-account-range label > span,
+.crz-accounts-results__tools > label > span,
+.crz-accounts-results__tools select,
+.crz-account-card__chips span,
+.crz-account-card__legacy-rank small,
+.crz-account-card__legacy-rank > span,
+.crz-account-card__legacy-benefits span,
+.crz-account-detail__gallery-main > span,
+.crz-account-detail__gallery-count,
+.crz-account-detail__rank-current small,
+.crz-account-detail__checklist span,
+.crz-account-detail__full-access p,
+.crz-account-detail__full-access ul,
+.crz-account-detail__inventory-legacy > header span,
+.crz-account-detail__inventory-legacy > header small,
+.crz-account-detail__tabs button,
+.crz-account-detail__tabs button span,
+.crz-account-detail__inventory-grid > button > span,
+.crz-account-lightbox__nav span,
+.crz-account-card__activity small,
+.crz-account-risk,
+.crz-account-detail__activity-box small,
+.crz-account-detail__activity-box > span,
+.crz-account-detail__facts-panel > header span,
+.crz-account-detail__facts-panel > header p {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-account-stat strong,
+.crz-account-detail__info strong,
+.crz-account-card__footer strong,
+.crz-account-detail__summary > p,
+.crz-account-detail__price-guard strong,
+.crz-account-detail__delivery strong,
+.crz-account-detail__cosmetic strong,
+.crz-account-detail__inventory-empty strong,
+.crz-account-rank-grid button > strong,
+.crz-account-card__legacy-rank strong,
+.crz-account-detail__legacy-stats h3,
+.crz-account-lightbox strong,
+.crz-account-card__activity strong {
+  font-size: 13px !important;
+}
+.crz-accounts-field input:not(.crz-input),
+.crz-account-filter-search input,
+.crz-account-filter-section__body > select,
+.crz-accounts-field > select,
+.crz-account-range input {
+  font-size: 13px !important;
+}
