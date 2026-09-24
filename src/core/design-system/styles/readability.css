@@ -215,3 +215,1640 @@ textarea:focus-visible {
   body { font-size: 14px; }
   .nav-item { font-size: 12px; }
 }
+
+
+/* PASS 2: customer-facing modules
+   Raise tiny legacy labels into a readable range without flattening visual hierarchy. */
+
+/* COMMUNITY */
+.crz-community-hero p,
+.crz-community-channel-panel > header strong,
+.crz-community-chat-head strong,
+.crz-community-empty strong,
+.crz-community-message-body > p,
+.chat-preview-link > span:nth-child(2),
+.crz-community-voice-dock > header strong {
+  font-size: 13px !important;
+}
+.crz-community-live span,
+.crz-community-channel-panel > header small,
+.crz-community-channel-panel nav strong,
+.crz-community-channel-panel nav small,
+.crz-community-rules strong,
+.crz-community-info strong,
+.crz-community-rules span,
+.crz-community-info span,
+.crz-community-chat-head small,
+.crz-community-empty span,
+.crz-community-message-body > header > button,
+.crz-community-message-body time,
+.crz-community-role,
+.crz-community-reply-preview strong,
+.crz-community-reply-preview span,
+.crz-community-message-actions > button,
+.crz-community-reactions > button,
+.crz-community-reactions summary,
+.crz-community-media strong,
+.crz-community-media small,
+.crz-community-compose-reply,
+.crz-community-compose-files span,
+.crz-community-compose footer,
+.crz-community-profile-name span,
+.crz-community-profile-main > p,
+.crz-community-profile-main dt,
+.crz-community-profile-main dd,
+.crz-community-profile-roles > small,
+.crz-community-profile-roles span,
+.crz-community-profile-loading,
+.crz-community-error-toast,
+.crz-community-voice-dock > header small,
+.crz-community-voice-dock__live,
+.crz-community-voice-actions > button strong,
+.crz-community-voice-actions > button small,
+.crz-community-voice-actions input,
+.crz-community-voice-actions label button,
+.crz-community-voice-list__label span,
+.crz-community-voice-list__label a,
+.crz-community-voice-empty small,
+.crz-community-voice-room strong,
+.crz-community-voice-room small,
+.crz-community-voice-features span,
+.crz-community-voice-dock > p {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-community-compose textarea {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+.crz-community-channel-panel nav small,
+.crz-community-rules span,
+.crz-community-info span,
+.crz-community-message-body time,
+.crz-community-profile-main dt,
+.crz-community-profile-main dd,
+.crz-community-profile-roles span,
+.crz-community-voice-actions > button small,
+.crz-community-voice-room small,
+.crz-community-voice-dock > p {
+  color: #aab7c7 !important;
+}
+
+/* SUPPORT / TICKETS */
+.crz-support-hero p,
+.crz-support-ticket-card__main > strong,
+.crz-support-message__bubble > p,
+.crz-support-thread-head a {
+  font-size: 13px !important;
+}
+.crz-support-stat span,
+.crz-support-ticket-card__top > small,
+.crz-support-ticket-card__main > p,
+.crz-support-ticket-card footer,
+.crz-support-category-grid strong,
+.crz-support-category-grid small,
+.crz-support-form-section label > span,
+.crz-support-form-section label > small,
+.crz-support-context-preview strong,
+.crz-support-context-preview span,
+.crz-support-file-picker strong,
+.crz-support-file-picker span,
+.crz-support-selected-files strong,
+.crz-support-selected-files small,
+.crz-support-tip strong,
+.crz-support-tip span,
+.crz-support-form-error,
+.crz-support-thread-head small,
+.crz-support-message__bubble > header strong,
+.crz-support-message__bubble > header > span,
+.crz-support-attachment strong,
+.crz-support-attachment span,
+.crz-support-attachment small,
+.crz-support-compose-files span,
+.crz-support-compose__actions > span,
+.crz-support-closed-notice,
+.crz-support-context-product strong,
+.crz-support-context-product small,
+.crz-support-context-empty,
+.crz-support-context-card dt,
+.crz-support-context-card dd,
+.crz-support-context-safe span,
+.crz-support-event-list strong,
+.crz-support-event-list span,
+.crz-support-inline-error {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-support-form-section input,
+.crz-support-form-section textarea,
+.crz-support-form-section select,
+.crz-support-compose textarea {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+.crz-support-ticket-card__main > p,
+.crz-support-category-grid small,
+.crz-support-form-section label > small,
+.crz-support-context-preview span,
+.crz-support-file-picker span,
+.crz-support-selected-files small,
+.crz-support-tip span,
+.crz-support-thread-head small,
+.crz-support-context-product small,
+.crz-support-context-empty,
+.crz-support-context-card dt,
+.crz-support-context-card dd,
+.crz-support-event-list span {
+  color: #a8b6c7 !important;
+}
+
+/* PRODUCT VIEW */
+.crz-product-breadcrumb,
+.crz-product-gallery__zoom,
+.crz-product-summary__eyebrow,
+.crz-product-rating > span:last-child,
+.crz-product-plan-block__head span,
+.crz-product-plan-block__head strong,
+.crz-product-plans b,
+.crz-product-plans span,
+.crz-product-plans small,
+.crz-product-plans em,
+.crz-product-buy-box small,
+.crz-product-buy-box span,
+.crz-product-buy-box > p,
+.crz-product-benefits strong,
+.crz-product-benefits small,
+.crz-product-highlight-grid > div,
+.crz-product-review__head strong,
+.crz-product-review__head small,
+.crz-product-review__head time,
+.crz-product-review__stars,
+.crz-product-related__grid small,
+.crz-product-related__grid span {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-product-summary__subtitle,
+.crz-product-rating strong,
+.crz-product-plans strong,
+.crz-product-info__description > p,
+.crz-product-compatibility li,
+.crz-product-reviews__list p,
+.crz-product-faq summary,
+.crz-product-faq p,
+.crz-product-related__grid strong {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+.crz-product-status-grid span {
+  font-size: 11px !important;
+}
+.crz-product-status-grid strong,
+.crz-product-buy-box strong {
+  font-size: 14px !important;
+}
+
+/* CLIENT HUB */
+.crz-hub-profile p,
+.crz-hub-order__main strong,
+.crz-hub-entitlement__body strong {
+  font-size: 13px !important;
+}
+.crz-hub-sidebar nav button span,
+.crz-hub-sidebar nav button b,
+.crz-hub-sidebar__support strong,
+.crz-hub-sidebar__support span,
+.crz-hub-stat span,
+.crz-hub-panel > header button,
+.crz-hub-panel > header span,
+.crz-hub-panel > header a,
+.crz-hub-mini-empty span,
+.crz-hub-product-list strong,
+.crz-hub-tutorial-list strong,
+.crz-hub-delivery-list strong,
+.crz-hub-role-list strong,
+.crz-hub-discord-card strong,
+.crz-hub-discord-detail strong,
+.crz-hub-product-list span,
+.crz-hub-tutorial-list span,
+.crz-hub-delivery-list span,
+.crz-hub-discord-card span,
+.crz-hub-discord-detail span,
+.crz-hub-tutorial-list small,
+.crz-hub-delivery-list small,
+.crz-hub-discord-detail small,
+.crz-hub-tutorial-list button,
+.crz-hub-order__main small,
+.crz-hub-order__main span,
+.crz-hub-order__status small,
+.crz-hub-entitlement__body small,
+.crz-hub-entitlement__body span,
+.crz-hub-entitlement footer,
+.crz-hub-sensitive-note span,
+.crz-hub-app-roles span,
+.crz-hub-inline-error {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* CATALOG */
+.crz-catalog-category-strip button,
+.crz-catalog-filters__head span,
+.crz-catalog-filters__head button,
+.crz-catalog-filter-group legend,
+.crz-catalog-filter-group label,
+.crz-catalog-filter-note strong,
+.crz-catalog-filter-note span,
+.crz-catalog-results__eyebrow,
+.crz-catalog-results__meta span,
+.crz-catalog-card__badges .crz-badge,
+.crz-catalog-card__category,
+.crz-catalog-stock,
+.crz-catalog-stock .crz-badge,
+.crz-catalog-card__mock-price small,
+.crz-catalog-card__footer a,
+.crz-catalog-pagination {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-catalog-discovery-link,
+.crz-catalog-card__body > p,
+.crz-catalog-card__mock-price strong {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+/* PROFILE */
+.crz-profile-card__name > span,
+.crz-profile-about strong,
+.crz-profile-member strong,
+.crz-profile-app-roles > strong,
+.crz-profile-about p,
+.crz-profile-member span,
+.crz-profile-app-roles span,
+.crz-profile-stat span,
+.crz-profile-discord strong,
+.crz-profile-discord span,
+.crz-profile-discord small,
+.crz-profile-role-list strong,
+.crz-profile-empty-roles span,
+.crz-profile-editor label > span,
+.crz-profile-color-field > span,
+.crz-profile-editor label > small,
+.crz-profile-color-row code,
+.crz-profile-inline-error,
+.crz-profile-rank__main small,
+.crz-profile-rank__main span,
+.crz-profile-rank__main em,
+.crz-profile-rank > a {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-profile-rank__main strong {
+  font-size: 14px !important;
+}
+.crz-profile-editor input[type="text"],
+.crz-profile-editor input:not([type]),
+.crz-profile-editor textarea,
+.crz-profile-editor select {
+  font-size: 13px !important;
+}
+
+/* REWARDS + LUCK */
+.crz-rewards-login strong,
+.crz-rewards-state strong,
+.crz-reward-card__products strong,
+.crz-rewards-history__list strong,
+.crz-luck-rules strong,
+.crz-luck-state strong,
+.crz-luck-history__grid strong,
+.crz-luck-history__grid b,
+.crz-arcade-wallet small,
+.crz-arcade-wallet a,
+.crz-pink-cell__value,
+.crz-pink-side p,
+.crz-arcade-history > div {
+  font-size: 12.5px !important;
+}
+.crz-rewards-login span,
+.crz-rewards-notice,
+.crz-rewards-catalog > header span,
+.crz-rewards-active > header span,
+.crz-rewards-history > header span,
+.crz-reward-card__copy small,
+.crz-reward-card__copy p,
+.crz-reward-card__products small,
+.crz-reward-card__products b,
+.crz-rewards-state p,
+.crz-rewards-video > div,
+.crz-rewards-progress > div:first-child,
+.crz-rewards-progress small,
+.crz-rewards-session-meta span,
+.crz-rewards-session-meta strong,
+.crz-rewards-attention strong,
+.crz-rewards-attention span,
+.crz-rewards-watch-note,
+.crz-rewards-history > header button,
+.crz-rewards-history__list span,
+.crz-rewards-history__list small,
+.crz-rewards-history__list b,
+.crz-luck-rules span,
+.crz-luck-notice,
+.crz-luck-tabs button,
+.crz-luck-wheel__hub span,
+.crz-luck-game-actions > p,
+.crz-luck-result > span,
+.crz-luck-result > small,
+.crz-luck-result > em,
+.crz-luck-result__coupon label,
+.crz-luck-result__coupon button,
+.crz-luck-scratch-prize > div > span,
+.crz-luck-odds header span,
+.crz-luck-history header span,
+.crz-luck-odds > p,
+.crz-luck-odds__list span,
+.crz-luck-odds__list small,
+.crz-luck-odds__list strong,
+.crz-luck-history > header button,
+.crz-luck-history__grid small,
+.crz-luck-history__grid span,
+.crz-luck-history__grid code,
+.crz-luck-state p,
+.crz-luck-payment > header small,
+.crz-luck-payment > small,
+.crz-luck-payment > header > span,
+.crz-luck-payment > p,
+.crz-luck-payment__methods small,
+.crz-luck-payment label,
+.crz-luck-payment label button {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-luck-payment textarea {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+
+/* PASS 3: admin operational modules
+   Admin screens must be dense, not microscopic. */
+
+/* FINANCE */
+.crz-finance-method-card > header strong,
+.crz-finance-chart-card header strong,
+.crz-finance-payments header strong,
+.crz-finance-holds header strong,
+.crz-finance-summary strong,
+.crz-finance-risk-strip strong,
+.crz-finance-hold-list strong {
+  font-size: 13px !important;
+}
+.crz-finance-presets button,
+.crz-finance-toolbar > select,
+.crz-finance-custom-range input,
+.crz-finance-custom-range span,
+.crz-finance-warning strong,
+.crz-finance-warning span,
+.crz-finance-notice,
+.crz-finance-summary small,
+.crz-finance-summary span,
+.crz-finance-risk-strip small,
+.crz-finance-risk-strip span,
+.crz-finance-risk-strip > button,
+.crz-finance-method-card > header small,
+.crz-finance-method-metrics span,
+.crz-finance-fee-editor span,
+.crz-finance-method-metrics strong,
+.crz-finance-fee-editor input,
+.crz-finance-method-card > footer > span,
+.crz-finance-method-card button,
+.crz-finance-payments button,
+.crz-finance-hold-actions button,
+.crz-finance-chart-card header small,
+.crz-finance-payments header small,
+.crz-finance-holds header small,
+.crz-finance-chart-card header > span,
+.crz-finance-payments header > span,
+.crz-finance-bar-value span,
+.crz-finance-bar-value small,
+.crz-finance-bar-column > b,
+.crz-finance-payment-head,
+.crz-finance-payment-table article strong,
+.crz-finance-payment-table article small,
+.crz-finance-empty,
+.crz-finance-hold-list small,
+.crz-finance-hold-list span,
+.crz-finance-footnote {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-finance-fee-editor input,
+.crz-finance-custom-range input,
+.crz-finance-toolbar > select {
+  min-height: 36px;
+}
+
+/* STOCK MANAGER */
+.crz-stock-summary small,
+.crz-stock-summary span,
+.crz-stock-notice,
+.crz-stock-plan-list small,
+.crz-stock-plan-list em,
+.crz-stock-plan-head small,
+.crz-stock-plan-head span,
+.crz-stock-plan-metrics span,
+.crz-stock-import header small,
+.crz-stock-items header small,
+.crz-stock-history header small,
+.crz-stock-import-fields label > span,
+.crz-stock-import-foot > span,
+.crz-stock-items header > button,
+.crz-stock-items-row,
+.crz-stock-items-row.is-head,
+.crz-stock-items-row code,
+.crz-stock-items-row b,
+.crz-stock-items-row button,
+.crz-stock-empty,
+.crz-stock-history article > div > div:not(.crz-stock-empty),
+.crz-stock-history article > div small,
+.crz-stock-history time {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-stock-search input,
+.crz-stock-import textarea,
+.crz-stock-import-fields input {
+  font-size: 13px !important;
+}
+.crz-stock-plan-list strong,
+.crz-stock-plan-list b,
+.crz-stock-import header strong,
+.crz-stock-items header strong,
+.crz-stock-history header strong,
+.crz-stock-empty strong,
+.crz-stock-history article > div strong {
+  font-size: 13px !important;
+}
+
+/* PAYMENTS */
+.crz-payments-methods small,
+.crz-payments-methods span,
+.crz-payments-methods button,
+.crz-payments-summary small,
+.crz-payments-summary span,
+.crz-payments-notice,
+.crz-payments-row--head,
+.crz-payments-row--item small,
+.crz-payments-pagination span,
+.crz-payments-pagination button,
+.crz-payments-detail-actions button,
+.crz-payments-case-list button,
+.crz-payments-detail-head small,
+.crz-payments-detail-section header small,
+.crz-payments-detail-head span,
+.crz-payments-detail-grid span,
+.crz-payments-detail-grid strong,
+.crz-payments-detail-section header strong,
+.crz-payments-event-list strong,
+.crz-payments-case-list strong,
+.crz-payments-event-list small,
+.crz-payments-case-list small,
+.crz-payments-event-list em,
+.crz-payments-case-list em,
+.crz-payments-secret-note,
+.crz-payments-empty,
+.crz-payments-detail-empty {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-payments-methods strong,
+.crz-payments-row--item strong,
+.crz-payments-total strong,
+.crz-payments-detail-empty strong {
+  font-size: 13px !important;
+}
+.crz-payments-toolbar input,
+.crz-payments-toolbar select {
+  font-size: 13px !important;
+  min-height: 38px;
+}
+
+/* SALES */
+.crz-sales-summary small,
+.crz-sales-summary span,
+.crz-sales-notice,
+.crz-sales-row--head,
+.crz-sales-row--sale small,
+.crz-sales-empty span,
+.crz-sales-detail-empty span,
+.crz-sales-pagination span,
+.crz-sales-pagination button,
+.crz-sales-detail-head small,
+.crz-sales-detail-section header small,
+.crz-sales-detail-head span,
+.crz-sales-alerts p,
+.crz-sales-detail-grid span,
+.crz-sales-detail-grid strong,
+.crz-sales-detail-section header strong,
+.crz-sales-detail-list article strong,
+.crz-sales-detail-list article small,
+.crz-sales-detail-list article b,
+.crz-sales-detail-list em,
+.crz-sales-secret-note {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-sales-row--sale strong,
+.crz-sales-total strong,
+.crz-sales-empty strong,
+.crz-sales-detail-empty strong {
+  font-size: 13px !important;
+}
+.crz-sales-search input,
+.crz-sales-toolbar select {
+  font-size: 13px !important;
+  min-height: 38px;
+}
+
+/* CONTROL CENTER */
+.crz-control-state p,
+.crz-control-health small,
+.crz-control-health span,
+.crz-control-health em,
+.crz-control-panel small,
+.crz-control-manual header small,
+.crz-control-list small,
+.crz-control-list b,
+.crz-control-list a,
+.crz-control-empty,
+.crz-control-manual > header > span,
+.crz-control-manual__list article p,
+.crz-control-manual__list article em,
+.crz-control-manual__actions button,
+.crz-control-generated {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-control-list strong,
+.crz-control-manual__list article strong {
+  font-size: 13px !important;
+}
+
+/* CATEGORY MANAGER */
+.crz-cm-notice,
+.crz-cm-list-head > span,
+.crz-cm-editor-head small,
+.crz-cm-preview > small,
+.crz-cm-list-head > button,
+.crz-cm-list small,
+.crz-cm-editor-head span,
+.crz-cm-form label > span,
+.crz-cm-actions > button,
+.crz-cm-actions > a,
+.crz-cm-preview article > p,
+.crz-cm-preview article > em,
+.crz-category-directory__body small,
+.crz-category-directory__body p,
+.crz-category-directory__body > span,
+.crz-category-directory__state button {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-cm-list strong,
+.crz-cm-preview article > strong,
+.crz-category-directory__state strong {
+  font-size: 13px !important;
+}
+.crz-cm-create input,
+.crz-cm-create textarea,
+.crz-cm-create select,
+.crz-cm-form input,
+.crz-cm-form textarea,
+.crz-cm-form select,
+.crz-cm-search input,
+.crz-category-directory__search input {
+  font-size: 13px !important;
+}
+
+/* APPEARANCE / WHITE LABEL */
+.crz-appearance-editor > header span,
+.crz-appearance-editor > label > span,
+.crz-appearance-color button,
+.crz-appearance-toggles small,
+.crz-appearance-notice,
+.crz-appearance-preview > header small,
+.crz-appearance-preview__frame span,
+.crz-appearance-preview__frame p,
+.crz-appearance-preview__frame button,
+.crz-appearance-preview dl,
+.crz-appearance-section > header span,
+.crz-appearance-section label > span,
+.crz-appearance-asset-field > span,
+.crz-appearance-upload {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-appearance-toggles strong,
+.crz-appearance-section > header strong {
+  font-size: 13px !important;
+}
+
+/* FULFILLMENT */
+.crz-fulfillment-stats small,
+.crz-fulfillment-list small,
+.crz-fulfillment-detail > header small,
+.crz-fulfillment-detail > header span,
+.crz-fulfillment-kv small,
+.crz-fulfillment-detail section p,
+.crz-fulfillment-detail section small,
+.crz-fulfillment-detail section em,
+.crz-fulfillment-detail footer a {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-fulfillment-list strong,
+.crz-fulfillment-list b,
+.crz-fulfillment-detail h2,
+.crz-fulfillment-kv strong {
+  font-size: 13px !important;
+}
+
+
+/* PASS 4: purchase, help and account journeys */
+
+/* AUTH + DISCORD GATE */
+.crz-auth-heading p,
+.crz-auth-provider strong,
+.crz-auth-security strong,
+.crz-auth-current strong,
+.crz-auth-recovery__panel p,
+.crz-discord-gate__steps article > b,
+.crz-discord-gate__steps strong {
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+.crz-auth-provider small,
+.crz-auth-security span,
+.crz-auth-error,
+.crz-auth-loading,
+.crz-auth-current span,
+.crz-auth-current small,
+.crz-auth-current__actions a,
+.crz-auth-current__actions button,
+.crz-auth-card > footer,
+.crz-discord-gate__steps small,
+.crz-discord-gate__missing {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* CHECKOUT */
+.crz-checkout-methods strong,
+.crz-checkout-payment-box > header strong,
+.crz-checkout-summary__items strong,
+.crz-checkout-coupon strong {
+  font-size: 13px !important;
+}
+.crz-checkout-methods small,
+.crz-checkout-methods em,
+.crz-checkout-notice strong,
+.crz-checkout-auth-gate strong,
+.crz-checkout-notice span,
+.crz-checkout-auth-gate span,
+.crz-checkout-auth-gate button,
+.crz-checkout-payment-box label > span,
+.crz-checkout-payment-box > small,
+.crz-checkout-ltc-amount small,
+.crz-checkout-ltc-amount span,
+.crz-checkout-status,
+.crz-checkout-inline-error,
+.crz-checkout-summary__items small,
+.crz-checkout-summary__items b,
+.crz-checkout-blocker span,
+.crz-checkout-security span,
+.crz-checkout-totals > div,
+.crz-checkout-coupon span,
+.crz-checkout-coupon small,
+.crz-checkout-summary__panel > a {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-checkout-payment-box textarea {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+/* CART + COMBO */
+.crz-cart-item__headline span,
+.crz-cart-item__fixed-plan strong,
+.crz-cart-item__quantity strong,
+.crz-cart-summary__lines > div,
+.crz-cart-combo-meter header span,
+.crz-cart-mini strong,
+.crz-cart-drawer__total span,
+.crz-combo-plan-switch strong,
+.crz-combo-card strong {
+  font-size: 13px !important;
+}
+.crz-cart-item__headline small,
+.crz-cart-item__controls label > span,
+.crz-cart-item__fixed-plan > span,
+.crz-cart-item__bottom span,
+.crz-cart-item__bottom button,
+.crz-cart-summary__coupon > label,
+.crz-cart-summary__coupon button,
+.crz-cart-summary__coupon > small,
+.crz-cart-summary__warning span,
+.crz-cart-summary__panel > a,
+.crz-cart-combo-status__title > a,
+.crz-cart-combo-meter header strong,
+.crz-cart-combo-meter footer,
+.crz-cart-combo-status > p,
+.crz-cart-drawer__empty span,
+.crz-cart-drawer__empty a,
+.crz-cart-mini span,
+.crz-cart-mini small,
+.crz-cart-drawer__combo span,
+.crz-combo-plan-switch small,
+.crz-combo-progress__ring span,
+.crz-combo-progress > div:nth-child(2) > small,
+.crz-combo-progress p,
+.crz-combo-tiers b,
+.crz-combo-tiers small,
+.crz-combo-progress__rule,
+.crz-combo-card small,
+.crz-combo-card > div:last-child > span,
+.crz-combo-card em {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-cart-summary__coupon input {
+  font-size: 13px !important;
+}
+
+/* HELP */
+.crz-help-state p,
+.crz-help-empty p,
+.crz-help-faq-list summary,
+.crz-help-faq-list details p,
+.crz-help-tutorial-list strong,
+.crz-help-support strong {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+.crz-help-quick-search > span,
+.crz-help-quick-search button,
+.crz-help-overview small,
+.crz-help-overview span,
+.crz-help-faqs small,
+.crz-help-tutorials header small,
+.crz-help-faqs > header > span,
+.crz-help-faq-list details small,
+.crz-help-tutorial-list small,
+.crz-help-tutorial-list p,
+.crz-help-tutorial-list em,
+.crz-help-tutorials__empty,
+.crz-help-support span,
+.crz-help-preview-state {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-help-search-box input {
+  font-size: 13px !important;
+}
+
+/* ACADEMY */
+.crz-academy-card__body > strong,
+.crz-academy-detail__hero h2,
+.crz-academy-block-text,
+.crz-academy-step strong {
+  font-size: 13px !important;
+  line-height: 1.48 !important;
+}
+.crz-academy-state p,
+.crz-academy-search a,
+.crz-academy-summary span,
+.crz-academy-card__meta span,
+.crz-academy-card__body > p,
+.crz-academy-card__products span,
+.crz-academy-breadcrumb,
+.crz-academy-detail__badges > span,
+.crz-academy-detail__hero p,
+.crz-academy-lock > p,
+.crz-academy-lock > div span,
+.crz-academy-toc > strong,
+.crz-academy-toc > span,
+.crz-academy-toc nav a,
+.crz-academy-block-media figcaption,
+.crz-academy-checklist span,
+.crz-academy-checklist strong,
+.crz-academy-shortcut > span,
+.crz-academy-shortcut kbd,
+.crz-academy-code header,
+.crz-academy-code header button,
+.crz-academy-file strong,
+.crz-academy-file small,
+.crz-academy-callout strong,
+.crz-academy-callout p,
+.crz-academy-step p,
+.crz-academy-complete strong,
+.crz-academy-complete span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-academy-search input,
+.crz-academy-code pre {
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+}
+
+/* REVIEWS */
+.crz-review-card__meta strong,
+.crz-review-card p,
+.crz-review-feed-state strong,
+.crz-review-compose-state strong {
+  font-size: 13px !important;
+}
+.crz-reviews-section-head span,
+.crz-reviews-compose__eyebrow,
+.crz-review-card__meta span,
+.crz-review-card__meta time,
+.crz-review-card__product,
+.crz-review-card__stars,
+.crz-review-feed-state p,
+.crz-reviews-compose > p,
+.crz-reviews-field > span,
+.crz-reviews-field small,
+.crz-reviews-notice,
+.crz-review-compose-state {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-reviews-field select,
+.crz-reviews-field textarea {
+  font-size: 13px !important;
+}
+
+/* RANK */
+.crz-rank-breakdown__grid article strong,
+.crz-rank-tiers article strong,
+.crz-rank-board__identity strong,
+.crz-rank-board__position {
+  font-size: 13px !important;
+}
+.crz-rank-state p,
+.crz-rank-hero-card__emblem > span,
+.crz-rank-hero-card__main > small,
+.crz-rank-hero-card__position small,
+.crz-rank-points span,
+.crz-rank-progress > div:first-child span,
+.crz-rank-progress footer span,
+.crz-rank-progress footer strong,
+.crz-rank-hero-card__position span,
+.crz-rank-breakdown header small,
+.crz-rank-tiers header small,
+.crz-rank-board header small,
+.crz-rank-breakdown > header > span,
+.crz-rank-breakdown__grid article span,
+.crz-rank-breakdown__grid article b,
+.crz-rank-tiers article span,
+.crz-rank-board > header button,
+.crz-rank-board__identity span,
+.crz-rank-board__points {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+
+/* DISCOVERY */
+.crz-discovery-kicker,
+.crz-discovery-categories button,
+.crz-discovery-eyebrow,
+.crz-discovery-count,
+.crz-discovery-feature__body > span,
+.crz-discovery-card__badge,
+.crz-discovery-card__body small,
+.crz-discovery-card__body a,
+.crz-discovery-empty button,
+.crz-discovery-news__grid span,
+.crz-discovery-tags button,
+.crz-discovery-state-card button {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-discovery-feature__body p,
+.crz-discovery-card__body p,
+.crz-discovery-empty p,
+.crz-discovery-news__grid p,
+.crz-discovery-state-card p {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+
+/* PASS 5: remaining customer modules */
+
+/* BONUS */
+.crz-bonus-balance small,
+.crz-bonus-grid header span,
+.crz-bonus-plan span,
+.crz-bonus-ledger small,
+.crz-bonus-rules {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* COUPONS */
+.crz-coupons-summary small,
+.crz-coupons-summary span,
+.crz-coupons-notice,
+.crz-coupons-filters button,
+.crz-coupon-card header span,
+.crz-coupon-card header b,
+.crz-coupon-card__meta small,
+.crz-coupon-card__products small,
+.crz-coupon-card__meta strong,
+.crz-coupon-card__products span,
+.crz-coupon-card footer button,
+.crz-coupons-empty p,
+.crz-coupon-picker__head span,
+.crz-coupon-picker__head a,
+.crz-coupon-picker__wallet-link,
+.crz-coupon-picker button strong,
+.crz-coupon-picker button span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-coupon-card__benefit code {
+  font-size: 13px !important;
+}
+
+/* CLUB */
+.crz-club-hero-card__copy > span,
+.crz-club-card small,
+.crz-club-card p,
+.crz-club-security span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-club-hero-card__copy p,
+.crz-club-security strong {
+  font-size: 13px !important;
+}
+
+/* MTSOUNDS */
+.crz-mtsounds-notice strong,
+.crz-mtsounds-footer-note strong,
+.crz-mtsounds-loading strong {
+  font-size: 13px !important;
+}
+.crz-mtsounds-notice span,
+.crz-mtsounds-footer-note span,
+.crz-mtsounds-frame-shell > header span,
+.crz-mtsounds-frame-shell > header strong,
+.crz-mtsounds-loading p,
+.crz-mtsounds-external p {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* NOTIFICATIONS */
+.crz-notify-list strong,
+.crz-notify-admin strong {
+  font-size: 13px !important;
+}
+.crz-notify-summary small,
+.crz-notify-list p,
+.crz-notify-list small,
+.crz-notify-admin small,
+.crz-notify-notice {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* INTERACTIVE DEMO */
+.crz-imgui-toolbar span,
+.crz-imgui-toolbar strong,
+.crz-imgui-sidebar button,
+.crz-imgui-topbar > strong,
+.crz-imgui-section > header,
+.crz-imgui-row,
+.crz-imgui-row--slider strong,
+.crz-imgui-row--select select,
+.crz-imgui-preview > header,
+.crz-imgui-preview > footer,
+.crz-imgui-preview__name,
+.crz-imgui-preview__weapon,
+.crz-imgui-preview__hit,
+.crz-imgui-toast {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-imgui-topbar input[type=text],
+.crz-imgui-topbar input:not([type]) {
+  font-size: 13px !important;
+}
+
+/* STATUS */
+.crz-status-components__list strong,
+.crz-status-no-incidents strong,
+.crz-status-incident-list article > header strong,
+.crz-status-help strong {
+  font-size: 13px !important;
+}
+.crz-status-state p,
+.crz-status-overall p,
+.crz-status-components > header > span,
+.crz-status-components__list span,
+.crz-status-components__list small,
+.crz-status-no-incidents span,
+.crz-status-incident-list time,
+.crz-status-incident-list article > p,
+.crz-status-incident__components span,
+.crz-status-incident__timeline strong,
+.crz-status-incident__timeline p,
+.crz-status-incident__timeline time,
+.crz-status-help span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* ACCOUNTS MARKET */
+.crz-accounts-source span,
+.crz-accounts-games button span,
+.crz-accounts-games button small,
+.crz-accounts-filters > header > span,
+.crz-accounts-results__head > div > span,
+.crz-accounts-filters header p,
+.crz-accounts-field > span,
+.crz-accounts-security-note strong,
+.crz-accounts-security-note span,
+.crz-accounts-results__count span,
+.crz-account-card__live,
+.crz-account-card__title small,
+.crz-account-stat span,
+.crz-account-detail__info span,
+.crz-account-card__footer small,
+.crz-account-card__footer > div span,
+.crz-account-card__footer a,
+.crz-accounts-pagination > div,
+.crz-account-detail__breadcrumb,
+.crz-account-detail__summary > small,
+.crz-account-detail__price-guard small,
+.crz-account-detail__price-guard span,
+.crz-account-detail__actions > a,
+.crz-account-detail__panel--security ul,
+.crz-account-card__status,
+.crz-account-card__preview > span,
+.crz-account-card__preview > small,
+.crz-account-detail__art-copy span,
+.crz-account-detail__price-box small,
+.crz-account-detail__price-box span,
+.crz-account-detail__delivery span,
+.crz-account-detail__cosmetic span,
+.crz-account-detail__cosmetic small,
+.crz-account-detail__inventory-empty span,
+.crz-account-filter-title button,
+.crz-account-filter-section__head > span,
+.crz-account-rank-grid span,
+.crz-account-weapon-grid span,
+.crz-account-switch,
+.crz-account-range > i,
+.crz-account-range label > span,
+.crz-accounts-results__tools > label > span,
+.crz-accounts-results__tools select,
+.crz-account-card__chips span,
+.crz-account-card__legacy-rank small,
+.crz-account-card__legacy-rank > span,
+.crz-account-card__legacy-benefits span,
+.crz-account-detail__gallery-main > span,
+.crz-account-detail__gallery-count,
+.crz-account-detail__rank-current small,
+.crz-account-detail__checklist span,
+.crz-account-detail__full-access p,
+.crz-account-detail__full-access ul,
+.crz-account-detail__inventory-legacy > header span,
+.crz-account-detail__inventory-legacy > header small,
+.crz-account-detail__tabs button,
+.crz-account-detail__tabs button span,
+.crz-account-detail__inventory-grid > button > span,
+.crz-account-lightbox__nav span,
+.crz-account-card__activity small,
+.crz-account-risk,
+.crz-account-detail__activity-box small,
+.crz-account-detail__activity-box > span,
+.crz-account-detail__facts-panel > header span,
+.crz-account-detail__facts-panel > header p {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-account-stat strong,
+.crz-account-detail__info strong,
+.crz-account-card__footer strong,
+.crz-account-detail__summary > p,
+.crz-account-detail__price-guard strong,
+.crz-account-detail__delivery strong,
+.crz-account-detail__cosmetic strong,
+.crz-account-detail__inventory-empty strong,
+.crz-account-rank-grid button > strong,
+.crz-account-card__legacy-rank strong,
+.crz-account-detail__legacy-stats h3,
+.crz-account-lightbox strong,
+.crz-account-card__activity strong {
+  font-size: 13px !important;
+}
+.crz-accounts-field input:not(.crz-input),
+.crz-account-filter-search input,
+.crz-account-filter-section__body > select,
+.crz-accounts-field > select,
+.crz-account-range input {
+  font-size: 13px !important;
+}
+
+
+/* PASS 6: operations, Discord and reseller modules */
+
+/* DISCORD BOT CORE */
+.crz-discord-core-status strong,
+.crz-discord-core-modules strong,
+.crz-discord-builder-editor header strong,
+.crz-discord-builder-preview header strong,
+.crz-discord-builder-history header strong,
+.crz-discord-builder-channel > span,
+.crz-discord-builder-tree section > strong,
+.crz-discord-builder-safety strong,
+.crz-discord-builder-history__table strong {
+  font-size: 13px !important;
+}
+.crz-discord-core-status small,
+.crz-discord-core-notice,
+.crz-discord-core-stats small,
+.crz-discord-core-stats span,
+.crz-discord-core-modules small,
+.crz-discord-core-modules span,
+.crz-discord-core-modules em,
+.crz-discord-builder-editor header small,
+.crz-discord-builder-preview header small,
+.crz-discord-builder-history header small,
+.crz-discord-builder-theme span,
+.crz-discord-builder-categories button,
+.crz-discord-builder-editor-actions button,
+.crz-discord-builder-history button,
+.crz-discord-builder-categories p,
+.crz-discord-builder-tree section > span,
+.crz-discord-builder-safety span,
+.crz-discord-builder-history__head,
+.crz-discord-builder-history__table article,
+.crz-discord-builder-history__table small,
+.crz-discord-builder-empty {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-discord-builder-theme input,
+.crz-discord-builder-categories input {
+  font-size: 13px !important;
+}
+
+/* DISCORD BRIDGE */
+.crz-bridge-table strong {
+  font-size: 13px !important;
+}
+.crz-bridge-stats small,
+.crz-bridge-notice,
+.crz-bridge-table > header,
+.crz-bridge-table small,
+.crz-bridge-table button,
+.crz-bridge-table a {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+
+/* DISCORD CAMPAIGNS */
+.crz-discord-worker-pill strong,
+.crz-discord-campaign-editor header strong,
+.crz-discord-template-list header strong,
+.crz-discord-campaign-history header strong,
+.crz-discord-target-box header strong,
+.crz-discord-preview > header b,
+.crz-discord-preview__author strong,
+.crz-discord-preview__embed h3,
+.crz-discord-preview__heading.h1,
+.crz-discord-template-list strong,
+.crz-discord-campaign-table strong {
+  font-size: 13px !important;
+}
+.crz-discord-worker-pill small,
+.crz-discord-campaign-notice,
+.crz-discord-campaign-stats small,
+.crz-discord-campaign-stats span,
+.crz-discord-campaign-editor header small,
+.crz-discord-template-list header small,
+.crz-discord-campaign-history header small,
+.crz-discord-target-box header small,
+.crz-discord-preview > header span,
+.crz-discord-campaign-editor > header button,
+.crz-discord-campaign-history > header button,
+.crz-discord-campaign-editor label > span,
+.crz-discord-template-row button,
+.crz-discord-send-actions button,
+.crz-discord-target-options button,
+.crz-discord-campaign-table button,
+.crz-discord-estimate span,
+.crz-discord-estimate small,
+.crz-discord-schedule,
+.crz-discord-preview__author span,
+.crz-discord-preview__author small,
+.crz-discord-preview__description,
+.crz-discord-preview__heading.h2,
+.crz-discord-preview__heading.h3,
+.crz-discord-preview__embed footer,
+.crz-discord-preview__actions span,
+.crz-discord-preview > p,
+.crz-discord-template-list > p,
+.crz-discord-template-list small,
+.crz-discord-campaign-table__head,
+.crz-discord-campaign-table article,
+.crz-discord-campaign-table small,
+.crz-discord-campaign-empty {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-discord-campaign-editor input,
+.crz-discord-campaign-editor textarea,
+.crz-discord-campaign-editor select {
+  font-size: 13px !important;
+}
+
+/* INTEGRATIONS */
+.crz-integrations-grid p,
+.crz-integrations-note strong {
+  font-size: 13px !important;
+}
+.crz-integrations-stats small,
+.crz-integrations-stats span,
+.crz-integrations-grid small,
+.crz-integrations-grid a,
+.crz-integrations-note span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* PARTNERS */
+.crz-partner-list strong,
+.crz-partner-rules strong,
+.crz-partner-sales strong {
+  font-size: 13px !important;
+}
+.crz-partner-stats small,
+.crz-partner-list small,
+.crz-partner-rules small,
+.crz-partner-grid span,
+.crz-partner-notes span,
+.crz-partner-payout small,
+.crz-partner-notice,
+.crz-partner-sales small,
+.crz-partner-empty {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* RESELLERS */
+.crz-resellers-list strong {
+  font-size: 13px !important;
+}
+.crz-resellers-summary small,
+.crz-resellerhub-stats small,
+.crz-resellers-summary span,
+.crz-resellerhub-stats span,
+.crz-resellers-list small,
+.crz-resellers-editor > header small,
+.crz-resellers-editor > header a,
+.crz-resellers-editor > label > span,
+.crz-resellers-editor__row span,
+.crz-resellers-products header,
+.crz-resellers-products label,
+.crz-resellers-notice,
+.crz-resellerhub-grid small,
+.crz-resellerhub-grid p,
+.crz-resellerhub-grid dl,
+.crz-resellerhub-grid a,
+.crz-resellerhub-history small,
+.crz-resellerhub-history em {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* SECURITY */
+.crz-security-list strong {
+  font-size: 13px !important;
+}
+.crz-security-stats small,
+.crz-security-notice,
+.crz-security-list p,
+.crz-security-list footer span,
+.crz-security-list button,
+.crz-security-list a {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* SUPPORT DESK */
+.crz-supportdesk-ticket strong,
+.crz-supportdesk-messages article p {
+  font-size: 13px !important;
+}
+.crz-supportdesk-stats small,
+.crz-supportdesk-stats span,
+.crz-supportdesk-notice,
+.crz-supportdesk-ticket p,
+.crz-supportdesk-ticket small,
+.crz-supportdesk-ticket aside em,
+.crz-supportdesk-thread__head small,
+.crz-supportdesk-thread__head span,
+.crz-supportdesk-thread__head a,
+.crz-supportdesk-actions button,
+.crz-supportdesk-actions select,
+.crz-supportdesk-messages article header strong,
+.crz-supportdesk-messages article header span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-supportdesk-toolbar input,
+.crz-supportdesk-toolbar select,
+.crz-supportdesk-compose textarea {
+  font-size: 13px !important;
+}
+
+
+/* PASS 7: calls and moderation managers */
+
+/* CRAZZY CALL */
+.crz-call-room-cards article > strong,
+.crz-call-lobby__profile strong,
+.crz-call-room__header strong,
+.crz-call-empty-player strong,
+.crz-call-empty-list strong {
+  font-size: 13px !important;
+}
+.crz-call-auth-gate p,
+.crz-call-hub__notice,
+.crz-call-notice,
+.crz-call-create small,
+.crz-call-my-rooms header small,
+.crz-call-admin__summary small,
+.crz-call-create em,
+.crz-call-my-rooms header button,
+.crz-call-room-cards article code,
+.crz-call-room-cards article small,
+.crz-call-room-cards article > div:last-child button,
+.crz-call-room-card__status b,
+.crz-call-admin__table b,
+.crz-call-empty-list,
+.crz-call-lobby__brand span,
+.crz-call-lobby__card > span,
+.crz-call-lobby__profile small,
+.crz-call-lobby__toggles button,
+.crz-call-lobby__warning,
+.crz-call-lobby__error,
+.crz-call-lobby__privacy,
+.crz-call-room__header > div:first-child > span,
+.crz-call-room__header code,
+.crz-call-room__status,
+.crz-call-room__status b,
+.crz-call-participants > header span,
+.crz-call-chat > header span,
+.crz-call-participants > header b,
+.crz-call-avatar,
+.crz-call-participant-copy > strong,
+.crz-call-participant-copy b,
+.crz-call-participant-copy em,
+.crz-call-media-badges,
+.crz-call-participant-menu button,
+.crz-call-stage__toolbar > div:first-child span,
+.crz-call-stage__toolbar > div:first-child strong,
+.crz-call-stage__toolbar label,
+.crz-call-player-label,
+.crz-call-player-label b,
+.crz-call-player-label em,
+.crz-call-empty-player span,
+.crz-call-previews > span,
+.crz-call-preview strong,
+.crz-call-preview small,
+.crz-call-chat__toggle,
+.crz-call-chat > header small,
+.crz-call-chat__messages strong,
+.crz-call-chat__messages time,
+.crz-call-chat__messages p,
+.crz-call-chat__empty,
+.crz-call-chat__composer button,
+.crz-call-controls button,
+.crz-call-admin__table > header,
+.crz-call-admin__table > article,
+.crz-call-admin__table strong,
+.crz-call-admin__table code,
+.crz-call-admin__table article button {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-call-create input,
+.crz-call-stage__toolbar select,
+.crz-call-chat__composer input {
+  font-size: 13px !important;
+}
+
+/* CUSTOMER 360 */
+.crz-customer360-row--item strong,
+.crz-customer360-kv strong,
+.crz-customer360-stack strong,
+.crz-customer360-stack b {
+  font-size: 13px !important;
+}
+.crz-customer360-notice,
+.crz-customer360-row--head,
+.crz-customer360-row--item small,
+.crz-customer360-detail__head small,
+.crz-customer360-block header span,
+.crz-customer360-detail__head span,
+.crz-customer360-cards small,
+.crz-customer360-cards span,
+.crz-customer360-kv small,
+.crz-customer360-stack small {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-customer360-toolbar input {
+  font-size: 13px !important;
+}
+
+/* COMMUNITY MOD */
+.crz-communitymod-message__head strong,
+.crz-communitymod-message p,
+.crz-communitymod-kv strong {
+  font-size: 13px !important;
+}
+.crz-communitymod-summary small,
+.crz-communitymod-summary span,
+.crz-communitymod-notice,
+.crz-communitymod-message__head span,
+.crz-communitymod-message > small,
+.crz-communitymod-detail > header small,
+.crz-communitymod-detail > header span,
+.crz-communitymod-kv small,
+.crz-communitymod-actions button,
+.crz-communitymod-actions a,
+.crz-communitymod-banreason,
+.crz-communitymod-history small,
+.crz-communitymod-history p {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-communitymod-toolbar input,
+.crz-communitymod-toolbar select {
+  font-size: 13px !important;
+}
+
+/* CLUB / REWARD / LUCK / BONUS / COUPON MANAGERS */
+.crz-clubmanager-grid p,
+.crz-rewardmanager-campaigns strong,
+.crz-rewardmanager-side strong,
+.crz-luckmanager-campaigns strong,
+.crz-luckmanager-prizes strong,
+.crz-couponmanager-list strong,
+.crz-couponmanager-grid strong {
+  font-size: 13px !important;
+}
+.crz-clubmanager-grid small,
+.crz-clubmanager-health small,
+.crz-rewardmanager-stats small,
+.crz-rewardmanager-stats span,
+.crz-rewardmanager-notice,
+.crz-rewardmanager-campaigns small,
+.crz-rewardmanager-campaigns p,
+.crz-rewardmanager-side small,
+.crz-rewardmanager-side em,
+.crz-rewardmanager-side a,
+.crz-rewardmanager-side b,
+.crz-luckmanager-stats small,
+.crz-luckmanager-notice,
+.crz-luckmanager-campaigns small,
+.crz-luckmanager-prizes small,
+.crz-luckmanager-campaigns em,
+.crz-bonusmanager-stats small,
+.crz-bonusmanager-list small,
+.crz-bonusmanager-list em,
+.crz-couponmanager-stats small,
+.crz-couponmanager-toolbar a,
+.crz-couponmanager-notice,
+.crz-couponmanager-list small,
+.crz-couponmanager-detail > header small,
+.crz-couponmanager-detail > header span,
+.crz-couponmanager-grid small,
+.crz-couponmanager-detail section > a {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+
+/* PASS 8: shell, library and studio */
+
+/* HOME */
+.crz-home-hero__pillar strong,
+.crz-home-hero__pillar small,
+.product-info .product-view-link {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-home-hero__cta,
+.product-card .product-art-brand {
+  font-size: 13px !important;
+}
+
+/* APP SHELL / FOOTER */
+.crz-shell-nav__item,
+.crz-shell-nav__item b,
+.crz-shell-auth,
+.crz-shell-user,
+.crz-shell-mobile-link b,
+.crz-shell-footer__brand p,
+.crz-shell-footer__social > span,
+.crz-shell-footer__brand strong,
+.crz-shell-footer__links a,
+.crz-shell-footer__bottom,
+.crz-shell-footer__bottom > strong,
+.crz-shell-nav__copy small {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-shell-nav__item {
+  font-weight: 650;
+}
+
+/* PWA */
+.crz-offline small {
+  font-size: 11.5px !important;
+}
+.crz-offline p {
+  font-size: 13px !important;
+}
+
+/* GLOBAL MUSIC */
+.crz-global-music__meta > span,
+.crz-global-music__meta > small,
+.crz-global-music__controls button,
+.crz-global-music__drawer button,
+.crz-global-music__drawer header,
+.crz-global-music__list b,
+.crz-global-music__saved b,
+.crz-global-music__list small,
+.crz-global-music__saved small,
+.crz-global-music__list p {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+
+/* TUTORIAL STUDIO */
+.crz-tutorialstudio-list strong {
+  font-size: 13px !important;
+}
+.crz-tutorialstudio-stats small,
+.crz-tutorialstudio-list > header button,
+.crz-tutorialstudio-list small,
+.crz-tutorialstudio-editor > header small,
+.crz-tutorialstudio-editor label > span,
+.crz-tutorialstudio-products label,
+.crz-tutorialstudio-help,
+.crz-tutorialstudio-notice {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-tutorialstudio-editor textarea.is-code {
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+}
+
+/* LIBRARY */
+.crz-library-hero p,
+.crz-library-card__headline strong,
+.crz-library-history strong {
+  font-size: 13px !important;
+}
+.crz-library-hero__stats span,
+.crz-library-tabs button,
+.crz-library-security strong,
+.crz-library-security span,
+.crz-library-card__art > span,
+.crz-library-card__headline small,
+.crz-library-card__headline span,
+.crz-library-secret__label span,
+.crz-library-secret__label b,
+.crz-library-card__meta span,
+.crz-library-card footer span,
+.crz-library-history span,
+.crz-library-history small,
+.crz-library-inline-error {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-library-secret pre {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
