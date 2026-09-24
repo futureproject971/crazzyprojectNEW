@@ -122,7 +122,7 @@ export function CatalogPage({ initialCategory = "all" }: { initialCategory?: str
           <PageHeader
             eyebrow="CRAZZY CATALOG"
             title="Produtos"
-            description="Catálogo ao vivo da CRAZZY PROJECT. Preço, plano e disponibilidade vêm direto do sistema comercial."
+            description="Escolha seu produto, compare as opções e encontre o plano ideal para você."
             actions={
               <a className="crz-catalog-discovery-link" href="/destaques">
                 <NeonIcon name="featured" size={22} />
@@ -222,7 +222,7 @@ export function CatalogPage({ initialCategory = "all" }: { initialCategory?: str
             <NeonIcon name="shield" size={28} />
             <div>
               <strong>Dados comerciais reais</strong>
-              <span>O checkout recalcula o preço no servidor antes de cobrar.</span>
+              <span>Confira preço, plano e disponibilidade antes de finalizar.</span>
             </div>
           </div>
         </aside>
@@ -230,7 +230,7 @@ export function CatalogPage({ initialCategory = "all" }: { initialCategory?: str
         <section className="crz-catalog-results" aria-labelledby="catalog-results-title">
           <header className="crz-catalog-results__head">
             <div>
-              <span className="crz-catalog-results__eyebrow">VITRINE AO VIVO</span>
+              <span className="crz-catalog-results__eyebrow">PRODUTOS</span>
               <h2 id="catalog-results-title">
                 {category === "all" ? "Todos os produtos" : categories.find((item) => item.id === category)?.label}
               </h2>
@@ -242,7 +242,7 @@ export function CatalogPage({ initialCategory = "all" }: { initialCategory?: str
           </header>
 
           {loadState === "loading" ? (
-            <div className="crz-integrations-state"><span className="crz-spinner" /><strong>Carregando catálogo real...</strong></div>
+            <div className="crz-integrations-state"><span className="crz-spinner" /><strong>Carregando produtos...</strong></div>
           ) : loadState === "error" ? (
             <EmptyState
               title="Catálogo indisponível"
@@ -310,8 +310,8 @@ export function CatalogPage({ initialCategory = "all" }: { initialCategory?: str
             </>
           ) : (
             <EmptyState
-              title={products.length ? "Nenhum produto encontrado" : "Catálogo ainda não publicado"}
-              description={products.length ? "Altere a busca ou os filtros." : "Cadastre e ative produtos/planos no Product Manager para começar as vendas."}
+              title={products.length ? "Nenhum produto encontrado" : "Nenhum produto disponível agora"}
+              description={products.length ? "Altere a busca ou os filtros." : "Volte em breve para conferir as novidades."}
               icon={<NeonIcon name="cube" size={30} />}
               action={products.length ? <Button variant="secondary" onClick={clearFilters}>Limpar filtros</Button> : undefined}
             />

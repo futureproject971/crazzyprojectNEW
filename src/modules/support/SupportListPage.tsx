@@ -91,7 +91,7 @@ export function SupportListPage() {
       <section className="crz-support-hero">
         <div className="crz-container crz-support-hero__inner">
           <div>
-            <small>M13 • CRAZZY SUPPORT</small>
+            <small>CRAZZY SUPPORT</small>
             <h1>Central de suporte</h1>
             <p>Abra tickets, envie arquivos e acompanhe cada resposta em uma thread privada.</p>
           </div>

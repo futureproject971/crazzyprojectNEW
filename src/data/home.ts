@@ -63,18 +63,18 @@ export const chatMessages: ChatMessage[] = [
 export const ticketCategories = [
   { title: "Suporte", subtitle: "Problemas e dúvidas", icon: "/icons/headset.svg" },
   { title: "Pedidos", subtitle: "Status e entregas", icon: "/icons/package.svg" },
-  { title: "Pagamentos", subtitle: "Boletos, PIX, reembolsos", icon: "/icons/credit-card.svg" },
+  { title: "Pagamentos", subtitle: "Cobranças e reembolsos", icon: "/icons/credit-card.svg" },
   { title: "Produtos", subtitle: "Informações e suporte", icon: "/icons/shopping-bag.svg" },
   { title: "Outros", subtitle: "Assuntos diversos", icon: "/icons/circle-dots.svg" },
 ];
 
 export const whyCrazzy = [
-  { title: "Atendimento 24/7", subtitle: "Suporte de verdade, todos os dias", icon: "/icons/headset.svg" },
-  { title: "Entrega Super Rápida", subtitle: "Receba seus produtos no seu e-mail", icon: "/icons/bolt.svg" },
-  { title: "Compra Segura", subtitle: "Ambiente 100% seguro e confiável", icon: "/icons/shield-check.svg" },
-  { title: "Comunidade Ativa", subtitle: "+50.000 gamers já fazem parte", icon: "/icons/users.svg" },
-  { title: "Cupons e Promoções", subtitle: "Ofertas exclusivas para membros", icon: "/icons/tag.svg" },
-];
+  { title: "Suporte CRAZZY", subtitle: "Abra um ticket quando precisar", icon: "/icons/headset.svg" },
+  { title: "Entrega do Seu Plano", subtitle: "Receba conforme a modalidade escolhida", icon: "/icons/bolt.svg" },
+  { title: "Compra Segura", subtitle: "Confira tudo antes de finalizar", icon: "/icons/shield-check.svg" },
+  { title: "Comunidade no Site", subtitle: "Chat, perfis e conversas em um só lugar", icon: "/icons/users.svg" },
+  { title: "Cupons e Benefícios", subtitle: "Use vantagens elegíveis no carrinho", icon: "/icons/tag.svg" },
+]
 
 
 export type FeaturedProduct = {

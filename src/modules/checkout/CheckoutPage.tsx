@@ -392,7 +392,7 @@ export function CheckoutPage() {
                 <span>Existem itens sem preço autoritativo. A cobrança fica bloqueada.</span>
               </div>
             ) : quoteState === "loading" ? (
-              <LoadingState label="Recalculando no servidor..." />
+              <LoadingState label="Atualizando seu pedido..." />
             ) : quote ? (
               <div className="crz-checkout-totals">
                 <div><span>Subtotal</span><strong>{cents(quote.subtotalCents)}</strong></div>
@@ -410,7 +410,7 @@ export function CheckoutPage() {
               <div className="crz-checkout-coupon">
                 <span>Cupom informado</span>
                 <strong>{couponCode}</strong>
-                <small>Combo e cupom não acumulam. O servidor aplica o melhor benefício válido.</small>
+                <small>Combo e cupom não acumulam. O melhor benefício disponível será aplicado.</small>
               </div>
             )}
 
@@ -425,7 +425,7 @@ export function CheckoutPage() {
 
             <div className="crz-checkout-security">
               <NeonIcon name="shield" size={22} />
-              <span>Pagamento protegido e entrega vinculada ao seu pedido.</span>
+              <span>Pagamento protegido e acompanhamento do pedido no seu perfil.</span>
             </div>
 
             <a href="/carrinho">← Voltar ao carrinho</a>

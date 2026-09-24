@@ -110,8 +110,8 @@ export function FeaturedProductsCarousel() {
         </>
       ) : (
         <div className="crz-discovery-empty">
-          <strong>Catálogo aguardando publicação</strong>
-          <p>Os produtos reais aparecerão aqui assim que forem ativados no Product Manager.</p>
+          <strong>Confira todos os produtos</strong>
+          <p>Veja as opções disponíveis na loja.</p>
           <a className="section-link" href="/produtos">Abrir catálogo →</a>
         </div>
       )}

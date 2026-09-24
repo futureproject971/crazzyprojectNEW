@@ -216,7 +216,7 @@ export function LibraryPage() {
       <section className="crz-library-hero">
         <div className="crz-container crz-library-hero__inner">
           <div>
-            <small>M11 • CRAZZY LIBRARY</small>
+            <small>CRAZZY LIBRARY</small>
             <h1>Suas entregas, sob seu controle</h1>
             <p>
               Keys, contas e links ficam mascarados até você pedir a revelação segura.
@@ -260,7 +260,7 @@ export function LibraryPage() {
           <Panel className="crz-library-panel">
             <header>
               <div>
-                <small>AUDITORIA</small>
+                <small>HISTÓRICO</small>
                 <h2>Histórico de revelações e cópias</h2>
               </div>
               <Badge tone="blue">{snapshot.history.length}</Badge>
@@ -269,7 +269,7 @@ export function LibraryPage() {
             {!snapshot.history.length ? (
               <EmptyState
                 icon={<NeonIcon name="shield" size={38} />}
-                title="Nenhuma revelação registrada"
+                title="Nenhuma visualização recente"
                 description="Quando você revelar ou copiar uma entrega, o evento aparecerá aqui. O segredo nunca é salvo no histórico."
               />
             ) : (
@@ -292,7 +292,7 @@ export function LibraryPage() {
             <EmptyState
               icon={<NeonIcon name="cube" size={42} />}
               title="Nada nesta categoria ainda"
-              description="As entregas concluídas aparecerão aqui automaticamente."
+              description="Suas entregas concluídas aparecem aqui."
               action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">Ver produtos</a>}
             />
           </div>
@@ -393,7 +393,7 @@ export function LibraryPage() {
 
                     <footer>
                       {delivery.tutorialAvailable ? (
-                        <span className="is-info">📖 Tutorial liberado • viewer no M22</span>
+                        <span className="is-info">📖 Tutorial disponível</span>
                       ) : (
                         <span>Sem tutorial associado</span>
                       )}

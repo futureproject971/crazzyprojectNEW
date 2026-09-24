@@ -23,20 +23,28 @@ export function TicketPanel() {
               <p>Precisa de ajuda? Nossa equipe está pronta para te atender.</p>
             </div>
           </div>
-          <button type="button" className="open-ticket-button">+ Abrir Ticket</button>
+          <a className="open-ticket-button" href="/tickets/novo">+ Abrir Ticket</a>
         </header>
 
         <p className="ticket-label">Escolha uma categoria:</p>
         <div className="ticket-grid">
-          {ticketCategories.map((item) => (
-            <button type="button" className="ticket-category" key={item.title}>
-              <MaskIcon src={item.icon} />
-              <span>
-                <strong>{item.title}</strong>
-                <small>{item.subtitle}</small>
-              </span>
-            </button>
-          ))}
+          {ticketCategories.map((item) => {
+            const category =
+              item.title === "Pedidos" ? "delivery" :
+              item.title === "Pagamentos" ? "payment" :
+              item.title === "Produtos" ? "product" :
+              item.title === "Outros" ? "other" :
+              "technical";
+            return (
+              <a className="ticket-category" key={item.title} href={"/tickets/novo?categoria=" + category}>
+                <MaskIcon src={item.icon} />
+                <span>
+                  <strong>{item.title}</strong>
+                  <small>{item.subtitle}</small>
+                </span>
+              </a>
+            );
+          })}
         </div>
       </section>
 

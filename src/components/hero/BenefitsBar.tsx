@@ -5,11 +5,11 @@ type Benefit = {
 };
 
 const benefits: Benefit[] = [
-  { icon: "/icons/neon-v2/community.svg", title: "+50.000", subtitle: "Clientes satisfeitos" },
-  { icon: "/icons/neon-v2/diamond.svg", title: "Produtos Originais", subtitle: "e de procedência" },
+  { icon: "/icons/neon-v2/community.svg", title: "Comunidade CRAZZY", subtitle: "Jogue e converse com a galera" },
+  { icon: "/icons/neon-v2/diamond.svg", title: "Catálogo Organizado", subtitle: "planos e opções em um só lugar" },
   { icon: "/icons/neon-v2/lightning.svg", title: "Entrega Rápida", subtitle: "Receba no seu e-mail" },
   { icon: "/icons/neon-v2/shield.svg", title: "Compra Segura", subtitle: "Seus dados protegidos" },
-  { icon: "/icons/neon-v2/community.svg", title: "Comunidade Ativa", subtitle: "Gamers do Brasil inteiro" },
+  { icon: "/icons/neon-v2/community.svg", title: "Chat da Comunidade", subtitle: "converse direto no site" },
 ];
 
 export function BenefitsBar() {

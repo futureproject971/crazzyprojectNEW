@@ -233,7 +233,7 @@ export function ProductView({
                       <span>{durationLabel(plan)}</span>
                       <small>
                         {!plan.stock_managed
-                          ? "Entrega configurada"
+                          ? "Disponível"
                           : available
                             ? Number(plan.stock_count || 0) + " em estoque"
                             : "ESGOTADO"}
@@ -261,7 +261,7 @@ export function ProductView({
                 {canBuy ? "Adicionar ao carrinho" : "Indisponível"}
               </Button>
 
-              <p>O checkout confirma novamente preço, plano e disponibilidade no servidor antes da cobrança.</p>
+              
             </div>
 
             {notice && (
@@ -273,10 +273,10 @@ export function ProductView({
         </section>
 
         <section className="crz-product-benefits" aria-label="Benefícios">
-          <div><NeonIcon name="shield" size={30} /><span><strong>Preço validado</strong><small>O navegador não decide o valor final.</small></span></div>
-          <div><NeonIcon name="lightning" size={30} /><span><strong>Entrega por plano</strong><small>O modo configurado no produto controla o fulfillment.</small></span></div>
-          <div><NeonIcon name="verified" size={30} /><span><strong>Histórico vinculado</strong><small>Pagamento, entitlement e entrega ficam relacionados.</small></span></div>
-          <div><NeonIcon name="community" size={30} /><span><strong>Suporte CRAZZY</strong><small>Tickets e painel do cliente no mesmo ecossistema.</small></span></div>
+          <div><NeonIcon name="shield" size={30} /><span><strong>Compra segura</strong><small>Confira o resumo antes de finalizar o pagamento.</small></span></div>
+          <div><NeonIcon name="lightning" size={30} /><span><strong>Entrega rápida</strong><small>Receba conforme a modalidade do plano escolhido.</small></span></div>
+          <div><NeonIcon name="verified" size={30} /><span><strong>Tudo no seu perfil</strong><small>Acompanhe seus pedidos, produtos e acessos em um só lugar.</small></span></div>
+          <div><NeonIcon name="community" size={30} /><span><strong>Suporte CRAZZY</strong><small>Fale com nossa equipe sempre que precisar.</small></span></div>
         </section>
 
         <section className="crz-product-info">
@@ -287,8 +287,8 @@ export function ProductView({
           <Panel className="crz-product-info__panel">
             {activeTab === "description" && (
               <div className="crz-product-info__description">
-                <SectionTitle icon={<NeonIcon name="cube" size={28} />} title="Sobre este produto" description="Informações publicadas no Product Manager." />
-                <p>{product.description || "Sem descrição publicada ainda."}</p>
+                <SectionTitle icon={<NeonIcon name="cube" size={28} />} title="Sobre este produto" description="Tudo o que você precisa saber antes de escolher seu plano." />
+                <p>{product.description || "Confira os detalhes deste produto e escolha seu plano."}</p>
                 {product.features_text && <p>{product.features_text}</p>}
               </div>
             )}
@@ -303,11 +303,11 @@ export function ProductView({
             {activeTab === "features" && (
               <div className="crz-product-compatibility">
                 <div>
-                  <SectionTitle icon={<NeonIcon name="gear" size={28} />} title="Recursos publicados" description="Dados configurados para este produto." />
+                  <SectionTitle icon={<NeonIcon name="gear" size={28} />} title="Recursos" description="Veja os principais recursos disponíveis neste produto." />
                   {featureLines.length ? (
                     <ul>{featureLines.map((item, index) => <li key={item.label + index}><strong>{item.label}:</strong> {item.value}</li>)}</ul>
                   ) : (
-                    <p>Nenhum recurso adicional foi publicado.</p>
+                    <p>Confira a descrição e escolha o plano que combina com você.</p>
                   )}
                 </div>
               </div>
@@ -333,7 +333,7 @@ export function ProductView({
 
         {relatedProducts.length > 0 && (
           <section className="crz-product-related" aria-labelledby="related-title">
-            <SectionTitle icon={<NeonIcon name="featured" size={30} />} title="Você também pode gostar" description="Outros produtos ativos do catálogo real." />
+            <SectionTitle icon={<NeonIcon name="featured" size={30} />} title="Você também pode gostar" description="Outras opções que podem combinar com você." />
             <h2 id="related-title" className="sr-only">Produtos relacionados</h2>
             <div className="crz-product-related__grid">
               {relatedProducts.slice(0, 4).map((item) => {

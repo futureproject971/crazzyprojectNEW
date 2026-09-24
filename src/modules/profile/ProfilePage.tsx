@@ -375,7 +375,7 @@ export function ProfilePage() {
                     <option value="crazzy">Conta CRAZZY</option>
                     <option value="discord">Discord</option>
                   </select>
-                  <small>O fallback é automático quando uma fonte não possui avatar.</small>
+                  <small>Se uma opção não tiver foto, usamos sua outra imagem disponível.</small>
                 </label>
 
                 <Button
@@ -473,11 +473,11 @@ export function ProfilePage() {
                       <span>
                         {snapshot.discord.username
                           ? "@" + snapshot.discord.username
-                          : "Conecte para sincronizar identidade e cargos."}
+                          : "Conecte seu Discord para usar seus cargos e benefícios."}
                       </span>
                       {snapshot.discord.lastCheckedAt && (
                         <small>
-                          Último sync: {date(snapshot.discord.lastCheckedAt)}
+                          Última verificação: {date(snapshot.discord.lastCheckedAt)}
                         </small>
                       )}
                     </div>
@@ -509,7 +509,7 @@ export function ProfilePage() {
                   {!snapshot.discordRoles.length ? (
                     <div className="crz-profile-empty-roles">
                       <NeonIcon name="community" size={31} />
-                      <span>Nenhum cargo de produto registrado ainda.</span>
+                      <span>Nenhum cargo de produto disponível no momento.</span>
                     </div>
                   ) : (
                     <div className="crz-profile-role-list">

@@ -80,7 +80,7 @@ export function ComboBuilderPage() {
       <section className="crz-combo-hero">
         <div className="crz-container">
           <PageHeader
-            eyebrow="M07 • MONTE SEU COMBO"
+            eyebrow="MONTE SEU COMBO"
             title="Monte seu Combo CRAZZY"
             description="Escolha vários produtos no mesmo plano Mensal ou Lifetime e desbloqueie até 35% de desconto."
           />

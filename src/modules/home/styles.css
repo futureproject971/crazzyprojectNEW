@@ -629,3 +629,61 @@ html[data-motion="off"] .crz-home-hero__smoke::before,
 html[data-motion="off"] .crz-home-hero__smoke::after {
   animation: none !important;
 }
+
+
+/* Live homepage community chat */
+.chat-avatar--live {
+  overflow: hidden;
+}
+.chat-avatar--live img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.chat-live-input-shell {
+  cursor: text;
+}
+.chat-live-input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: #eaf2ff;
+  background: transparent;
+  font: inherit;
+}
+.chat-live-input::placeholder {
+  color: #73849b;
+}
+.chat-live-empty {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  color: #8fa0b5;
+  text-align: center;
+}
+.chat-live-empty strong {
+  color: #e6eef8;
+  font-size: 12px;
+}
+.chat-live-empty span,
+.chat-live-error {
+  font-size: 10.5px;
+}
+.chat-live-error {
+  padding: 0 12px 6px;
+  color: #ff7c89;
+}
+.chat-reactions button {
+  border: 0;
+  padding: 2px 4px;
+  background: transparent;
+  font-size: inherit;
+  cursor: pointer;
+}
+.ticket-category,
+.open-ticket-button {
+  text-decoration: none;
+}

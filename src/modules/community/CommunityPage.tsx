@@ -16,6 +16,7 @@ import type {
   CommunitySnapshot,
 } from "./types";
 import { CommunityVoiceDock } from "./CommunityVoiceDock";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import {
   COMMUNITY_FILE_ACCEPT,
   COMMUNITY_MAX_FILES,
@@ -187,6 +188,7 @@ export function CommunityPage() {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
   const firstLoadRef = useRef(true);
+  const realtimeRefreshRef = useRef<number | null>(null);
 
   const load = async (silent = false) => {
     if (!silent) {
@@ -234,13 +236,39 @@ export function CommunityPage() {
     firstLoadRef.current = true;
     void load();
 
-    const timer = window.setInterval(() => {
+    const supabase = createBrowserSupabaseClient();
+    const queueRefresh = () => {
+      if (realtimeRefreshRef.current) {
+        window.clearTimeout(realtimeRefreshRef.current);
+      }
+      realtimeRefreshRef.current = window.setTimeout(() => {
+        realtimeRefreshRef.current = null;
+        void load(true);
+      }, 120);
+    };
+
+    const realtime = supabase
+      .channel("community-live-" + channel)
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_messages" }, queueRefresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_reactions" }, queueRefresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_attachments" }, queueRefresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_channels" }, queueRefresh)
+      .subscribe();
+
+    const fallback = window.setInterval(() => {
       if (document.visibilityState === "visible") {
         void load(true);
       }
-    }, 4000);
+    }, 30000);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      if (realtimeRefreshRef.current) {
+        window.clearTimeout(realtimeRefreshRef.current);
+        realtimeRefreshRef.current = null;
+      }
+      window.clearInterval(fallback);
+      void supabase.removeChannel(realtime);
+    };
   }, [channel]);
 
   const visibleMessages = useMemo(
@@ -425,9 +453,9 @@ export function CommunityPage() {
       <section className="crz-community-hero">
         <div className="crz-container crz-community-hero__inner">
           <div>
-            <small>M14 • CRAZZY COMMUNITY</small>
+            <small>CRAZZY COMMUNITY</small>
             <h1>Comunidade</h1>
-            <p>Texto, voz, vídeo e compartilhamento de tela no mesmo ecossistema CRAZZY PROJECT.</p>
+            <p>Converse, compartilhe e participe da comunidade CRAZZY PROJECT.</p>
           </div>
 
           <div className="crz-community-live">
@@ -468,7 +496,7 @@ export function CommunityPage() {
             <NeonIcon name="shield" size={25} />
             <div>
               <strong>Comunidade segura</strong>
-              <span>Sem keys automáticas no chat. Mídias privadas e mensagens vinculadas à sua conta.</span>
+              <span>Respeite a comunidade e evite compartilhar dados sensíveis no chat.</span>
             </div>
           </Panel>
         </aside>
@@ -727,7 +755,7 @@ export function CommunityPage() {
             <NeonIcon name="community" size={28} />
             <div>
               <strong>Chat real</strong>
-              <span>Mensagens, replies e reações ficam salvos na sua conta CRAZZY.</span>
+              <span>Mensagens, respostas e reações em um só lugar.</span>
             </div>
           </Panel>
 
@@ -735,7 +763,7 @@ export function CommunityPage() {
             <NeonIcon name="shield" size={28} />
             <div>
               <strong>Mídia privada</strong>
-              <span>Imagem, vídeo e áudio usam links temporários. O bucket não é público.</span>
+              <span>Envie imagens, vídeos e áudios direto na conversa.</span>
             </div>
           </Panel>
 

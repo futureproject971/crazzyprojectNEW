@@ -81,7 +81,7 @@ export function ReviewsPage() {
         <PageHeader
           eyebrow="CRAZZY REVIEWS"
           title="Avaliações da comunidade"
-          description="Feedback público com selo de compra verificada baseado em pedido e entitlement reais."
+          description="Avaliações públicas de clientes que realmente compraram na CRAZZY PROJECT."
           actions={
             <a className="crz-button crz-button--secondary crz-button--sm" href="/">
               Voltar ao início
