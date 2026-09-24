@@ -20,6 +20,17 @@ const automationKeys = [
   ["auto_expire", "Expiração automática"],
 ] as const;
 
+const productStatusChoices = [
+  { value: "online", label: "ONLINE", description: "Disponível normalmente", tone: "online" },
+  { value: "offline", label: "OFFLINE", description: "Indisponível no momento", tone: "offline" },
+] as const;
+
+const orderPresets = [0, 10, 20, 50, 100] as const;
+
+function statusLabelOf(status: string) {
+  return status === "online" ? "Online" : "Offline";
+}
+
 const planCodes: Array<[ManagerPlanCode, string]> = [
   ["1d", "1 dia"],
   ["3d", "3 dias"],
@@ -391,9 +402,57 @@ export function ProductManagerPage() {
                   }}>{catalog.games.map(game => <option key={game.id} value={game.id}>{game.name}{game.active ? "" : " (inativa)"}</option>)}</select></label>
                   <label><span>Emoji</span><input value={productDraft.emoji || ""} onChange={e => setProductDraft({...productDraft,emoji:e.target.value})} placeholder="🎮" /></label>
                   <label><span>Cor</span><div className="crz-pm-color"><input type="color" value={productDraft.accent_color || "#1687ff"} onChange={e => setProductDraft({...productDraft,accent_color:e.target.value})} /><input value={productDraft.accent_color || ""} onChange={e => setProductDraft({...productDraft,accent_color:e.target.value})} placeholder="#1687FF" /></div></label>
-                  <label><span>Status interno</span><input value={productDraft.status} onChange={e => setProductDraft({...productDraft,status:e.target.value})} /></label>
-                  <label><span>Label de status</span><input value={productDraft.status_label} onChange={e => setProductDraft({...productDraft,status_label:e.target.value})} /></label>
-                  <label><span>Ordem</span><input type="number" value={productDraft.sort_order} onChange={e => setProductDraft({...productDraft,sort_order:Number(e.target.value)})} /></label>
+                  <div className="crz-pm-choice-field">
+                    <span>Status interno</span>
+                    <div className="crz-pm-status-choice" role="group" aria-label="Status interno do produto">
+                      {productStatusChoices.map(choice => {
+                        const selected = productDraft.status === choice.value;
+                        return (
+                          <button
+                            key={choice.value}
+                            type="button"
+                            className={"is-" + choice.tone + (selected ? " is-selected" : "")}
+                            aria-pressed={selected}
+                            onClick={() => setProductDraft({
+                              ...productDraft,
+                              status: choice.value,
+                              status_label: statusLabelOf(choice.value),
+                            })}
+                          >
+                            <i />
+                            <span>
+                              <strong>{choice.label}</strong>
+                              <small>{choice.description}</small>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <small className="crz-pm-field-help">
+                      O texto público acompanha automaticamente o botão selecionado.
+                    </small>
+                  </div>
+
+                  <div className="crz-pm-choice-field">
+                    <span>Ordem de exibição</span>
+                    <div className="crz-pm-stepper">
+                      <button type="button" onClick={() => setProductDraft({...productDraft,sort_order:productDraft.sort_order-1})}>−</button>
+                      <strong>{productDraft.sort_order}</strong>
+                      <button type="button" onClick={() => setProductDraft({...productDraft,sort_order:productDraft.sort_order+1})}>＋</button>
+                    </div>
+                    <div className="crz-pm-preset-row" aria-label="Valores rápidos de ordem">
+                      {orderPresets.map(value => (
+                        <button
+                          key={value}
+                          type="button"
+                          className={productDraft.sort_order === value ? "is-selected" : ""}
+                          onClick={() => setProductDraft({...productDraft,sort_order:value})}
+                        >
+                          {value}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                   <label className="is-wide"><span>Imagem</span><input value={productDraft.image_url || ""} onChange={e => setProductDraft({...productDraft,image_url:e.target.value})} placeholder="https://..." /></label>
                   <label className="is-wide"><span>Descrição</span><textarea value={productDraft.description || ""} onChange={e => setProductDraft({...productDraft,description:e.target.value})} rows={3} /></label>
                   <label className="is-wide"><span>Features</span><textarea value={productDraft.features_text || ""} onChange={e => setProductDraft({...productDraft,features_text:e.target.value})} rows={3} /></label>
