@@ -50,7 +50,7 @@ const DEFAULT: Appearance = {
   brand_name: "CRAZZY PROJECT",
   tagline: "QUEM NAO XITA NAO BRILHA",
   logo_hero_url: "/brand/crazzy-logo-hero.png",
-  logo_navbar_url: "/brand/crazzy-logo-navbar.png",
+  logo_navbar_url: "/brand/crazzy-logo-hero.png",
   favicon_url: "/favicon.ico",
   site_wallpaper_url: "",
   hero_cover_url: "/backgrounds/hero-tokyo.webp",
