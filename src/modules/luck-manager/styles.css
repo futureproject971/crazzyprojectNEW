@@ -1,1 +1,35 @@
 .crz-luckmanager{min-height:100vh;padding:92px 0 48px;background:radial-gradient(circle at 50% -8%,rgba(0,101,255,.12),transparent 34%),linear-gradient(180deg,#020711,#01050b);color:#eaf4ff}.crz-luckmanager-state{min-height:100vh;display:grid;place-items:center;align-content:center;gap:9px;color:#71869e}.crz-luckmanager-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.crz-luckmanager-stats article{min-height:80px;border:1px solid var(--crz-card-border);border-radius:10px;display:grid;place-items:center;align-content:center;background:var(--crz-gradient-card)}.crz-luckmanager-stats .is-alert{border-color:rgba(255,184,55,.3)}.crz-luckmanager-stats small{color:#20adff;font-size:7px;font-weight:900}.crz-luckmanager-stats strong{font-size:20px}.crz-luckmanager-notice{font-size:9px;color:#9ed5ff}.crz-luckmanager-layout{display:grid;grid-template-columns:.8fr 1.2fr;gap:10px}.crz-luckmanager-campaigns,.crz-luckmanager-prizes{border:1px solid var(--crz-card-border);border-radius:11px;background:var(--crz-gradient-card);box-shadow:var(--crz-card-shadow)}.crz-luckmanager-campaigns>header,.crz-luckmanager-prizes>header{padding:10px;display:flex;justify-content:space-between;border-bottom:1px solid rgba(72,127,200,.1)}.crz-luckmanager-campaigns>button{width:100%;min-height:64px;border:0;border-bottom:1px solid rgba(72,127,200,.1);padding:8px 10px;display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;text-align:left;background:transparent;color:#8599ad;cursor:pointer}.crz-luckmanager-campaigns>button.is-selected{box-shadow:inset 3px 0 0 #1687ff;background:rgba(7,22,40,.82)}.crz-luckmanager-campaigns span,.crz-luckmanager-prizes article>span{display:grid;gap:2px}.crz-luckmanager-campaigns strong,.crz-luckmanager-prizes strong{color:#e4effa;font-size:9px}.crz-luckmanager-campaigns small,.crz-luckmanager-prizes small{font-size:7px;color:#6e849b}.crz-luckmanager-campaigns em{font-size:7px;color:#60c1ff;font-style:normal}.crz-luckmanager-prizes>header button,.crz-luckmanager-prizes article button{border:1px solid rgba(72,132,210,.2);border-radius:7px;color:#9ed5ff;background:var(--crz-gradient-card-soft);cursor:pointer}.crz-luckmanager-prizes article{min-height:62px;padding:8px 10px;border-bottom:1px solid rgba(72,127,200,.1);display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}.crz-luckmanager-empty{min-height:150px;display:grid;place-items:center;color:#71869e}@media(max-width:850px){.crz-luckmanager-layout{grid-template-columns:1fr}.crz-luckmanager-stats{grid-template-columns:1fr 1fr}}
+
+
+/* 2026-09-24 — internal admin editor, no native browser prompts */
+.crz-luckmanager-notice{font-size:13px;color:#9ed5ff;line-height:1.45}
+.crz-luckmanager-campaigns>header,
+.crz-luckmanager-prizes>header{padding:14px}
+.crz-luckmanager-campaigns>header div,
+.crz-luckmanager-prizes>header div{display:grid;gap:4px}
+.crz-luckmanager-campaigns>header strong,
+.crz-luckmanager-prizes>header strong{font-size:16px;color:#edf5ff}
+.crz-luckmanager-campaigns>header small,
+.crz-luckmanager-prizes>header small{font-size:12px;color:#8195ad}
+.crz-luckmanager-campaigns>button{min-height:76px;padding:11px 13px}
+.crz-luckmanager-campaigns strong,.crz-luckmanager-prizes strong{font-size:14px}
+.crz-luckmanager-campaigns small,.crz-luckmanager-prizes small{font-size:11px;line-height:1.35}
+.crz-luckmanager-campaigns em{font-size:12px}
+.crz-luckmanager-prizes article{min-height:74px;padding:11px 13px}
+.crz-luckmanager-prizes>header button,.crz-luckmanager-prizes article button{min-height:36px;padding:0 11px;font-size:12px}
+.crz-luckmanager-empty{font-size:13px;padding:20px;text-align:center}
+
+.crz-admin-form{display:grid;gap:16px}
+.crz-admin-form>label,.crz-admin-form__grid>label{display:grid;gap:6px}
+.crz-admin-form label>span{color:#edf5ff;font-size:14px;font-weight:700}
+.crz-admin-form label>small{color:#8193aa;font-size:12px;line-height:1.4}
+.crz-admin-form__grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.crz-admin-switch{grid-template-columns:20px 1fr!important;align-items:start;border:1px solid rgba(69,132,218,.22);border-radius:10px;padding:12px;background:rgba(7,17,31,.7)}
+.crz-admin-switch input{width:18px;height:18px;margin:2px 0 0;accent-color:#176cff}
+.crz-admin-switch>span{display:grid;gap:3px}
+.crz-admin-switch>span strong{font-size:14px}
+.crz-admin-switch>span small{font-weight:400}
+.crz-admin-textarea{width:100%;resize:vertical;border:1px solid rgba(104,143,199,.34);border-radius:8px;background:rgba(5,13,24,.94);color:#fff;padding:11px 12px;font:inherit;font-size:14px;line-height:1.5}
+.crz-admin-form__actions{display:flex;justify-content:flex-end;gap:9px;padding-top:4px}
+
+@media(max-width:600px){.crz-admin-form__grid{grid-template-columns:1fr}.crz-admin-form__actions{display:grid;grid-template-columns:1fr 1fr}}
