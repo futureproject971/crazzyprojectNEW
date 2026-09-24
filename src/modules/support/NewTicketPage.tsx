@@ -322,7 +322,7 @@ export function NewTicketPage() {
             <NeonIcon name="shield" size={30} />
             <div>
               <strong>Seus anexos são privados</strong>
-              <span>O site gera uma autorização curta para upload e outra curta para visualizar. O bucket não é público.</span>
+              <span>Envie prints, vídeos ou arquivos que ajudem nossa equipe a entender o problema.</span>
             </div>
           </Panel>
 
@@ -330,7 +330,7 @@ export function NewTicketPage() {
             <NeonIcon name="cube" size={30} />
             <div>
               <strong>Contexto sem expor sua key</strong>
-              <span>Você pode vincular pedido, entitlement ou entrega. O ticket recebe a referência, nunca o segredo da Library.</span>
+              <span>Escolha um pedido, produto ou entrega para o suporte localizar seu caso mais rápido.</span>
             </div>
           </Panel>
         </aside>
