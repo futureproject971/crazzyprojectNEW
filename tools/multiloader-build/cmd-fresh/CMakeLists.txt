@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.20)
+project(CrazzyCmdFresh LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+add_executable(CrazzyMultiloader_CMD_FRESH main.cpp)
+target_link_libraries(CrazzyMultiloader_CMD_FRESH PRIVATE shell32)
+if(MSVC)
+  target_compile_options(CrazzyMultiloader_CMD_FRESH PRIVATE /W4 /EHsc /utf-8)
+endif()
