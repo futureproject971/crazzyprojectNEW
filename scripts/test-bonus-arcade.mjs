@@ -6,3 +6,13 @@ for(const required of ["grant_purchase_bonus","allowed_plan_id","CRAZZY BONUS","
 const bonus=await fs.readFile("src/modules/bonus/BonusPage.tsx","utf8");if(!bonus.includes("Não é sacável")||!bonus.includes("Gerar benefício"))throw new Error("BONUS rules/UX incomplete");
 const admin=await fs.readFile("src/modules/bonus-manager/BonusManagerPage.tsx","utf8");if(!admin.includes("maxBonusPercent")||!admin.includes("monthlyLimitCents"))throw new Error("BONUS admin controls incomplete");
 console.log("[PASS] CRAZZY BONUS wallet, purchase grants, redemption limits and admin controls");
+
+const finalize=await fs.readFile("supabase/migrations/20260924174400_bonus_arcade_finalize.sql","utf8");
+for(const required of [
+  "luck_prizes_prize_type_check",
+  "'bonus'::text",
+  "on_order_ticket_purchase_bonus",
+  "trg_order_ticket_purchase_bonus",
+  "status in ('FULFILLING','COMPLETED')",
+  "private.bonus_credit"
+]) if(!finalize.includes(required)) throw new Error("BONUS/ARCADE finalize migration missing "+required);
