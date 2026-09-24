@@ -1,0 +1,112 @@
+name: Build CRAZZY CMD Multiloader
+
+on:
+  push:
+    branches:
+      - multiloader-build-temp
+  workflow_dispatch:
+
+jobs:
+  build-cmd:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Restore launcher source
+        shell: pwsh
+        run: |
+          $parts = 0..3 | ForEach-Object { Get-Content ("tools/multiloader-build/v03.part{0:D2}" -f $_) -Raw }
+          $b64 = ($parts -join "")
+          [IO.File]::WriteAllBytes("$env:GITHUB_WORKSPACE\multiloader-base.zip", [Convert]::FromBase64String($b64))
+          Expand-Archive -Path "$env:GITHUB_WORKSPACE\multiloader-base.zip" -DestinationPath "$env:GITHUB_WORKSPACE\cmd-src" -Force
+
+      - name: Add CMD/TUI edition
+        shell: pwsh
+        run: |
+          $root = "$env:GITHUB_WORKSPACE\cmd-src\CRAZZY_MULTILOADER_V0_2"
+          New-Item -ItemType Directory -Force (Join-Path $root "src\console") | Out-Null
+          Copy-Item "tools/multiloader-build/cmd/ConsoleMain.cpp" (Join-Path $root "src\console\ConsoleMain.cpp") -Force
+
+          $cmake = Join-Path $root "CMakeLists.txt"
+          $append = @'
+
+          add_executable(CrazzyCmdLoader
+              src/console/ConsoleMain.cpp
+              src/app.rc
+              src/core/AppPaths.cpp
+              src/core/Logger.cpp
+              src/platform/Admin.cpp
+              src/platform/Crypto.cpp
+              src/platform/ProcessLauncher.cpp
+              src/platform/Utf.cpp
+              src/services/MockApiClient.cpp
+              src/services/HttpApiClient.cpp
+              src/services/WinHttpClient.cpp
+          )
+          target_include_directories(CrazzyCmdLoader PRIVATE src)
+          target_compile_definitions(CrazzyCmdLoader PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN NOMINMAX)
+          target_link_libraries(CrazzyCmdLoader PRIVATE bcrypt crypt32 shell32 shlwapi winhttp dwmapi)
+          if (MSVC)
+              target_compile_options(CrazzyCmdLoader PRIVATE /W4 /permissive- /EHsc /utf-8)
+          endif()
+          set_target_properties(CrazzyCmdLoader PROPERTIES LINK_FLAGS "/MANIFEST:NO")
+          add_dependencies(CrazzyCmdLoader CrazzyDemoLoader)
+          add_custom_command(TARGET CrazzyCmdLoader POST_BUILD
+              COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:CrazzyCmdLoader>/mock_releases"
+              COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                  "$<TARGET_FILE:CrazzyDemoLoader>"
+                  "$<TARGET_FILE_DIR:CrazzyCmdLoader>/mock_releases/CrazzyDemoLoader.exe"
+          )
+          '@
+          Add-Content -Path $cmake -Value $append
+
+          $text = Get-Content $cmake -Raw
+          $needle = "target_compile_options(CrazzyDemoLoader PRIVATE /W4 /permissive- /EHsc /utf-8)"
+          if ($text.Contains($needle) -and -not $text.Contains('set_target_properties(CrazzyDemoLoader')) {
+            $replacement = 'target_compile_options(CrazzyDemoLoader PRIVATE /W4 /permissive- /EHsc /utf-8)' + [Environment]::NewLine + 'set_target_properties(CrazzyDemoLoader PROPERTIES LINK_FLAGS "/MANIFEST:NO")'
+            $text = $text.Replace($needle, $replacement)
+            Set-Content $cmake $text -Encoding UTF8
+          }
+
+          $demo = Join-Path $root "demo\DemoLoader.cpp"
+          $d = Get-Content $demo -Raw
+          if (-not $d.Contains("#include <windowsx.h>")) {
+            $d = $d.Replace("#include <windows.h>", "#include <windows.h>" + [Environment]::NewLine + "#include <windowsx.h>")
+            Set-Content $demo $d -Encoding UTF8
+          }
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -S "$env:GITHUB_WORKSPACE\cmd-src\CRAZZY_MULTILOADER_V0_2" -B "$env:GITHUB_WORKSPACE\cmd-build" -A x64
+
+      - name: Build CMD edition
+        shell: pwsh
+        run: |
+          cmake --build "$env:GITHUB_WORKSPACE\cmd-build" --config Release --target CrazzyCmdLoader --parallel
+
+      - name: Inspect
+        shell: pwsh
+        run: |
+          Get-Item "$env:GITHUB_WORKSPACE\cmd-build\Release\CrazzyCmdLoader.exe" | Select-Object Name,Length
+          Get-FileHash "$env:GITHUB_WORKSPACE\cmd-build\Release\CrazzyCmdLoader.exe" -Algorithm SHA256
+
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "$env:GITHUB_WORKSPACE\dist" | Out-Null
+          Copy-Item "$env:GITHUB_WORKSPACE\cmd-build\Release\CrazzyCmdLoader.exe" "$env:GITHUB_WORKSPACE\dist\CrazzyMultiloader_CMD.exe"
+          if (Test-Path "$env:GITHUB_WORKSPACE\cmd-build\Release\mock_releases") {
+            Copy-Item "$env:GITHUB_WORKSPACE\cmd-build\Release\mock_releases" "$env:GITHUB_WORKSPACE\dist\mock_releases" -Recurse
+          }
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CRAZZY-MULTILOADER-CMD-WINDOWS
+          path: dist
+          if-no-files-found: error
