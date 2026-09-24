@@ -1,0 +1,153 @@
+/*
+ * CRAZZY PROJECT • Global UX polish
+ * Cross-module affordance/readability layer. Keep module-specific layout in each module.
+ */
+
+html, body { min-height:100%; }
+
+body {
+  font-size:14px;
+  line-height:1.5;
+  background-color:#02050a;
+  background-image:
+    linear-gradient(180deg,rgba(1,5,11,.76),rgba(1,5,11,.88)),
+    var(--crz-site-wallpaper-image,none),
+    radial-gradient(circle at 50% -10%,rgba(0,91,255,.11),transparent 38%);
+  background-position:center,center,center;
+  background-size:cover,cover,auto;
+  background-repeat:no-repeat,no-repeat,no-repeat;
+  background-attachment:fixed,fixed,fixed;
+}
+
+.crz-app-shell::before { display:none !important; }
+.crz-app-shell__content { position:relative; isolation:isolate; }
+
+/* Let the global wallpaper breathe through full-page module surfaces. */
+.crz-app-shell__content > main {
+  background-color:rgba(2,7,14,.76) !important;
+}
+
+/* Typography: secondary copy must still be readable at desktop scale. */
+.crz-app-shell :where(p,li,dd,dt,label,input,textarea,select) { line-height:1.48; }
+.crz-app-shell :where(small,time,code,em) {
+  font-size:max(10.5px,.66rem);
+  line-height:1.4;
+}
+.crz-app-shell :where(p,small,time,label,dt) { color:color-mix(in srgb,var(--crz-color-text-soft) 82%,#9ecbff 18%); }
+
+/* Interactive controls should visually announce themselves. */
+.crz-app-shell :where(button,[role="button"],summary,a.crz-button,a[class*="cta"],a[class*="action"]) {
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:
+    transform 150ms var(--crz-ease),
+    border-color 150ms ease,
+    color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    filter 150ms ease;
+}
+
+.crz-app-shell button:not(:disabled),
+.crz-app-shell .crz-button:not([aria-disabled="true"]) {
+  border-style:solid;
+  border-width:1px;
+  border-color:rgba(73,151,255,.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 5px 14px rgba(0,0,0,.2),
+    0 0 0 1px rgba(32,101,200,.04);
+}
+
+.crz-app-shell button:not(:disabled):hover,
+.crz-app-shell .crz-button:not([aria-disabled="true"]):hover,
+.crz-app-shell a[class*="cta"]:hover {
+  transform:translateY(-2px);
+  border-color:rgba(86,180,255,.74);
+  filter:brightness(1.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.1),
+    0 8px 22px rgba(0,0,0,.3),
+    0 0 20px rgba(0,111,255,.18);
+}
+
+.crz-app-shell button:not(:disabled):active,
+.crz-app-shell .crz-button:not([aria-disabled="true"]):active {
+  transform:translateY(0) scale(.985);
+}
+
+.crz-app-shell :where(button,a,summary,[role="button"]):focus-visible {
+  outline:none;
+  box-shadow:
+    0 0 0 2px #02050a,
+    0 0 0 4px #2a91ff,
+    0 0 24px rgba(24,137,255,.38) !important;
+}
+
+/* Secondary/plain actions no longer disappear into cards. */
+.crz-app-shell button:not(.crz-button):not(.crz-community-avatar):not(.crz-call-preview) {
+  background-color:rgba(8,22,40,.88);
+}
+
+.crz-app-shell button:not(.crz-button):not(.crz-community-avatar):not(.crz-call-preview):hover {
+  background-color:rgba(12,43,80,.92);
+}
+
+/* Obvious click language for cards and nav. */
+.crz-panel--interactive,
+.crz-shell-nav__item,
+.crz-dropdown-item,
+.crz-community-channels nav button,
+.crz-call-room-cards article {
+  border-color:rgba(80,148,235,.24);
+}
+
+.crz-panel--interactive:hover,
+.crz-shell-nav__item:hover,
+.crz-dropdown-item:hover,
+.crz-community-channels nav button:hover {
+  border-color:rgba(74,168,255,.62);
+}
+
+/* Fast rendering for below-the-fold modules without hiding layout size. */
+.crz-home > section:not(:first-child),
+.crz-shell-footer {
+  content-visibility:auto;
+  contain-intrinsic-size:auto 540px;
+}
+
+/* CRAZZY CALL had intentionally microscopic labels. Raise the floor. */
+.crz-call-hub :where(small,em,code,time,label,button,input,select),
+.crz-call-room :where(small,em,code,time,label,button,input,select),
+.crz-call-admin :where(small,em,code,time,label,button,input,select),
+.crz-call-lobby :where(small,em,code,time,label,button,input,select) {
+  font-size:11px !important;
+}
+
+.crz-call-hub :where(p,span),
+.crz-call-room :where(p),
+.crz-call-admin :where(p),
+.crz-call-lobby :where(p) {
+  font-size:12px;
+}
+
+.crz-call-chat__messages strong,
+.crz-call-participant-copy > strong,
+.crz-call-stage__toolbar strong,
+.crz-call-room-cards article > strong {
+  font-size:12px !important;
+}
+
+/* Admin/control pages get the same readable action language as the storefront. */
+.crz-control-center button,
+.crz-control-center a,
+.crz-appearance button,
+.crz-appearance input,
+.crz-appearance select {
+  font-size:12px;
+}
+
+@media (max-width:700px) {
+  body { font-size:14px; background-attachment:scroll,scroll,scroll; }
+  .crz-app-shell__content > main { background-color:rgba(2,7,14,.82) !important; }
+}
