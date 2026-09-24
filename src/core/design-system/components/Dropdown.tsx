@@ -9,6 +9,7 @@ export type DropdownItem = {
   label: ReactNode;
   disabled?: boolean;
   danger?: boolean;
+  tone?: "default" | "admin";
   onSelect?: () => void;
 };
 
@@ -50,7 +51,7 @@ export function Dropdown({
               key={item.id}
               type="button"
               role="menuitem"
-              className={cn("crz-dropdown-item", item.danger && "crz-dropdown-item--danger")}
+              className={cn("crz-dropdown-item", item.danger && "crz-dropdown-item--danger", item.tone === "admin" && "crz-dropdown-item--admin")}
               disabled={item.disabled}
               onClick={() => {
                 item.onSelect?.();
