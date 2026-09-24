@@ -91,7 +91,7 @@ export function SupportDeskPage(){
       .on(
         "postgres_changes",
         {event:"INSERT",schema:"public",table:"support_messages"},
-        payload=>schedule(String((payload.new as {ticket_id?:unknown})?.ticket_id||""))
+        (payload:any)=>schedule(String((payload.new as {ticket_id?:unknown})?.ticket_id||""))
       )
       .on(
         "postgres_changes",
@@ -101,7 +101,7 @@ export function SupportDeskPage(){
       .on(
         "postgres_changes",
         {event:"UPDATE",schema:"public",table:"support_tickets"},
-        payload=>schedule(String((payload.new as {id?:unknown})?.id||""))
+        (payload:any)=>schedule(String((payload.new as {id?:unknown})?.id||""))
       )
       .subscribe();
 
