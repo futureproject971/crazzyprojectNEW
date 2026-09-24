@@ -825,11 +825,184 @@ export function ProductManagerPage() {
                 </section>
 
                 <nav className="crz-pm-section-nav" aria-label="Seções do produto">
+                  <a href="#pm-planos-rapido">Planos & Estoque</a>
                   <a href="#pm-geral">Geral</a>
-                  <a href="#pm-planos">Planos & Estoque</a>
                   <a href="#pm-automacao">Automação</a>
                   <a href="#pm-academy">Academy</a>
                 </nav>
+
+                <section id="pm-planos-rapido" className="crz-pm-plan-quick crz-pm-anchor-section">
+                  <header className="crz-pm-plan-quick__head">
+                    <div>
+                      <small>PLANOS & ESTOQUE</small>
+                      <h2>Venda por plano, estoque por plano</h2>
+                      <p>Crie o plano aqui e cole as keys logo abaixo. Não precisa descer a página para achar o estoque.</p>
+                    </div>
+                    <div className="crz-pm-plan-quick__actions">
+                      <Badge tone={productDraft.plans.length ? "blue" : "pink"}>
+                        {productDraft.plans.length} PLANO(S)
+                      </Badge>
+                      <button
+                        type="button"
+                        className="crz-button crz-button--primary crz-button--md"
+                        onClick={() => setCreatingPlan(value => !value)}
+                      >
+                        {creatingPlan ? "Fechar criador" : "+ Criar plano"}
+                      </button>
+                    </div>
+                  </header>
+
+                  {creatingPlan && (
+                    <div className="crz-pm-plan-quick__creator">
+                      <label>
+                        <span>Nome do plano</span>
+                        <input
+                          autoFocus
+                          value={newPlan.name}
+                          onChange={event => setNewPlan({...newPlan,name:event.target.value.slice(0,80)})}
+                          placeholder="Ex.: Diário"
+                        />
+                      </label>
+                      <label>
+                        <span>Duração</span>
+                        <select
+                          value={newPlan.planCode}
+                          onChange={event => setNewPlan({...newPlan,planCode:event.target.value as ManagerPlanCode})}
+                        >
+                          {planCodes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}
+                        </select>
+                      </label>
+                      <label>
+                        <span>Preço</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={newPlan.price}
+                          onChange={event => setNewPlan({...newPlan,price:Number(event.target.value)})}
+                          placeholder="10,00"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="crz-button crz-button--primary crz-button--md"
+                        disabled={busy || !newPlan.name.trim()}
+                        onClick={() => void createPlan()}
+                      >
+                        {busy ? "Criando..." : "Criar e abrir plano"}
+                      </button>
+                    </div>
+                  )}
+
+                  {productDraft.plans.length === 0 ? (
+                    <div className="crz-pm-plan-quick__empty">
+                      <div className="crz-pm-plan-quick__empty-icon">＋</div>
+                      <div>
+                        <strong>Este produto ainda não tem nenhum plano.</strong>
+                        <span>Crie Diário, Semanal, Mensal ou o período que quiser. Depois o campo de estoque aparece aqui mesmo.</span>
+                      </div>
+                      {!creatingPlan && (
+                        <button
+                          type="button"
+                          className="crz-button crz-button--primary crz-button--md"
+                          onClick={() => setCreatingPlan(true)}
+                        >
+                          + Criar primeiro plano
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="crz-pm-plan-quick__cards">
+                        {productDraft.plans.map(plan => {
+                          const stock = planStockMeta(plan);
+                          return (
+                            <button
+                              type="button"
+                              key={plan.id}
+                              className={selectedPlanId === plan.id ? "is-active" : ""}
+                              onClick={() => selectPlan(plan)}
+                            >
+                              <span className="crz-pm-plan-quick__card-top">
+                                <strong>{plan.name}</strong>
+                                <i className={plan.active ? "is-live" : ""}>{plan.active ? "ATIVO" : "OFF"}</i>
+                              </span>
+                              <b>{brl(Number(plan.price))}</b>
+                              <span className={"crz-pm-plan-quick__card-stock is-" + stock.tone}>
+                                <em>{stock.label}</em>
+                                <small>{stock.detail}</small>
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {planDraft && (
+                        <div className="crz-pm-plan-quick__stock">
+                          <header>
+                            <div>
+                              <small>ESTOQUE DO PLANO SELECIONADO</small>
+                              <h3>{planDraft.name}</h3>
+                              <p>Uma linha = uma key. Ex.: 100 linhas adicionadas = 100 unidades deste plano.</p>
+                            </div>
+                            <div>
+                              <Badge tone={planDraft.available_stock > 0 ? "green" : "pink"}>
+                                {planDraft.available_stock} DISPONÍVEL
+                              </Badge>
+                              <button
+                                type="button"
+                                className="crz-button crz-button--secondary crz-button--sm"
+                                onClick={() => document.getElementById("pm-planos")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                              >
+                                Configurar plano completo
+                              </button>
+                            </div>
+                          </header>
+
+                          {planDraft.delivery_mode === "internal_stock" && checkedFlags(planDraft.automation_flags, "auto_delivery") ? (
+                            <div className="crz-pm-stock-ready">✓ Estoque interno + entrega automática configurados.</div>
+                          ) : (
+                            <div className="crz-pm-stock-warning">
+                              <span>Para entregar a key automaticamente após a compra, use <strong>Estoque interno</strong> + <strong>Entrega automática</strong>.</span>
+                              <button type="button" onClick={prepareAutomaticStock}>Preparar automaticamente</button>
+                            </div>
+                          )}
+
+                          <label className="crz-pm-stock-import">
+                            <span>Colar keys / códigos deste plano</span>
+                            <textarea
+                              rows={7}
+                              value={stockText}
+                              onChange={event => setStockText(event.target.value)}
+                              placeholder={"KEY-0001\nKEY-0002\nKEY-0003"}
+                              spellCheck={false}
+                            />
+                          </label>
+
+                          <div className="crz-pm-stock-footer">
+                            <div>
+                              <strong>{stockItems.length} key(s) prontas para adicionar</strong>
+                              <small>Duplicadas são ignoradas. Limite de 5.000 por lote.</small>
+                            </div>
+                            <button
+                              type="button"
+                              className="crz-button crz-button--primary crz-button--md"
+                              disabled={stockBusy || !stockItems.length || stockItems.length > 5000}
+                              onClick={() => void importPlanStock()}
+                            >
+                              {stockBusy ? "Adicionando..." : "Adicionar ao estoque deste plano"}
+                            </button>
+                          </div>
+
+                          {stockItems.length > 5000 && (
+                            <div className="crz-pm-stock-error">Este lote passou de 5.000 linhas. Divida em dois lotes.</div>
+                          )}
+                          {stockNotice && <div className="crz-pm-stock-notice">{stockNotice}</div>}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </section>
 
                 <div id="pm-geral" className="crz-pm-editor__header crz-pm-editor__header--section">
                   <div>
@@ -911,18 +1084,17 @@ export function ProductManagerPage() {
                     <div><small>PLANOS</small><h3>Configuração de entrega</h3></div>
                     <div className="crz-pm-plans__actions">
                       <span>{productDraft.plans.length} plano(s)</span>
-                      <button type="button" onClick={() => setCreatingPlan(value => !value)}>{creatingPlan ? "Cancelar" : "+ Plano"}</button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCreatingPlan(true);
+                          document.getElementById("pm-planos-rapido")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }}
+                      >
+                        + Criar plano
+                      </button>
                     </div>
                   </header>
-
-                  {creatingPlan && (
-                    <div className="crz-pm-create-plan">
-                      <label><span>Nome</span><input value={newPlan.name} onChange={event => setNewPlan({...newPlan,name:event.target.value.slice(0,80)})} /></label>
-                      <label><span>Código</span><select value={newPlan.planCode} onChange={event => setNewPlan({...newPlan,planCode:event.target.value as ManagerPlanCode})}>{planCodes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-                      <label><span>Preço inicial</span><input type="number" min="0" step="0.01" value={newPlan.price} onChange={event => setNewPlan({...newPlan,price:Number(event.target.value)})} /></label>
-                      <button type="button" className="crz-button crz-button--primary crz-button--sm" disabled={busy || !newPlan.name.trim()} onClick={() => void createPlan()}>{busy ? "Criando..." : "Criar plano"}</button>
-                    </div>
-                  )}
 
                   <div className="crz-pm-plan-tabs">
                     {productDraft.plans.map(plan => {
@@ -956,7 +1128,7 @@ export function ProductManagerPage() {
                         <label><span>Ordem</span><input type="number" value={planDraft.sort_order} onChange={e => setPlanDraft({...planDraft,sort_order:Number(e.target.value)})} /></label>
                       </div>
 
-                      <div className="crz-pm-stock-section">
+                      <div id="pm-stock-detalhado" className="crz-pm-stock-section">
                         <header className="crz-pm-stock-head">
                           <div>
                             <small>ESTOQUE DESTE PLANO</small>
