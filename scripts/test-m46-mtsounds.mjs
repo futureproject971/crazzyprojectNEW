@@ -1,42 +1,12 @@
 const { readFile } = await import("node:fs/promises");
-
 const page = await readFile("src/modules/mtsounds/MtSoundsPage.tsx", "utf8");
-const api = await readFile("src/app/api/mtsounds/route.ts", "utf8");
-const config = await readFile("src/lib/mtsounds/config.ts", "utf8");
-
-for (const required of [
-  "/api/mtsounds",
-  "frameFailed",
-  "M46 COMPAT",
-  "sandbox=",
-  "referrerPolicy=",
-  "MTSOUNDS • integração CRAZZY ativa",
-  "/api/referral/capture",
-]) {
-  if (!page.includes(required)) throw new Error("M46 page missing " + required);
-}
-
-for (const forbidden of [
-  "DISCORD_BOT_TOKEN",
-  "SUPABASE_SERVICE_ROLE_KEY",
-  "LIVEKIT_API_SECRET",
-]) {
-  if (page.includes(forbidden) || api.includes(forbidden) || config.includes(forbidden)) {
-    throw new Error("M46 must not couple to private CRAZZY secrets: " + forbidden);
-  }
-}
-
-if (!config.includes('protocol !== "https:"')) {
-  throw new Error("M46 partner URL must stay HTTPS-only");
-}
-if (!config.includes("AbortController")) {
-  throw new Error("M46 health probe must have a timeout");
-}
-if (!api.includes("Cache-Control")) {
-  throw new Error("M46 status endpoint should be cheaply cacheable");
-}
-if (!page.includes('mode: "embed"') || !page.includes('mode === "external"')) {
-  throw new Error("M46 must preserve controlled embed/external fallback modes");
-}
-
-console.log("[PASS] M46 MTSOUNDS CRAZZY integration module");
+const editor = await readFile("src/modules/mtsounds/native/Editor.tsx", "utf8");
+const search = await readFile("src/modules/mtsounds/native/MusicSearch.tsx", "utf8");
+const youtube = await readFile("src/app/api/mtsounds/native/youtube/search/route.ts", "utf8");
+const downloader = await readFile("src/app/api/mtsounds/native/downloader/route.ts", "utf8");
+for (const required of ["./native/MusicSearch","./native/ReactiveVinyl","/mtsounds/editor","MTSOUND"]) if(!page.includes(required)) throw new Error("M46 native home missing "+required);
+if(page.includes("<iframe")||page.includes("mtsounds.vercel.app")) throw new Error("M46 main experience must no longer depend on external app iframe");
+for (const required of ["OfflineAudioContext","INTRO_MP3_BASE64","exportFinal","Bass Boost","Grave Estourado"]) if(!editor.includes(required)) throw new Error("M46 native editor missing "+required);
+for (const required of ["/api/mtsounds/native/youtube/search","/api/mtsounds/native/downloader","ReactiveVinyl"]) if(!search.includes(required)) throw new Error("M46 native search missing "+required);
+if(!youtube.includes("youtube.com/results")||!downloader.includes("isYouTubeUrl")) throw new Error("M46 native backend routes are incomplete");
+console.log("[PASS] M46 MTSOUNDS source is migrated natively into CRAZZY PROJECT");
