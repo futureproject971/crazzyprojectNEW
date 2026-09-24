@@ -29,6 +29,7 @@ const tests = [
   "scripts/test-discord-integration.mjs",
   "scripts/test-m46-mtsounds.mjs",
   "scripts/test-live-storefront.mjs",
+  "scripts/test-release-modules.mjs",
 ];
 
 function run(file) {
