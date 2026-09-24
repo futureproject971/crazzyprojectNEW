@@ -92,7 +92,7 @@ const ADMIN_GROUPS = [
     title: "Sistema",
     description: "Configurações avançadas e segurança ficam juntas, longe da navegação do cliente.",
     tools: [
-      { label: "Aparência", description: "Ajuste a identidade visual da plataforma.", href: "/admin/aparencia", icon: "/icons/diamond.svg" },
+      { label: "Marca & Aparência", description: "Logo, capas, wallpaper, cores, favicon e modo marca branca.", href: "/admin/aparencia", icon: "/icons/diamond.svg" },
       { label: "Segurança", description: "Veja incidentes, tentativas suspeitas e auditoria.", href: "/admin/security", icon: "/icons/shield-check.svg" },
       { label: "Notificações", description: "Configure avisos e mensagens operacionais.", href: "/admin/notificacoes", icon: "/icons/flame.svg" },
       { label: "Revendedores", description: "Gerencie acessos e regras da operação B2B.", href: "/admin/revendedores", icon: "/icons/users.svg" },
