@@ -1363,3 +1363,217 @@ textarea:focus-visible {
 .crz-account-range input {
   font-size: 13px !important;
 }
+
+
+/* PASS 6: operations, Discord and reseller modules */
+
+/* DISCORD BOT CORE */
+.crz-discord-core-status strong,
+.crz-discord-core-modules strong,
+.crz-discord-builder-editor header strong,
+.crz-discord-builder-preview header strong,
+.crz-discord-builder-history header strong,
+.crz-discord-builder-channel > span,
+.crz-discord-builder-tree section > strong,
+.crz-discord-builder-safety strong,
+.crz-discord-builder-history__table strong {
+  font-size: 13px !important;
+}
+.crz-discord-core-status small,
+.crz-discord-core-notice,
+.crz-discord-core-stats small,
+.crz-discord-core-stats span,
+.crz-discord-core-modules small,
+.crz-discord-core-modules span,
+.crz-discord-core-modules em,
+.crz-discord-builder-editor header small,
+.crz-discord-builder-preview header small,
+.crz-discord-builder-history header small,
+.crz-discord-builder-theme span,
+.crz-discord-builder-categories button,
+.crz-discord-builder-editor-actions button,
+.crz-discord-builder-history button,
+.crz-discord-builder-categories p,
+.crz-discord-builder-tree section > span,
+.crz-discord-builder-safety span,
+.crz-discord-builder-history__head,
+.crz-discord-builder-history__table article,
+.crz-discord-builder-history__table small,
+.crz-discord-builder-empty {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-discord-builder-theme input,
+.crz-discord-builder-categories input {
+  font-size: 13px !important;
+}
+
+/* DISCORD BRIDGE */
+.crz-bridge-table strong {
+  font-size: 13px !important;
+}
+.crz-bridge-stats small,
+.crz-bridge-notice,
+.crz-bridge-table > header,
+.crz-bridge-table small,
+.crz-bridge-table button,
+.crz-bridge-table a {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+
+/* DISCORD CAMPAIGNS */
+.crz-discord-worker-pill strong,
+.crz-discord-campaign-editor header strong,
+.crz-discord-template-list header strong,
+.crz-discord-campaign-history header strong,
+.crz-discord-target-box header strong,
+.crz-discord-preview > header b,
+.crz-discord-preview__author strong,
+.crz-discord-preview__embed h3,
+.crz-discord-preview__heading.h1,
+.crz-discord-template-list strong,
+.crz-discord-campaign-table strong {
+  font-size: 13px !important;
+}
+.crz-discord-worker-pill small,
+.crz-discord-campaign-notice,
+.crz-discord-campaign-stats small,
+.crz-discord-campaign-stats span,
+.crz-discord-campaign-editor header small,
+.crz-discord-template-list header small,
+.crz-discord-campaign-history header small,
+.crz-discord-target-box header small,
+.crz-discord-preview > header span,
+.crz-discord-campaign-editor > header button,
+.crz-discord-campaign-history > header button,
+.crz-discord-campaign-editor label > span,
+.crz-discord-template-row button,
+.crz-discord-send-actions button,
+.crz-discord-target-options button,
+.crz-discord-campaign-table button,
+.crz-discord-estimate span,
+.crz-discord-estimate small,
+.crz-discord-schedule,
+.crz-discord-preview__author span,
+.crz-discord-preview__author small,
+.crz-discord-preview__description,
+.crz-discord-preview__heading.h2,
+.crz-discord-preview__heading.h3,
+.crz-discord-preview__embed footer,
+.crz-discord-preview__actions span,
+.crz-discord-preview > p,
+.crz-discord-template-list > p,
+.crz-discord-template-list small,
+.crz-discord-campaign-table__head,
+.crz-discord-campaign-table article,
+.crz-discord-campaign-table small,
+.crz-discord-campaign-empty {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-discord-campaign-editor input,
+.crz-discord-campaign-editor textarea,
+.crz-discord-campaign-editor select {
+  font-size: 13px !important;
+}
+
+/* INTEGRATIONS */
+.crz-integrations-grid p,
+.crz-integrations-note strong {
+  font-size: 13px !important;
+}
+.crz-integrations-stats small,
+.crz-integrations-stats span,
+.crz-integrations-grid small,
+.crz-integrations-grid a,
+.crz-integrations-note span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* PARTNERS */
+.crz-partner-list strong,
+.crz-partner-rules strong,
+.crz-partner-sales strong {
+  font-size: 13px !important;
+}
+.crz-partner-stats small,
+.crz-partner-list small,
+.crz-partner-rules small,
+.crz-partner-grid span,
+.crz-partner-notes span,
+.crz-partner-payout small,
+.crz-partner-notice,
+.crz-partner-sales small,
+.crz-partner-empty {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* RESELLERS */
+.crz-resellers-list strong {
+  font-size: 13px !important;
+}
+.crz-resellers-summary small,
+.crz-resellerhub-stats small,
+.crz-resellers-summary span,
+.crz-resellerhub-stats span,
+.crz-resellers-list small,
+.crz-resellers-editor > header small,
+.crz-resellers-editor > header a,
+.crz-resellers-editor > label > span,
+.crz-resellers-editor__row span,
+.crz-resellers-products header,
+.crz-resellers-products label,
+.crz-resellers-notice,
+.crz-resellerhub-grid small,
+.crz-resellerhub-grid p,
+.crz-resellerhub-grid dl,
+.crz-resellerhub-grid a,
+.crz-resellerhub-history small,
+.crz-resellerhub-history em {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* SECURITY */
+.crz-security-list strong {
+  font-size: 13px !important;
+}
+.crz-security-stats small,
+.crz-security-notice,
+.crz-security-list p,
+.crz-security-list footer span,
+.crz-security-list button,
+.crz-security-list a {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* SUPPORT DESK */
+.crz-supportdesk-ticket strong,
+.crz-supportdesk-messages article p {
+  font-size: 13px !important;
+}
+.crz-supportdesk-stats small,
+.crz-supportdesk-stats span,
+.crz-supportdesk-notice,
+.crz-supportdesk-ticket p,
+.crz-supportdesk-ticket small,
+.crz-supportdesk-ticket aside em,
+.crz-supportdesk-thread__head small,
+.crz-supportdesk-thread__head span,
+.crz-supportdesk-thread__head a,
+.crz-supportdesk-actions button,
+.crz-supportdesk-actions select,
+.crz-supportdesk-messages article header strong,
+.crz-supportdesk-messages article header span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-supportdesk-toolbar input,
+.crz-supportdesk-toolbar select,
+.crz-supportdesk-compose textarea {
+  font-size: 13px !important;
+}
