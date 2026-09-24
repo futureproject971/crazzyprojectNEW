@@ -22,18 +22,12 @@ export const clientNavigation: ShellNavItem[] = [
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
 ];
 
-export const adminNavigation: ShellNavItem[] = [
-  { id: "admin", label: "Control", href: "/admin", icon: "/icons/home.svg" },
-  { id: "products", label: "Produtos", href: "/produtos", icon: "/icons/shopping-bag.svg" },
-  { id: "categories", label: "Categorias", href: "/categorias", icon: "/icons/neon-v2/gamepad.svg" },
-  { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
-  { id: "call", label: "CRAZZY CALL", href: "/call", icon: "/icons/headset.svg" },
-  { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
-  { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
-];
+// Administradores continuam usando o site como qualquer cliente.
+// As ferramentas privilegiadas ficam exclusivamente dentro de /admin.
+export const adminNavigation: ShellNavItem[] = clientNavigation;
 
 export function getNavigation(mode: ShellMode): ShellNavItem[] {
   if (mode === "client") return clientNavigation;
-  if (mode === "admin") return adminNavigation;
+  if (mode === "admin") return clientNavigation;
   return visitorNavigation;
 }
