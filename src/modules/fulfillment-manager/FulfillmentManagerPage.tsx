@@ -1,6 +1,6 @@
 "use client";
 
-import {useCallback,useEffect,useMemo,useState} from "react";
+import {useCallback,useEffect,useState} from "react";
 import {Badge,PageHeader} from "@/core/design-system";
 
 type Row=Record<string,any>;
@@ -23,6 +23,7 @@ function tone(s:string):"green"|"blue"|"pink"|"gold"|"neutral"{
 
 export function FulfillmentManagerPage(){
   const [runs,setRuns]=useState<Row[]>([]);
+  const [stats,setStats]=useState({running:0,manual:0,failed:0,completed:0});
   const [state,setState]=useState<"loading"|"ready"|"error">("loading");
   const [status,setStatus]=useState("");
   const [selected,setSelected]=useState<Row|null>(null);
@@ -35,18 +36,13 @@ export function FulfillmentManagerPage(){
       const p=await r.json();
       if(!r.ok)throw new Error();
       setRuns(p.runs||[]);
+      setStats(p.stats||{running:0,manual:0,failed:0,completed:0});
       setState("ready");
     }catch{setState("error")}
   },[status]);
 
   useEffect(()=>{void load()},[]);
 
-  const stats=useMemo(()=>({
-    running:runs.filter(x=>["queued","running"].includes(x.status)).length,
-    manual:runs.filter(x=>x.status==="manual_review").length,
-    failed:runs.filter(x=>x.status==="failed").length,
-    completed:runs.filter(x=>x.status==="completed").length
-  }),[runs]);
 
   if(state==="loading")return <main className="crz-fulfillment-state"><span className="crz-spinner"/><strong>Carregando fulfillment...</strong></main>;
   if(state==="error")return <main className="crz-fulfillment-state"><strong>Fulfillment Engine indisponível.</strong><button onClick={()=>void load()}>Tentar novamente</button></main>;

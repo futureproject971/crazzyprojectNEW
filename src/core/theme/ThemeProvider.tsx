@@ -48,6 +48,7 @@ function applyTheme(theme: ThemeMode) {
 function applyAppearance(settings: AppearanceSettings) {
   const root = document.documentElement;
   root.style.setProperty("--crz-color-blue", settings.accentHex);
+  root.style.setProperty("--crz-accent", settings.accentHex);
   root.dataset.motion = settings.motionEnabled ? "on" : "off";
   root.dataset.ambient = settings.ambientEffects ? "on" : "off";
 }

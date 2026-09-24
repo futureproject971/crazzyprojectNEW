@@ -62,6 +62,7 @@ for (const [name, body] of [
     p_failed: 0,
     p_skipped: 0,
   }],
+  ["admin_set_discord_invite_url", { p_invite_url: "https://discord.gg/anonymous-test" }],
   ["queue_discord_builder_job", { p_guild_id: null }],
   ["cancel_discord_builder_job", { p_job_id: zero }],
   ["claim_discord_builder_job", { p_worker_id: "anon" }],
@@ -112,6 +113,16 @@ for (const file of [
 }
 console.log("[PASS] site/client integration does not reference bot/service secrets");
 
+const integrationsApi = await readFile("src/app/api/admin/integrations/route.ts", "utf8");
+const integrationsUi = await readFile("src/modules/integrations/IntegrationsPage.tsx", "utf8");
+for (const required of ["DISCORD_INVITE_URL","admin_set_discord_invite_url","set_discord_invite"]) {
+  if (!integrationsApi.includes(required)) throw new Error("Integrations API missing " + required);
+}
+if (!integrationsUi.includes("discord-invite") || !integrationsUi.includes("Configurar convite")) {
+  throw new Error("Integrations UI must configure the official Discord invite");
+}
+console.log("[PASS] official Discord invite can be configured from the admin integrations panel");
+
 const botConfig = await readFile("apps/discord-bot/src/config.js", "utf8");
 if (!botConfig.includes("DISCORD_BOT_TOKEN")) {
   throw new Error("Unified bot must use DISCORD_BOT_TOKEN");
@@ -120,6 +131,25 @@ if (botConfig.includes("DISCORD_BOT_TOKEN_2") || botConfig.includes("SECOND_BOT_
   throw new Error("Unified bot must not define extra bot tokens");
 }
 console.log("[PASS] unified Discord worker uses one official bot token");
+const rootDiscloud = await readFile("discloud.config", "utf8");
+for (const required of [
+  "TYPE=bot",
+  "MAIN=apps/discord-bot/src/index.js",
+  "BUILD=npm --prefix apps/discord-bot install --omit=dev",
+  "START=npm --prefix apps/discord-bot start",
+  "AUTORESTART=true",
+]) {
+  if (!rootDiscloud.includes(required)) {
+    throw new Error("Root Discloud config missing " + required);
+  }
+}
+for (const forbidden of ["DISCORD_BOT_TOKEN=", "SUPABASE_SERVICE_ROLE_KEY="]) {
+  if (rootDiscloud.includes(forbidden)) {
+    throw new Error("Discloud config must never contain production secrets");
+  }
+}
+console.log("[PASS] root Discloud GitHub deployment config launches the unified Bot Core without embedded secrets");
+
 
 const campaignWorker = await readFile("apps/discord-bot/src/modules/campaigns.js", "utf8");
 for (const required of [
@@ -168,7 +198,33 @@ if (loginCount !== 1) {
 if (!botIndex.includes("startCampaignWorker") || !botIndex.includes("startBuilderWorker")) {
   throw new Error("Single Bot Core must start both Campaigns and Server Builder modules");
 }
-console.log("[PASS] one Gateway login runs multiple Discord modules");
+for (const required of [
+  'client.on("guildMemberAdd"',
+  'client.on("guildMemberRemove"',
+  'from("discord_identities")',
+  "guild_member:",
+]) {
+  if (!botIndex.includes(required)) {
+    throw new Error("Discord guild membership sync missing " + required);
+  }
+}
+console.log("[PASS] one Gateway login runs multiple Discord modules and keeps guild membership state fresh");
+const guildGate = await readFile("apps/discord-bot/src/modules/guild-gate.js", "utf8");
+for (const required of [
+  "DISCORD_INVITE_URL",
+  "CreateInstantInvite",
+  "maxAge: 0",
+  "maxUses: 0",
+  '.from("system_credentials")',
+]) {
+  if (!guildGate.includes(required)) {
+    throw new Error("Automatic guild invite setup missing " + required);
+  }
+}
+if (!botIndex.includes("ensureOfficialDiscordInvite")) {
+  throw new Error("Bot Core must run automatic guild invite setup on startup");
+}
+console.log("[PASS] Bot Core auto-configures a permanent official Discord invite when missing");
 
 const preview = await readFile("src/modules/discord-campaigns/DiscordEmbedPreview.tsx", "utf8");
 for (const feature of [

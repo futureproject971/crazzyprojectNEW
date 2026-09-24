@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { NeonIcon, PageHeader } from "@/core/design-system";
 import { useAuth } from "@/modules/auth/AuthProvider";
+import type { CheckoutConfig, CheckoutCreateResponse, CheckoutMethod } from "@/modules/checkout/types";
 import type { LuckCampaign, LuckHistoryItem, LuckMode, LuckPrize, LuckResult } from "./types";
 
 const modeLabels: Record<LuckMode, string> = {
@@ -41,6 +42,10 @@ function prizeCenterAngle(prizes: LuckPrize[], prizeId: string) {
     cursor += chance;
   }
   return 0;
+}
+
+function formatMoneyCents(value:number){
+  return new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format((Number(value)||0)/100);
 }
 
 function formatDate(value?: string) {
@@ -233,6 +238,15 @@ export function LuckPage() {
   const [rotation, setRotation] = useState(0);
   const [result, setResult] = useState<LuckResult | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [checkoutConfig,setCheckoutConfig]=useState<CheckoutConfig|null>(null);
+  const [paidRequired,setPaidRequired]=useState(false);
+  const [paidMethod,setPaidMethod]=useState<Extract<CheckoutMethod,"pix"|"crypto">>("pix");
+  const [paidPaymentId,setPaidPaymentId]=useState<string|null>(null);
+  const [paidPayment,setPaidPayment]=useState<CheckoutCreateResponse|null>(null);
+  const [paidStatus,setPaidStatus]=useState<string|null>(null);
+  const [paidBusy,setPaidBusy]=useState(false);
+  const paidAttemptKey=useRef<string|null>(null);
+  const paidPlayTriggered=useRef(false);
 
   const loadCatalog = useCallback(async () => {
     const response = await fetch("/api/luck?action=catalog", { cache: "no-store" });
@@ -252,7 +266,14 @@ export function LuckPage() {
   }, [user]);
 
   useEffect(() => {
-    Promise.all([loadCatalog(), user ? loadHistory() : Promise.resolve()]).finally(() => setLoading(false));
+    Promise.all([
+      loadCatalog(),
+      user ? loadHistory() : Promise.resolve(),
+      fetch("/api/checkout/config",{cache:"no-store"})
+        .then(async r=>r.ok?(await r.json() as CheckoutConfig):null)
+        .then(setCheckoutConfig)
+        .catch(()=>setCheckoutConfig(null)),
+    ]).finally(() => setLoading(false));
   }, [loadCatalog, loadHistory, user]);
 
   const campaign = useMemo(
@@ -266,9 +287,27 @@ export function LuckPage() {
     setNotice(null);
     setRotation(0);
     setOpening(false);
+    setPaidRequired(false);
+    setPaidPaymentId(null);
+    setPaidPayment(null);
+    setPaidStatus(null);
+    paidAttemptKey.current=null;
+    paidPlayTriggered.current=false;
   };
 
-  const play = async () => {
+  const paymentStorageKey=(slug:string)=>"crz:luck-payment:"+slug;
+
+  const clearPaidPayment=()=>{
+    if(campaign && typeof window!=="undefined")sessionStorage.removeItem(paymentStorageKey(campaign.slug));
+    setPaidPaymentId(null);
+    setPaidPayment(null);
+    setPaidStatus(null);
+    setPaidRequired(false);
+    paidAttemptKey.current=null;
+    paidPlayTriggered.current=false;
+  };
+
+  const play = async (paymentId?:string) => {
     if (!user) {
       window.location.assign("/login");
       return;
@@ -286,6 +325,7 @@ export function LuckPage() {
       body: JSON.stringify({
         campaignSlug: campaign.slug,
         idempotencyKey: createIdempotencyKey(),
+        paymentId: paymentId || null,
       }),
     });
 
@@ -294,11 +334,17 @@ export function LuckPage() {
       setBusy(false);
       setSpinning(false);
       setOpening(false);
-      setNotice(payload?.error || "Não foi possível jogar agora.");
+      if(response.status===402 && campaign.play_price_cents>0){
+        setPaidRequired(true);
+        setNotice("Sua jogada grátis já foi usada. Você pode comprar uma jogada extra com pagamento vinculado a esta campanha.");
+      }else{
+        setNotice(payload?.error || "Não foi possível jogar agora.");
+      }
       return;
     }
 
     const next = payload.result as LuckResult;
+    if(paymentId)clearPaidPayment();
 
     if (mode === "wheel") {
       const target = prizeCenterAngle(campaign.prizes, next.prize_id);
@@ -327,6 +373,92 @@ export function LuckPage() {
     void loadHistory();
   };
 
+
+  const enabledPaidMethods=(checkoutConfig?.methods||[])
+    .filter(item=>item.enabled&&(item.method==="pix"||item.method==="crypto"))
+    .map(item=>item.method as Extract<CheckoutMethod,"pix"|"crypto">);
+
+  const startPaidPlay=async()=>{
+    if(!campaign||paidBusy||campaign.play_price_cents<=0)return;
+    if(!checkoutConfig?.ready||!enabledPaidMethods.includes(paidMethod)){
+      setNotice("Pagamento para jogada extra está indisponível neste método.");
+      return;
+    }
+    if(!paidAttemptKey.current)paidAttemptKey.current="luck:"+campaign.slug+":"+createIdempotencyKey();
+    setPaidBusy(true);
+    setNotice(null);
+    try{
+      const response=await fetch("/api/checkout/create",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          method:paidMethod,
+          cart_snapshot:[{type:"luck-play",campaignSlug:campaign.slug,quantity:1}],
+          coupon_code:null,
+          idempotency_key:paidAttemptKey.current,
+        }),
+      });
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(payload?.error||"Não foi possível gerar o pagamento.");
+      const created=payload as CheckoutCreateResponse;
+      setPaidPayment(created);
+      setPaidPaymentId(created.payment_id);
+      setPaidStatus("ACTIVE");
+      paidPlayTriggered.current=false;
+      sessionStorage.setItem(paymentStorageKey(campaign.slug),JSON.stringify({paymentId:created.payment_id,method:paidMethod}));
+    }catch(error){
+      setNotice(error instanceof Error?error.message:"Não foi possível gerar o pagamento.");
+    }finally{
+      setPaidBusy(false);
+    }
+  };
+
+  useEffect(()=>{
+    if(!campaign||!user||paidPaymentId)return;
+    try{
+      const raw=sessionStorage.getItem(paymentStorageKey(campaign.slug));
+      if(!raw)return;
+      const saved=JSON.parse(raw);
+      if(typeof saved?.paymentId==="string"&&(saved?.method==="pix"||saved?.method==="crypto")){
+        setPaidPaymentId(saved.paymentId);
+        setPaidMethod(saved.method);
+        setPaidStatus("ACTIVE");
+        setPaidRequired(true);
+      }
+    }catch{
+      sessionStorage.removeItem(paymentStorageKey(campaign.slug));
+    }
+  },[campaign?.slug,user,paidPaymentId]);
+
+  useEffect(()=>{
+    if(!campaign||!paidPaymentId||!user||!["pix","crypto"].includes(paidMethod))return;
+    if(["COMPLETED","FAILED","EXPIRED","CANCELLED"].includes(String(paidStatus||"")))return;
+
+    let stopped=false;
+    const check=async()=>{
+      const response=await fetch(
+        "/api/checkout/status?payment_id="+encodeURIComponent(paidPaymentId)+"&method="+encodeURIComponent(paidMethod),
+        {cache:"no-store"}
+      );
+      const payload=await response.json().catch(()=>null);
+      if(stopped||!response.ok||!payload?.status)return;
+      const nextStatus=String(payload.status);
+      setPaidStatus(nextStatus);
+      if(nextStatus==="COMPLETED"&&!paidPlayTriggered.current){
+        paidPlayTriggered.current=true;
+        sessionStorage.removeItem(paymentStorageKey(campaign.slug));
+        await play(paidPaymentId);
+      }else if(["FAILED","EXPIRED","CANCELLED"].includes(nextStatus)){
+        paidAttemptKey.current=null;
+        sessionStorage.removeItem(paymentStorageKey(campaign.slug));
+        setNotice("A cobrança da jogada expirou ou falhou. Você pode gerar uma nova.");
+      }
+    };
+    void check();
+    const timer=window.setInterval(()=>void check(),3500);
+    return()=>{stopped=true;window.clearInterval(timer)};
+  },[campaign?.slug,paidPaymentId,paidMethod,paidStatus,user]);
+
   return (
     <main className="crz-luck-page">
       <div className="crz-container">
@@ -346,6 +478,30 @@ export function LuckPage() {
         </div>
 
         {notice && <div className="crz-luck-notice">{notice}</div>}
+
+        {campaign&&paidRequired&&campaign.play_price_cents>0&&(
+          <section className="crz-luck-payment">
+            <header><div><small>JOGADA EXTRA</small><strong>{formatMoneyCents(campaign.play_price_cents)}</strong></div><span>{paidStatus||"AGUARDANDO COBRANÇA"}</span></header>
+            {!paidPaymentId&&<>
+              <p>O valor é recalculado no servidor e o pagamento só vale para <b>{campaign.title}</b>. Cupom, revenda e pedidos comuns não viram crédito de Luck.</p>
+              <div className="crz-luck-payment__methods">
+                {(["pix","crypto"] as const).map(method=>{
+                  const enabled=Boolean(checkoutConfig?.ready&&enabledPaidMethods.includes(method));
+                  return <button type="button" key={method} disabled={!enabled||paidBusy} className={paidMethod===method?"is-active":""} onClick={()=>setPaidMethod(method)}>{method==="pix"?"PIX":"Litecoin"}<small>{enabled?"Disponível":"Indisponível"}</small></button>
+                })}
+              </div>
+              <button type="button" className="crz-button crz-button--primary crz-button--md" disabled={paidBusy||!enabledPaidMethods.includes(paidMethod)} onClick={()=>void startPaidPlay()}>{paidBusy?"Gerando...":"Gerar pagamento da jogada"}</button>
+            </>}
+            {paidPaymentId&&<>
+              {paidPayment?.charge?.qrCodeImage&&<img className="crz-luck-payment__qr" src={paidPayment.charge.qrCodeImage} alt="QR Code PIX"/>}
+              {paidPayment?.charge?.brCode&&<label><span>PIX copia e cola</span><textarea readOnly value={paidPayment.charge.brCode}/><button type="button" onClick={()=>navigator.clipboard?.writeText(paidPayment.charge?.brCode||"")}>Copiar PIX</button></label>}
+              {paidPayment?.crypto&&<label><span>Envie exatamente {paidPayment.crypto.payAmount} LTC</span><textarea readOnly value={paidPayment.crypto.address}/><button type="button" onClick={()=>navigator.clipboard?.writeText(paidPayment.crypto?.address||"")}>Copiar endereço</button></label>}
+              {!paidPayment&&<p>Cobrança recuperada. Conferindo confirmação automaticamente...</p>}
+              <small>Pagamento ID {paidPaymentId.slice(0,8)} • ao confirmar, a jogada acontece automaticamente.</small>
+              {["FAILED","EXPIRED","CANCELLED"].includes(String(paidStatus||""))&&<button type="button" className="crz-button crz-button--secondary crz-button--sm" onClick={clearPaidPayment}>Gerar outra cobrança</button>}
+            </>}
+          </section>
+        )}
 
         <div className="crz-luck-tabs">
           {(["wheel","scratch","drop"] as LuckMode[]).map((item) => (

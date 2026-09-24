@@ -1,0 +1,6 @@
+import type { SVGProps } from "react";
+type IconProps = SVGProps<SVGSVGElement> & { size?: number | string };
+function NativeIcon({ size = 20, className, ...props }: IconProps) {
+  return <svg aria-hidden="true" viewBox="0 0 24 24" width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12h7M12 8.5v7"/></svg>;
+}
+export const Activity=NativeIcon; export const ArrowUpRight=NativeIcon; export const AudioLines=NativeIcon; export const Braces=NativeIcon; export const Code2=NativeIcon; export const Copy=NativeIcon; export const Download=NativeIcon; export const ExternalLink=NativeIcon; export const Gauge=NativeIcon; export const Headphones=NativeIcon; export const Loader2=NativeIcon; export const LockKeyhole=NativeIcon; export const MessageCircle=NativeIcon; export const Pause=NativeIcon; export const Play=NativeIcon; export const Radio=NativeIcon; export const RotateCcw=NativeIcon; export const Scissors=NativeIcon; export const Search=NativeIcon; export const SlidersHorizontal=NativeIcon; export const Sparkles=NativeIcon; export const Upload=NativeIcon; export const Volume2=NativeIcon; export const Waves=NativeIcon; export const Youtube=NativeIcon;

@@ -30,7 +30,7 @@ export async function GET() {
     supabase.from("reward_deliveries").select("id,session_id,user_id,delivery_mode,delivered_at,expires_at").order("delivered_at",{ascending:false}).limit(200),
     supabase.from("products").select("id,name,slug,active,image_url").eq("active",true).order("name"),
     supabase.from("product_plans").select("id,product_id,name,plan_code,active").eq("active",true).order("sort_order"),
-    supabase.from("trial_stock_items").select("id,product_plan_id,used").limit(5000),
+    supabase.rpc("admin_reward_stock_counts"),
   ]);
 
   const all=[campaigns,links,sessions,deliveries,products,plans,trialStock];
@@ -43,9 +43,8 @@ export async function GET() {
   const profileMap=new Map((profiles.data||[]).map(x=>[x.user_id,x]));
 
   const stockMap=new Map<string,{total:number;available:number}>();
-  for(const item of trialStock.data||[]){
-    const current=stockMap.get(item.product_plan_id)||{total:0,available:0};
-    current.total+=1;if(!item.used)current.available+=1;stockMap.set(item.product_plan_id,current);
+  for(const item of (trialStock.data||[]) as Array<{product_plan_id:string;total:number;available:number}>){
+    stockMap.set(item.product_plan_id,{total:Number(item.total||0),available:Number(item.available||0)});
   }
 
   return NextResponse.json({

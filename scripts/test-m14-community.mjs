@@ -90,3 +90,12 @@ if (!products.ok) {
 console.log("[PASS] public catalog remains readable");
 
 console.log("[PASS] M14 Community security smoke");
+
+
+const middleware = await (await import("node:fs/promises")).readFile("src/lib/supabase/middleware.ts","utf8");
+for (const required of ['"/comunidade"','"/api/community"',"discord_identities","guild_member"]) {
+  if (!middleware.includes(required)) {
+    throw new Error("Community Discord/guild gate missing " + required);
+  }
+}
+console.log("[PASS] community page and API namespace require Discord guild membership");

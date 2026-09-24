@@ -47,12 +47,15 @@ function NavLinks({
           <a
             key={item.id}
             href={item.href}
-            className={compact ? "crz-shell-mobile-link" : `crz-shell-nav__item ${isActive ? "is-active" : ""}`}
+            className={compact ? `crz-shell-mobile-link ${item.id === "mtsounds" ? "is-mtsounds" : ""}` : `crz-shell-nav__item ${item.id === "mtsounds" ? "is-mtsounds" : ""} ${item.subtitle ? "has-subtitle" : ""} ${isActive ? "is-active" : ""}`}
             aria-current={isActive ? "page" : undefined}
             onClick={onNavigate}
           >
             <ShellIcon src={item.icon} />
-            <span>{item.label}</span>
+            <span className="crz-shell-nav__copy">
+              <span>{item.label}</span>
+              {item.subtitle && <small>{item.subtitle}</small>}
+            </span>
             {badge && <b>{badge}</b>}
           </a>
         );
@@ -85,7 +88,6 @@ export function AppHeader({
     signIn,
     signOut,
     discordEnabled,
-    googleEnabled,
   } = useAuth();
 
   const cartCount = hydrated ? totalQuantity : fallbackCartCount;
@@ -106,6 +108,7 @@ export function AppHeader({
           { id: "admin-products", label: "Produtos", onSelect: () => go("/admin/produtos") },
           { id: "admin-orders", label: "Pedidos", onSelect: () => go("/admin/pedidos") },
           { id: "admin-users", label: "Usuários", onSelect: () => go("/admin/usuarios") },
+          { id: "admin-partners", label: "Parceiros", onSelect: () => go("/admin/parceiros") },
           { id: "admin-notifications", label: "Notificações", onSelect: () => go("/admin/notificacoes") },
           { id: "admin-security", label: "Security Sentinel", onSelect: () => go("/admin/security") },
           { id: "admin-settings", label: "Configurações", onSelect: () => go("/admin/integracoes") },
@@ -155,33 +158,21 @@ export function AppHeader({
           )}
           {!user ? (
             <>
-              <a href="/login" className="crz-shell-auth crz-shell-auth--compact">
-                <LineIcon name="user" size={14} />
-                <span>{authLoading ? "Verificando..." : "Login"}</span>
-              </a>
-
-              {googleEnabled && (
+              {discordEnabled ? (
                 <button
                   type="button"
-                  className="crz-shell-auth"
-                  disabled={authLoading}
-                  onClick={() => void signIn("google", window.location.pathname)}
-                >
-                  <img src="/icons/brand-google.svg" alt="" aria-hidden="true" />
-                  <span>Login com Google</span>
-                </button>
-              )}
-
-              {discordEnabled && (
-                <button
-                  type="button"
-                  className="crz-shell-auth"
+                  className="crz-shell-auth crz-shell-auth--discord"
                   disabled={authLoading}
                   onClick={() => void signIn("discord", window.location.pathname)}
                 >
                   <img src="/icons/brand-discord.svg" alt="" aria-hidden="true" />
-                  <span>Login com Discord</span>
+                  <span>{authLoading ? "Verificando..." : "Entrar com Discord"}</span>
                 </button>
+              ) : (
+                <a href="/login" className="crz-shell-auth">
+                  <LineIcon name="user" size={14} />
+                  <span>Discord indisponível</span>
+                </a>
               )}
             </>
           ) : (
@@ -239,17 +230,19 @@ export function AppHeader({
           <div className="crz-shell-mobile__account">
             {!user ? (
               <>
-                <a className="crz-button crz-button--primary crz-button--md" href="/login">
-                  Entrar
-                </a>
-                {discordEnabled && (
+                {discordEnabled ? (
                   <button
                     type="button"
-                    className="crz-button crz-button--secondary crz-button--md"
+                    className="crz-button crz-button--primary crz-button--md"
                     onClick={() => void signIn("discord", window.location.pathname)}
                   >
-                    Discord
+                    <img src="/icons/brand-discord.svg" alt="" aria-hidden="true" />
+                    Entrar com Discord
                   </button>
+                ) : (
+                  <a className="crz-button crz-button--primary crz-button--md" href="/login">
+                    Discord indisponível
+                  </a>
                 )}
               </>
             ) : (

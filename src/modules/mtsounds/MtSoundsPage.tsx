@@ -1,193 +1,85 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Badge, NeonIcon, PageHeader } from "@/core/design-system";
-
-type RuntimePayload = {
-  mode: "embed" | "external";
-  url: string;
-  source: "environment" | "default";
-  health: {
-    reachable: boolean;
-    status: number | null;
-    latencyMs: number;
-  };
-};
-
-const FALLBACK_URL = "https://mtsounds.vercel.app/";
+import { useEffect } from "react";
+import Link from "next/link";
+import { Activity, AudioLines, ArrowUpRight, Gauge, Radio, Search, SlidersHorizontal, Sparkles, Waves } from "./native/icons";
+import MusicSearch from "./native/MusicSearch";
+import ReactiveVinyl from "./native/ReactiveVinyl";
 
 export function MtSoundsPage() {
-  const [runtime, setRuntime] = useState<RuntimePayload | null>(null);
-  const [loaded, setLoaded] = useState(false);
-  const [slow, setSlow] = useState(false);
-  const [frameFailed, setFrameFailed] = useState(false);
-
   useEffect(() => {
-    let active = true;
+    const params = new URLSearchParams(window.location.search);
+    const via = String(params.get("via") || "").trim().toLowerCase();
+    if (!via) return;
 
-    void fetch("/api/mtsounds", { cache: "no-store" })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("STATUS_UNAVAILABLE");
-        return response.json() as Promise<RuntimePayload>;
-      })
-      .then((payload) => {
-        if (active) setRuntime(payload);
-      })
-      .catch(() => {
-        if (active) {
-          setRuntime({
-            mode: "embed",
-            url: FALLBACK_URL,
-            source: "default",
-            health: { reachable: false, status: null, latencyMs: 0 },
-          });
-        }
-      });
-
-    return () => {
-      active = false;
-    };
+    void fetch("/api/referral/capture", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: via, source: "mtsounds" }),
+    }).finally(() => {
+      params.delete("via");
+      const query = params.toString();
+      window.history.replaceState({}, "", query ? "/mtsounds?" + query : "/mtsounds");
+    });
   }, []);
 
-  useEffect(() => {
-    if (loaded) return;
-    const slowTimer = window.setTimeout(() => setSlow(true), 6000);
-    const failTimer = window.setTimeout(() => setFrameFailed(true), 12000);
-    return () => {
-      window.clearTimeout(slowTimer);
-      window.clearTimeout(failTimer);
-    };
-  }, [loaded]);
-
-  const partnerUrl = runtime?.url || FALLBACK_URL;
-  const externalOnly = runtime?.mode === "external";
-  const badge = useMemo(() => {
-    if (!runtime) return { tone: "blue" as const, text: "CHECANDO" };
-    if (runtime.health.reachable) return { tone: "green" as const, text: "ONLINE" };
-    return { tone: "gold" as const, text: "FALLBACK" };
-  }, [runtime]);
-
-  return (
-    <main className="crz-mtsounds-page">
-      <div className="crz-container crz-mtsounds-container">
-        <PageHeader
-          eyebrow="M46 • PARCEIRO CRAZZY"
-          title="MT Sounds"
-          description="Integração compatível e isolada, pronta para trocar para o source nativo quando ele for entregue."
-          actions={
-            <div className="crz-mtsounds-actions">
-              <Badge tone="green">GRÁTIS</Badge>
-              <Badge tone={badge.tone}>{badge.text}</Badge>
-              <a
-                className="crz-button crz-button--secondary crz-button--sm"
-                href={partnerUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Abrir em nova aba
-              </a>
-            </div>
-          }
-        />
-
-        <section className="crz-mtsounds-notice">
-          <NeonIcon name="community" size={29} />
-          <div>
-            <strong>Ferramenta de parceiro isolada</strong>
-            <span>
-              Nenhum login, token ou dado privado da CRAZZY PROJECT é enviado para o app parceiro.
-            </span>
-          </div>
-        </section>
-
-        <section className="crz-mtsounds-frame-shell">
-          <header>
-            <div>
-              <i className="is-red" />
-              <i className="is-yellow" />
-              <i className="is-green" />
-            </div>
-            <span>MT SOUNDS • M46 COMPAT</span>
-            <strong>
-              {externalOnly
-                ? "MODO EXTERNO"
-                : loaded
-                  ? "EMBED ATIVO"
-                  : frameFailed
-                    ? "FALLBACK"
-                    : "CONECTANDO..."}
-            </strong>
-          </header>
-
-          <div className="crz-mtsounds-frame-wrap">
-            {externalOnly ? (
-              <div className="crz-mtsounds-external">
-                <NeonIcon name="community" size={42} />
-                <strong>MT Sounds está configurado para abrir externamente</strong>
-                <p>
-                  Esse modo evita iframe quando o parceiro aplica bloqueio de embed ou política de segurança própria.
-                </p>
-                <a
-                  className="crz-button crz-button--primary crz-button--md"
-                  href={partnerUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Abrir MT Sounds
-                </a>
-              </div>
-            ) : (
-              <>
-                {!loaded && (
-                  <div className="crz-mtsounds-loading">
-                    <span className="crz-spinner" />
-                    <strong>{frameFailed ? "O embed não confirmou carregamento" : "Carregando MT Sounds"}</strong>
-                    <p>
-                      {frameFailed
-                        ? "O parceiro pode estar offline ou bloqueando iframe. Use a abertura externa sem perder a rota CRAZZY."
-                        : "A ferramenta está sendo aberta numa área isolada da CRAZZY PROJECT."}
-                    </p>
-                    {(slow || frameFailed) && (
-                      <a
-                        className="crz-button crz-button--secondary crz-button--sm"
-                        href={partnerUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Abrir em nova aba
-                      </a>
-                    )}
-                  </div>
-                )}
-
-                <iframe
-                  className={loaded ? "is-loaded" : ""}
-                  src={partnerUrl}
-                  title="MT Sounds"
-                  onLoad={() => {
-                    setLoaded(true);
-                    setFrameFailed(false);
-                  }}
-                  onError={() => setFrameFailed(true)}
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"
-                  allow="autoplay; clipboard-read; clipboard-write"
-                  referrerPolicy="no-referrer"
-                />
-              </>
-            )}
-          </div>
-        </section>
-
-        <section className="crz-mtsounds-footer-note">
-          <NeonIcon name="shield" size={25} />
-          <div>
-            <strong>M46 fechado em modo compatibilidade</strong>
-            <span>
-              A migração 100% nativa do código continua sendo uma troca de implementação quando o source/repo original estiver disponível, sem mudar a rota pública.
-            </span>
-          </div>
-        </section>
+  return <div className="crz-mts-native">
+    <section className="command-hero wrap">
+      <div className="hero-copy reveal">
+        <span className="system-kicker"><Activity size={15}/> MTSOUND&apos;S / MTA:SA AUDIO</span>
+        <h1>SEU SERVIDOR.<br/><span>SEU SOM.</span></h1>
+        <p className="lead">Escolha a faixa, acerte o grave e deixe o servidor reconhecer sua presença antes mesmo do carro chegar.</p>
+        <div className="hero-quick-actions">
+          <Link href="/mtsounds#buscar" className="btn-primary"><Search size={18}/> Escolher uma música</Link>
+          <Link href="/mtsounds/editor" className="btn-ghost"><SlidersHorizontal size={18}/> Abrir Studio</Link>
+        </div>
       </div>
-    </main>
-  );
+
+      <div className="command-grid">
+        <section className="master-module reveal delay-1">
+          <div className="module-chrome" aria-hidden="true"/>
+          <div className="vinyl-bay">
+            <span className="bay-label">VINYL REACTOR / LIVE</span>
+            <ReactiveVinyl />
+          </div>
+          <div className="master-copy">
+            <div className="live-monitor"><span className="monitor-bars"><i/><i/><i/><i/></span> REAGE AO PLAYER</div>
+            <h2>O disco sente<br/>quando o grave bate.</h2>
+            <p>Play faz girar. Pause segura o ângulo. No Studio, cada pancada de grave acelera, pulsa e ilumina o vinil em tempo real.</p>
+            <Link href="/mtsounds/editor" className="btn-primary"><SlidersHorizontal size={18}/> Testar no Studio</Link>
+          </div>
+        </section>
+
+        <aside className="studio-module reveal delay-1">
+          <div className="studio-module-head"><div><span className="studio-icon"><SlidersHorizontal size={17}/></span><b>MTS STUDIO</b></div><em>LIVE FX</em></div>
+          <div className="studio-display">
+            <div className="display-top"><span>VINYL REACTOR</span><b>SYNC</b></div>
+            <div className="eq-bars" aria-hidden="true">{Array.from({length:28},(_,i)=><i key={i} style={{height:`${22+Math.abs(Math.sin(i*.7))*68}%`,animationDelay:`-${i*70}ms`}}/>)}</div>
+            <div className="frequency"><span>40</span><span>100</span><span>1K</span><span>5K</span><span>16K HZ</span></div>
+          </div>
+          <div className="studio-reading"><span>FX ENGINE</span><b><i/> PRONTO</b></div>
+          <Link href="/mtsounds/editor" className="studio-launch"><SlidersHorizontal size={17}/> ABRIR STUDIO</Link>
+        </aside>
+      </div>
+
+      <div className="spec-grid">
+        <div><Search/><span><small>BUSCA</small><b>YOUTUBE</b><em>Encontre e teste a faixa</em></span></div>
+        <div><Waves/><span><small>FX LIVE</small><b>BASS + ECHO</b><em>Reverb, filtro e distorção</em></span></div>
+        <div><Gauge/><span><small>EXPORT</small><b>WAV + INTRO</b><em>Arquivo final no navegador</em></span></div>
+        <div><Radio/><span><small>MTA:SA</small><b>SUA IDENTIDADE</b><em>Som com a cara do projeto</em></span></div>
+      </div>
+    </section>
+
+    <MusicSearch />
+
+    <section className="wrap premium-studio-cta">
+      <div className="studio-cta-glow" aria-hidden="true"/>
+      <div>
+        <span className="eyebrow"><Sparkles size={14}/> MTSOUND&apos;S STUDIO</span>
+        <h2>Achou a faixa?<br/>Agora deixa ela <span>com a sua cara.</span></h2>
+        <p>Corte o trecho, ajuste o peso do grave, aplique FX e exporte a versão final com a assinatura MTSound&apos;s.</p>
+      </div>
+      <Link href="/mtsounds/editor"><SlidersHorizontal size={18}/> Entrar no Studio <ArrowUpRight size={17}/></Link>
+    </section>
+  </div>;
 }

@@ -111,7 +111,7 @@ Config atual:
 - `TYPE=bot`
 - `MAIN=src/index.js`
 - `START=npm start`
-- `RAM=384`
+- `RAM=512`
 - `VERSION=latest`
 - `AUTORESTART=true`
 
@@ -129,7 +129,18 @@ discloud up
 
 ### Integração GitHub da Discloud
 
-A integração GitHub espera `discloud.config` na raiz do repositório selecionado. Como o CRAZZY PROJECT é um monorepo e o bot está em `apps/discord-bot`, prefira o upload/CLI desta pasta enquanto não houver uma estratégia específica de deploy de subdiretório.
+O repositório agora também possui um `discloud.config` na raiz para deploy direto pela integração GitHub da Discloud.
+
+Esse arquivo raiz aponta para:
+
+- `MAIN=apps/discord-bot/src/index.js`
+- `BUILD=npm --prefix apps/discord-bot install --omit=dev`
+- `START=npm --prefix apps/discord-bot start`
+- `RAM=512`
+- `VERSION=latest`
+- `AUTORESTART=true`
+
+Assim, você pode usar tanto o upload/CLI da pasta `apps/discord-bot` quanto o deploy GitHub do monorepo, sem mover o Bot Core e sem colocar segredos no repositório.
 
 ## Sinal de saúde esperado
 

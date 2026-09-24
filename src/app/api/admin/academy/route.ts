@@ -14,22 +14,27 @@ export async function GET(){
   if(!user)return NextResponse.json({error:"UNAUTHENTICATED"},{status:401});
   if(!admin)return NextResponse.json({error:"FORBIDDEN"},{status:403});
 
-  const [tutorials,blocks,links,products]=await Promise.all([
+  const [tutorials,blocks,links,planLinks,products,plans]=await Promise.all([
     supabase.from("academy_tutorials").select("*").order("sort_order").order("created_at"),
     supabase.from("academy_tutorial_blocks").select("*").order("tutorial_id").order("position"),
     supabase.from("academy_tutorial_products").select("tutorial_id,product_id"),
+    supabase.from("academy_tutorial_plans").select("tutorial_id,product_plan_id"),
     supabase.from("products").select("id,name,slug,active,image_url").order("name"),
+    supabase.from("product_plans").select("id,product_id,name,plan_code,active,sort_order").order("sort_order"),
   ]);
-  if([tutorials,blocks,links,products].some(x=>x.error))return NextResponse.json({error:"ACADEMY_MANAGER_UNAVAILABLE"},{status:500});
+  if([tutorials,blocks,links,planLinks,products,plans].some(x=>x.error))return NextResponse.json({error:"ACADEMY_MANAGER_UNAVAILABLE"},{status:500});
 
   const blockMap=new Map<string,any[]>();
   for(const block of blocks.data||[]){const list=blockMap.get(block.tutorial_id)||[];list.push(block);blockMap.set(block.tutorial_id,list)}
   const productMap=new Map<string,string[]>();
   for(const link of links.data||[]){const list=productMap.get(link.tutorial_id)||[];list.push(link.product_id);productMap.set(link.tutorial_id,list)}
+  const planMap=new Map<string,string[]>();
+  for(const link of planLinks.data||[]){const list=planMap.get(link.tutorial_id)||[];list.push(link.product_plan_id);planMap.set(link.tutorial_id,list)}
 
   return NextResponse.json({
-    tutorials:(tutorials.data||[]).map(t=>({...t,blocks:blockMap.get(t.id)||[],product_ids:productMap.get(t.id)||[]})),
+    tutorials:(tutorials.data||[]).map(t=>({...t,blocks:blockMap.get(t.id)||[],product_ids:productMap.get(t.id)||[],plan_ids:planMap.get(t.id)||[]})),
     products:(products.data||[]).filter(p=>p.active),
+    plans:(plans.data||[]).filter(p=>p.active),
   },{headers:{"Cache-Control":"private, no-store"}});
 }
 
@@ -46,6 +51,10 @@ export async function POST(request:NextRequest){
     ? [...new Set(body.productIds.map((x:unknown)=>String(x)).filter((x:string)=>/^[0-9a-f-]{36}$/i.test(x)))]
     : [];
 
+  const planIds=Array.isArray(body?.planIds)
+    ? [...new Set(body.planIds.map((x:unknown)=>String(x)).filter((x:string)=>/^[0-9a-f-]{36}$/i.test(x)))]
+    : [];
+
   const blocks=Array.isArray(body?.blocks)?body.blocks:[];
   if(blocks.length>200)return NextResponse.json({error:"TOO_MANY_BLOCKS"},{status:400});
 
@@ -56,16 +65,26 @@ export async function POST(request:NextRequest){
     p_subtitle:String(body?.subtitle||"").slice(0,300)||null,
     p_summary:String(body?.summary||"").slice(0,2000),
     p_category:String(body?.category||"Geral").slice(0,100),
-    p_access_type:body?.accessType==="product"?"product":"public",
+    p_access_type:body?.accessType==="public"?"public":"product",
     p_cover_url:String(body?.coverUrl||"").slice(0,1200)||null,
     p_estimated_minutes:Math.max(1,Math.min(600,Math.trunc(Number(body?.estimatedMinutes)||5))),
     p_featured:body?.featured===true,
     p_active:body?.active!==false,
     p_sort_order:Math.trunc(Number(body?.sortOrder)||0),
-    p_product_ids:productIds,
+    p_product_ids:body?.accessType==="product"?productIds:[],
     p_blocks:blocks.map((block:any)=>({type:String(block?.type||"text"),content:block?.content&&typeof block.content==="object"?block.content:{text:String(block?.content||"")}})),
   });
 
   if(error)return NextResponse.json({error:"TUTORIAL_SAVE_FAILED",detail:String(error.message||"").slice(0,180)},{status:400});
+
+  const tutorialId=String((data as any)?.tutorial?.id||id||"");
+  if(tutorialId){
+    const {error:deleteError}=await supabase.from("academy_tutorial_plans").delete().eq("tutorial_id",tutorialId);
+    if(deleteError)return NextResponse.json({error:"TUTORIAL_PLAN_LINK_FAILED"},{status:400});
+    if(body?.accessType==="plan"&&planIds.length){
+      const {error:linkError}=await supabase.from("academy_tutorial_plans").insert(planIds.map(productPlanId=>({tutorial_id:tutorialId,product_plan_id:productPlanId})));
+      if(linkError)return NextResponse.json({error:"TUTORIAL_PLAN_LINK_FAILED"},{status:400});
+    }
+  }
   return NextResponse.json(data,{status:id?200:201});
 }

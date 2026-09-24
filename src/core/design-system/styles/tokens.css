@@ -4,20 +4,20 @@
   --crz-color-navy-950: #07111b;
   --crz-color-navy-900: #0b1726;
   --crz-color-navy-850: #0e1c2d;
-  --crz-color-line: rgba(55, 119, 255, 0.28);
-  --crz-color-line-strong: rgba(52, 139, 255, 0.56);
+  --crz-color-line: color-mix(in srgb, var(--crz-color-blue) 28%, transparent);
+  --crz-color-line-strong: color-mix(in srgb, var(--crz-color-blue) 56%, #5fd4ff 18%, transparent);
   --crz-color-text: #ffffff;
   --crz-color-text-soft: #d8e1ec;
   --crz-color-muted: #8e9bad;
   --crz-color-blue: #0000ff;
-  --crz-color-blue-2: #087cff;
+  --crz-color-blue-2: color-mix(in srgb, var(--crz-color-blue) 68%, #00baff 32%);
   --crz-color-cyan: #00d7ff;
   --crz-color-magenta: #ff2f9b;
   --crz-color-green: #18e59a;
   --crz-color-gold: #ffc33d;
   --crz-color-danger: #ff4d67;
 
-  --crz-gradient-brand: linear-gradient(180deg, #1374ff 0%, #0456e7 100%);
+  --crz-gradient-brand: linear-gradient(180deg, color-mix(in srgb, var(--crz-color-blue) 68%, #59c9ff 32%) 0%, color-mix(in srgb, var(--crz-color-blue) 84%, #00143d 16%) 100%);
   --crz-gradient-panel: linear-gradient(180deg, rgba(13, 24, 44, 0.96), rgba(4, 10, 20, 0.96));
   --crz-gradient-panel-soft: linear-gradient(180deg, rgba(11, 23, 38, 0.92), rgba(6, 13, 24, 0.92));
   --crz-gradient-card:
@@ -28,8 +28,8 @@
     radial-gradient(120% 105% at 12% -10%, rgba(34, 118, 255, .12), transparent 58%),
     radial-gradient(80% 75% at 100% 100%, rgba(0, 173, 255, .045), transparent 62%),
     linear-gradient(145deg, rgba(10, 22, 38, .94), rgba(4, 11, 21, .97));
-  --crz-card-border: rgba(76, 139, 228, .24);
-  --crz-card-border-hover: rgba(58, 154, 255, .52);
+  --crz-card-border: color-mix(in srgb, var(--crz-color-blue) 24%, #72cfff 12%, transparent);
+  --crz-card-border-hover: color-mix(in srgb, var(--crz-color-blue) 52%, #5fd4ff 18%, transparent);
   --crz-card-shadow:
     inset 0 1px 0 rgba(255,255,255,.035),
     inset 0 -1px 0 rgba(0,103,255,.045),
@@ -39,8 +39,8 @@
   --crz-gradient-gold: linear-gradient(180deg, #ffe984 0%, #ffae00 100%);
 
   --crz-shadow-panel: 0 14px 38px rgba(0, 0, 0, 0.34);
-  --crz-shadow-blue: 0 0 18px rgba(0, 102, 255, 0.42);
-  --crz-shadow-blue-strong: 0 0 26px rgba(0, 111, 255, 0.56);
+  --crz-shadow-blue: 0 0 18px color-mix(in srgb, var(--crz-color-blue) 42%, transparent);
+  --crz-shadow-blue-strong: 0 0 26px color-mix(in srgb, var(--crz-color-blue) 56%, transparent);
   --crz-shadow-magenta: 0 0 18px rgba(255, 47, 155, 0.34);
   --crz-shadow-green: 0 0 15px rgba(24, 229, 154, 0.32);
 

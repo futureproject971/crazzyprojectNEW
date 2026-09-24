@@ -15,7 +15,11 @@ export function CategoryDirectoryPage() {
       const response = await fetch("/api/categories", { cache: "no-store" });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error("CATEGORIES_UNAVAILABLE");
-      setCategories(Array.isArray(payload.categories) ? payload.categories : []);
+      setCategories(
+        Array.isArray(payload.categories)
+          ? payload.categories.filter((category: PublicCategory) => Number(category.product_count || 0) > 0)
+          : []
+      );
       setState("ready");
     } catch {
       setState("error");

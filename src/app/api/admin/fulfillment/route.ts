@@ -21,14 +21,23 @@ export async function GET(request:NextRequest){
   if(status)runsQuery=runsQuery.eq("status",status);
   if(paymentId)runsQuery=runsQuery.eq("payment_id",paymentId);
 
-  const {data:runs,error}=await runsQuery;
-  if(error)return NextResponse.json({error:"FULFILLMENT_UNAVAILABLE"},{status:500});
+  const [runsResult,runningCount,manualCount,failedCount,completedCount]=await Promise.all([
+    runsQuery,
+    supabase.from("fulfillment_runs").select("id",{count:"exact",head:true}).in("status",["queued","running"]),
+    supabase.from("fulfillment_runs").select("id",{count:"exact",head:true}).eq("status","manual_review"),
+    supabase.from("fulfillment_runs").select("id",{count:"exact",head:true}).eq("status","failed"),
+    supabase.from("fulfillment_runs").select("id",{count:"exact",head:true}).eq("status","completed"),
+  ]);
+  const {data:runs,error}=runsResult;
+  if(error||runningCount.error||manualCount.error||failedCount.error||completedCount.error){
+    return NextResponse.json({error:"FULFILLMENT_UNAVAILABLE"},{status:500});
+  }
 
   const paymentIds=(runs||[]).map(item=>item.payment_id);
   const [payments,tickets,events]=await Promise.all([
     paymentIds.length?supabase.from("payments").select("id,user_id,amount,status,payment_method,paid_at,created_at").in("id",paymentIds):Promise.resolve({data:[],error:null}),
     paymentIds.length?supabase.from("order_tickets").select("id,payment_id,user_id,product_id,product_plan_id,stock_item_id,status,status_label,created_at,updated_at").in("payment_id",paymentIds):Promise.resolve({data:[],error:null}),
-    paymentIds.length?supabase.from("fulfillment_events").select("*").in("payment_id",paymentIds).order("created_at",{ascending:false}).limit(500):Promise.resolve({data:[],error:null}),
+    paymentIds.length?supabase.from("fulfillment_events").select("*").in("payment_id",paymentIds).order("created_at",{ascending:false}).limit(1000):Promise.resolve({data:[],error:null}),
   ]);
 
   const userIds=[...new Set((payments.data||[]).map(item=>item.user_id))];
@@ -37,6 +46,12 @@ export async function GET(request:NextRequest){
   const paymentMap=new Map((payments.data||[]).map(x=>[x.id,{...x,customer:profileMap.get(x.user_id)||null}]));
 
   return NextResponse.json({
+    stats:{
+      running:runningCount.count||0,
+      manual:manualCount.count||0,
+      failed:failedCount.count||0,
+      completed:completedCount.count||0,
+    },
     runs:(runs||[]).map(run=>({
       ...run,
       payment:paymentMap.get(run.payment_id)||null,

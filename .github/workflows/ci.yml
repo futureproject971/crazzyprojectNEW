@@ -1,1 +1,45 @@
-name: CRAZZY PROJECT Full Module CI\n\non:\n  push:\n    branches:\n      - main\n      - "m*-*"\n      - "production-*"\n  pull_request:\n    branches:\n      - main\n\nconcurrency:\n  group: crazzy-full-${{ github.ref }}\n  cancel-in-progress: true\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    timeout-minutes: 25\n    steps:\n      - name: Checkout\n        uses: actions/checkout@v4\n\n      - name: Setup Node\n        uses: actions/setup-node@v4\n        with:\n          node-version: 22\n\n      - name: Install\n        run: npm ci\n\n      - name: Typecheck\n        run: npm run typecheck\n\n      - name: Production build\n        run: npm run build\n\n      - name: Full module regression suite\n        run: node scripts/test-all-modules.mjs\n\n      - name: Unified Discord Bot Core syntax\n        run: npm --prefix apps/discord-bot run check\n
+name: CRAZZY PROJECT Full Module CI
+
+on:
+  push:
+    branches:
+      - main
+      - "m*-*"
+      - "production-*"
+      - "ux-*"
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: crazzy-full-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Production build
+        run: npm run build
+
+      - name: Full module regression suite
+        run: node scripts/test-all-modules.mjs
+
+      - name: Unified Discord Bot Core syntax
+        run: npm --prefix apps/discord-bot run check

@@ -11,8 +11,10 @@ export interface CheckoutCartItem {
   productImage?: string | null;
   planName?: string;
   price?: number;
+  resellerDiscountPercent?: number;
   skinsCount?: number | null;
   planCode?: string | null;
+  campaignSlug?: string;
 }
 
 type DiscountSource = "none" | "combo" | "coupon";
@@ -54,17 +56,22 @@ export async function calculateServerTotal(
 
   const { data: resellerData } = await supabaseAdmin
     .from("resellers")
-    .select("id, discount_percent, total_purchases")
+    .select("id, discount_percent, total_purchases, expires_at")
     .eq("user_id", userId)
     .eq("active", true)
     .maybeSingle();
 
+  const activeReseller =
+    resellerData && (!resellerData.expires_at || new Date(resellerData.expires_at).getTime() > Date.now())
+      ? resellerData
+      : null;
+
   let resellerAllowedProductIds: string[] | null = null;
-  if (resellerData) {
+  if (activeReseller) {
     const { data: resellerProducts } = await supabaseAdmin
       .from("reseller_products")
       .select("product_id")
-      .eq("reseller_id", resellerData.id);
+      .eq("reseller_id", activeReseller.id);
     const ids = (resellerProducts || []).map((p: any) => p.product_id);
     resellerAllowedProductIds = ids.length > 0 ? ids : null;
   }
@@ -75,6 +82,56 @@ export async function calculateServerTotal(
       return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: `Quantidade inválida. Máximo ${MAX_ITEM_QUANTITY} por item.` };
     }
     const qty = qtyRaw;
+    const isLuckPlay = rawItem.type === "luck-play";
+
+    if (isLuckPlay) {
+      if (cartItems.length !== 1 || qty !== 1 || couponId) {
+        return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Jogada CRAZZY LUCK deve ser cobrada separadamente e sem cupom." };
+      }
+
+      const campaignSlug = String(rawItem.campaignSlug || "").trim().toLowerCase();
+      if (!/^[a-z0-9][a-z0-9-]{1,79}$/.test(campaignSlug)) {
+        return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Campanha CRAZZY LUCK inválida." };
+      }
+
+      const { data: campaign, error: campaignError } = await supabaseAdmin
+        .from("luck_campaigns")
+        .select("id,slug,title,active,play_price_cents,starts_at,ends_at")
+        .eq("slug", campaignSlug)
+        .eq("active", true)
+        .maybeSingle();
+
+      const now = Date.now();
+      if (
+        campaignError ||
+        !campaign ||
+        (campaign.starts_at && new Date(campaign.starts_at).getTime() > now) ||
+        (campaign.ends_at && new Date(campaign.ends_at).getTime() <= now)
+      ) {
+        return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Campanha CRAZZY LUCK indisponível." };
+      }
+
+      const unitPriceCents = Math.round(Number(campaign.play_price_cents || 0));
+      if (!Number.isFinite(unitPriceCents) || unitPriceCents <= 0) {
+        return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Esta campanha não possui jogada paga disponível." };
+      }
+
+      subtotal += unitPriceCents;
+      cartSnapshot.push({
+        productId: "luck:" + campaign.id,
+        planId: "luck-play",
+        quantity: 1,
+        type: "luck-play",
+        campaignSlug: campaign.slug,
+        productName: campaign.title,
+        productImage: null,
+        planName: "Jogada CRAZZY LUCK",
+        price: unitPriceCents / 100,
+        resellerDiscountPercent: 0,
+      });
+      continue;
+    }
+
     const isLztAccount = rawItem.type === "lzt-account" || rawItem.planId === "lzt-account" || (rawItem.planId || "").startsWith("lzt-");
 
     if (isLztAccount) {
@@ -193,9 +250,10 @@ export async function calculateServerTotal(
       return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Preço inválido no catálogo" };
     }
 
-    if (resellerData && (!resellerAllowedProductIds || resellerAllowedProductIds.includes(planData.product_id))) {
-      const discountPercent = Math.max(0, Math.min(100, Number(resellerData.discount_percent || 0)));
-      unitPriceCents = Math.round(unitPriceCents * (1 - discountPercent / 100));
+    let resellerDiscountPercent = 0;
+    if (activeReseller && (!resellerAllowedProductIds || resellerAllowedProductIds.includes(planData.product_id))) {
+      resellerDiscountPercent = Math.max(0, Math.min(100, Number(activeReseller.discount_percent || 0)));
+      unitPriceCents = Math.round(unitPriceCents * (1 - resellerDiscountPercent / 100));
     }
 
     subtotal += unitPriceCents * qty;
@@ -207,6 +265,7 @@ export async function calculateServerTotal(
       planName: planData.name,
       planCode: planData.plan_code || null,
       price: unitPriceCents / 100,
+      resellerDiscountPercent,
       quantity: qty,
     });
   }
@@ -437,8 +496,10 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
     productName: string;
     planName: string;
     price: number;
+    resellerDiscountPercent?: number;
     quantity: number;
     type?: string;
+    campaignSlug?: string;
     lztItemId?: string;
     lztPrice?: number;
     lztCurrency?: string;
@@ -447,13 +508,23 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
   // Check if buyer is a reseller
   const { data: resellerData } = await supabaseAdmin
     .from("resellers")
-    .select("id, discount_percent, total_purchases")
+    .select("id, discount_percent, total_purchases, expires_at")
     .eq("user_id", payment.user_id)
     .eq("active", true)
     .maybeSingle();
 
+  const activeFulfillmentReseller =
+    resellerData && (!resellerData.expires_at || new Date(resellerData.expires_at).getTime() > Date.now())
+      ? resellerData
+      : null;
+
   for (let itemIndex = 0; itemIndex < cartItems.length; itemIndex++) {
     const item = cartItems[itemIndex];
+
+    // A paid CRAZZY LUCK attempt is fulfilled by play_luck() after this payment reaches
+    // COMPLETED. It never creates a product ticket, consumes a key or earns reseller credit.
+    if (item.type === "luck-play") continue;
+
     // Handle LZT Market accounts (check type or planId fallback)
     const isLztAccount = item.type === "lzt-account" || item.planId === "lzt-account";
     if (isLztAccount) {
@@ -469,7 +540,7 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
 
     // Regular product fulfillment
     let originalPrice = item.price || 0;
-    if (resellerData) {
+    if (activeFulfillmentReseller && Number(item.resellerDiscountPercent || 0) > 0) {
       const { data: planData } = await supabaseAdmin
         .from("product_plans")
         .select("price")
@@ -545,21 +616,19 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
         });
       }
 
-      if (resellerData && stockId) {
-        await supabaseAdmin.from("reseller_purchases").insert({
-          reseller_id: resellerData.id,
+      if (activeFulfillmentReseller && Number(item.resellerDiscountPercent || 0) > 0) {
+        const { error: resellerLedgerError } = await supabaseAdmin.from("reseller_purchases").insert({
+          reseller_id: activeFulfillmentReseller.id,
           product_plan_id: item.planId,
           stock_item_id: stockId,
           original_price: originalPrice,
           paid_price: item.price || 0,
+          payment_id: payment.id,
+          payment_item_index: itemIndex,
+          payment_unit_index: i,
         });
-
-        const { error: resellerIncrementError } = await supabaseAdmin.rpc(
-          "increment_reseller_purchases",
-          { _reseller_id: resellerData.id },
-        );
-        if (resellerIncrementError) {
-          console.error("[checkout] failed to increment reseller purchases", resellerIncrementError);
+        if (resellerLedgerError && resellerLedgerError.code !== "23505") {
+          console.error("[checkout] reseller ledger insert failed", resellerLedgerError.code);
         }
       }
     }

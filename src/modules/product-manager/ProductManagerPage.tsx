@@ -6,6 +6,7 @@ import type { ManagerCatalog, ManagerPlan, ManagerPlanCode, ManagerProduct } fro
 
 const deliveryModes = [
   ["internal_stock", "Estoque interno"],
+  ["ghost_stock", "Estoque Fantasma • ilimitado / ticket"],
   ["purincash_supplier", "Supplier PurinCash"],
   ["lzt_account", "Conta externa"],
   ["manual", "Entrega manual"],
@@ -456,6 +457,7 @@ export function ProductManagerPage() {
                         <label><span>Preço</span><input type="number" step="0.01" value={planDraft.price} onChange={e => setPlanDraft({...planDraft,price:Number(e.target.value)})} /></label>
                         <label><span>Código</span><select value={planDraft.plan_code || "custom"} onChange={e => setPlanDraft({...planDraft,plan_code:e.target.value as ManagerPlanCode})}>{planCodes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
                         <label><span>Modo de entrega</span><select value={planDraft.delivery_mode} onChange={e => setPlanDraft({...planDraft,delivery_mode:e.target.value as ManagerPlan["delivery_mode"]})}>{deliveryModes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+                        {planDraft.delivery_mode==="ghost_stock"&&<div className="crz-pm-ghost-note">👻 Estoque Fantasma: sempre disponível na loja, não consome key e abre entrega por suporte após o pagamento.</div>}
                         <label><span>Emoji</span><input value={planDraft.emoji || ""} onChange={e => setPlanDraft({...planDraft,emoji:e.target.value})} /></label>
                         <label><span>Cor</span><div className="crz-pm-color"><input type="color" value={planDraft.accent_color || productDraft.accent_color || "#1687ff"} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /><input value={planDraft.accent_color || ""} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /></div></label>
                         <label><span>Duração entitlement (min)</span><input type="number" value={planDraft.entitlement_duration_minutes ?? ""} onChange={e => setPlanDraft({...planDraft,entitlement_duration_minutes:e.target.value ? Number(e.target.value) : null})} placeholder="vazio = sem expiração" /></label>

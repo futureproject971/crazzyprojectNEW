@@ -8,6 +8,7 @@ export type ManagerTutorial = {
 
 export type ManagerDeliveryMode =
   | "internal_stock"
+  | "ghost_stock"
   | "purincash_supplier"
   | "lzt_account"
   | "manual"
