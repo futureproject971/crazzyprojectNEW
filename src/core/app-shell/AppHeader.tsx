@@ -27,15 +27,17 @@ export function AppHeader({mode="visitor",activeNav="home",cartCount:fallbackCar
  const displayName=user?.username||userName;
  const go=(path:string)=>router.push(path);
  const accountItems=effectiveMode==="admin"?[
-  {id:"admin-dashboard",label:"Dashboard",onSelect:()=>go("/admin")},
-  {id:"admin-products",label:"Produtos",onSelect:()=>go("/admin/produtos")},
-  {id:"admin-bonus",label:"CRAZZY BONUS",onSelect:()=>go("/admin/bonus")},
-  {id:"admin-arcade",label:"CRAZZY ARCADE",onSelect:()=>go("/admin/luck")},
+  {id:"admin-dashboard",label:"Dashboard",onSelect:()=>go("/painel")},
+  {id:"admin-panel",label:"Painel Admin",tone:"admin" as const,onSelect:()=>go("/admin")},
+  {id:"admin-orders",label:"Minhas Compras",onSelect:()=>go("/painel/pedidos")},
+  {id:"admin-library",label:"Minha Biblioteca",onSelect:()=>go("/biblioteca")},
+  {id:"admin-bonus",label:"Minha Carteira BONUS",onSelect:()=>go("/bonus")},
+  {id:"admin-profile",label:"Meu Perfil",onSelect:()=>go("/perfil")},
   {id:"admin-support",label:"Suporte",onSelect:()=>go("/admin/suporte")},
   {id:"admin-settings",label:"Configurações",onSelect:()=>go("/admin/integracoes")},
   {id:"admin-signout",label:"Sair",danger:true,onSelect:()=>void signOut()},
  ]:[
-  {id:"client-dashboard",label:"Painel do Cliente",onSelect:()=>go("/painel")},
+  {id:"client-dashboard",label:"Dashboard",onSelect:()=>go("/painel")},
   {id:"client-orders",label:"Minhas Compras",onSelect:()=>go("/painel/pedidos")},
   {id:"client-library",label:"Minha Biblioteca",onSelect:()=>go("/biblioteca")},
   {id:"client-bonus",label:"Minha Carteira BONUS",onSelect:()=>go("/bonus")},
@@ -54,6 +56,6 @@ export function AppHeader({mode="visitor",activeNav="home",cartCount:fallbackCar
    </div>
    <button type="button" className="crz-shell-menu" aria-label="Abrir menu" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(true)}><span/><span/><span/></button>
   </header>
-  <Drawer open={mobileOpen} title="CRAZZY PROJECT" onClose={()=>setMobileOpen(false)}><div className="crz-shell-mobile"><img className="crz-shell-mobile__logo" src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT"/><NavLinks items={items} activeNav={activeNav} cartCount={cartCount} compact onNavigate={()=>setMobileOpen(false)}/><div className="crz-shell-mobile__account"><Link className="crz-button crz-button--secondary crz-button--md" href={ticketHref}>Abrir Ticket</Link>{!user?(discordEnabled?<button type="button" className="crz-button crz-button--primary crz-button--md" onClick={()=>void signIn("discord",window.location.pathname)}><img src="/icons/brand-discord.svg" alt="" aria-hidden="true"/> Entrar com Discord</button>:<Link className="crz-button crz-button--primary crz-button--md" href="/login">Discord indisponível</Link>):<><Link className="crz-button crz-button--secondary crz-button--md" href="/painel">{displayName}</Link><button type="button" className="crz-button crz-button--ghost crz-button--md" onClick={()=>void signOut()}>Sair</button></>}</div></div></Drawer>
+  <Drawer open={mobileOpen} title="CRAZZY PROJECT" onClose={()=>setMobileOpen(false)}><div className="crz-shell-mobile"><img className="crz-shell-mobile__logo" src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT"/><NavLinks items={items} activeNav={activeNav} cartCount={cartCount} compact onNavigate={()=>setMobileOpen(false)}/><div className="crz-shell-mobile__account"><Link className="crz-button crz-button--secondary crz-button--md" href={ticketHref}>Abrir Ticket</Link>{!user?(discordEnabled?<button type="button" className="crz-button crz-button--primary crz-button--md" onClick={()=>void signIn("discord",window.location.pathname)}><img src="/icons/brand-discord.svg" alt="" aria-hidden="true"/> Entrar com Discord</button>:<Link className="crz-button crz-button--primary crz-button--md" href="/login">Discord indisponível</Link>):<><Link className="crz-button crz-button--secondary crz-button--md" href="/painel">{displayName}</Link>{effectiveMode==="admin"&&<Link className="crz-button crz-button--danger crz-button--md" href="/admin" onClick={()=>setMobileOpen(false)}>Painel Admin</Link>}<button type="button" className="crz-button crz-button--ghost crz-button--md" onClick={()=>void signOut()}>Sair</button></>}</div></div></Drawer>
  </>;
 }
