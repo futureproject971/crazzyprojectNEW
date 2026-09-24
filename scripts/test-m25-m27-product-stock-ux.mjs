@@ -17,7 +17,7 @@ const productStyles = await readFile(
   "utf8"
 );
 const commerceHardening = await readFile(
-  "supabase/migrations/20260923205027_commercial_auth_operations_hardening.sql",
+  "supabase/migrations/20260923191639_discord_partner_commerce_hardening.sql",
   "utf8"
 );
 
