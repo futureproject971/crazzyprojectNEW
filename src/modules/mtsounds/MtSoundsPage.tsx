@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Activity, AudioLines, ArrowUpRight, Gauge, Radio, Search, SlidersHorizontal, Sparkles, Waves } from "./native/icons";
 import MusicSearch from "./native/MusicSearch";
 import ReactiveVinyl from "./native/ReactiveVinyl";
+import ReactiveBackground from "./native/ReactiveBackground";
 
 export function MtSoundsPage() {
   useEffect(() => {
@@ -24,6 +25,15 @@ export function MtSoundsPage() {
   }, []);
 
   return <div className="crz-mts-native">
+    <div className="mts-site-art-bg" aria-hidden="true"><img src="/mtsounds/assets/mtsounds-hero-full.webp" alt=""/></div>
+    <ReactiveBackground />
+    <div className="mts-inner-nav wrap">
+      <div className="mts-brand"><ReactiveVinyl size="header" showSignal={false}/><span>MT<b>SOUND&apos;S</b></span></div>
+      <div className="mts-tabs">
+        <Link href="/mtsounds">Início</Link><Link href="/mtsounds#buscar">Músicas</Link><Link href="/mtsounds/editor">Studio</Link><Link href="/mtsounds/documentation">API</Link><Link href="/mtsounds/about">Sobre</Link>
+      </div>
+      <span className="mts-online"><i/> MTA:SA</span>
+    </div>
     <section className="command-hero wrap">
       <div className="hero-copy reveal">
         <span className="system-kicker"><Activity size={15}/> MTSOUND&apos;S / MTA:SA AUDIO</span>
