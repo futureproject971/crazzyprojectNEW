@@ -516,3 +516,8 @@ html[data-theme="light"] .crz-mtsounds-external strong {color:#102033}
     flex:1;
   }
 }
+
+
+/* Header safe-area: MTSOUNDS must never sit under the CRAZZY PROJECT shell */
+.crz-mts-native{padding-top:88px!important}
+@media(max-width:980px){.crz-mts-native{padding-top:78px!important}}

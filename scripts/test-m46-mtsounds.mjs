@@ -7,7 +7,7 @@ const downloader = await readFile("src/app/api/mtsounds/native/downloader/route.
 for (const required of ["./native/MusicSearch","./native/ReactiveVinyl","/mtsounds/editor","MTSOUND"]) if(!page.includes(required)) throw new Error("M46 native home missing "+required);
 if(page.includes("<iframe")||page.includes("mtsounds.vercel.app")) throw new Error("M46 main experience must no longer depend on external app iframe");
 for (const required of ["OfflineAudioContext","INTRO_MP3_BASE64","exportFinal","Bass Boost","Grave Estourado"]) if(!editor.includes(required)) throw new Error("M46 native editor missing "+required);
-for (const required of ["/api/mtsounds/native/youtube/search","/api/mtsounds/native/downloader","ReactiveVinyl"]) if(!search.includes(required)) throw new Error("M46 native search missing "+required);
+for (const required of ["/api/mtsounds/native/youtube/search","ReactiveVinyl","https://y2meta.is/pt93/youtube-to-mp3/"]) if(!search.includes(required)) throw new Error("M46 native search missing "+required);
 if(!youtube.includes("youtube.com/results")||!downloader.includes("isYouTubeUrl")) throw new Error("M46 native backend routes are incomplete");
 const vinyl = await readFile("src/modules/mtsounds/native/ReactiveVinyl.tsx", "utf8");
 for (const required of ["/mtsounds/assets/mtsounds-vinyl-full.webp","vinyl-fallback","onError","vinyl-disc-shell"]) {
@@ -42,17 +42,22 @@ for (const required of [
   "if(data.info===0)next()",
   "picture-in-picture",
   "• PIP",
+  "crz:mtsounds:position:v1",
+  "getCurrentTime",
+  "seekTo",
 ]) {
   if (!globalPlayer.includes(required)) throw new Error("M46 persistent music player missing " + required);
 }
 for (const required of ["position:fixed","crz-global-music__drawer","crz-global-music__video"]) {
   if (!globalPlayerStyles.includes(required)) throw new Error("M46 site PiP styling missing " + required);
 }
-for (const required of ["music.youtube.com","youtube-music","Tocar no site","globalPlayer.enqueue","globalPlayer.addToPlaylist"]) {
+for (const required of ["music.youtube.com","youtube-music","Tocar no site","globalPlayer.enqueue","globalPlayer.addToPlaylist","https://y2meta.is/pt93/youtube-to-mp3/"]) {
   if (!search.includes(required)) throw new Error("M46 YouTube/queue integration missing " + required);
 }
 for (const forbidden of ["Play faz girar","Pause segura o ângulo","REAGE AO PLAYER","O SOM BATE.","O VINIL RESPONDE."]) {
   if (page.includes(forbidden)) throw new Error("M46 literal/technical marketing copy returned: " + forbidden);
 }
 
-console.log("[PASS] M46 MTSOUNDS is native, persistent, queue-enabled and copy-hardened");
+const bridge = await readFile("src/core/navigation/InternalNavigationBridge.tsx", "utf8");
+if (!bridge.includes("router.push") || !bridge.includes("a[href]")) throw new Error("M46 global route persistence bridge missing");
+console.log("[PASS] M46 MTSOUNDS is native, route-persistent, position-restoring and Y2Meta-linked");

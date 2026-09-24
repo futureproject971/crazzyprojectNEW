@@ -6,6 +6,7 @@ import { PublicInteractionGuard } from "@/core/security/PublicInteractionGuard";
 import { ThemeProvider } from "@/core/theme/ThemeProvider";
 import { PwaRegister } from "@/core/pwa";
 import { GlobalMusicProvider } from "@/core/music/GlobalMusicProvider";
+import { InternalNavigationBridge } from "@/core/navigation/InternalNavigationBridge";
 import "@/core/music/styles.css";
 import "./globals.css";
 
@@ -46,7 +47,7 @@ export default function RootLayout({
         <PublicInteractionGuard />
         <ThemeProvider>
           <AuthProvider>
-            <GlobalMusicProvider><CartProvider>{children}</CartProvider></GlobalMusicProvider>
+            <GlobalMusicProvider><InternalNavigationBridge/><CartProvider>{children}</CartProvider></GlobalMusicProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

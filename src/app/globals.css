@@ -19,6 +19,7 @@
 @import "../modules/club/styles.css";
 @import "../modules/rewards/styles.css";
 @import "../modules/luck/styles.css";
+@import "../modules/bonus/styles.css";
 @import "../modules/interactive-demo/styles.css";
 @import "../modules/coupons/styles.css";
 @import "../modules/rank/styles.css";
@@ -44,6 +45,7 @@
 @import "../modules/club-manager/styles.css";
 @import "../modules/reward-manager/styles.css";
 @import "../modules/luck-manager/styles.css";
+@import "../modules/bonus-manager/styles.css";
 @import "../modules/coupon-manager/styles.css";
 @import "../modules/integrations/styles.css";
 @import "../modules/fulfillment-manager/styles.css";

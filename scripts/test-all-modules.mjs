@@ -11,6 +11,7 @@ const tests = [
   "scripts/test-m14-community.mjs",
   "scripts/test-m17-rewards.mjs",
   "scripts/test-m18-luck.mjs",
+  "scripts/test-bonus-arcade.mjs",
   "scripts/test-m19-coupons.mjs",
   "scripts/test-m20-rank.mjs",
   "scripts/test-m21-status.mjs",

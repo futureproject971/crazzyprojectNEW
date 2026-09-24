@@ -120,7 +120,7 @@ export default function MusicSearch(){
     }catch{
       setMessage("Abrindo o downloader…");
     }
-    window.open("/api/mtsounds/native/downloader?url="+encodeURIComponent(url),"_blank","noopener,noreferrer");
+    window.open("https://y2meta.is/pt93/youtube-to-mp3/","_blank","noopener,noreferrer");
   }
 
   function playAcrossSite(video:Video){

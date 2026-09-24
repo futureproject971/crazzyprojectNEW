@@ -11,7 +11,6 @@ export const visitorNavigation: ShellNavItem[] = [
   { id: "call", label: "CRAZZY CALL", href: "/call", icon: "/icons/headset.svg" },
   { id: "club", label: "CLUB", href: "/club", icon: "/icons/crown.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
-  { id: "support", label: "Ticket", subtitle: "Suporte prioritário", href: "/tickets", icon: "/icons/headset.svg" },
   { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
 ];
 
@@ -22,7 +21,6 @@ export const clientNavigation: ShellNavItem[] = [
   { id: "accounts", label: "Contas", href: "/contas", icon: "/icons/package.svg" },
   { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
   { id: "call", label: "CRAZZY CALL", href: "/call", icon: "/icons/headset.svg" },
-  { id: "support", label: "Ticket", subtitle: "Suporte prioritário", href: "/tickets", icon: "/icons/headset.svg" },
   { id: "notifications", label: "Avisos", href: "/painel/notificacoes", icon: "/icons/flame.svg" },
   { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
@@ -36,8 +34,10 @@ export const adminNavigation: ShellNavItem[] = [
   { id: "payments", label: "Pagamentos", href: "/admin/pagamentos", icon: "/icons/credit-card.svg" },
   { id: "finance", label: "Finance", href: "/admin/finance", icon: "/icons/credit-card.svg" },
   { id: "fulfillment", label: "Entregas", href: "/admin/fulfillment", icon: "/icons/package.svg" },
-  { id: "discord", label: "Discord", href: "/admin/discord", icon: "/icons/users.svg" },
   { id: "campaigns", label: "Campanhas", href: "/admin/campanhas", icon: "/icons/flame.svg" },
+  { id: "bonus-manager", label: "Bonus", href: "/admin/bonus", icon: "/icons/crown.svg" },
+  { id: "luck-manager", label: "Arcade", href: "/admin/luck", icon: "/icons/bolt.svg" },
+  { id: "discord", label: "Discord", href: "/admin/discord", icon: "/icons/users.svg" },
   { id: "calls", label: "CRAZZY CALL", href: "/admin/calls", icon: "/icons/headset.svg" },
   { id: "stock", label: "Estoque", href: "/admin/estoque", icon: "/icons/package.svg" },
   { id: "academy", label: "Tutoriais", href: "/admin/academy", icon: "/icons/book.svg" },
