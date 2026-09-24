@@ -872,3 +872,274 @@ textarea:focus-visible {
 .crz-fulfillment-kv strong {
   font-size: 13px !important;
 }
+
+
+/* PASS 4: purchase, help and account journeys */
+
+/* AUTH + DISCORD GATE */
+.crz-auth-heading p,
+.crz-auth-provider strong,
+.crz-auth-security strong,
+.crz-auth-current strong,
+.crz-auth-recovery__panel p,
+.crz-discord-gate__steps article > b,
+.crz-discord-gate__steps strong {
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+.crz-auth-provider small,
+.crz-auth-security span,
+.crz-auth-error,
+.crz-auth-loading,
+.crz-auth-current span,
+.crz-auth-current small,
+.crz-auth-current__actions a,
+.crz-auth-current__actions button,
+.crz-auth-card > footer,
+.crz-discord-gate__steps small,
+.crz-discord-gate__missing {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+
+/* CHECKOUT */
+.crz-checkout-methods strong,
+.crz-checkout-payment-box > header strong,
+.crz-checkout-summary__items strong,
+.crz-checkout-coupon strong {
+  font-size: 13px !important;
+}
+.crz-checkout-methods small,
+.crz-checkout-methods em,
+.crz-checkout-notice strong,
+.crz-checkout-auth-gate strong,
+.crz-checkout-notice span,
+.crz-checkout-auth-gate span,
+.crz-checkout-auth-gate button,
+.crz-checkout-payment-box label > span,
+.crz-checkout-payment-box > small,
+.crz-checkout-ltc-amount small,
+.crz-checkout-ltc-amount span,
+.crz-checkout-status,
+.crz-checkout-inline-error,
+.crz-checkout-summary__items small,
+.crz-checkout-summary__items b,
+.crz-checkout-blocker span,
+.crz-checkout-security span,
+.crz-checkout-totals > div,
+.crz-checkout-coupon span,
+.crz-checkout-coupon small,
+.crz-checkout-summary__panel > a {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-checkout-payment-box textarea {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+/* CART + COMBO */
+.crz-cart-item__headline span,
+.crz-cart-item__fixed-plan strong,
+.crz-cart-item__quantity strong,
+.crz-cart-summary__lines > div,
+.crz-cart-combo-meter header span,
+.crz-cart-mini strong,
+.crz-cart-drawer__total span,
+.crz-combo-plan-switch strong,
+.crz-combo-card strong {
+  font-size: 13px !important;
+}
+.crz-cart-item__headline small,
+.crz-cart-item__controls label > span,
+.crz-cart-item__fixed-plan > span,
+.crz-cart-item__bottom span,
+.crz-cart-item__bottom button,
+.crz-cart-summary__coupon > label,
+.crz-cart-summary__coupon button,
+.crz-cart-summary__coupon > small,
+.crz-cart-summary__warning span,
+.crz-cart-summary__panel > a,
+.crz-cart-combo-status__title > a,
+.crz-cart-combo-meter header strong,
+.crz-cart-combo-meter footer,
+.crz-cart-combo-status > p,
+.crz-cart-drawer__empty span,
+.crz-cart-drawer__empty a,
+.crz-cart-mini span,
+.crz-cart-mini small,
+.crz-cart-drawer__combo span,
+.crz-combo-plan-switch small,
+.crz-combo-progress__ring span,
+.crz-combo-progress > div:nth-child(2) > small,
+.crz-combo-progress p,
+.crz-combo-tiers b,
+.crz-combo-tiers small,
+.crz-combo-progress__rule,
+.crz-combo-card small,
+.crz-combo-card > div:last-child > span,
+.crz-combo-card em {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-cart-summary__coupon input {
+  font-size: 13px !important;
+}
+
+/* HELP */
+.crz-help-state p,
+.crz-help-empty p,
+.crz-help-faq-list summary,
+.crz-help-faq-list details p,
+.crz-help-tutorial-list strong,
+.crz-help-support strong {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+.crz-help-quick-search > span,
+.crz-help-quick-search button,
+.crz-help-overview small,
+.crz-help-overview span,
+.crz-help-faqs small,
+.crz-help-tutorials header small,
+.crz-help-faqs > header > span,
+.crz-help-faq-list details small,
+.crz-help-tutorial-list small,
+.crz-help-tutorial-list p,
+.crz-help-tutorial-list em,
+.crz-help-tutorials__empty,
+.crz-help-support span,
+.crz-help-preview-state {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-help-search-box input {
+  font-size: 13px !important;
+}
+
+/* ACADEMY */
+.crz-academy-card__body > strong,
+.crz-academy-detail__hero h2,
+.crz-academy-block-text,
+.crz-academy-step strong {
+  font-size: 13px !important;
+  line-height: 1.48 !important;
+}
+.crz-academy-state p,
+.crz-academy-search a,
+.crz-academy-summary span,
+.crz-academy-card__meta span,
+.crz-academy-card__body > p,
+.crz-academy-card__products span,
+.crz-academy-breadcrumb,
+.crz-academy-detail__badges > span,
+.crz-academy-detail__hero p,
+.crz-academy-lock > p,
+.crz-academy-lock > div span,
+.crz-academy-toc > strong,
+.crz-academy-toc > span,
+.crz-academy-toc nav a,
+.crz-academy-block-media figcaption,
+.crz-academy-checklist span,
+.crz-academy-checklist strong,
+.crz-academy-shortcut > span,
+.crz-academy-shortcut kbd,
+.crz-academy-code header,
+.crz-academy-code header button,
+.crz-academy-file strong,
+.crz-academy-file small,
+.crz-academy-callout strong,
+.crz-academy-callout p,
+.crz-academy-step p,
+.crz-academy-complete strong,
+.crz-academy-complete span {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-academy-search input,
+.crz-academy-code pre {
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+}
+
+/* REVIEWS */
+.crz-review-card__meta strong,
+.crz-review-card p,
+.crz-review-feed-state strong,
+.crz-review-compose-state strong {
+  font-size: 13px !important;
+}
+.crz-reviews-section-head span,
+.crz-reviews-compose__eyebrow,
+.crz-review-card__meta span,
+.crz-review-card__meta time,
+.crz-review-card__product,
+.crz-review-card__stars,
+.crz-review-feed-state p,
+.crz-reviews-compose > p,
+.crz-reviews-field > span,
+.crz-reviews-field small,
+.crz-reviews-notice,
+.crz-review-compose-state {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-reviews-field select,
+.crz-reviews-field textarea {
+  font-size: 13px !important;
+}
+
+/* RANK */
+.crz-rank-breakdown__grid article strong,
+.crz-rank-tiers article strong,
+.crz-rank-board__identity strong,
+.crz-rank-board__position {
+  font-size: 13px !important;
+}
+.crz-rank-state p,
+.crz-rank-hero-card__emblem > span,
+.crz-rank-hero-card__main > small,
+.crz-rank-hero-card__position small,
+.crz-rank-points span,
+.crz-rank-progress > div:first-child span,
+.crz-rank-progress footer span,
+.crz-rank-progress footer strong,
+.crz-rank-hero-card__position span,
+.crz-rank-breakdown header small,
+.crz-rank-tiers header small,
+.crz-rank-board header small,
+.crz-rank-breakdown > header > span,
+.crz-rank-breakdown__grid article span,
+.crz-rank-breakdown__grid article b,
+.crz-rank-tiers article span,
+.crz-rank-board > header button,
+.crz-rank-board__identity span,
+.crz-rank-board__points {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+
+/* DISCOVERY */
+.crz-discovery-kicker,
+.crz-discovery-categories button,
+.crz-discovery-eyebrow,
+.crz-discovery-count,
+.crz-discovery-feature__body > span,
+.crz-discovery-card__badge,
+.crz-discovery-card__body small,
+.crz-discovery-card__body a,
+.crz-discovery-empty button,
+.crz-discovery-news__grid span,
+.crz-discovery-tags button,
+.crz-discovery-state-card button {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-discovery-feature__body p,
+.crz-discovery-card__body p,
+.crz-discovery-empty p,
+.crz-discovery-news__grid p,
+.crz-discovery-state-card p {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
