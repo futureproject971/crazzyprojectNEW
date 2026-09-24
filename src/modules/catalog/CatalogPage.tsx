@@ -34,11 +34,11 @@ function StockBadge({ product }: { product: PublicStoreProduct }) {
   );
 }
 
-export function CatalogPage() {
+export function CatalogPage({ initialCategory = "all" }: { initialCategory?: string }) {
   const [products, setProducts] = useState<PublicStoreProduct[]>([]);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState(initialCategory || "all");
   const [sort, setSort] = useState<Sort>("featured");
   const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [page, setPage] = useState(1);
