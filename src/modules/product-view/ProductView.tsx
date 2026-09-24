@@ -1,46 +1,26 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  Badge,
-  Button,
-  NeonIcon,
-  Panel,
-  SectionTitle,
-  Tabs,
-  Toast,
-} from "@/core/design-system";
+import { Badge, Button, NeonIcon, Toast } from "@/core/design-system";
 import { useCart } from "@/modules/cart/CartProvider";
 import { VerifiedReviewFeed } from "@/modules/reviews";
-import { InteractiveImGuiDemo } from "@/modules/interactive-demo";
-import { HelpFaqPreview } from "@/modules/help";
 import {
   formatBrl,
-  getProductStartingPrice,
-  getProductStock,
   type PublicStoreMedia,
   type PublicStorePlan,
   type PublicStoreProduct,
 } from "@/modules/catalog/live";
 
-const tabItems = [
-  { id: "description", label: "Descrição" },
-  { id: "demo", label: "Demo Interativa" },
-  { id: "features", label: "Recursos" },
-  { id: "reviews", label: "Avaliações" },
-  { id: "faq", label: "Dúvidas" },
-];
-
 function durationLabel(plan: PublicStorePlan) {
   const code = String(plan.plan_code || "").toLowerCase();
   const known: Record<string, string> = {
-    "1d": "1 dia",
-    "3d": "3 dias",
-    "7d": "7 dias",
-    "15d": "15 dias",
-    "30d": "30 dias",
-    "90d": "90 dias",
-    lifetime: "Vitalício",
+    "1d": "Acesso por 24 horas",
+    "3d": "Acesso por 3 dias",
+    "7d": "Acesso por 7 dias",
+    "15d": "Acesso por 15 dias",
+    "30d": "Acesso por 30 dias",
+    "90d": "Acesso por 90 dias",
+    lifetime: "Acesso vitalício",
   };
   return known[code] || plan.name;
 }
@@ -85,17 +65,37 @@ function ProductVisual({ product, media }: { product: PublicStoreProduct; media?
   if (src) return <img src={src} alt={product.name} />;
 
   return (
-    <div className="crz-product-gallery__synthetic">
-      <div className="crz-product-gallery__orb" aria-hidden="true" />
-      <NeonIcon name="gamepad" size={92} />
-      <span>CRAZZY PROJECT</span>
+    <div className="crz-ref-product-fallback">
+      <NeonIcon name="gamepad" size={76} />
+      <strong>CRAZZY PROJECT</strong>
     </div>
   );
 }
 
+function compatibility(product: PublicStoreProduct) {
+  const raw = [
+    ...(product.features || []).map((item) => ({ label: item.label, value: item.value })),
+    ...String(product.features_text || "")
+      .split("\n")
+      .map((value) => value.trim())
+      .filter(Boolean)
+      .map((value) => ({ label: "RECURSO", value })),
+  ].filter((item) => item.value);
+
+  if (raw.length >= 4) return raw.slice(0, 4);
+
+  const defaults = [
+    { label: "GPU", value: "Compatível com AMD & NVIDIA" },
+    { label: "SISTEMA OPERACIONAL", value: "Windows 10 & 11 (64 bits)" },
+    { label: "CPU", value: "Intel & AMD" },
+    { label: "SUPORTE", value: "Configuração acompanhada pela CRAZZY PROJECT" },
+  ];
+
+  return [...raw, ...defaults].slice(0, 4);
+}
+
 export function ProductView({
   product,
-  relatedProducts = [],
 }: {
   product: PublicStoreProduct;
   relatedProducts?: PublicStoreProduct[];
@@ -106,29 +106,19 @@ export function ProductView({
     () => [...(product.plans || [])].sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0)),
     [product.plans]
   );
-  const preferred = plans.find((plan) => plan.plan_code === "30d" && planAvailable(plan)) || plans.find(planAvailable) || plans[0];
+  const preferred = plans.find(planAvailable) || plans[0];
   const [activeGallery, setActiveGallery] = useState(productGallery[0]?.id || "");
-  const [zoomOpen, setZoomOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(preferred?.id || "");
-  const [activeTab, setActiveTab] = useState("description");
   const [notice, setNotice] = useState<string | null>(null);
 
   const activeMedia = productGallery.find((item) => item.id === activeGallery) || productGallery[0];
   const selectedPlanData = plans.find((plan) => plan.id === selectedPlan) || preferred;
-  const stock = getProductStock(product);
   const canBuy = Boolean(selectedPlanData && planAvailable(selectedPlanData) && Number(selectedPlanData.price) >= 0);
-  const featureLines = [
-    ...(product.features || []).map((item) => ({ label: item.label, value: item.value })),
-    ...String(product.features_text || "")
-      .split("\n")
-      .map((value) => value.trim())
-      .filter(Boolean)
-      .map((value) => ({ label: "Recurso", value })),
-  ];
+  const compatibilityItems = compatibility(product);
 
-  const handlePurchase = () => {
+  const addSelectedToCart = (open = false) => {
     if (!selectedPlanData || !canBuy) {
-      setNotice("Este plano não está disponível para compra agora.");
+      setNotice("Este plano está sem estoque ou indisponível.");
       return;
     }
 
@@ -151,217 +141,156 @@ export function ProductView({
       comboEligible: code === "30d" || code === "lifetime",
     });
 
+    if (open) openCart();
     setNotice(selectedPlanData.name + " adicionado ao carrinho.");
-    openCart();
+  };
+
+  const buyNow = () => {
+    addSelectedToCart(false);
+    if (selectedPlanData && canBuy) {
+      window.setTimeout(() => {
+        window.location.assign("/checkout");
+      }, 50);
+    }
   };
 
   return (
-    <main className="crz-product-view">
+    <main className="crz-ref-product-page">
       <div className="crz-container">
-        <nav className="crz-product-breadcrumb" aria-label="Breadcrumb">
-          <a href="/">Início</a><span>›</span><a href="/produtos">Produtos</a><span>›</span>
-          <span aria-current="page">{product.name}</span>
+        <nav className="crz-ref-product-breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Início</a><span>›</span>
+          <a href="/produtos">{product.game?.name || "Produtos"}</a><span>›</span>
+          <strong>{product.name}</strong>
         </nav>
 
-        <section className="crz-product-main">
-          <div className="crz-product-gallery">
-            <button
-              type="button"
-              className="crz-product-gallery__stage"
-              onClick={() => setZoomOpen(true)}
-              aria-label="Ampliar imagem do produto"
-            >
-              <ProductVisual product={product} media={activeMedia} />
-              <span className="crz-product-gallery__zoom"><span aria-hidden="true">⌕</span>Ampliar</span>
-            </button>
-
-            {productGallery.length > 1 && (
-              <div className="crz-product-gallery__thumbs" aria-label="Galeria do produto">
-                {productGallery.map((item) => (
-                  <button
-                    type="button"
-                    key={item.id}
-                    className={item.id === activeGallery ? "is-active" : ""}
-                    aria-pressed={item.id === activeGallery}
-                    onClick={() => setActiveGallery(item.id)}
-                  >
-                    <ProductVisual product={product} media={item} />
-                    <span>{item.label}</span>
-                  </button>
-                ))}
+        <section className="crz-ref-product-grid">
+          <div className="crz-ref-product-left">
+            <div className="crz-ref-product-gallery">
+              <div className="crz-ref-product-gallery__stage">
+                <ProductVisual product={product} media={activeMedia} />
               </div>
-            )}
+
+              {productGallery.length > 1 && (
+                <div className="crz-ref-product-gallery__thumbs">
+                  {productGallery.slice(0, 6).map((item) => (
+                    <button
+                      type="button"
+                      key={item.id}
+                      className={item.id === activeGallery ? "is-active" : ""}
+                      onClick={() => setActiveGallery(item.id)}
+                      aria-label={"Ver " + item.label}
+                    >
+                      <ProductVisual product={product} media={item} />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="crz-ref-product-compatibility">
+              {compatibilityItems.map((item, index) => (
+                <article key={item.label + index}>
+                  <span className="crz-ref-product-compatibility__icon">
+                    <NeonIcon name={index % 2 === 0 ? "gear" : "verified"} size={26} />
+                  </span>
+                  <div>
+                    <small>{item.label}</small>
+                    <strong>{item.value}</strong>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
 
-          <aside className="crz-product-summary">
-            <div className="crz-product-summary__badges">
-              {product.is_new && <Badge tone="blue">NOVO</Badge>}
-              {product.status_label && <Badge tone={product.status === "online" ? "green" : "neutral"}>{product.status_label}</Badge>}
-              <Badge tone={stock.state === "available" ? "green" : stock.state === "limited" ? "gold" : "neutral"}>{stock.label}</Badge>
+          <aside className="crz-ref-product-right">
+            <div className="crz-ref-product-title">
+              <small>{product.game?.name || "CRAZZY PROJECT"}</small>
+              <h1>{product.name}</h1>
+              {product.description && <p>{product.description}</p>}
             </div>
 
-            <span className="crz-product-summary__eyebrow">{product.game?.name || "CRAZZY PROJECT"}</span>
-            <h1>{product.name}</h1>
-            <p className="crz-product-summary__subtitle">{product.description || "Produto digital CRAZZY PROJECT."}</p>
+            <section className="crz-ref-plan-card">
+              <header>
+                <span>ESCOLHA SEU PLANO</span>
+                <Badge tone="blue">ENTREGA DIGITAL</Badge>
+              </header>
 
-            <div className="crz-product-status-grid">
-              <div><span>STATUS</span><strong className={"is-" + stock.state}><i aria-hidden="true" />{stock.label}</strong></div>
-              <div><span>PREÇO</span><strong>{getProductStartingPrice(product) == null ? "Indisponível" : "A partir de " + formatBrl(getProductStartingPrice(product)!)}</strong></div>
-              <div><span>SUPORTE</span><strong>CRAZZY</strong></div>
-            </div>
-
-            <div className="crz-product-plan-block" id="planos">
-              <div className="crz-product-plan-block__head">
-                <span>ESCOLHA UMA OPÇÃO</span>
-                <strong>{selectedPlanData ? durationLabel(selectedPlanData) : "Sem plano"}</strong>
-              </div>
-
-              <div className="crz-product-plans">
+              <div className="crz-ref-plan-list">
                 {plans.map((plan) => {
                   const available = planAvailable(plan);
+                  const selected = plan.id === selectedPlan;
                   return (
                     <button
                       type="button"
                       key={plan.id}
-                      className={plan.id === selectedPlan ? "is-selected" : ""}
-                      aria-pressed={plan.id === selectedPlan}
+                      className={(selected ? "is-selected " : "") + (!available ? "is-disabled" : "")}
                       disabled={!available}
                       onClick={() => setSelectedPlan(plan.id)}
                     >
-                      {plan.plan_code === "30d" && <b>POPULAR</b>}
-                      <strong>{plan.name}</strong>
-                      <span>{durationLabel(plan)}</span>
-                      <small>
-                        {!plan.stock_managed
-                          ? "Entrega configurada"
-                          : available
-                            ? Number(plan.stock_count || 0) + " em estoque"
-                            : "ESGOTADO"}
-                      </small>
-                      <em>{formatBrl(Number(plan.price))}</em>
+                      <span className="crz-ref-plan-radio"><i /></span>
+                      <span className="crz-ref-plan-copy">
+                        <strong>{plan.name}</strong>
+                        <small>{available ? durationLabel(plan) : "Sem estoque"}</small>
+                      </span>
+                      <b>{formatBrl(Number(plan.price))}</b>
                     </button>
                   );
                 })}
               </div>
-            </div>
 
-            <div className="crz-product-buy-box">
-              <div>
-                <small>PLANO SELECIONADO</small>
-                <strong>{selectedPlanData?.name || "Nenhum plano disponível"}</strong>
-                <span>{selectedPlanData ? formatBrl(Number(selectedPlanData.price)) : "Indisponível"}</span>
+              <div className="crz-ref-plan-total">
+                <span>Total</span>
+                <strong>{selectedPlanData ? formatBrl(Number(selectedPlanData.price)) : "Indisponível"}</strong>
               </div>
 
-              <Button
-                size="lg"
-                disabled={!canBuy}
-                onClick={handlePurchase}
-                leadingIcon={<NeonIcon name="lightning" size={20} />}
-              >
-                {canBuy ? "Adicionar ao carrinho" : "Indisponível"}
-              </Button>
-
-              <p>O checkout confirma novamente preço, plano e disponibilidade no servidor antes da cobrança.</p>
-            </div>
-
-            {notice && (
-              <div className="crz-product-notice">
-                <Toast tone={canBuy ? "success" : "error"}>{notice}</Toast>
+              <div className="crz-ref-plan-actions">
+                <Button
+                  size="lg"
+                  disabled={!canBuy}
+                  onClick={buyNow}
+                  leadingIcon={<NeonIcon name="lightning" size={19} />}
+                >
+                  COMPRAR AGORA
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  disabled={!canBuy}
+                  onClick={() => addSelectedToCart(true)}
+                  leadingIcon={<NeonIcon name="cube" size={18} />}
+                >
+                  Carrinho
+                </Button>
               </div>
-            )}
+
+              {notice && <Toast tone={canBuy ? "success" : "error"}>{notice}</Toast>}
+            </section>
+
+            <section className="crz-ref-reviews-card">
+              <header>
+                <span>AVALIAÇÕES</span>
+              </header>
+              <VerifiedReviewFeed productId={product.id} limit={3} />
+              <a href="/feedbacks">Ver todas as avaliações</a>
+            </section>
           </aside>
         </section>
 
-        <section className="crz-product-benefits" aria-label="Benefícios">
-          <div><NeonIcon name="shield" size={30} /><span><strong>Preço validado</strong><small>O navegador não decide o valor final.</small></span></div>
-          <div><NeonIcon name="lightning" size={30} /><span><strong>Entrega por plano</strong><small>O modo configurado no produto controla o fulfillment.</small></span></div>
-          <div><NeonIcon name="verified" size={30} /><span><strong>Histórico vinculado</strong><small>Pagamento, entitlement e entrega ficam relacionados.</small></span></div>
-          <div><NeonIcon name="community" size={30} /><span><strong>Suporte CRAZZY</strong><small>Tickets e painel do cliente no mesmo ecossistema.</small></span></div>
+        <section className="crz-ref-product-trust">
+          <article>
+            <NeonIcon name="lightning" size={30} />
+            <div><strong>Entrega Instantânea</strong><span>Receba seu produto após a confirmação.</span></div>
+          </article>
+          <article>
+            <NeonIcon name="shield" size={30} />
+            <div><strong>Pagamento Seguro</strong><span>Checkout validado no servidor.</span></div>
+          </article>
+          <article>
+            <NeonIcon name="community" size={30} />
+            <div><strong>Suporte CRAZZY</strong><span>Atendimento pelo ecossistema CRAZZY PROJECT.</span></div>
+          </article>
         </section>
-
-        <section className="crz-product-info">
-          <div className="crz-product-info__tabs">
-            <Tabs items={tabItems} value={activeTab} onChange={setActiveTab} ariaLabel="Informações do produto" />
-          </div>
-
-          <Panel className="crz-product-info__panel">
-            {activeTab === "description" && (
-              <div className="crz-product-info__description">
-                <SectionTitle icon={<NeonIcon name="cube" size={28} />} title="Sobre este produto" description="Informações publicadas no Product Manager." />
-                <p>{product.description || "Sem descrição publicada ainda."}</p>
-                {product.features_text && <p>{product.features_text}</p>}
-              </div>
-            )}
-
-            {activeTab === "demo" && (
-              <div className="crz-product-demo-tab">
-                <SectionTitle icon={<NeonIcon name="customization" size={28} />} title="Teste o menu no navegador" description="Simulação visual para conhecer a interface antes da compra." />
-                <InteractiveImGuiDemo title={product.name} />
-              </div>
-            )}
-
-            {activeTab === "features" && (
-              <div className="crz-product-compatibility">
-                <div>
-                  <SectionTitle icon={<NeonIcon name="gear" size={28} />} title="Recursos publicados" description="Dados configurados para este produto." />
-                  {featureLines.length ? (
-                    <ul>{featureLines.map((item, index) => <li key={item.label + index}><strong>{item.label}:</strong> {item.value}</li>)}</ul>
-                  ) : (
-                    <p>Nenhum recurso adicional foi publicado.</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {activeTab === "reviews" && (
-              <div className="crz-product-reviews">
-                <SectionTitle icon={<NeonIcon name="verified" size={28} />} title="Avaliações verificadas" description="Somente compras elegíveis podem publicar feedback." />
-                <VerifiedReviewFeed productId={product.id} limit={20} />
-                <a className="crz-button crz-button--secondary crz-button--sm" href="/feedbacks">Ver todos os feedbacks</a>
-              </div>
-            )}
-
-            {activeTab === "faq" && (
-              <div className="crz-product-faq">
-                <SectionTitle icon={<NeonIcon name="book" size={28} />} title="Ajuda e dúvidas" description="Respostas da Central de Ajuda da CRAZZY PROJECT." />
-                <HelpFaqPreview query={product.name} limit={5} />
-                <a className="crz-button crz-button--secondary crz-button--sm" href="/help">Pesquisar na Central de Ajuda</a>
-              </div>
-            )}
-          </Panel>
-        </section>
-
-        {relatedProducts.length > 0 && (
-          <section className="crz-product-related" aria-labelledby="related-title">
-            <SectionTitle icon={<NeonIcon name="featured" size={30} />} title="Você também pode gostar" description="Outros produtos ativos do catálogo real." />
-            <h2 id="related-title" className="sr-only">Produtos relacionados</h2>
-            <div className="crz-product-related__grid">
-              {relatedProducts.slice(0, 4).map((item) => {
-                const itemStock = getProductStock(item);
-                return (
-                  <a href={"/produto/" + item.slug} key={item.id}>
-                    <div className="crz-product-related__art">
-                      {item.image_url || item.game?.image_url ? <img src={item.image_url || item.game.image_url || ""} alt="" aria-hidden="true" /> : <NeonIcon name="gamepad" size={48} />}
-                    </div>
-                    <div>
-                      <small>{item.game?.name || "CRAZZY PROJECT"}</small>
-                      <strong>{item.name}</strong>
-                      <span>{itemStock.label}</span>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-          </section>
-        )}
       </div>
-
-      {zoomOpen && (
-        <div className="crz-product-zoom" role="dialog" aria-modal="true" aria-label="Imagem ampliada do produto" onClick={() => setZoomOpen(false)}>
-          <button type="button" onClick={() => setZoomOpen(false)} aria-label="Fechar zoom">×</button>
-          <div onClick={(event) => event.stopPropagation()}><ProductVisual product={product} media={activeMedia} /></div>
-        </div>
-      )}
     </main>
   );
 }
