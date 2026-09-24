@@ -261,7 +261,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
               <strong>Precisa de ajuda?</strong>
               <span>Abra um ticket com contexto da sua compra.</span>
             </div>
-            <span>Support Desk entra no M13</span>
+            <span>Abra um ticket para falar com nossa equipe.</span>
           </div>
         </aside>
 
@@ -298,7 +298,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                   {!activeProducts.length ? (
                     <div className="crz-hub-mini-empty">
                       <NeonIcon name="cube" size={30} />
-                      <span>Nenhum entitlement ativo ainda.</span>
+                      <span>Nenhum produto ativo ainda.</span>
                     </div>
                   ) : (
                     <div className="crz-hub-product-list">
@@ -384,7 +384,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
             <Panel className="crz-hub-panel">
               <header>
                 <div>
-                  <small>ENTITLEMENTS</small>
+                  <small>MEUS ACESSOS</small>
                   <h2>Meus produtos</h2>
                 </div>
                 <Badge tone="green">{activeProducts.length} ativos</Badge>
@@ -394,7 +394,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                 <EmptyState
                   icon={<NeonIcon name="cube" size={38} />}
                   title="Nenhum produto liberado"
-                  description="Após o fulfillment, seu direito de acesso aparece aqui automaticamente."
+                  description="Seus produtos e acessos aparecem aqui depois da confirmação da compra."
                   action={<a className="crz-button crz-button--primary crz-button--md" href="/produtos">Ver produtos</a>}
                 />
               ) : (
@@ -455,8 +455,8 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                             : "Acesso preservado pelo histórico do produto"}
                         </span>
                       </div>
-                      <button type="button" disabled title="Viewer protegido entra no M22">
-                        Viewer M22
+                      <button type="button" disabled title="Abrir conteúdo">
+                        Abrir
                       </button>
                     </article>
                   ))}
@@ -469,7 +469,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
             <Panel className="crz-hub-panel">
               <header>
                 <div>
-                  <small>FULFILLMENT</small>
+                  <small>ENTREGAS</small>
                   <h2>Entregas</h2>
                 </div>
                 <a href="/biblioteca">Abrir Biblioteca →</a>
@@ -585,7 +585,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                 {!snapshot.roleGrants.length ? (
                   <div className="crz-hub-mini-empty">
                     <NeonIcon name="community" size={30} />
-                    <span>Nenhum cargo de produto registrado ainda. O M44 Discord Bridge será o escritor desta fila.</span>
+                    <span>Nenhum cargo de produto disponível no momento.</span>
                   </div>
                 ) : (
                   <div className="crz-hub-role-list">
