@@ -50,6 +50,13 @@ function safeColor(value: unknown) {
   return COLOR_RE.test(normalized) ? normalized.toUpperCase() : null;
 }
 
+function safeAssetUrl(value: unknown) {
+  const normalized = nullableString(value, 1200);
+  if (!normalized) return null;
+  if (normalized.startsWith("/") || normalized.startsWith("https://")) return normalized;
+  return null;
+}
+
 function safeTutorialIds(value: unknown) {
   if (!Array.isArray(value)) return [];
   return [...new Set(value.map(String).filter((item) => UUID_RE.test(item)))].slice(0, 200);
@@ -132,6 +139,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "PRODUCT_CREATE_FAILED" }, { status: 400 });
     }
 
+    const createdId = cleanString((data as { id?: unknown })?.id, 36);
+    if (UUID_RE.test(createdId)) {
+      const { error: presentationError } = await supabase.rpc("save_product_manager_presentation", {
+        p_product_id: createdId,
+        p_description: nullableString(body?.description, 6000),
+        p_icon_url: safeAssetUrl(body?.iconUrl),
+        p_banner_url: safeAssetUrl(body?.bannerUrl),
+        p_hide_delivery_badge: Boolean(body?.hideDeliveryBadge),
+        p_auto_delivery: Boolean(body?.autoDelivery),
+      });
+
+      if (presentationError) {
+        return NextResponse.json(
+          { error: "PRODUCT_PRESENTATION_SAVE_FAILED", created: data },
+          { status: 400 }
+        );
+      }
+    }
+
     return NextResponse.json({ created: data }, { status: 201 });
   }
 
@@ -202,7 +228,23 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "PRODUCT_SAVE_FAILED" }, { status: 400 });
     }
 
-    return NextResponse.json({ saved: data });
+    const { data: presentation, error: presentationError } = await supabase.rpc(
+      "save_product_manager_presentation",
+      {
+        p_product_id: productId,
+        p_description: nullableString(product.description, 6000),
+        p_icon_url: safeAssetUrl(product.icon_url),
+        p_banner_url: safeAssetUrl(product.banner_url || product.image_url),
+        p_hide_delivery_badge: Boolean(product.hide_delivery_badge),
+        p_auto_delivery: product?.automation_flags?.auto_delivery === true,
+      }
+    );
+
+    if (presentationError) {
+      return NextResponse.json({ error: "PRODUCT_PRESENTATION_SAVE_FAILED" }, { status: 400 });
+    }
+
+    return NextResponse.json({ saved: data, presentation });
   }
 
   if (kind === "plan") {
