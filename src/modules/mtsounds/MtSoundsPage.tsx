@@ -36,9 +36,9 @@ export function MtSoundsPage() {
     </div>
     <section className="command-hero wrap">
       <div className="hero-copy reveal">
-        <span className="system-kicker"><Activity size={15}/> MTSOUND&apos;S / MTA:SA AUDIO</span>
-        <h1>SEU SERVIDOR.<br/><span>SEU SOM.</span></h1>
-        <p className="lead">Escolha a faixa, acerte o grave e deixe o servidor reconhecer sua presença antes mesmo do carro chegar.</p>
+        <span className="system-kicker"><Activity size={15}/> MTSOUND&apos;S • MTA & FIVEM AUDIO STUDIO</span>
+        <h1>EDITE SUA MÚSICA.<br/><span>USE NO SERVIDOR.</span></h1>
+        <p className="lead">Busque no YouTube ou YouTube Music, corte, personalize, aplique efeitos e exporte para MTA ou FiveM.</p>
         <div className="hero-quick-actions">
           <Link href="/mtsounds#buscar" className="btn-primary"><Search size={18}/> Escolher uma música</Link>
           <Link href="/mtsounds/editor" className="btn-ghost"><SlidersHorizontal size={18}/> Abrir Studio</Link>
@@ -49,13 +49,13 @@ export function MtSoundsPage() {
         <section className="master-module reveal delay-1">
           <div className="module-chrome" aria-hidden="true"/>
           <div className="vinyl-bay">
-            <span className="bay-label">VINYL REACTOR / LIVE</span>
+            <span className="bay-label">EDIÇÃO / PREVIEW</span>
             <ReactiveVinyl />
           </div>
           <div className="master-copy">
-            <div className="live-monitor"><span className="monitor-bars"><i/><i/><i/><i/></span> VINYL REACTOR</div>
-            <h2>O SOM BATE.<br/>O VINIL RESPONDE.</h2>
-            <p>Ritmo, grave e FX ganham movimento em tempo real. O visual acompanha a faixa sem tirar você da experiência.</p>
+            <div className="live-monitor"><span className="monitor-bars"><i/><i/><i/><i/></span> MTS STUDIO</div>
+            <h2>ESCOLHA. EDITE.<br/>EXPORTE.</h2>
+            <p>Transforme a faixa para o seu servidor em um fluxo simples: prévia, corte, efeitos e exportação.</p>
             <Link href="/mtsounds/editor" className="btn-primary"><SlidersHorizontal size={18}/> Abrir MTS Studio</Link>
           </div>
         </section>
@@ -73,10 +73,10 @@ export function MtSoundsPage() {
       </div>
 
       <div className="spec-grid">
-        <div><Search/><span><small>BUSCA</small><b>YOUTUBE</b><em>Encontre e teste a faixa</em></span></div>
-        <div><Waves/><span><small>FX LIVE</small><b>BASS + ECHO</b><em>Reverb, filtro e distorção</em></span></div>
-        <div><Gauge/><span><small>EXPORT</small><b>WAV + INTRO</b><em>Arquivo final no navegador</em></span></div>
-        <div><Radio/><span><small>MTA:SA</small><b>SUA IDENTIDADE</b><em>Som com a cara do projeto</em></span></div>
+        <div><Search/><span><small>BUSCA</small><b>YOUTUBE + MUSIC</b><em>Encontre a faixa</em></span></div>
+        <div><Waves/><span><small>EDIÇÃO</small><b>CORTE + FX</b><em>Personalize o áudio</em></span></div>
+        <div><Gauge/><span><small>EXPORTAÇÃO</small><b>WAV</b><em>Arquivo pronto para usar</em></span></div>
+        <div><Radio/><span><small>MTA + FIVEM</small><b>PRONTO PRO SERVIDOR</b><em>Edite e use no projeto</em></span></div>
       </div>
     </section>
 
@@ -86,8 +86,8 @@ export function MtSoundsPage() {
       <div className="studio-cta-glow" aria-hidden="true"/>
       <div>
         <span className="eyebrow"><Sparkles size={14}/> MTSOUND&apos;S STUDIO</span>
-        <h2>Achou a faixa?<br/>Agora deixa ela <span>com a sua cara.</span></h2>
-        <p>Corte o trecho, ajuste o peso do grave, aplique FX e exporte a versão final com a assinatura MTSound&apos;s.</p>
+        <h2>Do YouTube<br/><span>pro seu servidor.</span></h2>
+        <p>Abra no Studio, personalize o áudio e exporte a versão final para MTA ou FiveM.</p>
       </div>
       <Link href="/mtsounds/editor"><SlidersHorizontal size={18}/> Entrar no Studio <ArrowUpRight size={17}/></Link>
     </section>
