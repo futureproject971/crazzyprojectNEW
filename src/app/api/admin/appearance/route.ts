@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     brand_name: text(body?.brandName, "CRAZZY PROJECT", 60),
     tagline: text(body?.tagline, "QUEM NAO XITA NAO BRILHA", 120),
     logo_hero_url: asset(body?.logoHeroUrl, "/brand/crazzy-logo-hero.png"),
-    logo_navbar_url: asset(body?.logoNavbarUrl, "/brand/crazzy-logo-navbar.png"),
+    logo_navbar_url: asset(body?.logoNavbarUrl, "/brand/crazzy-logo-hero.png"),
     favicon_url: asset(body?.faviconUrl, "/favicon.ico"),
     site_wallpaper_url: asset(body?.siteWallpaperUrl, ""),
     hero_cover_url: asset(body?.heroCoverUrl, "/backgrounds/hero-tokyo.webp"),
