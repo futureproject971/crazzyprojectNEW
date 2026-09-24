@@ -223,7 +223,7 @@ export function RewardsPage() {
               <div className="crz-rewards-state">
                 <NeonIcon name="crown" size={34} />
                 <strong>Nenhuma missão ativa agora</strong>
-                <p>Quando uma campanha for publicada, ela aparece aqui automaticamente.</p>
+                <p>Novas missões e recompensas aparecerão aqui quando estiverem disponíveis.</p>
               </div>
             ) : (
               <div className="crz-rewards-cards">
