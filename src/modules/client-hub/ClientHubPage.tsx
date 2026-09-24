@@ -339,12 +339,12 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                       <strong>{snapshot.discord.username || "Discord não conectado"}</strong>
                       <span>
                         {!snapshot.discord.connected
-                          ? "Conecte para sincronizar identidade e cargos."
+                          ? "Conecte seu Discord para usar seus cargos e benefícios."
                           : !snapshot.discord.guildConfigured
-                            ? "Servidor oficial ainda não configurado."
+                            ? "Discord conectado."
                             : snapshot.discord.guildMember
-                              ? "Membro do servidor oficial verificado."
-                              : "Conta conectada, fora do servidor no último sync."}
+                              ? "Você está no servidor oficial."
+                              : "Entre no servidor oficial para liberar os benefícios da comunidade."}
                       </span>
                     </div>
                   </div>
@@ -508,7 +508,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
 
               <div className="crz-hub-sensitive-note">
                 <NeonIcon name="shield" size={23} />
-                <span>Conteúdo sensível nunca é retornado pelo Client Hub. Use a CRAZZY LIBRARY para revelar ou copiar com auditoria.</span>
+                <span>Abra a CRAZZY LIBRARY para visualizar e copiar suas entregas com segurança.</span>
               </div>
             </Panel>
           )}
@@ -518,7 +518,7 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
               <Panel className="crz-hub-panel">
                 <header>
                   <div>
-                    <small>DISCORD SYNC</small>
+                    <small>DISCORD</small>
                     <h2>Conta conectada</h2>
                   </div>
                   <Badge tone={snapshot.discord.connected ? "green" : "neutral"}>
@@ -539,13 +539,13 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                     <span>
                       {snapshot.discord.lastCheckedAt
                         ? "Última verificação: " + date(snapshot.discord.lastCheckedAt)
-                        : "Aguardando primeira sincronização"}
+                        : "Aguardando confirmação do Discord"}
                     </span>
                     {snapshot.discord.guildConfigured && (
                       <small>
                         {snapshot.discord.guildMember
                           ? "✓ Membro do servidor oficial"
-                          : "Servidor configurado • membership não confirmado"}
+                          : "Entre no servidor oficial para confirmar sua participação"}
                       </small>
                     )}
                   </div>
