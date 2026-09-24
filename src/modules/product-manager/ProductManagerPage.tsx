@@ -331,6 +331,11 @@ export function ProductManagerPage() {
           emoji: newProduct.emoji,
           accentColor: newProduct.accentColor,
           createDefaultPlans: newProduct.createDefaultPlans,
+          description: newProduct.description,
+          iconUrl: newProduct.iconUrl,
+          bannerUrl: newProduct.bannerUrl,
+          autoDelivery: newProduct.autoDelivery,
+          hideDeliveryBadge: newProduct.hideDeliveryBadge,
         }),
       });
       const payload = await response.json().catch(() => ({}));
@@ -338,12 +343,17 @@ export function ProductManagerPage() {
 
       const createdId = String(payload.created.id);
       setCreatingProduct(false);
-      setNewProduct(current => ({ ...current, name: "" }));
+      setNewProduct(current => ({
+        ...current,
+        name: "",
+        description: "",
+        iconUrl: "",
+        bannerUrl: "",
+      }));
       await load(true, createdId, null);
-      setNotice("Produto criado desativado. Agora configure imagem, descrição, preços e estoque.");
-      window.requestAnimationFrame(() => {
-        document.getElementById("pm-editor")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+      setEditorTab("fields");
+      setEditorOpen(true);
+      setNotice("Produto criado. Agora adicione as variações, preços e estoque.");
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Falha ao criar produto.");
     } finally {
