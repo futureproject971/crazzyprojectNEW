@@ -1,12 +1,26 @@
 const { readFile } = await import("node:fs/promises");
 
 const middleware = await readFile("src/lib/supabase/middleware.ts", "utf8");
-for (const required of ['"/call"','"/admin"',"discord_identities","guild_member"]) {
+for (const required of [
+  '"/call"',
+  '"/admin"',
+  '"/api/client-hub"',
+  '"/api/library"',
+  '"/api/profile"',
+  '"/api/support"',
+  '"/api/reviews/eligible"',
+  '"/api/academy/progress"',
+  'pathname === "/api/luck"',
+  'pathname === "/api/rewards"',
+  'pathname === "/api/reviews"',
+  "discord_identities",
+  "guild_member",
+]) {
   if (!middleware.includes(required)) {
     throw new Error("Discord-only middleware gate missing " + required);
   }
 }
-console.log("[PASS] private routes require authenticated Discord guild membership");
+console.log("[PASS] private pages and authenticated APIs require Discord guild membership");
 
 const provider = await readFile("src/modules/auth/AuthProvider.tsx", "utf8");
 for (const required of [
