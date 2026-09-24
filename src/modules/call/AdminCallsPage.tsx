@@ -76,7 +76,10 @@ export function AdminCallsPage() {
           eyebrow="ADMIN • CRAZZY CALL"
           title="Salas e moderação"
           description="Supervisão transparente de metadados das salas. O painel não acessa áudio ou vídeo ocultamente."
-          actions={<button className="crz-button crz-button--secondary crz-button--sm" type="button" onClick={() => void load()}>↻ Atualizar</button>}
+          actions={<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            <a className="crz-button crz-button--primary crz-button--sm" href="/call">+ Criar / entrar em uma CALL</a>
+            <button className="crz-button crz-button--secondary crz-button--sm" type="button" onClick={() => void load()}>↻ Atualizar</button>
+          </div>}
         />
 
         <section className="crz-call-admin__summary">
