@@ -42,17 +42,22 @@ for (const required of [
   "if(data.info===0)next()",
   "picture-in-picture",
   "• PIP",
+  "crz:mtsounds:position:v1",
+  "getCurrentTime",
+  "seekTo",
 ]) {
   if (!globalPlayer.includes(required)) throw new Error("M46 persistent music player missing " + required);
 }
 for (const required of ["position:fixed","crz-global-music__drawer","crz-global-music__video"]) {
   if (!globalPlayerStyles.includes(required)) throw new Error("M46 site PiP styling missing " + required);
 }
-for (const required of ["music.youtube.com","youtube-music","Tocar no site","globalPlayer.enqueue","globalPlayer.addToPlaylist"]) {
+for (const required of ["music.youtube.com","youtube-music","Tocar no site","globalPlayer.enqueue","globalPlayer.addToPlaylist","https://y2meta.is/pt93/youtube-to-mp3/"]) {
   if (!search.includes(required)) throw new Error("M46 YouTube/queue integration missing " + required);
 }
 for (const forbidden of ["Play faz girar","Pause segura o ângulo","REAGE AO PLAYER","O SOM BATE.","O VINIL RESPONDE."]) {
   if (page.includes(forbidden)) throw new Error("M46 literal/technical marketing copy returned: " + forbidden);
 }
 
-console.log("[PASS] M46 MTSOUNDS is native, persistent, queue-enabled and copy-hardened");
+const bridge = await readFile("src/core/navigation/InternalNavigationBridge.tsx", "utf8");
+if (!bridge.includes("router.push") || !bridge.includes("a[href]")) throw new Error("M46 global route persistence bridge missing");
+console.log("[PASS] M46 MTSOUNDS is native, route-persistent, position-restoring and Y2Meta-linked");

@@ -1062,3 +1062,7 @@ html[data-theme="light"] .crz-shell-auth img {
 .crz-shell-nav__item.is-mtsounds:hover,.crz-shell-nav__item.is-mtsounds.is-active{border-color:rgba(35,146,255,.62);background:linear-gradient(180deg,rgba(0,92,255,.27),rgba(0,29,78,.16));box-shadow:0 0 24px rgba(0,93,255,.18)}
 .crz-shell-mobile-link.is-mtsounds{border-color:rgba(0,112,255,.32);background:linear-gradient(180deg,rgba(0,73,255,.16),rgba(0,22,64,.08))}
 .crz-shell-auth--discord{min-width:138px;border-color:rgba(88,101,242,.34);background:linear-gradient(180deg,rgba(88,101,242,.12),rgba(7,15,28,.88))}
+
+
+.crz-shell-auth--ticket{border-color:rgba(66,145,255,.28);background:rgba(8,28,55,.82)}
+.crz-shell-auth--ticket:hover{border-color:rgba(73,157,255,.55);background:rgba(10,54,104,.72)}

@@ -82,54 +82,8 @@ export async function calculateServerTotal(
       return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: `Quantidade inválida. Máximo ${MAX_ITEM_QUANTITY} por item.` };
     }
     const qty = qtyRaw;
-    const isLuckPlay = rawItem.type === "luck-play";
-
-    if (isLuckPlay) {
-      if (cartItems.length !== 1 || qty !== 1 || couponId) {
-        return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Jogada CRAZZY LUCK deve ser cobrada separadamente e sem cupom." };
-      }
-
-      const campaignSlug = String(rawItem.campaignSlug || "").trim().toLowerCase();
-      if (!/^[a-z0-9][a-z0-9-]{1,79}$/.test(campaignSlug)) {
-        return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Campanha CRAZZY LUCK inválida." };
-      }
-
-      const { data: campaign, error: campaignError } = await supabaseAdmin
-        .from("luck_campaigns")
-        .select("id,slug,title,active,play_price_cents,starts_at,ends_at")
-        .eq("slug", campaignSlug)
-        .eq("active", true)
-        .maybeSingle();
-
-      const now = Date.now();
-      if (
-        campaignError ||
-        !campaign ||
-        (campaign.starts_at && new Date(campaign.starts_at).getTime() > now) ||
-        (campaign.ends_at && new Date(campaign.ends_at).getTime() <= now)
-      ) {
-        return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Campanha CRAZZY LUCK indisponível." };
-      }
-
-      const unitPriceCents = Math.round(Number(campaign.play_price_cents || 0));
-      if (!Number.isFinite(unitPriceCents) || unitPriceCents <= 0) {
-        return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Esta campanha não possui jogada paga disponível." };
-      }
-
-      subtotal += unitPriceCents;
-      cartSnapshot.push({
-        productId: "luck:" + campaign.id,
-        planId: "luck-play",
-        quantity: 1,
-        type: "luck-play",
-        campaignSlug: campaign.slug,
-        productName: campaign.title,
-        productImage: null,
-        planName: "Jogada CRAZZY LUCK",
-        price: unitPriceCents / 100,
-        resellerDiscountPercent: 0,
-      });
-      continue;
+    if (rawItem.type === "luck-play") {
+      return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Jogadas do CRAZZY ARCADE usam somente CRAZZY BONUS." };
     }
 
     const isLztAccount = rawItem.type === "lzt-account" || rawItem.planId === "lzt-account" || (rawItem.planId || "").startsWith("lzt-");
@@ -301,7 +255,7 @@ export async function calculateServerTotal(
   if (couponId) {
     const { data: coupon, error: couponError } = await supabaseAdmin
       .from("coupons")
-      .select("id, active, expires_at, max_uses, current_uses, min_order_value, discount_type, discount_value")
+      .select("id, active, expires_at, max_uses, current_uses, min_order_value, discount_type, discount_value, origin, metadata")
       .eq("id", couponId)
       .eq("active", true)
       .maybeSingle();
@@ -347,6 +301,20 @@ export async function calculateServerTotal(
         return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Cupom não aplicável aos produtos deste carrinho" };
       }
     }
+    const allowedPlanId = coupon?.metadata?.allowed_plan_id ? String(coupon.metadata.allowed_plan_id) : "";
+    if (allowedPlanId) {
+      const planBaseCents = cartSnapshot.reduce((sum, item) => {
+        if (String(item.planId || "") !== allowedPlanId) return sum;
+        const unitCents = Math.round(Number(item.price || 0) * 100);
+        const quantity = Math.max(1, Number(item.quantity || 1));
+        return sum + (Number.isFinite(unitCents) ? unitCents * quantity : 0);
+      }, 0);
+      couponBaseCents = Math.min(couponBaseCents, planBaseCents);
+      if (couponBaseCents <= 0) {
+        return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Este CRAZZY BONUS só vale para o plano selecionado" };
+      }
+    }
+
     if (usage?.length) {
       return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Cupom já utilizado" };
     }
@@ -576,6 +544,17 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
       // the fulfillment pipeline. In that case, never duplicate messages, reseller
       // accounting or any other side effect.
       if (!deliveryCreated) continue;
+
+      const { error: bonusGrantError } = await supabaseAdmin.rpc("grant_purchase_bonus", {
+        p_user_id: payment.user_id,
+        p_plan_id: item.planId,
+        p_payment_id: payment.id,
+        p_item_index: itemIndex,
+        p_unit_index: i,
+      });
+      if (bonusGrantError) {
+        console.warn("[checkout] CRAZZY BONUS grant skipped", bonusGrantError.message || bonusGrantError);
+      }
 
       if (stockId) {
         await supabaseAdmin.from("ticket_messages").insert({
