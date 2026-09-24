@@ -39,6 +39,10 @@ for (const required of [
   "crz-pm-create-dialog",
   "await load(true, createdId, null)",
   "await load(true, productDraft.id, createdPlanId)",
+  "Venda por plano, estoque por plano",
+  "+ Criar primeiro plano",
+  "Adicionar ao estoque deste plano",
+  'id="pm-planos-rapido"',
 ]) {
   if (!productManager.includes(required)) {
     throw new Error("Product Manager per-plan stock UX missing: " + required);
@@ -77,6 +81,9 @@ for (const required of [
   ".crz-pm-overview__stock.is-out",
   ".crz-pm-create-dialog",
   ".crz-pm-create-dialog__flow",
+  ".crz-pm-plan-quick",
+  ".crz-pm-plan-quick__stock",
+  ".crz-pm-plan-quick__creator",
 ]) {
   if (!productStyles.includes(required)) {
     throw new Error("Product Manager visual style missing: " + required);
