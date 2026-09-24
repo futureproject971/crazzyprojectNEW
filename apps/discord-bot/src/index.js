@@ -34,6 +34,40 @@ const client = new Client({
 
 installCommandHandlers(client, supabase, config);
 
+async function syncGuildMembership(member, guildMember) {
+  if (!member?.guild || member.guild.id !== config.guildId) return;
+
+  const now = new Date().toISOString();
+  const payload = {
+    guild_id: config.guildId,
+    guild_member: guildMember,
+    guild_verified_at: guildMember ? now : null,
+    last_checked_at: now,
+    updated_at: now,
+  };
+
+  const { error } = await supabase
+    .from("discord_identities")
+    .update(payload)
+    .eq("discord_user_id", String(member.id));
+
+  if (error) {
+    console.error(
+      "[guild-membership] failed to sync Discord member state:",
+      member.id,
+      error.code || error.message,
+    );
+  }
+}
+
+client.on("guildMemberAdd", (member) => {
+  void syncGuildMembership(member, true);
+});
+
+client.on("guildMemberRemove", (member) => {
+  void syncGuildMembership(member, false);
+});
+
 let stopCampaigns = null;
 let stopBuilder = null;
 let stopRoleBridge = null;
