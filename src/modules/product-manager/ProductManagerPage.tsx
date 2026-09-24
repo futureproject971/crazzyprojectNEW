@@ -1084,7 +1084,7 @@ export function ProductManagerPage() {
                           disabled={imageUploading}
                           onChange={event => {
                             const file = event.target.files?.[0];
-                            if (file) void uploadProductImage(file);
+                            if (file) void uploadProductAsset(file, "banner", "edit");
                             event.currentTarget.value = "";
                           }}
                         />
