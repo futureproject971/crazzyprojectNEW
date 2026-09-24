@@ -839,17 +839,6 @@ export function ProductManagerPage() {
                     </button>
                   </section>
 
-                  <button
-                    type="button"
-                    className={"crz-purin-default-plans " + (newProduct.createDefaultPlans ? "is-on" : "")}
-                    onClick={() => setNewProduct({...newProduct,createDefaultPlans:!newProduct.createDefaultPlans})}
-                  >
-                    <i />
-                    <span>
-                      <strong>Criar variações padrão automaticamente</strong>
-                      <small>1 dia, 3 dias, 7 dias, 15 dias, 30 dias, 90 dias e Lifetime.</small>
-                    </span>
-                  </button>
                 </section>
               </div>
             </section>
