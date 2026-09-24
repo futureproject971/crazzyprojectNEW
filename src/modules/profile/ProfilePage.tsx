@@ -375,7 +375,7 @@ export function ProfilePage() {
                     <option value="crazzy">Conta CRAZZY</option>
                     <option value="discord">Discord</option>
                   </select>
-                  <small>O fallback é automático quando uma fonte não possui avatar.</small>
+                  <small>Se uma opção não tiver foto, usamos sua outra imagem disponível.</small>
                 </label>
 
                 <Button
