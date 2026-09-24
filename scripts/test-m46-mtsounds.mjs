@@ -7,7 +7,7 @@ const downloader = await readFile("src/app/api/mtsounds/native/downloader/route.
 for (const required of ["./native/MusicSearch","./native/ReactiveVinyl","/mtsounds/editor","MTSOUND"]) if(!page.includes(required)) throw new Error("M46 native home missing "+required);
 if(page.includes("<iframe")||page.includes("mtsounds.vercel.app")) throw new Error("M46 main experience must no longer depend on external app iframe");
 for (const required of ["OfflineAudioContext","INTRO_MP3_BASE64","exportFinal","Bass Boost","Grave Estourado"]) if(!editor.includes(required)) throw new Error("M46 native editor missing "+required);
-for (const required of ["/api/mtsounds/native/youtube/search","/api/mtsounds/native/downloader","ReactiveVinyl"]) if(!search.includes(required)) throw new Error("M46 native search missing "+required);
+for (const required of ["/api/mtsounds/native/youtube/search","ReactiveVinyl","https://y2meta.is/pt93/youtube-to-mp3/"]) if(!search.includes(required)) throw new Error("M46 native search missing "+required);
 if(!youtube.includes("youtube.com/results")||!downloader.includes("isYouTubeUrl")) throw new Error("M46 native backend routes are incomplete");
 const vinyl = await readFile("src/modules/mtsounds/native/ReactiveVinyl.tsx", "utf8");
 for (const required of ["/mtsounds/assets/mtsounds-vinyl-full.webp","vinyl-fallback","onError","vinyl-disc-shell"]) {
