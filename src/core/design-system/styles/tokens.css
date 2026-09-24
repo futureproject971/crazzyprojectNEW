@@ -1,33 +1,33 @@
 :root {
   /* CRAZZY PROJECT — M00 core tokens */
-  --crz-color-black: #040a0f;
-  --crz-color-navy-950: #07111b;
-  --crz-color-navy-900: #0b1726;
-  --crz-color-navy-850: #0e1c2d;
+  --crz-color-black: #07101a;
+  --crz-color-navy-950: #0b1624;
+  --crz-color-navy-900: #111f31;
+  --crz-color-navy-850: #17283d;
   --crz-color-line: color-mix(in srgb, var(--crz-color-blue) 28%, transparent);
   --crz-color-line-strong: color-mix(in srgb, var(--crz-color-blue) 56%, #5fd4ff 18%, transparent);
   --crz-color-text: #ffffff;
-  --crz-color-text-soft: #d8e1ec;
-  --crz-color-muted: #8e9bad;
-  --crz-color-blue: #0000ff;
+  --crz-color-text-soft: #e3ebf5;
+  --crz-color-muted: #a8b5c6;
+  --crz-color-blue: #1f6fff;
   --crz-color-blue-2: color-mix(in srgb, var(--crz-color-blue) 68%, #00baff 32%);
-  --crz-color-cyan: #00d7ff;
+  --crz-color-cyan: #32d9ff;
   --crz-color-magenta: #ff2f9b;
   --crz-color-green: #18e59a;
   --crz-color-gold: #ffc33d;
   --crz-color-danger: #ff4d67;
 
   --crz-gradient-brand: linear-gradient(180deg, color-mix(in srgb, var(--crz-color-blue) 68%, #59c9ff 32%) 0%, color-mix(in srgb, var(--crz-color-blue) 84%, #00143d 16%) 100%);
-  --crz-gradient-panel: linear-gradient(180deg, rgba(13, 24, 44, 0.96), rgba(4, 10, 20, 0.96));
-  --crz-gradient-panel-soft: linear-gradient(180deg, rgba(11, 23, 38, 0.92), rgba(6, 13, 24, 0.92));
+  --crz-gradient-panel: linear-gradient(180deg, rgba(18, 33, 54, 0.97), rgba(9, 19, 32, 0.98));
+  --crz-gradient-panel-soft: linear-gradient(180deg, rgba(15, 29, 47, 0.95), rgba(8, 18, 31, 0.96));
   --crz-gradient-card:
     radial-gradient(125% 115% at 14% -8%, rgba(37, 125, 255, .17) 0%, rgba(14, 49, 88, .07) 38%, transparent 61%),
     radial-gradient(92% 88% at 104% 108%, rgba(0, 173, 255, .065) 0%, transparent 58%),
-    linear-gradient(145deg, rgba(11, 24, 41, .985) 0%, rgba(6, 14, 26, .992) 54%, rgba(3, 9, 18, .998) 100%);
+    linear-gradient(145deg, rgba(15, 29, 48, .985) 0%, rgba(10, 20, 34, .992) 54%, rgba(7, 15, 26, .998) 100%);
   --crz-gradient-card-soft:
     radial-gradient(120% 105% at 12% -10%, rgba(34, 118, 255, .12), transparent 58%),
     radial-gradient(80% 75% at 100% 100%, rgba(0, 173, 255, .045), transparent 62%),
-    linear-gradient(145deg, rgba(10, 22, 38, .94), rgba(4, 11, 21, .97));
+    linear-gradient(145deg, rgba(15, 29, 47, .96), rgba(8, 18, 31, .98));
   --crz-card-border: color-mix(in srgb, var(--crz-color-blue) 24%, #72cfff 12%, transparent);
   --crz-card-border-hover: color-mix(in srgb, var(--crz-color-blue) 52%, #5fd4ff 18%, transparent);
   --crz-card-shadow:
