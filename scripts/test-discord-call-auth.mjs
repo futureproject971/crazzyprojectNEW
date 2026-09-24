@@ -68,6 +68,8 @@ for (const required of [
   "CRAZZY_OWNER_DISCORD_ID",
   'role: "admin"',
   "ownerMatch",
+  "officialGuildOwner",
+  "officialGuild?.owner === true",
 ]) {
   if (!sync.includes(required)) {
     throw new Error("Discord sync function missing " + required);
