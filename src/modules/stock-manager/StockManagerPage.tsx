@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Badge, NeonIcon, PageHeader } from "@/core/design-system";
 import type {
   StockManagerCatalog,
@@ -47,6 +48,10 @@ const stockFilters = [
 ] as const;
 
 export function StockManagerPage() {
+  const searchParams = useSearchParams();
+  const requestedPlanId = String(searchParams.get("planId") || "").trim();
+  const requestedRestock = searchParams.get("repor") === "1";
+
   const [catalog, setCatalog] = useState<StockManagerCatalog | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "auth" | "forbidden" | "error">("loading");
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
@@ -77,10 +82,15 @@ export function StockManagerPage() {
       setCatalog(next);
 
       const nextPlan =
+        next.plans.find((plan) => plan.plan_id === requestedPlanId) ||
         next.plans.find((plan) => plan.plan_id === (preserve ? selectedPlanId : null)) ||
         next.plans[0] ||
         null;
       setSelectedPlanId(nextPlan?.plan_id || null);
+      if (requestedRestock && nextPlan?.plan_id) {
+        setShowImport(true);
+        setImportSource("reposicao");
+      }
       setState("ready");
     } catch {
       setState("error");
@@ -279,8 +289,8 @@ export function StockManagerPage() {
       <div className="crz-container crz-stock-container">
         <PageHeader
           eyebrow="M27 • CRAZZY STOCK"
-          title="Estoque seguro por produto e plano"
-          description="Importe keys em lote, acompanhe disponibilidade, reservas e consumo sem expor o conteúdo completo na interface."
+          title="Estoque de keys por variação"
+          description="Cada plano/variação tem o próprio stock. Selecione a variação, reponha keys e acompanhe disponíveis, reservadas, usadas e desativadas."
           actions={
             <a className="crz-button crz-button--secondary crz-button--sm" href="/admin/produtos">
               Product Manager
@@ -303,6 +313,11 @@ export function StockManagerPage() {
               <span>⌕</span>
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar produto/plano..." />
             </label>
+
+            <div className="crz-stock-plan-list__label">
+              <span>VARIAÇÕES / PLANOS</span>
+              <small>Cada variação tem stock separado</small>
+            </div>
 
             <div className="crz-stock-plan-list">
               {filteredPlans.map((plan) => (
@@ -339,10 +354,13 @@ export function StockManagerPage() {
                   </div>
                   <button
                     type="button"
-                    className="crz-button crz-button--primary crz-button--sm"
-                    onClick={() => setShowImport((value) => !value)}
+                    className="crz-button crz-button--primary crz-button--sm crz-stock-restock-button"
+                    onClick={() => {
+                      setImportSource("reposicao");
+                      setShowImport((value) => !value);
+                    }}
                   >
-                    {showImport ? "Fechar importação" : "+ Importar keys"}
+                    {showImport ? "FECHAR REPOSIÇÃO" : "+ REPOR STOCK DESTA VARIAÇÃO"}
                   </button>
                 </header>
 
@@ -358,8 +376,8 @@ export function StockManagerPage() {
                   <section className="crz-stock-import">
                     <header>
                       <div>
-                        <small>IMPORTAÇÃO EM LOTE</small>
-                        <strong>Uma key/credencial por linha</strong>
+                        <small>REPOSIÇÃO DE STOCK • {selectedPlan.plan_name}</small>
+                        <strong>Cole as keys desta variação, uma por linha</strong>
                       </div>
                       <Badge tone={importItems.length > 5000 ? "pink" : "blue"}>
                         {importItems.length} linha(s)
