@@ -448,8 +448,12 @@ export function ProductManagerPage() {
     }
   };
 
-  const uploadProductImage = async (file: File) => {
-    if (!productDraft || imageUploading) return;
+  const uploadProductAsset = async (
+    file: File,
+    target: "icon" | "banner",
+    mode: "create" | "edit"
+  ) => {
+    if (imageUploading) return;
 
     setImageUploading(true);
     setNotice("");
@@ -457,6 +461,7 @@ export function ProductManagerPage() {
     try {
       const form = new FormData();
       form.append("file", file);
+      form.append("kind", target);
 
       const response = await fetch("/api/admin/products/upload", {
         method: "POST",
@@ -468,8 +473,22 @@ export function ProductManagerPage() {
         throw new Error(payload?.error || "Falha ao enviar imagem.");
       }
 
-      setProductDraft(current => current ? { ...current, image_url: String(payload.url) } : current);
-      setNotice("Imagem enviada. Clique em Salvar produto para publicar.");
+      const url = String(payload.url);
+      if (mode === "create") {
+        setNewProduct(current =>
+          target === "icon"
+            ? { ...current, iconUrl: url }
+            : { ...current, bannerUrl: url }
+        );
+      } else {
+        setProductDraft(current => {
+          if (!current) return current;
+          if (target === "icon") return { ...current, icon_url: url };
+          return { ...current, banner_url: url, image_url: url };
+        });
+      }
+
+      setNotice(target === "icon" ? "Ícone enviado." : "Banner enviado.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Falha ao enviar imagem.");
     } finally {
