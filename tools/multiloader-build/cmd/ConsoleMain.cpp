@@ -1,0 +1,47 @@
+#include "core/AppPaths.h"
+#include "core/Logger.h"
+#include "platform/Admin.h"
+#include "platform/ProcessLauncher.h"
+#include "platform/Utf.h"
+#include "services/HttpApiClient.h"
+#include "services/MockApiClient.h"
+#include <windows.h>
+#include <dwmapi.h>
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <filesystem>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
+
+namespace {
+using crazzy::Product;
+constexpr int kWidth=104,kHeight=34,kFirstProductRow=10,kRowsPerProduct=4;
+std::wstring Env(const wchar_t*n){wchar_t*r=nullptr;size_t l=0;_wdupenv_s(&r,&l,n);if(!r)return{};std::wstring v(r);free(r);return v;}
+void C(const wchar_t*s){std::wcout<<L"\x1b["<<s<<L"m";} void Reset(){C(L"0");}
+void Blue(){C(L"38;2;40;120;255");} void Cyan(){C(L"38;2;60;210;255");} void White(){C(L"38;2;240;245;255");}
+void Muted(){C(L"38;2;125;148;190");} void Green(){C(L"38;2;75;235;165");} void Yellow(){C(L"38;2;255;190;65");}
+void Red(){C(L"38;2;255;90;90");} void Sel(){C(L"48;2;12;56;160");}
+std::wstring Rep(wchar_t c,int n){return std::wstring((std::max)(0,n),c);}
+std::wstring Fit(const std::wstring&t,int w){if(w<=0)return{};if((int)t.size()<=w)return t+Rep(L' ',w-(int)t.size());if(w<=3)return t.substr(0,w);return t.substr(0,w-3)+L"...";}
+std::wstring Mask(const std::wstring&k){if(k.size()<=8)return L"********";return k.substr(0,4)+L"-****-****-"+k.substr(k.size()-4);}
+bool Clipboard(const std::wstring&v){if(!OpenClipboard(nullptr))return false;EmptyClipboard();size_t b=(v.size()+1)*sizeof(wchar_t);HGLOBAL m=GlobalAlloc(GMEM_MOVEABLE,b);if(!m){CloseClipboard();return false;}void*p=GlobalLock(m);memcpy(p,v.c_str(),b);GlobalUnlock(m);if(!SetClipboardData(CF_UNICODETEXT,m)){GlobalFree(m);CloseClipboard();return false;}CloseClipboard();return true;}
+void Terminal(){SetConsoleOutputCP(CP_UTF8);SetConsoleCP(CP_UTF8);HANDLE o=GetStdHandle(STD_OUTPUT_HANDLE);DWORD om=0;GetConsoleMode(o,&om);SetConsoleMode(o,om|ENABLE_VIRTUAL_TERMINAL_PROCESSING|DISABLE_NEWLINE_AUTO_RETURN);HANDLE i=GetStdHandle(STD_INPUT_HANDLE);DWORD im=0;GetConsoleMode(i,&im);im|=ENABLE_EXTENDED_FLAGS|ENABLE_WINDOW_INPUT|ENABLE_MOUSE_INPUT;im&=~ENABLE_QUICK_EDIT_MODE;SetConsoleMode(i,im);CONSOLE_CURSOR_INFO ci{1,FALSE};SetConsoleCursorInfo(o,&ci);}
+void Window(){SetConsoleTitleW(L"CRAZZY MULTILOADER");HANDLE o=GetStdHandle(STD_OUTPUT_HANDLE);SMALL_RECT sr{0,0,(SHORT)(kWidth-1),(SHORT)(kHeight-1)};SetConsoleWindowInfo(o,TRUE,&sr);COORD bs{(SHORT)kWidth,(SHORT)kHeight};SetConsoleScreenBufferSize(o,bs);HWND h=GetConsoleWindow();if(!h)return;LONG_PTR st=GetWindowLongPtrW(h,GWL_STYLE);st&=~(WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX|WS_MAXIMIZEBOX);st|=WS_THICKFRAME;SetWindowLongPtrW(h,GWL_STYLE,st);SetWindowPos(h,nullptr,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED);BOOL dark=TRUE;DwmSetWindowAttribute(h,20,&dark,sizeof(dark));int corner=2;DwmSetWindowAttribute(h,33,&corner,sizeof(corner));RECT r{};GetWindowRect(h,&r);int sw=GetSystemMetrics(SM_CXSCREEN),sh=GetSystemMetrics(SM_CYSCREEN);SetWindowPos(h,nullptr,(sw-(r.right-r.left))/2,(sh-(r.bottom-r.top))/2,0,0,SWP_NOSIZE|SWP_NOZORDER);}
+void Clear(){std::wcout<<L"\x1b[2J\x1b[H";}
+void Top(){Blue();std::wcout<<L"╭"<<Rep(L'─',kWidth-2)<<L"╮\n";Reset();}
+void Bottom(){Blue();std::wcout<<L"╰"<<Rep(L'─',kWidth-2)<<L"╯";Reset();}
+void Rule(){Blue();std::wcout<<L"├"<<Rep(L'─',kWidth-2)<<L"┤\n";Reset();}
+void Line(const std::wstring&t=L""){Blue();std::wcout<<L"│";Reset();std::wcout<<Fit(t,kWidth-2);Blue();std::wcout<<L"│\n";Reset();}
+void Header(const std::wstring&source){Top();Blue();std::wcout<<L"│  CRAZZY";White();std::wcout<<L" PROJECT";Muted();std::wcout<<L"  //  MULTILOADER CMD";std::wstring r=L"v0.1 CMD";int used=2+6+8+17,sp=(std::max)(1,kWidth-2-used-(int)r.size());std::wcout<<Rep(L' ',sp)<<r;Blue();std::wcout<<L" │\n";Reset();Line(L"  Login  •  Produtos adquiridos  •  Keys  •  Iniciar");Line(L"  Fonte: "+source);Rule();}
+std::wstring Status(const Product&p){if(p.revoked)return L"REVOGADO";if(p.expired)return L"EXPIRADO";if(p.maintenance)return L"MANUTENCAO";if(p.updateRequired)return L"UPDATE";return L"ATIVO";}
+void StatusColor(const Product&p){if(p.revoked)Red();else if(p.expired||p.maintenance)Yellow();else if(p.updateRequired)Cyan();else Green();}
+void Login(){Clear();Header(L"CRAZZY PROJECT");Line();Line();Blue();std::wcout<<L"│";Reset();std::wstring t=L"CRAZZY MULTILOADER";int l=(kWidth-2-(int)t.size())/2;std::wcout<<Rep(L' ',l);Cyan();std::wcout<<t;Reset();std::wcout<<Rep(L' ',kWidth-2-l-(int)t.size());Blue();std::wcout<<L"│\n";Reset();Line();Line(L"                         Entre para carregar somente os seus produtos.");Line();Blue();std::wcout<<L"│";Reset();std::wstring b=L"[  ENTER  ]  ENTRAR COM DISCORD";int bl=(kWidth-2-(int)b.size())/2;std::wcout<<Rep(L' ',bl);Sel();White();std::wcout<<b;Reset();std::wcout<<Rep(L' ',kWidth-2-bl-(int)b.size());Blue();std::wcout<<L"│\n";Reset();Line();Line();Line(L"                       ESC sair  •  Login final usa o mesmo Discord OAuth do site");for(int i=0;i<12;++i)Line();Bottom();}
+void Products(const std::vector<Product>&ps,size_t sel,const std::wstring&source,const std::wstring&toast=L""){Clear();Header(source);Line(L"  MEUS PRODUTOS");Line(L"  Use ↑ ↓ ou clique. ENTER copia a key e abre o produto. F5 sincroniza.");Rule();int inner=kWidth-2;for(size_t i=0;i<ps.size();++i){const auto&p=ps[i];bool s=i==sel;Blue();std::wcout<<L"│";Reset();if(s)Sel();std::wstring pre=s?L"  > ":L"    ";if(s)Cyan();else White();std::wcout<<pre<<Fit(p.game+L"  //  "+p.name,58);Reset();if(s)Sel();Muted();std::wcout<<L"  "<<Fit(p.plan,12)<<L"  ";Reset();if(s)Sel();StatusColor(p);std::wcout<<Fit(Status(p),14);Reset();int used=4+58+2+12+2+14;std::wcout<<Rep(L' ',inner-used);Blue();std::wcout<<L"│\n";Reset();Line(L"      Key: "+Mask(p.licenseKey)+L"    Expira: "+p.expiresAt);Line(L"      "+Fit(p.description,kWidth-10));if(i+1<ps.size()){Blue();std::wcout<<L"│";Muted();std::wcout<<L"    "<<Rep(L'─',kWidth-10)<<L"    ";Blue();std::wcout<<L"│\n";Reset();}}int consumed=(int)ps.size()*kRowsPerProduct;for(int i=0;i<(std::max)(1,15-consumed);++i)Line();Rule();if(!toast.empty())Line(L"  ✓ "+toast);else Line(L"  ENTER copiar key + iniciar   •   F5 sincronizar   •   ESC sair");Bottom();}
+std::filesystem::path LaunchPath(const Product&p){if(!p.executablePath.empty()&&std::filesystem::exists(p.executablePath))return p.executablePath;auto d=crazzy::paths::ExecutableDirectory()/L"mock_releases"/L"CrazzyDemoLoader.exe";if(std::filesystem::exists(d))return d;return{};}
+void Activate(const Product&p,std::wstring&toast){if(p.revoked){toast=L"Licenca revogada. Produto bloqueado.";return;}if(p.expired){toast=L"Licenca expirada. Renove no site.";return;}if(p.maintenance){toast=L"Produto em manutencao.";return;}toast=Clipboard(p.licenseKey)?L"KEY COPIADA. No loader, basta CTRL+V.":L"Nao consegui copiar a key.";auto exe=LaunchPath(p);if(!exe.empty())crazzy::platform::LaunchElevated(exe);else toast+=L" Produto ainda nao instalado.";}
+std::unique_ptr<crazzy::IApiClient> Api(std::wstring&source){auto base=Env(L"CRAZZY_API_BASE"),token=Env(L"CRAZZY_API_TOKEN");if(!base.empty()&&!token.empty()){source=L"CRAZZY PROJECT API";return std::make_unique<crazzy::HttpApiClient>(base,token);}source=L"DEV LOCAL (site ainda nao conectado)";return std::make_unique<crazzy::MockApiClient>();}
+}
+int wmain(){try{crazzy::paths::EnsureAll();if(!crazzy::platform::IsProcessElevated()){MessageBoxW(nullptr,L"O CRAZZY MULTILOADER precisa ser executado como Administrador.",L"CRAZZY MULTILOADER",MB_ICONERROR);return 2;}Terminal();Window();Login();HANDLE input=GetStdHandle(STD_INPUT_HANDLE);while(true){INPUT_RECORD r{};DWORD n=0;ReadConsoleInputW(input,&r,1,&n);if(r.EventType==KEY_EVENT&&r.Event.KeyEvent.bKeyDown){WORD k=r.Event.KeyEvent.wVirtualKeyCode;if(k==VK_ESCAPE)return 0;if(k==VK_RETURN)break;}}std::wstring source;auto api=Api(source);std::vector<Product> products;try{products=api->FetchMyProducts();}catch(...){source=L"DEV LOCAL (API ainda nao vinculada)";api=std::make_unique<crazzy::MockApiClient>();products=api->FetchMyProducts();}size_t selected=0;std::wstring toast;Products(products,selected,source,toast);while(true){INPUT_RECORD r{};DWORD n=0;ReadConsoleInputW(input,&r,1,&n);bool redraw=false;if(r.EventType==KEY_EVENT&&r.Event.KeyEvent.bKeyDown){WORD k=r.Event.KeyEvent.wVirtualKeyCode;if(k==VK_ESCAPE)break;if(k==VK_UP&&!products.empty()){selected=selected==0?products.size()-1:selected-1;toast.clear();redraw=true;}else if(k==VK_DOWN&&!products.empty()){selected=(selected+1)%products.size();toast.clear();redraw=true;}else if(k==VK_RETURN&&!products.empty()){Activate(products[selected],toast);redraw=true;}else if(k==VK_F5){try{products=api->FetchMyProducts();if(selected>=products.size())selected=products.empty()?0:products.size()-1;toast=L"Produtos sincronizados.";}catch(...){toast=L"Falha ao sincronizar agora.";}redraw=true;}}else if(r.EventType==MOUSE_EVENT){const auto&m=r.Event.MouseEvent;if((m.dwButtonState&FROM_LEFT_1ST_BUTTON_PRESSED)&&!products.empty()){int rel=m.dwMousePosition.Y-kFirstProductRow;if(rel>=0){size_t idx=(size_t)(rel/kRowsPerProduct);if(idx<products.size()){if(selected==idx)Activate(products[idx],toast);else{selected=idx;toast.clear();}redraw=true;}}}}if(redraw)Products(products,selected,source,toast);}Reset();Clear();return 0;}catch(...){Reset();MessageBoxW(nullptr,L"Falha fatal ao iniciar o CRAZZY MULTILOADER CMD.",L"CRAZZY MULTILOADER",MB_ICONERROR);return 1;}}
