@@ -531,7 +531,7 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
             <dl>
               {context.entitlement && (
                 <>
-                  <dt>Entitlement</dt>
+                  <dt>Acesso</dt>
                   <dd>{context.entitlement.status}</dd>
                 </>
               )}
@@ -553,7 +553,7 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
 
             <div className="crz-support-context-safe">
               <NeonIcon name="shield" size={20} />
-              <span>Keys, senhas e payloads privados não entram no ticket automaticamente.</span>
+              <span>Não compartilhe senhas ou informações sensíveis na conversa.</span>
             </div>
           </Panel>
 
