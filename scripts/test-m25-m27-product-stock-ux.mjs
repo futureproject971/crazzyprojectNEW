@@ -16,6 +16,10 @@ const productStyles = await readFile(
   "src/modules/product-manager/styles.css",
   "utf8"
 );
+const commerceHardening = await readFile(
+  "supabase/migrations/20260923205027_commercial_auth_operations_hardening.sql",
+  "utf8"
+);
 
 for (const required of [
   "ESTOQUE DESTE PLANO",
@@ -67,5 +71,19 @@ for (const required of [
   }
 }
 console.log("[PASS] Product Manager visual navigation and stock styles are versioned");
+
+for (const required of [
+  "reserve_stock_for_fulfillment(",
+  "product_plan_id",
+  "claim_paid_delivery",
+  "STOCK_RESERVATION_REQUIRED",
+  "library_deliveries",
+  "delivery_mode='internal_stock'",
+]) {
+  if (!commerceHardening.includes(required)) {
+    throw new Error("Commerce fulfillment does not prove per-plan delivery: " + required);
+  }
+}
+console.log("[PASS] Paid delivery reserves and fulfills stock by exact product plan");
 
 console.log("[PASS] M25/M27 Product + Stock UX integration smoke");
