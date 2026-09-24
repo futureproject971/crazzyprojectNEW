@@ -1,3 +1,7 @@
+"use client";
+
+import { useTheme } from "@/core/theme/ThemeProvider";
+
 const socials = [
   { label: "Discord", icon: "/icons/social-discord.svg" },
   { label: "Instagram", icon: "/icons/social-instagram.svg" },
@@ -20,15 +24,20 @@ const footerLinks = [
 ];
 
 export function AppFooter() {
+  const { brandName, tagline, logoHeroUrl, whiteLabelEnabled, showPoweredBy } = useTheme();
+  const signature = whiteLabelEnabled
+    ? (showPoweredBy ? "POWERED BY CRAZZY PROJECT" : "")
+    : (tagline || "GAMERS BUILD A BETTER TOMORROW");
+
   return (
     <footer className="crz-shell-footer">
       <div className="crz-shell-footer__glow" aria-hidden="true" />
 
       <div className="crz-shell-footer__inner">
         <div className="crz-shell-footer__brand">
-          <img src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT" />
+          <img src={logoHeroUrl} alt={brandName} />
           <div>
-            <strong>CRAZZY PROJECT</strong>
+            <strong>{brandName}</strong>
             <p>Produtos digitais, comunidade e suporte em um só lugar.</p>
           </div>
         </div>
@@ -40,7 +49,7 @@ export function AppFooter() {
         </nav>
 
         <div className="crz-shell-footer__social">
-          <span>Siga a CRAZZY PROJECT</span>
+          <span>Siga {brandName}</span>
           <div>
             {socials.map((item) => (
               <a href="#" aria-label={item.label} key={item.label}>
@@ -52,9 +61,9 @@ export function AppFooter() {
       </div>
 
       <div className="crz-shell-footer__bottom">
-        <span>© {new Date().getFullYear()} CRAZZY PROJECT</span>
+        <span>© {new Date().getFullYear()} {brandName}</span>
         <a className="crz-shell-footer__status" href="/status"><i /> Ver status dos serviços</a>
-        <strong>GAMERS BUILD A BETTER TOMORROW</strong>
+        {signature ? <strong>{signature}</strong> : <span />}
       </div>
     </footer>
   );
