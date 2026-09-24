@@ -262,14 +262,25 @@ export function ProductManagerPage() {
     setProductDraft(cloneProduct(product));
     const first = product.plans[0] || null;
     setSelectedPlanId(first?.id || null);
+    setExpandedPlanId(first?.id || null);
     setPlanDraft(first ? clonePlan(first) : null);
     setStockText("");
     setStockNotice("");
     setNotice("");
   };
 
+  const openProductEditor = (
+    product: ManagerProduct,
+    tab: "general" | "fields" | "hooks" = "general"
+  ) => {
+    selectProduct(product);
+    setEditorTab(tab);
+    setEditorOpen(true);
+  };
+
   const selectPlan = (plan: ManagerPlan) => {
     setSelectedPlanId(plan.id);
+    setExpandedPlanId(plan.id);
     setPlanDraft(clonePlan(plan));
     setStockText("");
     setStockNotice("");
