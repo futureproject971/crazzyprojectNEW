@@ -179,7 +179,17 @@ if (loginCount !== 1) {
 if (!botIndex.includes("startCampaignWorker") || !botIndex.includes("startBuilderWorker")) {
   throw new Error("Single Bot Core must start both Campaigns and Server Builder modules");
 }
-console.log("[PASS] one Gateway login runs multiple Discord modules");
+for (const required of [
+  'client.on("guildMemberAdd"',
+  'client.on("guildMemberRemove"',
+  'from("discord_identities")',
+  "guild_member:",
+]) {
+  if (!botIndex.includes(required)) {
+    throw new Error("Discord guild membership sync missing " + required);
+  }
+}
+console.log("[PASS] one Gateway login runs multiple Discord modules and keeps guild membership state fresh");
 
 const preview = await readFile("src/modules/discord-campaigns/DiscordEmbedPreview.tsx", "utf8");
 for (const feature of [
