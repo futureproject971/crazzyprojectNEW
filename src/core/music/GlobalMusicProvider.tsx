@@ -85,7 +85,7 @@ export function GlobalMusicProvider({children}:{children:React.ReactNode}){
 
   const current=index>=0&&index<queue.length?queue[index]:null;
 
-  const postCommand=useCallback((func:string)=>{
+  useEffect(()=>{\n    window.dispatchEvent(new CustomEvent("mtsounds:playback",{detail:{playing}}));\n    if(!playing)window.dispatchEvent(new CustomEvent("mtsounds:audiolevel",{detail:{bass:0,level:0}}));\n  },[playing]);\n\n  const postCommand=useCallback((func:string)=>{
     iframeRef.current?.contentWindow?.postMessage(JSON.stringify({event:"command",func,args:[]}),"*");
   },[]);
 
