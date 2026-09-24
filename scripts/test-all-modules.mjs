@@ -22,6 +22,7 @@ const tests = [
   "scripts/test-m25-product-manager.mjs",
   "scripts/test-m26-category-manager.mjs",
   "scripts/test-m27-stock-manager.mjs",
+  "scripts/test-m25-m27-product-stock-ux.mjs",
   "scripts/test-m28-sales-manager.mjs",
   "scripts/test-m29-payments-manager.mjs",
   "scripts/test-m30-finance.mjs",
