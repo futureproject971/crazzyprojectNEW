@@ -32,7 +32,7 @@ export function MtSoundsPage() {
       <div className="mts-tabs">
         <Link href="/mtsounds">Início</Link><Link href="/mtsounds#buscar">Músicas</Link><Link href="/mtsounds/editor">Studio</Link><Link href="/mtsounds/documentation">API</Link><Link href="/mtsounds/about">Sobre</Link>
       </div>
-      <span className="mts-online"><i/> MTA:SA</span>
+      <span className="mts-online"><i/> MTA / FIVEM</span>
     </div>
     <section className="command-hero wrap">
       <div className="hero-copy reveal">
@@ -63,7 +63,7 @@ export function MtSoundsPage() {
         <aside className="studio-module reveal delay-1">
           <div className="studio-module-head"><div><span className="studio-icon"><SlidersHorizontal size={17}/></span><b>MTS STUDIO</b></div><em>LIVE FX</em></div>
           <div className="studio-display">
-            <div className="display-top"><span>VINYL REACTOR</span><b>SYNC</b></div>
+            <div className="display-top"><span>AUDIO PREVIEW</span><b>SYNC</b></div>
             <div className="eq-bars" aria-hidden="true">{Array.from({length:28},(_,i)=><i key={i} style={{height:`${22+Math.abs(Math.sin(i*.7))*68}%`,animationDelay:`-${i*70}ms`}}/>)}</div>
             <div className="frequency"><span>40</span><span>100</span><span>1K</span><span>5K</span><span>16K HZ</span></div>
           </div>
