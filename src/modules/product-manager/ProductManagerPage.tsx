@@ -1608,7 +1608,7 @@ export function ProductManagerPage() {
                   >
                     <span className="crz-pm-overview__product">
                       <i style={{ "--accent": product.accent_color || "#1687ff" } as React.CSSProperties}>
-                        {product.image_url ? <img src={product.image_url} alt="" /> : product.emoji || "◆"}
+                        {product.icon_url || product.image_url ? <img src={product.icon_url || product.image_url || ""} alt="" /> : product.emoji || "◆"}
                       </i>
                       <b>
                         <strong>{product.name}</strong>
@@ -1683,8 +1683,8 @@ export function ProductManagerPage() {
                     className="crz-pm-visual-cover"
                     style={{ "--accent": productDraft.accent_color || "#1687ff" } as React.CSSProperties}
                   >
-                    {productDraft.image_url ? (
-                      <img src={productDraft.image_url} alt={productDraft.name} />
+                    {productDraft.banner_url || productDraft.image_url ? (
+                      <img src={productDraft.banner_url || productDraft.image_url || ""} alt={productDraft.name} />
                     ) : (
                       <span>{productDraft.emoji || "🎮"}</span>
                     )}
