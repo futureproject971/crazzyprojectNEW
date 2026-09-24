@@ -6,6 +6,7 @@ import { Activity, AudioLines, ArrowUpRight, Gauge, Radio, Search, SlidersHorizo
 import MusicSearch from "./native/MusicSearch";
 import ReactiveVinyl from "./native/ReactiveVinyl";
 import ReactiveBackground from "./native/ReactiveBackground";
+import YouTubeAccount from "./native/YouTubeAccount";
 
 export function MtSoundsPage() {
   useEffect(() => {
@@ -81,6 +82,7 @@ export function MtSoundsPage() {
     </section>
 
     <MusicSearch />
+    <YouTubeAccount />
 
     <section className="wrap premium-studio-cta">
       <div className="studio-cta-glow" aria-hidden="true"/>
