@@ -1,1 +1,27 @@
 .crz-integrations{min-height:100vh;padding:92px 0 48px;background:radial-gradient(circle at 50% -8%,rgba(0,101,255,.12),transparent 34%),linear-gradient(180deg,#020711,#01050b);color:#eaf4ff}.crz-integrations-state{min-height:100vh;display:grid;place-items:center;align-content:center;gap:9px;color:#71869e}.crz-integrations-stats{margin:10px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.crz-integrations-stats article{min-height:82px;border:1px solid var(--crz-card-border);border-radius:10px;display:grid;place-items:center;align-content:center;background:var(--crz-gradient-card)}.crz-integrations-stats small{color:#20adff;font-size:7px;font-weight:900}.crz-integrations-stats strong{font-size:21px}.crz-integrations-stats span{font-size:8px;color:#70869c}.crz-integrations-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.crz-integrations-grid article{min-height:148px;border:1px solid var(--crz-card-border);border-radius:11px;padding:11px;background:var(--crz-gradient-card);box-shadow:var(--crz-card-shadow)}.crz-integrations-grid article.is-missing,.crz-integrations-grid article.is-offline{border-color:rgba(255,77,110,.22)}.crz-integrations-grid article.is-partial{border-color:rgba(255,184,55,.22)}.crz-integrations-grid header{display:flex;justify-content:space-between;gap:8px}.crz-integrations-grid small{color:#20adff;font-size:7px;font-weight:900}.crz-integrations-grid h2{margin:3px 0;font-size:13px}.crz-integrations-grid p{min-height:46px;color:#788da3;font-size:9px;line-height:1.45}.crz-integrations-grid a{color:#65c4ff;font-size:8px}.crz-integrations-note{margin-top:10px;border:1px solid rgba(48,145,255,.2);border-radius:10px;padding:10px;display:grid;gap:3px;background:rgba(0,90,205,.06)}.crz-integrations-note strong{font-size:9px}.crz-integrations-note span{font-size:8px;color:#70869c}@media(max-width:950px){.crz-integrations-grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.crz-integrations-grid,.crz-integrations-stats{grid-template-columns:1fr}}
+
+/* 2026-09-24 — readable settings + explained in-app configuration */
+.crz-integrations-state strong{font-size:16px}
+.crz-integrations-stats{gap:10px;margin:14px 0}
+.crz-integrations-stats article{min-height:96px;padding:12px}
+.crz-integrations-stats small{font-size:10px}
+.crz-integrations-stats strong{font-size:26px}
+.crz-integrations-stats span{font-size:12px}
+.crz-integrations-grid{gap:11px}
+.crz-integrations-grid article{min-height:176px;padding:15px;border-radius:13px}
+.crz-integrations-grid small{font-size:10px}
+.crz-integrations-grid h2{margin:5px 0;font-size:17px}
+.crz-integrations-grid p{min-height:58px;font-size:13px;line-height:1.55}
+.crz-integrations-grid a{font-size:12px}
+.crz-integrations-note{padding:13px 14px;gap:5px}
+.crz-integrations-note strong{font-size:13px}
+.crz-integrations-note span{font-size:12px;line-height:1.5}
+.crz-integration-form{display:grid;gap:16px}
+.crz-integration-form label{display:grid;gap:6px}
+.crz-integration-form label>span{color:#eef5ff;font-size:14px;font-weight:750}
+.crz-integration-form label>small{color:#8194ac;font-size:12px;line-height:1.45}
+.crz-integration-form__help{border:1px solid rgba(43,139,255,.25);border-radius:10px;padding:12px;display:grid;gap:4px;background:rgba(0,91,220,.07)}
+.crz-integration-form__help strong{font-size:13px;color:#dcecff}
+.crz-integration-form__help span{font-size:12px;line-height:1.5;color:#8ea4bd}
+.crz-integration-form__actions{display:flex;justify-content:flex-end;gap:9px}
+@media(max-width:600px){.crz-integration-form__actions{display:grid;grid-template-columns:1fr 1fr}}
