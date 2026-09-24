@@ -282,7 +282,7 @@ export function NewTicketPage() {
             <label className="crz-support-file-picker">
               <NeonIcon name="shield" size={28} />
               <strong>Selecionar arquivos</strong>
-              <span>Até 5 por mensagem • 25 MB cada • bucket privado</span>
+              <span>Até 5 arquivos por mensagem • 25 MB cada</span>
               <input
                 type="file"
                 multiple
