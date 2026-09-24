@@ -90,15 +90,16 @@ export function GlobalMusicProvider({children}:{children:React.ReactNode}){
     if(!playing)window.dispatchEvent(new CustomEvent("mtsounds:audiolevel",{detail:{bass:0,level:0}}));
   },[playing]);
 
-  const postCommand=useCallback((func:string)=>{
-    iframeRef.current?.contentWindow?.postMessage(JSON.stringify({event:"command",func,args:[]}),"*");
-  },[]);
+  const postCommand=useCallback((func:string,args:unknown[]=[])=>( 
+    iframeRef.current?.contentWindow?.postMessage(JSON.stringify({event:"command",func,args}),"*")
+  ),[]);
 
   const previous=useCallback(()=>{
     if(!queue.length)return;
     if(index<=0){
       setIndex(0);
-      postCommand("seekTo");
+      postCommand("seekTo",[0,true]);
+      setPlaying(true);
       return;
     }
     setIndex(index-1);
