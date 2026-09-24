@@ -1069,3 +1069,273 @@ html[data-theme="light"] button.crz-pm-overview__row.is-selected {
     width:100%;
   }
 }
+
+
+/* Product creation modal */
+.crz-pm-create-modal {
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  padding:24px;
+  background:rgba(1,6,12,.78);
+  backdrop-filter:blur(12px);
+  display:grid;
+  place-items:center;
+}
+.crz-pm-create-dialog {
+  width:min(760px,100%);
+  max-height:min(90vh,860px);
+  overflow:auto;
+  border:1px solid rgba(72,151,255,.42);
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 8% 0%,rgba(29,121,255,.16),transparent 34%),
+    linear-gradient(180deg,#101d2f,#08121f);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.045),
+    0 28px 80px rgba(0,0,0,.52),
+    0 0 40px rgba(0,91,255,.10);
+}
+.crz-pm-create-dialog__head {
+  padding:16px 18px;
+  border-bottom:1px solid rgba(84,145,224,.20);
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr) 38px;
+  gap:12px;
+  align-items:center;
+}
+.crz-pm-create-dialog__icon {
+  width:48px;
+  height:48px;
+  border:1px solid rgba(62,158,255,.56);
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  color:#7ad8ff;
+  background:rgba(0,100,224,.16);
+  box-shadow:0 0 18px rgba(0,112,255,.18);
+  font-size:26px;
+}
+.crz-pm-create-dialog__head > div:nth-child(2) {
+  display:grid;
+  gap:3px;
+}
+.crz-pm-create-dialog__head small {
+  color:#54c8ff;
+  font-size:11.5px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.crz-pm-create-dialog__head h2 {
+  margin:0;
+  color:#f8fbff;
+  font-size:22px;
+}
+.crz-pm-create-dialog__head p {
+  margin:0;
+  color:#a9b7c8;
+  font-size:12px;
+  line-height:1.45;
+}
+.crz-pm-create-dialog__head > button {
+  width:38px;
+  height:38px;
+  border:1px solid rgba(111,153,209,.25);
+  border-radius:9px;
+  color:#c6d3e2;
+  background:#0c1827;
+  font-size:22px;
+  cursor:pointer;
+}
+.crz-pm-create-dialog__head > button:hover:not(:disabled) {
+  color:#fff;
+  border-color:rgba(68,151,255,.6);
+  background:#14283f;
+}
+.crz-pm-create-dialog__body {
+  padding:17px 18px;
+}
+.crz-pm-create-dialog__grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+}
+.crz-pm-create-dialog__grid label {
+  display:grid;
+  gap:5px;
+}
+.crz-pm-create-dialog__grid label > span {
+  color:#becada;
+  font-size:12px;
+  font-weight:650;
+}
+.crz-pm-create-dialog__grid input,
+.crz-pm-create-dialog__grid select {
+  width:100%;
+  min-height:42px;
+  border:1px solid rgba(102,151,217,.34);
+  border-radius:9px;
+  padding:0 11px;
+  outline:0;
+  color:#f4f8ff;
+  background:#0a1624;
+  font-size:13px;
+}
+.crz-pm-create-dialog__grid input:focus,
+.crz-pm-create-dialog__grid select:focus {
+  border-color:rgba(59,154,255,.9);
+  box-shadow:0 0 0 3px rgba(28,119,255,.13);
+}
+.crz-pm-create-dialog__color {
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr);
+  gap:7px;
+}
+.crz-pm-create-dialog__color input[type=color] {
+  padding:4px;
+}
+.crz-pm-create-dialog__toggle {
+  width:100%;
+  min-height:64px;
+  margin-top:13px;
+  border:1px solid rgba(98,147,212,.26);
+  border-radius:10px;
+  padding:10px 12px;
+  color:#c3cfdd;
+  background:rgba(8,18,31,.72);
+  display:grid;
+  grid-template-columns:18px minmax(0,1fr);
+  gap:10px;
+  align-items:center;
+  text-align:left;
+  cursor:pointer;
+}
+.crz-pm-create-dialog__toggle > i {
+  width:18px;
+  height:18px;
+  border:1px solid rgba(119,158,211,.48);
+  border-radius:6px;
+  background:#0a1522;
+}
+.crz-pm-create-dialog__toggle > span {
+  display:grid;
+  gap:2px;
+}
+.crz-pm-create-dialog__toggle strong {
+  color:#f0f6fe;
+  font-size:12.5px;
+}
+.crz-pm-create-dialog__toggle small {
+  color:#98a8ba;
+  font-size:11px !important;
+}
+.crz-pm-create-dialog__toggle.is-on {
+  border-color:rgba(54,160,255,.52);
+  background:rgba(15,75,139,.22);
+}
+.crz-pm-create-dialog__toggle.is-on > i {
+  border-color:#3f9dff;
+  background:linear-gradient(180deg,#218cff,#0960e9);
+  box-shadow:0 0 12px rgba(0,112,255,.28);
+}
+.crz-pm-create-dialog__toggle.is-on > i::after {
+  content:"✓";
+  height:100%;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  font-size:11px;
+  font-style:normal;
+}
+.crz-pm-create-dialog__flow {
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+}
+.crz-pm-create-dialog__flow > div {
+  min-height:72px;
+  border:1px solid rgba(82,139,213,.22);
+  border-radius:9px;
+  padding:9px;
+  background:rgba(7,17,29,.62);
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.crz-pm-create-dialog__flow b {
+  width:27px;
+  height:27px;
+  flex:0 0 27px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  background:linear-gradient(180deg,#248bff,#0b5fe6);
+  font-size:11px;
+}
+.crz-pm-create-dialog__flow span {
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+.crz-pm-create-dialog__flow strong {
+  color:#edf5ff;
+  font-size:11.5px;
+}
+.crz-pm-create-dialog__flow small {
+  color:#91a2b7;
+  font-size:10.5px !important;
+}
+.crz-pm-create-dialog__foot {
+  padding:13px 18px;
+  border-top:1px solid rgba(84,145,224,.18);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  background:rgba(5,13,23,.58);
+}
+.crz-pm-create-dialog__foot > span {
+  color:#9aabbe;
+  font-size:11.5px;
+  line-height:1.4;
+}
+.crz-pm-create-dialog__foot > div {
+  display:flex;
+  gap:8px;
+}
+html[data-theme="light"] .crz-pm-create-modal {
+  background:rgba(24,42,64,.42);
+}
+html[data-theme="light"] .crz-pm-create-dialog {
+  background:#fff;
+  border-color:rgba(31,91,170,.2);
+  box-shadow:0 28px 70px rgba(24,52,87,.18);
+}
+html[data-theme="light"] .crz-pm-create-dialog__head h2,
+html[data-theme="light"] .crz-pm-create-dialog__grid input,
+html[data-theme="light"] .crz-pm-create-dialog__grid select,
+html[data-theme="light"] .crz-pm-create-dialog__toggle strong,
+html[data-theme="light"] .crz-pm-create-dialog__flow strong {
+  color:#102033;
+}
+html[data-theme="light"] .crz-pm-create-dialog__grid input,
+html[data-theme="light"] .crz-pm-create-dialog__grid select,
+html[data-theme="light"] .crz-pm-create-dialog__toggle,
+html[data-theme="light"] .crz-pm-create-dialog__flow > div {
+  background:#f7fbff;
+}
+@media(max-width:700px){
+  .crz-pm-create-modal { padding:10px; }
+  .crz-pm-create-dialog__grid { grid-template-columns:1fr; }
+  .crz-pm-create-dialog__flow { grid-template-columns:1fr 1fr; }
+  .crz-pm-create-dialog__foot {
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .crz-pm-create-dialog__foot > div {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+}
