@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Badge, NeonIcon, PageHeader } from "@/core/design-system";
 import type { ControlCenterSnapshot, ManualControlAlert } from "./types";
@@ -33,6 +34,72 @@ function EmptyCheck({ text }: { text: string }) {
     </div>
   );
 }
+
+
+const ADMIN_GROUPS = [
+  {
+    title: "Catálogo",
+    description: "Organize o que o cliente vê e recebe.",
+    tools: [
+      { label: "Produtos", description: "Cadastre produtos, planos, preços e disponibilidade.", href: "/admin/produtos", icon: "/icons/package.svg" },
+      { label: "Categorias", description: "Organize jogos e vitrines sem mexer no código.", href: "/admin/categorias", icon: "/icons/neon-v2/gamepad.svg" },
+      { label: "Estoque", description: "Acompanhe keys e itens com alerta de estoque baixo.", href: "/admin/estoque", icon: "/icons/package.svg" },
+      { label: "Tutoriais", description: "Crie e publique guias liberados por produto.", href: "/admin/academy", icon: "/icons/book.svg" },
+    ],
+  },
+  {
+    title: "Comercial",
+    description: "Venda, receba e acompanhe o dinheiro com clareza.",
+    tools: [
+      { label: "Vendas", description: "Veja pedidos, status e histórico comercial.", href: "/admin/vendas", icon: "/icons/shopping-cart.svg" },
+      { label: "Pagamentos", description: "Acompanhe PIX e demais cobranças confirmadas.", href: "/admin/pagamentos", icon: "/icons/credit-card.svg" },
+      { label: "Financeiro", description: "Resumo de valores, divergências e operação financeira.", href: "/admin/finance", icon: "/icons/credit-card.svg" },
+      { label: "Campanhas", description: "Monte mensagens do Discord com preview antes de enviar.", href: "/admin/campanhas", icon: "/icons/flame.svg" },
+      { label: "Cupons", description: "Crie descontos e regras sem caixas externas do navegador.", href: "/admin/cupons", icon: "/icons/star.svg" },
+    ],
+  },
+  {
+    title: "Fidelização",
+    description: "Controle bônus, recompensas e experiências do cliente.",
+    tools: [
+      { label: "CRAZZY BONUS", description: "Configure carteira promocional e regras de crédito.", href: "/admin/bonus", icon: "/icons/crown.svg" },
+      { label: "CRAZZY ARCADE", description: "Gerencie roleta, raspadinha, pesos e prêmios.", href: "/admin/luck", icon: "/icons/bolt.svg" },
+      { label: "Rewards", description: "Controle recompensas, elegibilidade e resgates.", href: "/admin/rewards", icon: "/icons/diamond.svg" },
+      { label: "Club", description: "Gerencie benefícios e experiências do CRAZZY CLUB.", href: "/admin/club", icon: "/icons/crown.svg" },
+    ],
+  },
+  {
+    title: "Atendimento",
+    description: "Tudo que envolve clientes, suporte e comunicação.",
+    tools: [
+      { label: "Tickets", description: "Atenda conversas, prioridades, status e histórico.", href: "/admin/suporte", icon: "/icons/headset.svg" },
+      { label: "Clientes", description: "Visão 360° do usuário sem misturar dados de outros clientes.", href: "/admin/clientes", icon: "/icons/users.svg" },
+      { label: "CRAZZY CALL", description: "Gerencie salas, participantes e atendimento por chamada.", href: "/admin/calls", icon: "/icons/headset.svg" },
+      { label: "Comunidade", description: "Modere o chat e acompanhe ações da comunidade.", href: "/admin/comunidade", icon: "/icons/users.svg" },
+    ],
+  },
+  {
+    title: "Integrações",
+    description: "Conecte serviços externos e veja o estado de cada integração.",
+    tools: [
+      { label: "Discord", description: "Bot, membros, cargos e sincronização da guild.", href: "/admin/discord", icon: "/icons/brand-discord.svg" },
+      { label: "Discord Bridge", description: "Acompanhe grants, retries e sincronizações.", href: "/admin/discord-bridge", icon: "/icons/users.svg" },
+      { label: "Integrações", description: "PIX, APIs e conexões com estado e explicação do erro.", href: "/admin/integracoes", icon: "/icons/bolt.svg" },
+      { label: "Entregas", description: "Monitore fulfillment sem duplicar entrega.", href: "/admin/fulfillment", icon: "/icons/package.svg" },
+    ],
+  },
+  {
+    title: "Sistema",
+    description: "Configurações avançadas e segurança ficam juntas, longe da navegação do cliente.",
+    tools: [
+      { label: "Aparência", description: "Ajuste a identidade visual da plataforma.", href: "/admin/aparencia", icon: "/icons/diamond.svg" },
+      { label: "Segurança", description: "Veja incidentes, tentativas suspeitas e auditoria.", href: "/admin/security", icon: "/icons/shield-check.svg" },
+      { label: "Notificações", description: "Configure avisos e mensagens operacionais.", href: "/admin/notificacoes", icon: "/icons/flame.svg" },
+      { label: "Revendedores", description: "Gerencie acessos e regras da operação B2B.", href: "/admin/revendedores", icon: "/icons/users.svg" },
+      { label: "Parceiros", description: "Cadastre e acompanhe parceiros da plataforma.", href: "/admin/parceiros", icon: "/icons/crown.svg" },
+    ],
+  },
+] as const;
 
 export function ControlCenterPage() {
   const [snapshot, setSnapshot] = useState<ControlCenterSnapshot | null>(null);
@@ -130,14 +197,57 @@ export function ControlCenterPage() {
   return (
     <main className="crz-control-page">
       <div className="crz-container">
-        <PageHeader
-          eyebrow="CRAZZY CONTROL CENTER"
-          title="Operação e alertas"
-          description="Visão administrativa de pagamentos, entregas, Discord, estoque, tutoriais e incidentes."
-          actions={<button className="crz-button crz-button--secondary crz-button--sm" type="button" onClick={() => void load()}>↻ Atualizar</button>}
-        />
+        <section className="crz-admin-hero" id="inicio">
+          <div className="crz-admin-hero__copy">
+            <span>CRAZZY CONTROL CENTER</span>
+            <h1>Painel <strong>Admin</strong></h1>
+            <p>Central exclusiva para administrar a CRAZZY PROJECT. Cada área explica o que faz antes de você alterar qualquer configuração.</p>
+          </div>
+          <div className="crz-admin-hero__badge">
+            <span className="crz-admin-shield" aria-hidden="true" />
+            <div><small>ADMINISTRADOR</small><strong>Acesso total ao sistema</strong></div>
+          </div>
+        </section>
 
-        <section className="crz-control-health" id="inicio">
+        <section className="crz-admin-tools" aria-labelledby="admin-tools-title">
+          <header>
+            <div>
+              <small>GERENCIAMENTO DO SISTEMA</small>
+              <h2 id="admin-tools-title">Acesso rápido às ferramentas administrativas</h2>
+              <p>Escolha uma área. As configurações ficam dentro do site, com explicação, estado atual e ações claras.</p>
+            </div>
+          </header>
+          <div className="crz-admin-groups">
+            {ADMIN_GROUPS.map(group => (
+              <section className="crz-admin-group" key={group.title}>
+                <div className="crz-admin-group__head">
+                  <h3>{group.title}</h3>
+                  <p>{group.description}</p>
+                </div>
+                <div className="crz-admin-tool-grid">
+                  {group.tools.map(tool => (
+                    <Link className="crz-admin-tool" href={tool.href} key={tool.href}>
+                      <span className="crz-admin-tool__icon" aria-hidden="true" style={{WebkitMaskImage:`url("${tool.icon}")`,maskImage:`url("${tool.icon}")`}} />
+                      <span className="crz-admin-tool__copy"><strong>{tool.label}</strong><small>{tool.description}</small></span>
+                      <span className="crz-admin-tool__arrow" aria-hidden="true">›</span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </section>
+
+        <div className="crz-control-ops-head">
+          <PageHeader
+            eyebrow="MONITORAMENTO"
+            title="Operação e alertas"
+            description="Confira pagamentos, entregas, Discord, estoque, tutoriais e incidentes sem sair do painel."
+            actions={<button className="crz-button crz-button--secondary crz-button--md" type="button" onClick={() => void load()}>↻ Atualizar</button>}
+          />
+        </div>
+
+        <section className="crz-control-health">
           <div className={totalWarnings ? "has-alerts" : "is-clean"}>
             <NeonIcon name={totalWarnings ? "lightning" : "verified"} size={34} />
             <span><small>ALERTAS ATIVOS</small><strong>{totalWarnings}</strong><em>{totalWarnings ? "itens pedindo atenção" : "operação limpa"}</em></span>
