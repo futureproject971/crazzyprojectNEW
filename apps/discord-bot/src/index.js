@@ -13,6 +13,7 @@ import { startBuilderWorker } from "./modules/server-builder.js";
 import { startDiscordRoleBridge } from "./modules/role-bridge.js";
 import { startNotificationWorker } from "./modules/notifications.js";
 import { startSecuritySentinel } from "./modules/security-sentinel.js";
+import { ensureOfficialDiscordInvite } from "./modules/guild-gate.js";
 import {
   deployCommands,
   installCommandHandlers,
@@ -84,6 +85,7 @@ client.once("ready", async () => {
     console.error("[commands] deploy failed:", error);
   }
 
+  await ensureOfficialDiscordInvite(client, supabase, config);
   stopHeartbeat = startWorkerHeartbeat(client, supabase, config);
   stopCampaigns = startCampaignWorker(client, supabase, config);
   stopBuilder = startBuilderWorker(client, supabase, config);
