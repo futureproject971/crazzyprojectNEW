@@ -5,6 +5,8 @@ import { CartProvider } from "@/modules/cart/CartProvider";
 import { PublicInteractionGuard } from "@/core/security/PublicInteractionGuard";
 import { ThemeProvider } from "@/core/theme/ThemeProvider";
 import { PwaRegister } from "@/core/pwa";
+import { GlobalMusicProvider } from "@/core/music/GlobalMusicProvider";
+import "@/core/music/styles.css";
 import "./globals.css";
 
 const inter = Inter({
@@ -44,7 +46,7 @@ export default function RootLayout({
         <PublicInteractionGuard />
         <ThemeProvider>
           <AuthProvider>
-            <CartProvider>{children}</CartProvider>
+            <GlobalMusicProvider><CartProvider>{children}</CartProvider></GlobalMusicProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

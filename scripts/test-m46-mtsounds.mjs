@@ -25,4 +25,34 @@ for (const required of ["mts-site-art-bg","mts-inner-nav","vinyl-disc-shell","vi
   if (!styles.includes(required)) throw new Error("M46 premium visual fidelity missing " + required);
 }
 
-console.log("[PASS] M46 MTSOUNDS source is native, local-asset backed and visually hardened");
+const layout = await readFile("src/app/layout.tsx", "utf8");
+const globalPlayer = await readFile("src/core/music/GlobalMusicProvider.tsx", "utf8");
+const globalPlayerStyles = await readFile("src/core/music/styles.css", "utf8");
+
+for (const required of ["GlobalMusicProvider","@/core/music/styles.css"]) {
+  if (!layout.includes(required)) throw new Error("M46 global music root integration missing " + required);
+}
+for (const required of [
+  "crz:mtsounds:queue:v1",
+  "crz:mtsounds:playlist:v1",
+  "localStorage",
+  "playNow",
+  "enqueue",
+  "playPlaylist",
+  "if(data.info===0)next()",
+  "picture-in-picture",
+  "• PIP",
+]) {
+  if (!globalPlayer.includes(required)) throw new Error("M46 persistent music player missing " + required);
+}
+for (const required of ["position:fixed","crz-global-music__drawer","crz-global-music__video"]) {
+  if (!globalPlayerStyles.includes(required)) throw new Error("M46 site PiP styling missing " + required);
+}
+for (const required of ["music.youtube.com","youtube-music","Tocar no site","globalPlayer.enqueue","globalPlayer.addToPlaylist"]) {
+  if (!search.includes(required)) throw new Error("M46 YouTube/queue integration missing " + required);
+}
+for (const forbidden of ["Play faz girar","Pause segura o ângulo","REAGE AO PLAYER","O SOM BATE.","O VINIL RESPONDE."]) {
+  if (page.includes(forbidden)) throw new Error("M46 literal/technical marketing copy returned: " + forbidden);
+}
+
+console.log("[PASS] M46 MTSOUNDS is native, persistent, queue-enabled and copy-hardened");

@@ -476,3 +476,43 @@ html[data-theme="light"] .crz-mtsounds-external strong {color:#102033}
   .crz-mts-native .module-chrome,
   .crz-mts-native .vinyl-disc-shell{animation:none!important;transform:none!important}
 }
+
+
+/* MTSOUNDS source switch + persistent-player entry points */
+.crz-mts-native .mts-source-switch{
+  display:flex;
+  gap:7px;
+  margin:16px 0 9px;
+}
+.crz-mts-native .mts-source-switch button{
+  min-height:34px;
+  padding:0 11px;
+  border-radius:8px;
+  color:#9c95a4;
+  background:#0d0d12;
+}
+.crz-mts-native .mts-source-switch button.is-active{
+  color:#160a1f;
+  border-color:transparent;
+  background:#c084fc;
+  box-shadow:0 8px 24px rgba(139,50,215,.18);
+}
+.crz-mts-native .player-actions .download-choice{
+  color:#160a1f;
+  border-color:transparent;
+  background:#c084fc;
+  font-weight:850;
+}
+.crz-mts-native .search-message{
+  margin-top:9px;
+  color:#b9b1c1;
+  font-size:.76rem;
+}
+@media(max-width:560px){
+  .crz-mts-native .mts-source-switch{
+    width:100%;
+  }
+  .crz-mts-native .mts-source-switch button{
+    flex:1;
+  }
+}
