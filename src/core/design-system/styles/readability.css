@@ -1746,3 +1746,109 @@ textarea:focus-visible {
   font-size: 11.5px !important;
   line-height: 1.42 !important;
 }
+
+
+/* PASS 8: shell, library and studio */
+
+/* HOME */
+.crz-home-hero__pillar strong,
+.crz-home-hero__pillar small,
+.product-info .product-view-link {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-home-hero__cta,
+.product-card .product-art-brand {
+  font-size: 13px !important;
+}
+
+/* APP SHELL / FOOTER */
+.crz-shell-nav__item,
+.crz-shell-nav__item b,
+.crz-shell-auth,
+.crz-shell-user,
+.crz-shell-mobile-link b,
+.crz-shell-footer__brand p,
+.crz-shell-footer__social > span,
+.crz-shell-footer__brand strong,
+.crz-shell-footer__links a,
+.crz-shell-footer__bottom,
+.crz-shell-footer__bottom > strong,
+.crz-shell-nav__copy small {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+.crz-shell-nav__item {
+  font-weight: 650;
+}
+
+/* PWA */
+.crz-offline small {
+  font-size: 11.5px !important;
+}
+.crz-offline p {
+  font-size: 13px !important;
+}
+
+/* GLOBAL MUSIC */
+.crz-global-music__meta > span,
+.crz-global-music__meta > small,
+.crz-global-music__controls button,
+.crz-global-music__drawer button,
+.crz-global-music__drawer header,
+.crz-global-music__list b,
+.crz-global-music__saved b,
+.crz-global-music__list small,
+.crz-global-music__saved small,
+.crz-global-music__list p {
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+}
+
+/* TUTORIAL STUDIO */
+.crz-tutorialstudio-list strong {
+  font-size: 13px !important;
+}
+.crz-tutorialstudio-stats small,
+.crz-tutorialstudio-list > header button,
+.crz-tutorialstudio-list small,
+.crz-tutorialstudio-editor > header small,
+.crz-tutorialstudio-editor label > span,
+.crz-tutorialstudio-products label,
+.crz-tutorialstudio-help,
+.crz-tutorialstudio-notice {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-tutorialstudio-editor textarea.is-code {
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+}
+
+/* LIBRARY */
+.crz-library-hero p,
+.crz-library-card__headline strong,
+.crz-library-history strong {
+  font-size: 13px !important;
+}
+.crz-library-hero__stats span,
+.crz-library-tabs button,
+.crz-library-security strong,
+.crz-library-security span,
+.crz-library-card__art > span,
+.crz-library-card__headline small,
+.crz-library-card__headline span,
+.crz-library-secret__label span,
+.crz-library-secret__label b,
+.crz-library-card__meta span,
+.crz-library-card footer span,
+.crz-library-history span,
+.crz-library-history small,
+.crz-library-inline-error {
+  font-size: 11.5px !important;
+  line-height: 1.42 !important;
+}
+.crz-library-secret pre {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
