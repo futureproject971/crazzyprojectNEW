@@ -97,8 +97,16 @@ if (!pwa.includes("fetch") || !pwa.includes("caches")) {
 }
 
 const fulfillment = await readFile("supabase/migrations/20260922233855_m43_fulfillment_engine_core.sql", "utf8");
-if (!/idempot/i.test(fulfillment) || !/entitlement/i.test(fulfillment)) {
-  throw new Error("M43 fulfillment migration is missing core idempotent entitlement flow");
+for (const required of [
+  "fulfillment_key",
+  "on conflict (fulfillment_key)",
+  "entitlement_id",
+  "fulfillment_events_ticket_type_unique_idx",
+  "discord_role_grants_entitlement_role_unique_idx",
+]) {
+  if (!fulfillment.toLowerCase().includes(required.toLowerCase())) {
+    throw new Error("M43 fulfillment migration is missing idempotency primitive: " + required);
+  }
 }
 
 const bridge = await readFile("apps/discord-bot/src/modules/role-bridge.js", "utf8");
