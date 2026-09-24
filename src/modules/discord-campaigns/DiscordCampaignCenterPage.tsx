@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge, PageHeader } from "@/core/design-system";
+import { Badge, ConfirmDialog, PageHeader } from "@/core/design-system";
 import { DiscordEmbedPreview, type DiscordEmbedDraft } from "./DiscordEmbedPreview";
 import type {
   DiscordCampaign,
@@ -77,6 +77,7 @@ export function DiscordCampaignCenterPage() {
   const [scheduledFor, setScheduledFor] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
+  const [confirmAction, setConfirmAction] = useState<{kind:"delete-template"|"queue"|"cancel";description:string;campaignId?:string}|null>(null);
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setState("loading");
@@ -170,9 +171,12 @@ export function DiscordCampaignCenterPage() {
     }
   };
 
-  const deleteTemplate = async () => {
+  const deleteTemplate = async (confirmed = false) => {
     if (!templateId) return;
-    if (!window.confirm("Excluir este template? O histórico antigo continua salvo.")) return;
+    if (!confirmed) {
+      setConfirmAction({kind:"delete-template",description:"Excluir este template? O histórico antigo continuará salvo e nenhum disparo antigo será apagado."});
+      return;
+    }
     setBusy("delete-template");
     try {
       const response = await fetch(
@@ -190,7 +194,7 @@ export function DiscordCampaignCenterPage() {
     }
   };
 
-  const queue = async (testMe = false) => {
+  const queue = async (testMe = false, confirmed = false) => {
     if (busy) return;
     if (!draft.title.trim() && !draft.description.trim()) {
       setNotice("Preencha título ou descrição.");
@@ -205,9 +209,10 @@ export function DiscordCampaignCenterPage() {
       return;
     }
 
-    if (!testMe) {
+    if (!testMe && !confirmed) {
       const targetText = estimated == null ? "o público selecionado" : "aprox. " + estimated + " membro(s)";
-      if (!window.confirm("Adicionar este disparo à fila para " + targetText + "?")) return;
+      setConfirmAction({kind:"queue",description:"Adicionar este disparo à fila para " + targetText + "? Você poderá acompanhar o progresso no histórico."});
+      return;
     }
 
     setBusy(testMe ? "test" : "send");
@@ -249,8 +254,11 @@ export function DiscordCampaignCenterPage() {
     }
   };
 
-  const cancel = async (campaignId: string) => {
-    if (!window.confirm("Cancelar este disparo?")) return;
+  const cancel = async (campaignId: string, confirmed = false) => {
+    if (!confirmed) {
+      setConfirmAction({kind:"cancel",campaignId,description:"Cancelar este disparo? Mensagens já enviadas não podem ser recolhidas, mas novos envios serão interrompidos."});
+      return;
+    }
     setBusy(campaignId);
     try {
       const response = await fetch("/api/admin/discord-campaigns", {
@@ -418,6 +426,21 @@ export function DiscordCampaignCenterPage() {
             {campaigns.length === 0 && <div className="crz-discord-campaign-empty">Nenhum disparo ainda.</div>}
           </div>
         </section>
+        <ConfirmDialog
+          open={Boolean(confirmAction)}
+          title={confirmAction?.kind==="delete-template"?"Excluir template":confirmAction?.kind==="cancel"?"Cancelar disparo":"Confirmar campanha"}
+          description={confirmAction?.description||""}
+          confirmLabel={confirmAction?.kind==="delete-template"?"Excluir":confirmAction?.kind==="cancel"?"Cancelar disparo":"Colocar na fila"}
+          danger={confirmAction?.kind==="delete-template"||confirmAction?.kind==="cancel"}
+          onClose={()=>setConfirmAction(null)}
+          onConfirm={()=>{
+            const action=confirmAction;
+            if(!action)return;
+            if(action.kind==="delete-template")void deleteTemplate(true);
+            if(action.kind==="queue")void queue(false,true);
+            if(action.kind==="cancel"&&action.campaignId)void cancel(action.campaignId,true);
+          }}
+        />
       </div>
     </main>
   );
