@@ -131,6 +131,25 @@ if (botConfig.includes("DISCORD_BOT_TOKEN_2") || botConfig.includes("SECOND_BOT_
   throw new Error("Unified bot must not define extra bot tokens");
 }
 console.log("[PASS] unified Discord worker uses one official bot token");
+const rootDiscloud = await readFile("discloud.config", "utf8");
+for (const required of [
+  "TYPE=bot",
+  "MAIN=apps/discord-bot/src/index.js",
+  "BUILD=npm --prefix apps/discord-bot install --omit=dev",
+  "START=npm --prefix apps/discord-bot start",
+  "AUTORESTART=true",
+]) {
+  if (!rootDiscloud.includes(required)) {
+    throw new Error("Root Discloud config missing " + required);
+  }
+}
+for (const forbidden of ["DISCORD_BOT_TOKEN=", "SUPABASE_SERVICE_ROLE_KEY="]) {
+  if (rootDiscloud.includes(forbidden)) {
+    throw new Error("Discloud config must never contain production secrets");
+  }
+}
+console.log("[PASS] root Discloud GitHub deployment config launches the unified Bot Core without embedded secrets");
+
 
 const campaignWorker = await readFile("apps/discord-bot/src/modules/campaigns.js", "utf8");
 for (const required of [
