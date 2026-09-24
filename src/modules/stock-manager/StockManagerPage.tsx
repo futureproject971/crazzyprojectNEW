@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { Badge, NeonIcon, PageHeader } from "@/core/design-system";
 import type {
   StockManagerCatalog,
@@ -48,9 +47,12 @@ const stockFilters = [
 ] as const;
 
 export function StockManagerPage() {
-  const searchParams = useSearchParams();
-  const requestedPlanId = String(searchParams.get("planId") || "").trim();
-  const requestedRestock = searchParams.get("repor") === "1";
+  const queryParams =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : null;
+  const requestedPlanId = String(queryParams?.get("planId") || "").trim();
+  const requestedRestock = queryParams?.get("repor") === "1";
 
   const [catalog, setCatalog] = useState<StockManagerCatalog | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "auth" | "forbidden" | "error">("loading");
@@ -168,6 +170,19 @@ export function StockManagerPage() {
         .filter(Boolean),
     [importText]
   );
+
+  const visibleItems = useMemo(() => {
+    const normalized = itemQuery.trim().toLowerCase();
+    return items.filter((item) => {
+      const itemStatus = statusOf(item);
+      const matchesStatus = itemFilter === "all" || itemStatus === itemFilter;
+      const matchesQuery =
+        !normalized ||
+        [item.masked_content, item.source, item.disabled_reason]
+          .some((value) => String(value || "").toLowerCase().includes(normalized));
+      return matchesStatus && matchesQuery;
+    });
+  }, [items, itemFilter, itemQuery]);
 
   const importBatch = async () => {
     if (!selectedPlan || busy || !importItems.length) return;
