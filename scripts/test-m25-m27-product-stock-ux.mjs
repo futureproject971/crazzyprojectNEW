@@ -32,6 +32,10 @@ for (const required of [
   'href="#pm-geral"',
   'href="#pm-planos"',
   'href="#pm-automacao"',
+  "VISÃO GERAL DO CATÁLOGO",
+  "productStockMeta(product)",
+  "productPriceRange(product)",
+  "Sem estoque",
 ]) {
   if (!productManager.includes(required)) {
     throw new Error("Product Manager per-plan stock UX missing: " + required);
@@ -65,6 +69,9 @@ for (const required of [
   ".crz-pm-visual-summary",
   ".crz-pm-stock-section",
   ".crz-pm-section-nav",
+  ".crz-pm-overview",
+  ".crz-pm-overview__stock.is-low",
+  ".crz-pm-overview__stock.is-out",
 ]) {
   if (!productStyles.includes(required)) {
     throw new Error("Product Manager visual style missing: " + required);
