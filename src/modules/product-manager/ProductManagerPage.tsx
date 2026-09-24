@@ -569,6 +569,27 @@ export function ProductManagerPage() {
     setStockNotice("");
 
     try {
+      if (
+        planDraft.delivery_mode === "internal_stock" &&
+        checkedFlags(planDraft.automation_flags, "auto_delivery")
+      ) {
+        const planResponse = await fetch("/api/admin/products", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            kind: "plan",
+            plan: {
+              ...planDraft,
+              tutorial_ids: planDraft.tutorials.map(item => item.id),
+            },
+          }),
+        });
+        const planPayload = await planResponse.json().catch(() => ({}));
+        if (!planResponse.ok) {
+          throw new Error(planPayload?.error || "Falha ao preparar estoque automático.");
+        }
+      }
+
       const response = await fetch("/api/admin/stock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
