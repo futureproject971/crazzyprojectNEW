@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Badge,
   Button,
@@ -11,9 +11,11 @@ import {
 } from "@/core/design-system";
 import type {
   SupportAttachment,
+  SupportMessage,
   SupportStatus,
   SupportThread,
 } from "./types";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import {
   SUPPORT_FILE_ACCEPT,
   SUPPORT_MAX_FILES_PER_MESSAGE,
@@ -114,8 +116,9 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
   const [statusBusy, setStatusBusy] = useState(false);
   const fileInput = useRef<HTMLInputElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const realtimeRefreshTimer = useRef<number | null>(null);
 
-  const load = async (silent = false) => {
+  const load = useCallback(async (silent = false) => {
     if (!silent) {
       setState("loading");
       setError("");
@@ -136,19 +139,89 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
         setState("error");
       }
     }
-  };
+  }, [ticketId]);
+
+  const scheduleRealtimeRefresh = useCallback(() => {
+    if (realtimeRefreshTimer.current) {
+      window.clearTimeout(realtimeRefreshTimer.current);
+    }
+
+    realtimeRefreshTimer.current = window.setTimeout(() => {
+      realtimeRefreshTimer.current = null;
+      void load(true);
+    }, 120);
+  }, [load]);
 
   useEffect(() => {
     void load();
 
-    const timer = window.setInterval(() => {
+    const supabase = createBrowserSupabaseClient();
+    const channel = supabase
+      .channel("support-ticket-" + ticketId)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "support_messages",
+          filter: "ticket_id=eq." + ticketId,
+        },
+        scheduleRealtimeRefresh
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "support_attachments",
+          filter: "ticket_id=eq." + ticketId,
+        },
+        scheduleRealtimeRefresh
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "support_ticket_events",
+          filter: "ticket_id=eq." + ticketId,
+        },
+        scheduleRealtimeRefresh
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "support_tickets",
+          filter: "id=eq." + ticketId,
+        },
+        scheduleRealtimeRefresh
+      )
+      .subscribe();
+
+    const fallback = window.setInterval(() => {
       if (document.visibilityState === "visible") {
         void load(true);
       }
-    }, 6000);
+    }, 30000);
 
-    return () => window.clearInterval(timer);
-  }, [ticketId]);
+    return () => {
+      if (realtimeRefreshTimer.current) {
+        window.clearTimeout(realtimeRefreshTimer.current);
+        realtimeRefreshTimer.current = null;
+      }
+      window.clearInterval(fallback);
+      void supabase.removeChannel(channel);
+    };
+  }, [ticketId, load, scheduleRealtimeRefresh]);
+
+  useEffect(() => {
+    if (!thread?.messages.length) return;
+    window.requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+  }, [thread?.messages.length]);
 
   const attachmentsByMessage = useMemo(() => {
     const map = new Map<string, SupportAttachment[]>();
@@ -210,12 +283,38 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
         });
       }
 
+      const sentId = String(sent.messageId || ("local-" + Date.now()));
+      const knownSender =
+        thread.messages.find((item) => item.senderRole === "user")?.sender ||
+        { id: null, name: "Você", avatarUrl: null };
+
+      const optimisticMessage: SupportMessage = {
+        id: sentId,
+        senderRole: "user",
+        message: text,
+        editedAt: null,
+        createdAt: new Date().toISOString(),
+        sender: knownSender,
+      };
+
+      setThread((current) => {
+        if (!current || current.messages.some((item) => item.id === sentId)) return current;
+        return {
+          ...current,
+          messages: [...current.messages, optimisticMessage],
+        };
+      });
+
       setMessage("");
       setFiles([]);
       setUploadLabel("");
       if (fileInput.current) fileInput.current.value = "";
-      await load(true);
-      window.setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 60);
+
+      if (files.length > 0) {
+        await load(true);
+      }
+
+      window.setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), 40);
     } catch (sendError) {
       setError(sendError instanceof Error ? sendError.message : "Falha ao enviar.");
     } finally {
