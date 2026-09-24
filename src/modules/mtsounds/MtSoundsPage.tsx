@@ -1,9 +1,28 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
 import { Activity, AudioLines, ArrowUpRight, Gauge, Radio, Search, SlidersHorizontal, Sparkles, Waves } from "./native/icons";
 import MusicSearch from "./native/MusicSearch";
 import ReactiveVinyl from "./native/ReactiveVinyl";
 
 export function MtSoundsPage() {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const via = String(params.get("via") || "").trim().toLowerCase();
+    if (!via) return;
+
+    void fetch("/api/referral/capture", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: via, source: "mtsounds" }),
+    }).finally(() => {
+      params.delete("via");
+      const query = params.toString();
+      window.history.replaceState({}, "", query ? "/mtsounds?" + query : "/mtsounds");
+    });
+  }, []);
+
   return <div className="crz-mts-native">
     <section className="command-hero wrap">
       <div className="hero-copy reveal">
