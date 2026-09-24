@@ -1,0 +1,44 @@
+name: Build CRAZZY CMD Fresh
+
+on:
+  push:
+    branches:
+      - multiloader-build-temp
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -S "$env:GITHUB_WORKSPACE\tools\multiloader-build\cmd-fresh" -B "$env:GITHUB_WORKSPACE\cmd-fresh-build" -A x64
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cmake --build "$env:GITHUB_WORKSPACE\cmd-fresh-build" --config Release --parallel
+
+      - name: Inspect
+        shell: pwsh
+        run: |
+          Get-Item "$env:GITHUB_WORKSPACE\cmd-fresh-build\Release\CrazzyMultiloader_CMD_FRESH.exe" | Select-Object Name,Length
+          Get-FileHash "$env:GITHUB_WORKSPACE\cmd-fresh-build\Release\CrazzyMultiloader_CMD_FRESH.exe" -Algorithm SHA256
+
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "$env:GITHUB_WORKSPACE\dist" | Out-Null
+          Copy-Item "$env:GITHUB_WORKSPACE\cmd-fresh-build\Release\CrazzyMultiloader_CMD_FRESH.exe" "$env:GITHUB_WORKSPACE\dist\CrazzyMultiloader_CMD_FRESH.exe"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CRAZZY-MULTILOADER-CMD-FRESH-WINDOWS
+          path: dist
+          if-no-files-found: error
