@@ -80,7 +80,7 @@ export function AcademyTutorialPage({ slug }: { slug: string }) {
           <section className="crz-academy-lock">
             <NeonIcon name="shield" size={46} />
             <strong>Este tutorial é exclusivo de produto</strong>
-            <p>Ele é liberado automaticamente quando sua conta possui um entitlement ativo de um dos produtos abaixo.</p>
+            <p>Ele é liberado quando sua conta possui acesso ativo a um dos produtos abaixo.</p>
             <div>{tutorial.products.map(product => <span key={product.id}>{product.name}</span>)}</div>
             <a className="crz-button crz-button--primary crz-button--md" href="/produtos">Ver produtos</a>
           </section>
