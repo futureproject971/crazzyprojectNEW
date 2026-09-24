@@ -57,6 +57,9 @@ export type ManagerProduct = {
   description: string | null;
   features_text: string | null;
   image_url: string | null;
+  icon_url: string | null;
+  banner_url: string | null;
+  hide_delivery_badge: boolean;
   is_new: boolean;
   active: boolean;
   sort_order: number;

@@ -24,6 +24,8 @@ export async function POST(request: NextRequest) {
 
   const form = await request.formData().catch(() => null);
   const file = form?.get("file");
+  const kindValue = String(form?.get("kind") || "banner").toLowerCase();
+  const kind = kindValue === "icon" ? "icon" : "banner";
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "INVALID_UPLOAD" }, { status: 400 });
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "UNSUPPORTED_IMAGE_TYPE" }, { status: 400 });
   }
 
-  const path = `product-cover/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+  const path = `product-media/${kind}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
   const bytes = new Uint8Array(await file.arrayBuffer());
 
   const { error } = await supabase.storage
