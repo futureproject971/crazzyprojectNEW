@@ -540,11 +540,8 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
       const stockId = (delivery.stock_item_id || null) as string | null;
       const deliveryCreated = delivery.created === true;
 
-      // A previous attempt may have delivered this exact unit and then failed later in
-      // the fulfillment pipeline. In that case, never duplicate messages, reseller
-      // accounting or any other side effect.
-      if (!deliveryCreated) continue;
-
+      // CRAZZY BONUS is independently idempotent by payment/item/unit. Run this even
+      // on a delivery retry so a transient bonus error can heal without duplicating credit.
       const { error: bonusGrantError } = await supabaseAdmin.rpc("grant_purchase_bonus", {
         p_user_id: payment.user_id,
         p_plan_id: item.planId,
@@ -555,6 +552,10 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
       if (bonusGrantError) {
         console.warn("[checkout] CRAZZY BONUS grant skipped", bonusGrantError.message || bonusGrantError);
       }
+
+      // A previous attempt may have delivered this exact unit and then failed later in
+      // the fulfillment pipeline. Ticket messages and reseller accounting remain one-shot.
+      if (!deliveryCreated) continue;
 
       if (stockId) {
         await supabaseAdmin.from("ticket_messages").insert({

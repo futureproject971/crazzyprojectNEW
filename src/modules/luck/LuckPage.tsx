@@ -18,7 +18,7 @@ function ScratchCell({label,win,revealAll}:{label:string;win:boolean;revealAll:b
 
 function buildGrid(result:LuckResult){
  const win=result.prize_type!=="none",seed=[...result.play_id].reduce((a,c)=>a+c.charCodeAt(0),0),patterns=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]],pattern=patterns[seed%patterns.length];
- const labels=["Nada","Quase","Nada","Tente","Nada","Bônus?","Nada","Quase","Nada"];
+ const labels=["Tente","Quase","Bônus?","Nada","Outra","De novo","Volte","Hoje não","Mais uma"];
  if(win)for(const i of pattern)labels[i]=result.prize_label;
  return labels.map((label,i)=>({label,win:win&&pattern.includes(i)}));
 }
