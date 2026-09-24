@@ -85,7 +85,7 @@ export function RankPage() {
         <PageHeader
           eyebrow="CRAZZY RANK"
           title="Seu progresso no ecossistema"
-          description="O rank é calculado no servidor usando atividade real da conta. Compras, produtos ativos, avaliações, Rewards, Luck e comunidade entram no progresso."
+          description="Seu rank evolui com compras, produtos ativos, avaliações, Rewards, Luck e participação na comunidade."
           actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">Voltar ao CLUB</a>}
         />
 
