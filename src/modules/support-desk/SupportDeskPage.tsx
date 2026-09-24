@@ -96,7 +96,7 @@ export function SupportDeskPage(){
       .on(
         "postgres_changes",
         {event:"INSERT",schema:"public",table:"support_attachments"},
-        payload=>schedule(String((payload.new as {ticket_id?:unknown})?.ticket_id||""))
+        (payload:any)=>schedule(String((payload.new as {ticket_id?:unknown})?.ticket_id||""))
       )
       .on(
         "postgres_changes",
