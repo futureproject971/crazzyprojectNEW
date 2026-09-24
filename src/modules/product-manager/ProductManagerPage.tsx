@@ -44,10 +44,79 @@ function checkedFlags(flags: Record<string, unknown>, key: string) {
   return flags?.[key] === true;
 }
 
+type ProductFilter = "all" | "active" | "inactive" | "out";
+
+function brl(value: number) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+  }).format(value);
+}
+
+function productPriceRange(product: ManagerProduct) {
+  const prices = product.plans
+    .map(plan => Number(plan.price))
+    .filter(price => Number.isFinite(price) && price >= 0);
+
+  if (!prices.length) return "Sem preço";
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  return min === max ? brl(min) : `${brl(min)} até ${brl(max)}`;
+}
+
+function productInternalStock(product: ManagerProduct) {
+  return product.plans
+    .filter(plan => plan.delivery_mode === "internal_stock")
+    .reduce((total, plan) => total + Number(plan.available_stock || 0), 0);
+}
+
+function productStockMeta(product: ManagerProduct) {
+  const internal = product.plans.filter(plan => plan.delivery_mode === "internal_stock");
+  const available = productInternalStock(product);
+
+  if (internal.length) {
+    return {
+      label: String(available),
+      detail: available === 1 ? "1 key" : `${available} keys`,
+      tone: available === 0 ? "out" : available <= 10 ? "low" : "ok",
+    };
+  }
+
+  if (product.plans.some(plan => plan.delivery_mode === "ghost_stock")) {
+    return { label: "∞", detail: "estoque fantasma", tone: "infinite" };
+  }
+
+  if (product.plans.some(plan => ["purincash_supplier", "lzt_account"].includes(plan.delivery_mode))) {
+    return { label: "EXT", detail: "fornecedor externo", tone: "external" };
+  }
+
+  return { label: "MAN", detail: "entrega manual", tone: "manual" };
+}
+
+function planStockMeta(plan: ManagerPlan) {
+  if (plan.delivery_mode === "internal_stock") {
+    const value = Number(plan.available_stock || 0);
+    return {
+      label: String(value),
+      detail: value === 1 ? "1 disponível" : `${value} disponíveis`,
+      tone: value === 0 ? "out" : value <= 10 ? "low" : "ok",
+    };
+  }
+  if (plan.delivery_mode === "ghost_stock") {
+    return { label: "∞", detail: "ilimitado / ticket", tone: "infinite" };
+  }
+  if (["purincash_supplier", "lzt_account"].includes(plan.delivery_mode)) {
+    return { label: "EXT", detail: "fornecedor externo", tone: "external" };
+  }
+  return { label: "MAN", detail: "entrega manual", tone: "manual" };
+}
+
 export function ProductManagerPage() {
   const [catalog, setCatalog] = useState<ManagerCatalog | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "auth" | "forbidden" | "error">("loading");
   const [query, setQuery] = useState("");
+  const [productFilter, setProductFilter] = useState<ProductFilter>("all");
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [productDraft, setProductDraft] = useState<ManagerProduct | null>(null);
@@ -136,12 +205,24 @@ export function ProductManagerPage() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!catalog) return [];
-    if (!q) return catalog.products;
-    return catalog.products.filter(product =>
-      [product.name, product.game_name, product.status_label]
-        .some(value => String(value || "").toLowerCase().includes(q))
-    );
-  }, [catalog, query]);
+
+    return catalog.products.filter(product => {
+      const queryMatch =
+        !q ||
+        [product.name, product.game_name, product.status_label]
+          .some(value => String(value || "").toLowerCase().includes(q));
+
+      if (!queryMatch) return false;
+      if (productFilter === "active") return product.active;
+      if (productFilter === "inactive") return !product.active;
+      if (productFilter === "out") {
+        const internalPlans = product.plans.filter(plan => plan.delivery_mode === "internal_stock");
+        return internalPlans.length > 0 && productInternalStock(product) === 0;
+      }
+
+      return true;
+    });
+  }, [catalog, query, productFilter]);
 
   const selectProduct = (product: ManagerProduct) => {
     setSelectedProductId(product.id);
@@ -411,6 +492,107 @@ export function ProductManagerPage() {
 
         {notice && <div className="crz-pm-notice">{notice}</div>}
 
+        <section className="crz-pm-overview">
+          <header className="crz-pm-overview__head">
+            <div>
+              <small>VISÃO GERAL DO CATÁLOGO</small>
+              <h2>{catalog.products.length} produto(s)</h2>
+              <p>Produto, categoria, planos, estoque e faixa de preço em uma tela só.</p>
+            </div>
+            <button
+              type="button"
+              className="crz-button crz-button--primary crz-button--md"
+              onClick={() => setCreatingProduct(true)}
+            >
+              + Criar produto
+            </button>
+          </header>
+
+          <div className="crz-pm-overview__toolbar">
+            <label className="crz-pm-overview__search">
+              <span>⌕</span>
+              <input
+                value={query}
+                onChange={event => setQuery(event.target.value)}
+                placeholder="Pesquisar produto, categoria ou status..."
+              />
+            </label>
+            <div className="crz-pm-overview__filters" aria-label="Filtros de produto">
+              {([
+                ["all", "Todos"],
+                ["active", "Ativos"],
+                ["inactive", "Desativados"],
+                ["out", "Sem estoque"],
+              ] as Array<[ProductFilter, string]>).map(([value, label]) => (
+                <button
+                  type="button"
+                  key={value}
+                  className={productFilter === value ? "is-active" : ""}
+                  onClick={() => setProductFilter(value)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="crz-pm-overview__table-wrap">
+            <div className="crz-pm-overview__table">
+              <div className="crz-pm-overview__row is-head">
+                <span>Produto</span>
+                <span>Categoria</span>
+                <span>Planos</span>
+                <span>Estoque</span>
+                <span>Preço</span>
+                <span>Status</span>
+              </div>
+
+              {filtered.length ? filtered.map(product => {
+                const stock = productStockMeta(product);
+                return (
+                  <button
+                    type="button"
+                    key={product.id}
+                    className={"crz-pm-overview__row " + (selectedProductId === product.id ? "is-selected" : "")}
+                    onClick={() => {
+                      selectProduct(product);
+                      window.requestAnimationFrame(() => {
+                        document.getElementById("pm-editor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      });
+                    }}
+                  >
+                    <span className="crz-pm-overview__product">
+                      <i style={{ "--accent": product.accent_color || "#1687ff" } as React.CSSProperties}>
+                        {product.image_url ? <img src={product.image_url} alt="" /> : product.emoji || "◆"}
+                      </i>
+                      <b>
+                        <strong>{product.name}</strong>
+                        <small>{product.status_label || "Sem status"}</small>
+                      </b>
+                    </span>
+                    <span className="crz-pm-overview__category">{product.game_name}</span>
+                    <span className="crz-pm-overview__plans">{product.plans.length} plano(s)</span>
+                    <span className={"crz-pm-overview__stock is-" + stock.tone}>
+                      <strong>{stock.label}</strong>
+                      <small>{stock.detail}</small>
+                    </span>
+                    <span className="crz-pm-overview__price">{productPriceRange(product)}</span>
+                    <span>
+                      <Badge tone={product.active ? "green" : "neutral"}>
+                        {product.active ? "ATIVO" : "OFF"}
+                      </Badge>
+                    </span>
+                  </button>
+                );
+              }) : (
+                <div className="crz-pm-overview__empty">
+                  Nenhum produto corresponde aos filtros.
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
         <div className="crz-pm-layout">
           <aside className="crz-pm-products">
             <div className="crz-pm-products__head">
@@ -466,7 +648,7 @@ export function ProductManagerPage() {
             </div>
           </aside>
 
-          <section className="crz-pm-editor">
+          <section id="pm-editor" className="crz-pm-editor">
             {!productDraft ? (
               <div className="crz-pm-state"><p>Nenhum produto selecionado.</p></div>
             ) : (
@@ -611,18 +793,21 @@ export function ProductManagerPage() {
                   )}
 
                   <div className="crz-pm-plan-tabs">
-                    {productDraft.plans.map(plan => (
-                      <button type="button" key={plan.id} className={selectedPlanId === plan.id ? "is-active" : ""} onClick={() => selectPlan(plan)}>
-                        <span className="crz-pm-plan-tab__top">
-                          <strong>{plan.name}</strong>
-                          <i className={plan.active ? "is-live" : "is-off"}>{plan.active ? "ATIVO" : "OFF"}</i>
-                        </span>
-                        <b>R$ {Number(plan.price).toFixed(2)}</b>
-                        <span className="crz-pm-plan-tab__stock">
-                          <em>{plan.available_stock}</em> disponível(is)
-                        </span>
-                      </button>
-                    ))}
+                    {productDraft.plans.map(plan => {
+                      const stock = planStockMeta(plan);
+                      return (
+                        <button type="button" key={plan.id} className={selectedPlanId === plan.id ? "is-active" : ""} onClick={() => selectPlan(plan)}>
+                          <span className="crz-pm-plan-tab__top">
+                            <strong>{plan.name}</strong>
+                            <i className={plan.active ? "is-live" : "is-off"}>{plan.active ? "ATIVO" : "OFF"}</i>
+                          </span>
+                          <b>{brl(Number(plan.price))}</b>
+                          <span className={"crz-pm-plan-tab__stock is-" + stock.tone}>
+                            <em>{stock.label}</em> {stock.detail}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
 
                   {planDraft && (
