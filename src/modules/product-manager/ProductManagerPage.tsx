@@ -128,13 +128,22 @@ export function ProductManagerPage() {
   const [stockNotice, setStockNotice] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
   const [creatingProduct, setCreatingProduct] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorTab, setEditorTab] = useState<"general" | "fields" | "hooks">("general");
+  const [stockModalOpen, setStockModalOpen] = useState(false);
+  const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
   const [creatingPlan, setCreatingPlan] = useState(false);
   const [newProduct, setNewProduct] = useState({
     gameId: "",
     name: "",
     emoji: "🎮",
     accentColor: "#1687FF",
-    createDefaultPlans: true,
+    description: "",
+    iconUrl: "",
+    bannerUrl: "",
+    autoDelivery: true,
+    hideDeliveryBadge: false,
+    createDefaultPlans: false,
   });
   const [newPlan, setNewPlan] = useState<{
     name: string;
