@@ -152,7 +152,6 @@ export function ProductManagerPage() {
     preferredPlanId: string | null = null
   ) => {
     setState("loading");
-    setNotice("");
 
     try {
       const response = await fetch("/api/admin/products", { cache: "no-store" });
@@ -317,8 +316,8 @@ export function ProductManagerPage() {
       const createdId = String(payload.created.id);
       setCreatingProduct(false);
       setNewProduct(current => ({ ...current, name: "" }));
-      setNotice("Produto criado desativado. Agora configure imagem, descrição, preços e estoque.");
       await load(true, createdId, null);
+      setNotice("Produto criado desativado. Agora configure imagem, descrição, preços e estoque.");
       window.requestAnimationFrame(() => {
         document.getElementById("pm-editor")?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -351,8 +350,8 @@ export function ProductManagerPage() {
 
       const createdPlanId = String(payload.created.id);
       setCreatingPlan(false);
-      setNotice("Plano criado desativado. Revise entrega, preço, estoque e automações antes de ativar.");
       await load(true, productDraft.id, createdPlanId);
+      setNotice("Plano criado desativado. Revise entrega, preço, estoque e automações antes de ativar.");
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Falha ao criar plano.");
     } finally {
@@ -379,8 +378,8 @@ export function ProductManagerPage() {
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || "Falha ao salvar produto.");
-      setNotice("Produto salvo.");
       await load(true);
+      setNotice("Produto salvo.");
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Falha ao salvar produto.");
     } finally {
@@ -407,8 +406,8 @@ export function ProductManagerPage() {
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error || "Falha ao salvar plano.");
-      setNotice("Plano salvo.");
       await load(true);
+      setNotice("Plano salvo.");
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Falha ao salvar plano.");
     } finally {
