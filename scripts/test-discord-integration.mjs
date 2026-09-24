@@ -248,3 +248,43 @@ for (const feature of ["Voz, câmera e screen share", "/api/call/create", "/call
 console.log("[PASS] CRAZZY Community links text ecosystem with CRAZZY CALL");
 
 console.log("[PASS] Unified Discord + CRAZZY CALL integration smoke");
+
+
+const authCallback = await readFile("src/app/auth/callback/route.ts", "utf8");
+const guildGatePage = await readFile("src/modules/auth/DiscordGuildGatePage.tsx", "utf8");
+const guildStatusApi = await readFile("src/app/api/auth/guild-status/route.ts", "utf8");
+for (const required of [
+  "Keep the authenticated Discord session alive",
+  "return guildGate(request, next)",
+]) {
+  if (!authCallback.includes(required)) throw new Error("Automatic guild gate callback missing " + required);
+}
+for (const required of [
+  "/api/auth/guild-status",
+  "setInterval",
+  "router.replace(nextPath)",
+  "window.open(url",
+  "verificação automática a cada 2s",
+]) {
+  if (!guildGatePage.includes(required)) throw new Error("Automatic Discord gate UI missing " + required);
+}
+for (const required of [
+  "auth.getUser",
+  '.from("discord_identities")',
+  "guild_member",
+  "Cache-Control",
+]) {
+  if (!guildStatusApi.includes(required)) throw new Error("Guild status API missing " + required);
+}
+for (const required of [
+  "startPendingGuildVerifier",
+  "guild.members.fetch",
+  '.eq("guild_member", false)',
+  '.from("discord_identities")',
+]) {
+  if (!guildGate.includes(required)) throw new Error("Bot pending guild verifier missing " + required);
+}
+if (!botIndex.includes("startPendingGuildVerifier")) {
+  throw new Error("Bot Core must start pending guild verifier");
+}
+console.log("[PASS] Discord login waits for guild entry and auto-approves through Bot Core");

@@ -73,3 +73,85 @@ export async function ensureOfficialDiscordInvite(client, supabase, config) {
     return null;
   }
 }
+
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export function startPendingGuildVerifier(client, supabase, config) {
+  let running = false;
+
+  const tick = async () => {
+    if (running || !client.isReady()) return;
+    running = true;
+
+    try {
+      const guild =
+        client.guilds.cache.get(config.guildId) ||
+        await client.guilds.fetch(config.guildId).catch(() => null);
+      if (!guild) return;
+
+      const { data: pending, error } = await supabase
+        .from("discord_identities")
+        .select("user_id,discord_user_id,last_checked_at")
+        .eq("guild_member", false)
+        .not("discord_user_id", "is", null)
+        .order("last_checked_at", { ascending: true, nullsFirst: true })
+        .limit(25);
+
+      if (error) throw error;
+
+      for (const identity of pending || []) {
+        const discordUserId = String(identity.discord_user_id || "").trim();
+        if (!/^\d{10,30}$/.test(discordUserId)) continue;
+
+        const now = new Date().toISOString();
+        try {
+          const member = await guild.members.fetch(discordUserId);
+          if (member) {
+            const { error: updateError } = await supabase
+              .from("discord_identities")
+              .update({
+                guild_id: config.guildId,
+                guild_member: true,
+                guild_verified_at: now,
+                last_checked_at: now,
+                updated_at: now,
+              })
+              .eq("user_id", identity.user_id)
+              .eq("discord_user_id", discordUserId);
+
+            if (updateError) throw updateError;
+            console.log("[guild-gate] pending website login approved:", discordUserId);
+          }
+        } catch (memberError) {
+          const code = Number(memberError?.code || 0);
+          if (![10007, 10013].includes(code)) {
+            console.warn("[guild-gate] pending member lookup failed:", discordUserId, memberError?.code || memberError?.message || memberError);
+          }
+
+          await supabase
+            .from("discord_identities")
+            .update({
+              guild_id: config.guildId,
+              guild_member: false,
+              guild_verified_at: null,
+              last_checked_at: now,
+              updated_at: now,
+            })
+            .eq("user_id", identity.user_id)
+            .eq("discord_user_id", discordUserId);
+        }
+
+        await wait(120);
+      }
+    } catch (error) {
+      console.error("[guild-gate] pending verifier failed:", error?.message || error);
+    } finally {
+      running = false;
+    }
+  };
+
+  const timer = setInterval(() => void tick(), 5000);
+  void tick();
+  return () => clearInterval(timer);
+}
