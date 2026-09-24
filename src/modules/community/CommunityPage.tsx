@@ -755,7 +755,7 @@ export function CommunityPage() {
             <NeonIcon name="community" size={28} />
             <div>
               <strong>Chat real</strong>
-              <span>Mensagens, replies e reações ficam salvos na sua conta CRAZZY.</span>
+              <span>Mensagens, respostas e reações em um só lugar.</span>
             </div>
           </Panel>
 
@@ -763,7 +763,7 @@ export function CommunityPage() {
             <NeonIcon name="shield" size={28} />
             <div>
               <strong>Mídia privada</strong>
-              <span>Imagem, vídeo e áudio usam links temporários. O bucket não é público.</span>
+              <span>Envie imagens, vídeos e áudios direto na conversa.</span>
             </div>
           </Panel>
 
