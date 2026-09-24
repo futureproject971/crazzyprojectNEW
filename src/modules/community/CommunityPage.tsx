@@ -16,6 +16,7 @@ import type {
   CommunitySnapshot,
 } from "./types";
 import { CommunityVoiceDock } from "./CommunityVoiceDock";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import {
   COMMUNITY_FILE_ACCEPT,
   COMMUNITY_MAX_FILES,
@@ -187,6 +188,7 @@ export function CommunityPage() {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
   const firstLoadRef = useRef(true);
+  const realtimeRefreshRef = useRef<number | null>(null);
 
   const load = async (silent = false) => {
     if (!silent) {
@@ -234,13 +236,39 @@ export function CommunityPage() {
     firstLoadRef.current = true;
     void load();
 
-    const timer = window.setInterval(() => {
+    const supabase = createBrowserSupabaseClient();
+    const queueRefresh = () => {
+      if (realtimeRefreshRef.current) {
+        window.clearTimeout(realtimeRefreshRef.current);
+      }
+      realtimeRefreshRef.current = window.setTimeout(() => {
+        realtimeRefreshRef.current = null;
+        void load(true);
+      }, 120);
+    };
+
+    const realtime = supabase
+      .channel("community-live-" + channel)
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_messages" }, queueRefresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_reactions" }, queueRefresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_attachments" }, queueRefresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "community_channels" }, queueRefresh)
+      .subscribe();
+
+    const fallback = window.setInterval(() => {
       if (document.visibilityState === "visible") {
         void load(true);
       }
-    }, 4000);
+    }, 30000);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      if (realtimeRefreshRef.current) {
+        window.clearTimeout(realtimeRefreshRef.current);
+        realtimeRefreshRef.current = null;
+      }
+      window.clearInterval(fallback);
+      void supabase.removeChannel(realtime);
+    };
   }, [channel]);
 
   const visibleMessages = useMemo(
