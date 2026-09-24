@@ -2022,3 +2022,5 @@ html[data-theme="light"] .crz-drawer {
   background: rgba(250,253,255,.985);
   color: #15263a;
 }
+
+@import "../core/design-system/styles/ux-polish.css";
