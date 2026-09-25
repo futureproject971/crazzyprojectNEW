@@ -11,6 +11,7 @@ const tests = [
   "scripts/test-m13-support-realtime.mjs",
   "scripts/test-admin-ticket-badge.mjs",
   "scripts/test-customer-facing-cleanup.mjs",
+  "scripts/test-carousel-stock-simplification.mjs",
   "scripts/test-m14-community.mjs",
   "scripts/test-m17-rewards.mjs",
   "scripts/test-m18-luck.mjs",
