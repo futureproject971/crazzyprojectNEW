@@ -581,19 +581,6 @@ export function ProductManagerPage() {
     }
   };
 
-  const prepareAutomaticStock = () => {
-    if (!planDraft) return;
-    setPlanDraft({
-      ...planDraft,
-      delivery_mode: "internal_stock",
-      automation_flags: {
-        ...planDraft.automation_flags,
-        auto_delivery: true,
-      },
-    });
-    setStockNotice("Entrega automática preparada. Salve o plano para publicar essa configuração.");
-  };
-
   if (state === "loading" && !catalog) {
     return <main className="crz-product-manager-page crz-pm-state"><span className="crz-spinner" /><p>Carregando produtos...</p></main>;
   }
@@ -893,7 +880,7 @@ export function ProductManagerPage() {
                   className={editorTab === "fields" ? "is-active" : ""}
                   onClick={() => setEditorTab("fields")}
                 >
-                  Campos
+                  Planos & Estoque
                 </button>
                 <button
                   type="button"
@@ -1349,7 +1336,7 @@ export function ProductManagerPage() {
                         </div>
                       </>
                     ) : (
-                      <div className="crz-purin-hooks__empty">Selecione uma variação na aba Campos para editar hooks específicos.</div>
+                      <div className="crz-purin-hooks__empty">Selecione um plano na aba Planos & Estoque para editar integrações específicas.</div>
                     )}
 
                     <div className="crz-purin-hooks__block">
