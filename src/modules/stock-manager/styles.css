@@ -446,3 +446,72 @@ html[data-theme="light"] .crz-stock-summary strong {
   .crz-stock-import-fields { grid-template-columns:1fr; }
   .crz-stock-import-foot { align-items:flex-start;flex-direction:column; }
 }
+
+
+/* Simplified stock audit: product creation/import stays in Product Manager. */
+.crz-stock-summary--simple {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  max-width:620px;
+}
+
+.crz-stock-plan-metrics--simple {
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.crz-stock-summary--simple small,
+.crz-stock-plan-head small,
+.crz-stock-items header small {
+  font-size:11px;
+}
+
+.crz-stock-summary--simple span,
+.crz-stock-plan-head span,
+.crz-stock-plan-list small,
+.crz-stock-search input,
+.crz-stock-notice,
+.crz-stock-items-row,
+.crz-stock-items-row button {
+  font-size:11.5px;
+}
+
+.crz-stock-plan-list strong,
+.crz-stock-items header strong {
+  font-size:12.5px;
+}
+
+.crz-stock-plan-list em,
+.crz-stock-history {
+  display:none;
+}
+
+.crz-stock-items-row {
+  min-width:650px;
+  grid-template-columns:1.45fr .7fr .9fr .65fr;
+}
+
+.crz-stock-items-row.is-head {
+  font-size:10.5px;
+}
+
+.crz-stock-items-row code {
+  font-size:12px;
+}
+
+.crz-stock-items-row b {
+  font-size:10px;
+}
+
+.crz-stock-empty {
+  font-size:11.5px;
+}
+
+.crz-stock-empty strong {
+  font-size:13px;
+}
+
+@media(max-width:760px){
+  .crz-stock-summary--simple,
+  .crz-stock-plan-metrics--simple {
+    grid-template-columns:1fr 1fr;
+  }
+}
