@@ -2272,53 +2272,6 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
   border-radius:9px;
 }
 
-.crz-purin-custom-stock {
-  border:1px solid #1b2430;
-  border-radius:10px;
-  overflow:hidden;
-  background:#0a0f17;
-}
-
-.crz-purin-custom-stock > header {
-  min-height:47px;
-  padding:0 12px;
-  border-bottom:1px solid #18202a;
-  display:flex;
-  align-items:center;
-}
-
-.crz-purin-custom-stock > header > div {
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.crz-purin-custom-stock > header strong {
-  color:#dce4ed;
-  font-size:12.5px;
-}
-
-.crz-purin-custom-stock > header span { color:#506075; }
-
-.crz-purin-custom-stock > header b {
-  border-radius:999px;
-  padding:4px 7px;
-  color:#2ddc91;
-  background:#0b2a1f;
-  font-size:10.5px;
-}
-
-.crz-purin-custom-stock__row {
-  padding:10px 12px 14px;
-  display:grid;
-  gap:10px;
-}
-
-.crz-purin-custom-stock__row .crz-purin-toggle-row {
-  padding:0;
-  background:transparent;
-}
-
 .crz-purin-add-stock {
   width:max-content;
   min-height:35px;
@@ -2330,17 +2283,6 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
   font-size:11.5px;
   font-weight:850;
   cursor:pointer;
-}
-
-.crz-purin-variation__advanced {
-  display:flex;
-  align-items:end;
-  justify-content:space-between;
-  gap:12px;
-}
-
-.crz-purin-variation__advanced label {
-  min-width:220px;
 }
 
 .crz-purin-hooks > header {
@@ -2625,5 +2567,107 @@ html[data-theme="light"] .crz-purin-variation__editor select {
   .crz-purin-stock-modal__counter small {
     width:100%;
     margin-left:0;
+  }
+}
+
+
+/* Simplified plan delivery + stock: one decision, one stock action. */
+.crz-purin-stock-simple {
+  border:1px solid #1b2430;
+  border-radius:10px;
+  overflow:hidden;
+  background:#0a0f17;
+}
+
+.crz-purin-stock-simple > header {
+  min-height:54px;
+  padding:10px 12px;
+  border-bottom:1px solid #18202a;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.crz-purin-stock-simple > header > div {
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+
+.crz-purin-stock-simple > header strong {
+  color:#edf3f9;
+  font-size:13px;
+}
+
+.crz-purin-stock-simple > header small,
+.crz-purin-stock-simple__hint {
+  color:#7f8ea1;
+  font-size:11.5px;
+  line-height:1.4;
+}
+
+.crz-purin-stock-simple__controls {
+  padding:12px;
+  display:grid;
+  grid-template-columns:minmax(220px,1fr) auto auto;
+  gap:9px;
+  align-items:end;
+}
+
+.crz-purin-stock-simple__controls label {
+  display:grid;
+  gap:6px;
+}
+
+.crz-purin-stock-simple__controls label > span {
+  color:#93a1b5;
+  font-size:11.5px;
+  font-weight:700;
+}
+
+.crz-purin-stock-simple__controls select {
+  width:100%;
+  min-height:38px;
+  border:1px solid #26313f;
+  border-radius:8px;
+  padding:0 10px;
+  outline:0;
+  color:#f2f6fb;
+  background:#0d131c;
+  font-size:12.5px;
+}
+
+.crz-purin-stock-simple__controls select:focus {
+  border-color:#28ca84;
+  box-shadow:0 0 0 3px rgba(40,202,132,.10);
+}
+
+.crz-purin-stock-simple__hint {
+  margin:0;
+  padding:0 12px 12px;
+}
+
+html[data-theme="light"] .crz-purin-stock-simple {
+  background:#f8fbff;
+  border-color:#d8e1ec;
+}
+
+html[data-theme="light"] .crz-purin-stock-simple > header strong,
+html[data-theme="light"] .crz-purin-stock-simple__controls select {
+  color:#14243a;
+}
+
+html[data-theme="light"] .crz-purin-stock-simple__controls select {
+  background:#fff;
+}
+
+@media(max-width:700px){
+  .crz-purin-stock-simple__controls {
+    grid-template-columns:1fr;
+  }
+  .crz-purin-stock-simple__controls .crz-purin-add-stock,
+  .crz-purin-stock-simple__controls .crz-purin-save-field {
+    width:100%;
   }
 }
