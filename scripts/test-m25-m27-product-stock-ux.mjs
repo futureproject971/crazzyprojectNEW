@@ -86,8 +86,8 @@ for (const forbidden of ["+ Importar keys", "importText", "importBatch"]) {
     throw new Error("Advanced Stock Manager must not duplicate stock import UI: " + forbidden);
   }
 }
-if (!stockManagerUi.includes("+ Adicionar estoque no produto")) {
-  throw new Error("Advanced Stock Manager must route stock additions back to Products");
+if (!stockManagerUi.includes("Gerenciar produtos") || !stockManagerUi.includes("Editar produto")) {
+  throw new Error("Advanced Stock Manager must route product/stock changes back to Products");
 }
 console.log("[PASS] Stock Manager is audit-only; stock addition lives in Products");
 
