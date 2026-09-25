@@ -82,7 +82,6 @@ export function FeaturedProductsCarousel() {
                     <div className="product-art">
                       {image ? <img src={image} alt="" aria-hidden="true" /> : null}
                       <div className="product-art-noise" />
-                      <span className="product-art-brand">{product.name}</span>
                     </div>
                     <div className="product-info">
                       <strong>{product.name}</strong>
