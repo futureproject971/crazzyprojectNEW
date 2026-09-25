@@ -17,15 +17,14 @@ function statusOf(item: StockManagerItem) {
   return "available";
 }
 
-function deliveryLabel(value: string) {
-  const labels: Record<string, string> = {
-    internal_stock: "Keys / estoque automático",
-    purincash_supplier: "Fornecedor PurinCash",
-    lzt_account: "Conta LZT",
-    manual: "Manual",
-    service: "Serviço",
+function statusLabel(value: ReturnType<typeof statusOf>) {
+  const labels = {
+    available: "DISPONÍVEL",
+    reserved: "RESERVADA",
+    used: "UTILIZADA",
+    disabled: "DESATIVADA",
   };
-  return labels[value] || value;
+  return labels[value];
 }
 
 export function StockManagerPage() {
@@ -41,6 +40,7 @@ export function StockManagerPage() {
 
   const loadCatalog = async (preserve = true) => {
     setState("loading");
+
     try {
       const response = await fetch("/api/admin/stock", { cache: "no-store" });
       if (response.status === 401) return setState("auth");
@@ -56,6 +56,7 @@ export function StockManagerPage() {
         next.plans.find((plan) => plan.plan_id === (preserve ? selectedPlanId : null)) ||
         next.plans[0] ||
         null;
+
       setSelectedPlanId(nextPlan?.plan_id || null);
       setState("ready");
     } catch {
@@ -83,7 +84,7 @@ export function StockManagerPage() {
       setItems(result.items || []);
       setItemsTotal(result.total || 0);
     } catch {
-      setNotice("Não foi possível carregar os itens deste plano.");
+      setNotice("Não foi possível carregar as keys deste plano.");
     } finally {
       setItemsLoading(false);
     }
@@ -101,8 +102,9 @@ export function StockManagerPage() {
     if (!catalog) return [];
     const normalized = query.trim().toLowerCase();
     if (!normalized) return catalog.plans;
+
     return catalog.plans.filter((plan) =>
-      [plan.product_name, plan.plan_name, plan.plan_code, plan.game_name, plan.delivery_mode]
+      [plan.product_name, plan.plan_name, plan.game_name]
         .some((value) => String(value || "").toLowerCase().includes(normalized))
     );
   }, [catalog, query]);
@@ -112,20 +114,15 @@ export function StockManagerPage() {
     [catalog, selectedPlanId]
   );
 
-  const totals = useMemo(() => {
-    const plans = catalog?.plans || [];
-    return plans.reduce(
-      (acc, plan) => {
-        acc.available += plan.available_stock;
-        acc.reserved += plan.reserved_stock;
-        acc.used += plan.used_stock;
-        acc.disabled += plan.disabled_stock;
-        return acc;
-      },
-      { available: 0, reserved: 0, used: 0, disabled: 0 }
-    );
-  }, [catalog]);
+  const totalAvailable = useMemo(
+    () => (catalog?.plans || []).reduce((sum, plan) => sum + Number(plan.available_stock || 0), 0),
+    [catalog]
+  );
 
+  const totalKeys = useMemo(
+    () => (catalog?.plans || []).reduce((sum, plan) => sum + Number(plan.local_stock || 0), 0),
+    [catalog]
+  );
 
   const toggleDisabled = async (item: StockManagerItem) => {
     if (item.used || busy) return;
@@ -137,6 +134,7 @@ export function StockManagerPage() {
 
     setBusy(item.id);
     setNotice("");
+
     try {
       const response = await fetch("/api/admin/stock", {
         method: "PATCH",
@@ -148,10 +146,11 @@ export function StockManagerPage() {
         }),
       });
       const payload = await response.json().catch(() => ({}));
+
       if (!response.ok) {
         throw new Error(
           payload.error === "STOCK_ITEM_RESERVED"
-            ? "Esta key está reservada para uma entrega e não pode ser alterada agora."
+            ? "Esta key está reservada e não pode ser alterada agora."
             : "Falha ao atualizar a key."
         );
       }
@@ -199,7 +198,7 @@ export function StockManagerPage() {
   if (state === "error" || !catalog) {
     return (
       <main className="crz-stock-manager crz-stock-state">
-        <strong>Stock Manager indisponível</strong>
+        <strong>Estoque indisponível</strong>
         <button type="button" onClick={() => void loadCatalog(false)}>Tentar novamente</button>
       </main>
     );
@@ -209,21 +208,27 @@ export function StockManagerPage() {
     <main className="crz-stock-manager">
       <div className="crz-container crz-stock-container">
         <PageHeader
-          eyebrow="ESTOQUE AVANÇADO"
-          title="Auditoria de estoque"
-          description="Use esta tela para conferir, localizar e desativar keys. Para adicionar estoque, abra o produto e o plano correspondente."
+          eyebrow="ESTOQUE"
+          title="Keys por plano"
+          description="Aqui você só confere e corrige keys. Para criar produto, plano ou adicionar novas keys, use Produtos."
           actions={
-            <a className="crz-button crz-button--secondary crz-button--sm" href="/admin/produtos">
-              Produtos
+            <a className="crz-button crz-button--primary crz-button--sm" href="/admin/produtos">
+              Gerenciar produtos
             </a>
           }
         />
 
-        <section className="crz-stock-summary">
-          <div><small>DISPONÍVEIS</small><strong>{totals.available}</strong><span>prontas para entrega</span></div>
-          <div><small>RESERVADAS</small><strong>{totals.reserved}</strong><span>aguardando consumo</span></div>
-          <div><small>UTILIZADAS</small><strong>{totals.used}</strong><span>já entregues</span></div>
-          <div><small>DESATIVADAS</small><strong>{totals.disabled}</strong><span>temporariamente bloqueadas</span></div>
+        <section className="crz-stock-summary crz-stock-summary--simple">
+          <div>
+            <small>DISPONÍVEIS</small>
+            <strong>{totalAvailable}</strong>
+            <span>prontas para entrega</span>
+          </div>
+          <div>
+            <small>TOTAL DE KEYS</small>
+            <strong>{totalKeys}</strong>
+            <span>somando todos os planos</span>
+          </div>
         </section>
 
         {notice && <div className="crz-stock-notice">{notice}</div>}
@@ -232,7 +237,11 @@ export function StockManagerPage() {
           <aside className="crz-stock-plans">
             <label className="crz-stock-search">
               <span>⌕</span>
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar produto/plano..." />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Buscar produto ou plano..."
+              />
             </label>
 
             <div className="crz-stock-plan-list">
@@ -245,8 +254,7 @@ export function StockManagerPage() {
                 >
                   <span>
                     <strong>{plan.product_name}</strong>
-                    <small>{plan.game_name} • {plan.plan_name}</small>
-                    <em>{deliveryLabel(plan.delivery_mode)}</em>
+                    <small>{plan.plan_name}</small>
                   </span>
                   <b>{plan.available_stock}</b>
                 </button>
@@ -256,60 +264,64 @@ export function StockManagerPage() {
 
           <section className="crz-stock-workspace">
             {!selectedPlan ? (
-              <div className="crz-stock-empty">Nenhum plano configurado.</div>
+              <div className="crz-stock-empty">Nenhum plano encontrado.</div>
             ) : (
               <>
                 <header className="crz-stock-plan-head">
                   <div>
                     <small>{selectedPlan.game_name}</small>
-                    <h2>{selectedPlan.product_name} • {selectedPlan.plan_name}</h2>
-                    <span>
-                      {deliveryLabel(selectedPlan.delivery_mode)}
-                      {selectedPlan.supplier_provider ? ` • fornecedor: ${selectedPlan.supplier_provider}` : ""}
-                    </span>
+                    <h2>{selectedPlan.product_name}</h2>
+                    <span>{selectedPlan.plan_name}</span>
                   </div>
-                  <a
-                    className="crz-button crz-button--primary crz-button--sm"
-                    href="/admin/produtos"
-                  >
-                    + Adicionar estoque no produto
+                  <a className="crz-button crz-button--secondary crz-button--sm" href="/admin/produtos">
+                    Editar produto
                   </a>
                 </header>
 
-                <div className="crz-stock-plan-metrics">
+                <div className="crz-stock-plan-metrics crz-stock-plan-metrics--simple">
                   <div><span>Disponível</span><strong>{selectedPlan.available_stock}</strong></div>
                   <div><span>Reservado</span><strong>{selectedPlan.reserved_stock}</strong></div>
-                  <div><span>Usado</span><strong>{selectedPlan.used_stock}</strong></div>
-                  <div><span>Desativado</span><strong>{selectedPlan.disabled_stock}</strong></div>
-                  <div><span>Total local</span><strong>{selectedPlan.local_stock}</strong></div>
+                  <div><span>Utilizado</span><strong>{selectedPlan.used_stock}</strong></div>
                 </div>
 
                 <section className="crz-stock-items">
                   <header>
                     <div>
-                      <small>KEYS DESTE PLANO</small>
+                      <small>KEYS</small>
                       <strong>{itemsTotal} item(ns)</strong>
                     </div>
-                    <button type="button" disabled={itemsLoading} onClick={() => void loadItems(selectedPlan.plan_id)}>
+                    <button
+                      type="button"
+                      disabled={itemsLoading}
+                      onClick={() => void loadItems(selectedPlan.plan_id)}
+                    >
                       ↻ Atualizar
                     </button>
                   </header>
 
                   {itemsLoading ? (
-                    <div className="crz-stock-empty">Carregando itens...</div>
+                    <div className="crz-stock-empty">Carregando keys...</div>
                   ) : items.length ? (
                     <div className="crz-stock-items-table">
                       <div className="crz-stock-items-row is-head">
-                        <span>KEY</span><span>STATUS</span><span>ORIGEM</span><span>DATA</span><span>AÇÃO</span>
+                        <span>KEY</span>
+                        <span>STATUS</span>
+                        <span>DATA</span>
+                        <span>AÇÃO</span>
                       </div>
+
                       {items.map((item) => {
                         const status = statusOf(item);
                         return (
                           <div className="crz-stock-items-row" key={item.id}>
                             <code>{item.masked_content}</code>
-                            <span><b className={"is-" + status}>{status.toUpperCase()}</b></span>
-                            <span>{item.source}</span>
-                            <time>{new Date(item.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</time>
+                            <span><b className={"is-" + status}>{statusLabel(status)}</b></span>
+                            <time>
+                              {new Date(item.created_at).toLocaleString("pt-BR", {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })}
+                            </time>
                             <span>
                               {!item.used ? (
                                 <button
@@ -319,7 +331,9 @@ export function StockManagerPage() {
                                 >
                                   {item.disabled ? "Reativar" : "Desativar"}
                                 </button>
-                              ) : "Consumida"}
+                              ) : (
+                                "Consumida"
+                              )}
                             </span>
                           </div>
                         );
@@ -328,8 +342,8 @@ export function StockManagerPage() {
                   ) : (
                     <div className="crz-stock-empty">
                       <NeonIcon name="cube" size={30} />
-                      <strong>Nenhuma key cadastrada neste plano</strong>
-                      <span>Adicione as keys pelo produto e plano correspondente.</span>
+                      <strong>Nenhuma key neste plano</strong>
+                      <span>Adicione novas keys em Produtos → Campos → plano → Adicionar Estoque.</span>
                     </div>
                   )}
                 </section>
@@ -337,37 +351,6 @@ export function StockManagerPage() {
             )}
           </section>
         </div>
-
-        <section className="crz-stock-history">
-          <article>
-            <header><small>LOTES RECENTES</small><strong>Importações</strong></header>
-            <div>
-              {catalog.recent_batches.length ? catalog.recent_batches.map((batch) => {
-                const plan = catalog.plans.find((item) => item.plan_id === batch.product_plan_id);
-                return (
-                  <div key={batch.id}>
-                    <span><strong>{plan?.product_name || "Produto"} • {plan?.plan_name || "Plano"}</strong><small>{batch.source}</small></span>
-                    <span><b>{batch.accepted_count}</b> adicionadas</span>
-                    <span><b>{batch.duplicate_count}</b> duplicadas</span>
-                    <time>{new Date(batch.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</time>
-                  </div>
-                );
-              }) : <div className="crz-stock-empty">Nenhum lote importado.</div>}
-            </div>
-          </article>
-
-          <article>
-            <header><small>HISTÓRICO</small><strong>Movimentações de estoque</strong></header>
-            <div>
-              {catalog.recent_events.length ? catalog.recent_events.map((event) => (
-                <div key={event.id}>
-                  <span><strong>{event.event_type.replaceAll("_", " ")}</strong><small>{event.stock_item_id ? event.stock_item_id.slice(0, 8) : "lote/sistema"}</small></span>
-                  <time>{new Date(event.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</time>
-                </div>
-              )) : <div className="crz-stock-empty">Nenhum evento registrado.</div>}
-            </div>
-          </article>
-        </section>
       </div>
     </main>
   );
