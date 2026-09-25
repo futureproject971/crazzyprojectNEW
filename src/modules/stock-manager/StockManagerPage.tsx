@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Badge, NeonIcon, PageHeader } from "@/core/design-system";
+import { NeonIcon, PageHeader } from "@/core/design-system";
 import type {
   StockManagerCatalog,
   StockManagerItem,
