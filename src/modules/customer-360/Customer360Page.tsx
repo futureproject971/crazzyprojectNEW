@@ -33,6 +33,9 @@ export function Customer360Page(){
   const [state,setState]=useState<"loading"|"ready"|"auth"|"forbidden"|"error">("loading");
   const [detailLoading,setDetailLoading]=useState(false);
   const [notice,setNotice]=useState("");
+  const [bonusAdjust,setBonusAdjust]=useState("");
+  const [bonusReason,setBonusReason]=useState("");
+  const [bonusBusy,setBonusBusy]=useState(false);
 
   const load=useCallback(async(q=query)=>{
     try{
@@ -74,6 +77,8 @@ export function Customer360Page(){
     }
   },[]);
 
+  const adjustBonus=async()=>{if(!detail||bonusBusy)return;const amount=Math.round(Number(bonusAdjust.replace(",", "."))*100);if(!Number.isFinite(amount)||amount===0){setNotice("Informe um valor diferente de zero.");return}setBonusBusy(true);const r=await fetch("/api/admin/bonus",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"adjust",userId:detail.account.user_id,amountCents:amount,description:bonusReason.trim()||"Ajuste administrativo",idempotencyKey:"customer360:"+detail.account.user_id+":"+crypto.randomUUID()})});setBonusBusy(false);if(!r.ok){setNotice("Não foi possível ajustar o CRAZZY BONUS.");return}setBonusAdjust("");setBonusReason("");setNotice("CRAZZY BONUS atualizado.");await loadDetail({user_id:detail.account.user_id})};
+
   const rows=useMemo(()=>customers,[customers]);
 
   if(state==="loading")return <main className="crz-customer360-state"><span className="crz-spinner"/><strong>Carregando clientes...</strong></main>;
@@ -82,10 +87,10 @@ export function Customer360Page(){
   if(state==="error")return <main className="crz-customer360-state"><strong>Customer 360 indisponível.</strong><button onClick={()=>void load()}>Tentar novamente</button></main>;
 
   return <main className="crz-customer360"><div className="crz-container crz-customer360__container">
-    <PageHeader eyebrow="M31 • CUSTOMER 360" title="Cada cliente, uma linha do tempo" description="Conta, Discord, pagamentos, produtos, entregas, tickets e cargos num único lugar." actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/admin">Control Center</a>}/>
+    <PageHeader eyebrow="M31 • CUSTOMER 360" title="Clientes" description="Encontre pelo nome, e-mail ou Discord e veja compras, produtos, entregas, tickets e CRAZZY Club sem lidar com IDs técnicos." actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/admin">Control Center</a>}/>
 
     <section className="crz-customer360-toolbar">
-      <label><span>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")void load()}} placeholder="Nome, e-mail, Discord ID, username ou UUID..."/></label>
+      <label><span>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")void load()}} placeholder="Nome, e-mail ou usuário do Discord..."/></label>
       <button className="crz-button crz-button--primary crz-button--sm" onClick={()=>void load()}>Buscar</button>
     </section>
 
@@ -95,7 +100,7 @@ export function Customer360Page(){
       <section className="crz-customer360-list">
         <header className="crz-customer360-row crz-customer360-row--head"><span>Cliente</span><span>Discord</span><span>Compras</span><span>Ativos</span><span>Tickets</span><span>Valor pago</span></header>
         {rows.map(customer=><button key={customer.user_id} className={"crz-customer360-row crz-customer360-row--item"+(selected?.user_id===customer.user_id?" is-selected":"")} onClick={()=>void loadDetail(customer)}>
-          <span><strong>{customer.username||customer.email||short(customer.user_id)}</strong><small>{customer.email||short(customer.user_id)}</small></span>
+          <span><strong>{customer.username||customer.email||"Cliente CRAZZY"}</strong><small>{customer.email||"Sem e-mail"}</small></span>
           <span><strong>{customer.discord_global_name||customer.discord_username||"Não conectado"}</strong><small>{customer.guild_member?"✓ no servidor":customer.discord_user_id?"fora do servidor":"sem Discord"}</small></span>
           <span><strong>{customer.completed_payment_count}</strong><small>{customer.payment_count} tentativa(s)</small></span>
           <span><strong>{customer.active_entitlements}</strong><small>entitlement(s)</small></span>
@@ -108,7 +113,7 @@ export function Customer360Page(){
       <aside className="crz-customer360-detail">
         {detailLoading?<div className="crz-customer360-empty"><span className="crz-spinner"/><span>Carregando histórico...</span></div>:!detail?<div className="crz-customer360-empty"><strong>Selecione um cliente</strong><span>A visão 360 aparece aqui.</span></div>:<>
           <header className="crz-customer360-detail__head">
-            <div><small>CLIENTE</small><h2>{detail.account.username||detail.account.email||short(detail.account.user_id)}</h2><span>{detail.account.email||"sem e-mail"} • desde {dateTime(detail.account.created_at)}</span></div>
+            <div><small>CLIENTE</small><h2>{detail.account.username||detail.account.email||"Cliente CRAZZY"}</h2><span>{detail.account.email||"sem e-mail"} • desde {dateTime(detail.account.created_at)}</span></div>
             <Badge tone={detail.account.banned?"pink":"green"}>{detail.account.banned?"BLOQUEADO":"ATIVO"}</Badge>
           </header>
 
@@ -123,9 +128,24 @@ export function Customer360Page(){
             <header><strong>Discord</strong><span>{detail.discord?.guild_member?"✓ membro verificado":detail.discord?"conectado, fora da guild":"não conectado"}</span></header>
             <div className="crz-customer360-kv">
               <span><small>Usuário</small><strong>{detail.discord?.global_name||detail.discord?.username||"—"}</strong></span>
-              <span><small>Discord ID</small><strong>{detail.discord?.discord_user_id||"—"}</strong></span>
+              <span><small>Conta Discord</small><strong>{detail.discord?.global_name||detail.discord?.username||"Não conectada"}</strong></span>
               <span><small>Última verificação</small><strong>{dateTime(detail.discord?.last_checked_at)}</strong></span>
               <span><small>Roles CRAZZY</small><strong>{detail.roles.join(", ")||"cliente"}</strong></span>
+            </div>
+          </section>
+
+          <section className="crz-customer360-block">
+            <header><strong>CRAZZY Club</strong><span>FREE + Prêmios</span></header>
+            <div className="crz-customer360-kv">
+              <span><small>CRAZZY BONUS</small><strong>{money(detail.club?.bonus_balance_cents||0)}</strong></span>
+              <span><small>Rewards</small><strong>{detail.club?.reward_sessions||0}</strong></span>
+              <span><small>Luck / Arcade</small><strong>{detail.club?.luck_plays||0}</strong></span>
+              <span><small>Cupons</small><strong>{detail.club?.coupons||0}</strong></span>
+            </div>
+            <div className="crz-customer360-toolbar">
+              <label><span>R$</span><input value={bonusAdjust} onChange={e=>setBonusAdjust(e.target.value)} placeholder="+10,00 ou -5,00"/></label>
+              <label><span>✎</span><input value={bonusReason} onChange={e=>setBonusReason(e.target.value)} placeholder="Motivo do ajuste"/></label>
+              <button className="crz-button crz-button--primary crz-button--sm" disabled={bonusBusy} onClick={()=>void adjustBonus()}>{bonusBusy?"Salvando...":"Ajustar bônus"}</button>
             </div>
           </section>
 

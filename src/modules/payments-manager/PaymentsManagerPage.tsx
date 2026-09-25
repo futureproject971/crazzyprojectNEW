@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge, PageHeader } from "@/core/design-system";
+import { Badge, PageHeader } from "@/core/design-system";\nimport { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
 import type {
   PaymentManagerDetail,
   PaymentManagerRow,
@@ -147,7 +147,7 @@ export function PaymentsManagerPage() {
 
   const reconcile = async () => {
     if (!selected || busy) return;
-    if (!window.confirm("Consultar a PurinCash agora e reconciliar este pagamento?")) return;
+    if (!await adminConfirm("Reconciliar pagamento","Consultar a PurinCash agora e reconciliar este pagamento?","Reconciliar")) return;
 
     setBusy("reconcile");
     setNotice("");
@@ -179,10 +179,7 @@ export function PaymentsManagerPage() {
 
   const registerRefund = async () => {
     if (!selected || !detail || busy) return;
-    const raw = window.prompt(
-      "Valor do caso de reembolso em R$:",
-      (detail.payment.amount_cents / 100).toFixed(2).replace(".", ",")
-    );
+    const raw = await adminPrompt("Reembolso",{label:"Valor do reembolso em R$",defaultValue:(detail.payment.amount_cents / 100).toFixed(2).replace(".", ","),inputMode:"decimal"});
     if (!raw) return;
 
     const amount = Number(raw.replace(",", "."));
@@ -191,7 +188,7 @@ export function PaymentsManagerPage() {
       return;
     }
 
-    const reason = window.prompt("Motivo do reembolso:") || "";
+    const reason = await adminPrompt("Reembolso",{label:"Motivo do reembolso",required:true}) || "";
     setBusy("refund");
     try {
       const response = await fetch("/api/admin/payments", {
@@ -218,7 +215,7 @@ export function PaymentsManagerPage() {
 
   const registerDispute = async () => {
     if (!selected || busy) return;
-    const reason = window.prompt("Motivo / descrição da disputa:");
+    const reason = await adminPrompt("Disputa",{label:"Motivo ou descrição",required:true});
     if (!reason?.trim()) return;
 
     setBusy("dispute");
@@ -247,7 +244,7 @@ export function PaymentsManagerPage() {
 
   const addEvidence = async (disputeId: string) => {
     if (!selected || busy) return;
-    const note = window.prompt("Evidência / observação:");
+    const note = await adminPrompt("Disputa",{label:"Evidência ou observação"});
     if (!note?.trim()) return;
 
     setBusy("evidence:" + disputeId);

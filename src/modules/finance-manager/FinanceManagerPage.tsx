@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge, PageHeader } from "@/core/design-system";
+import { Badge, PageHeader } from "@/core/design-system";\nimport { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
 import type {
   FinanceMethodRow,
   FinancePayload,
@@ -61,7 +61,7 @@ function shortId(value: string) {
 
 function feeSourceLabel(value: FinancePaymentRow["fee_source"]) {
   const map = {
-    provider: "REAL / PROVIDER",
+    provedor: "REAL / PROVIDER",
     manual: "REAL / MANUAL",
     estimated: "ESTIMADA",
     unconfigured: "NÃO PRECIFICADA",
@@ -72,7 +72,7 @@ function feeSourceLabel(value: FinancePaymentRow["fee_source"]) {
 function feeSourceTone(
   value: FinancePaymentRow["fee_source"]
 ): "green" | "blue" | "gold" | "pink" | "neutral" {
-  if (value === "provider") return "green";
+  if (value === "provedor") return "green";
   if (value === "manual") return "blue";
   if (value === "estimated") return "gold";
   if (value === "unconfigured") return "pink";
@@ -335,9 +335,7 @@ export function FinanceManagerPage() {
 
   const clearFeeRule = async (feeMethod: string) => {
     if (
-      !window.confirm(
-        "Remover esta regra estimada? Pagamentos sem custo real voltarão a ficar como não precificados."
-      )
+      !(await adminConfirm("Remover regra","Pagamentos sem custo real voltarão a ficar como não precificados.","Remover regra"))
     ) {
       return;
     }
@@ -364,12 +362,7 @@ export function FinanceManagerPage() {
   };
 
   const setExactPaymentCost = async (payment: FinancePaymentRow) => {
-    const rawFee = window.prompt(
-      "Taxa REAL desta transação em R$:",
-      payment.fee_cents !== null
-        ? (payment.fee_cents / 100).toFixed(2).replace(".", ",")
-        : ""
-    );
+    const rawFee = await adminPrompt("Custo real",{label:"Taxa real desta transação em R$",defaultValue:payment.fee_cents !== null ? (payment.fee_cents / 100).toFixed(2).replace(".", ",") : "",inputMode:"decimal"});
     if (rawFee === null) return;
 
     const fee = Number(rawFee.replace(",", "."));
@@ -378,12 +371,7 @@ export function FinanceManagerPage() {
       return;
     }
 
-    const rawNet = window.prompt(
-      "Líquido informado pelo provider em R$ (opcional):",
-      payment.provider_net_cents !== null
-        ? (payment.provider_net_cents / 100).toFixed(2).replace(".", ",")
-        : ""
-    );
+    const rawNet = await adminPrompt("Custo real",{label:"Líquido informado pelo provedor em R$ (opcional)",defaultValue:payment.provider_net_cents !== null ? (payment.provider_net_cents / 100).toFixed(2).replace(".", ",") : "",inputMode:"decimal"});
 
     const net =
       rawNet && rawNet.trim()
@@ -391,11 +379,11 @@ export function FinanceManagerPage() {
         : null;
 
     if (net !== null && (!Number.isFinite(net) || net < 0)) {
-      setNotice("Líquido do provider inválido.");
+      setNotice("Líquido do provedor inválido.");
       return;
     }
 
-    const note = window.prompt("Fonte/observação deste custo real:") || "";
+    const note = await adminPrompt("Custo real",{label:"Fonte ou observação"}) || "";
 
     setBusy("cost:" + payment.payment_id);
     try {
@@ -422,7 +410,7 @@ export function FinanceManagerPage() {
   };
 
   const createHold = async () => {
-    const raw = window.prompt("Valor da retenção em R$:");
+    const raw = await adminPrompt("Nova retenção",{label:"Valor da retenção em R$",inputMode:"decimal",required:true});
     if (!raw) return;
     const value = Number(raw.replace(",", "."));
 
@@ -432,10 +420,10 @@ export function FinanceManagerPage() {
     }
 
     const paymentId =
-      window.prompt("Payment ID relacionado (opcional):")?.trim() || "";
-    const reason = window.prompt("Motivo da retenção:") || "";
+      await adminPrompt("Nova retenção",{label:"Pagamento relacionado (opcional)"})?.trim() || "";
+    const reason = await adminPrompt("Nova retenção",{label:"Motivo da retenção",required:true}) || "";
     const providerRef =
-      window.prompt("Referência externa/provider (opcional):") || "";
+      await adminPrompt("Nova retenção",{label:"Referência externa ou provedor (opcional)"}) || "";
 
     setBusy("hold:create");
     try {

@@ -1,6 +1,6 @@
 "use client";
 import {useCallback,useEffect,useMemo,useState} from "react";
-import {Badge,PageHeader} from "@/core/design-system";
+import {Badge,PageHeader} from "@/core/design-system";\nimport {adminPrompt} from "@/core/ui/adminDialog";
 
 type AnyRow=Record<string,any>;
 export function RewardManagerPage(){
@@ -10,10 +10,10 @@ export function RewardManagerPage(){
  const pending=useMemo(()=>data?.sessions?.filter((x:AnyRow)=>["completed","requested","delivering"].includes(x.status))||[],[data]);
  const saveCampaign=async()=>{
   const current=selected?.kind==="campaign"?selected.row:null;
-  const title=window.prompt("Título da campanha:",current?.title||"");if(!title)return;
-  const videoUrl=window.prompt("URL do vídeo:",current?.video_url||"");if(!videoUrl)return;
-  const watch=Number(window.prompt("Segundos obrigatórios:",String(current?.required_watch_seconds||60)));if(!Number.isFinite(watch))return;
-  const cooldown=Number(window.prompt("Cooldown em horas:",String(current?.cooldown_hours||168)));if(!Number.isFinite(cooldown))return;
+  const title=await adminPrompt("Campanha",{label:"Título",defaultValue:current?.title||"",required:true});if(!title)return;
+  const videoUrl=await adminPrompt("Campanha",{label:"Vídeo (URL)",defaultValue:current?.video_url||"",required:true});if(!videoUrl)return;
+  const watch=Number(await adminPrompt("Campanha",{label:"Segundos obrigatórios",defaultValue:String(current?.required_watch_seconds||60),inputMode:"numeric"}));if(!Number.isFinite(watch))return;
+  const cooldown=Number(await adminPrompt("Campanha",{label:"Cooldown em horas",defaultValue:String(current?.cooldown_hours||168),inputMode:"numeric"}));if(!Number.isFinite(cooldown))return;
   setBusy(true);const r=await fetch("/api/admin/rewards",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save_campaign",id:current?.id,title,description:current?.description||"",videoUrl,requiredWatchSeconds:watch,cooldownHours:cooldown,active:current?.active!==false,sortOrder:current?.sort_order||0})});setBusy(false);
   setNotice(r.ok?"Campanha salva.":"Falha ao salvar campanha.");if(r.ok){setSelected(null);await load()}
  };
@@ -21,7 +21,7 @@ export function RewardManagerPage(){
  if(state==="loading")return <main className="crz-rewardmanager-state"><span className="crz-spinner"/><strong>Carregando Rewards...</strong></main>;
  if(state==="error"||!data)return <main className="crz-rewardmanager-state"><strong>Reward Manager indisponível.</strong><button onClick={()=>void load()}>Tentar novamente</button></main>;
  return <main className="crz-rewardmanager"><div className="crz-container">
-  <PageHeader eyebrow="M36 • REWARD MANAGER" title="Missões sem prêmio fantasma" description="Campanhas, tempo validado, produtos liberados, estoque de trial e sessões acompanhados no mesmo painel." actions={<button className="crz-button crz-button--primary crz-button--sm" onClick={()=>void saveCampaign()} disabled={busy}>+ Campanha</button>}/>
+  <PageHeader eyebrow="CRAZZY CLUB • FREE" title="FREE + Rewards" description="Campanhas grátis, tempo validado, testes e entregas em um só lugar." actions={<button className="crz-button crz-button--primary crz-button--sm" onClick={()=>void saveCampaign()} disabled={busy}>+ Campanha</button>}/>
   <section className="crz-rewardmanager-stats"><article><small>CAMPANHAS</small><strong>{data.campaigns.length}</strong><span>{data.campaigns.filter((x:AnyRow)=>x.active).length} ativas</span></article><article><small>SESSÕES</small><strong>{data.sessions.length}</strong><span>recentes</span></article><article className={pending.length?"is-alert":""}><small>PENDENTES</small><strong>{pending.length}</strong><span>concluídas/solicitadas</span></article><article><small>ENTREGAS</small><strong>{data.deliveries.length}</strong><span>recentes</span></article></section>
   {notice&&<p className="crz-rewardmanager-notice">{notice}</p>}
   <div className="crz-rewardmanager-layout">

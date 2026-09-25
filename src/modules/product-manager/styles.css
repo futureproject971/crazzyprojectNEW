@@ -2671,3 +2671,11 @@ html[data-theme="light"] .crz-purin-stock-simple__controls select {
     width:100%;
   }
 }
+
+/* M48 UX: category/status choices are buttons first, typing/select only fallback. */
+.crz-pm-category-buttons,.crz-pm-status-presets{display:flex;gap:7px;flex-wrap:wrap}
+.crz-pm-category-buttons button,.crz-pm-status-presets button{min-height:34px;border:1px solid #25303d;border-radius:8px;padding:0 11px;color:#91a0b4;background:#0d131c;font-size:11.5px;font-weight:800;cursor:pointer}
+.crz-pm-category-buttons button.is-active,.crz-pm-status-presets button.is-active{color:#fff;border-color:#176cff;background:#0b3d9c;box-shadow:0 0 0 2px rgba(23,108,255,.12)}
+.crz-pm-category-fallback{display:none}
+.crz-pm-status-presets{padding:12px;border-bottom:1px solid #171f29}
+@media(max-width:700px){.crz-pm-category-buttons button,.crz-pm-status-presets button{flex:1 1 calc(50% - 7px)}}

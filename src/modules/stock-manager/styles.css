@@ -515,3 +515,5 @@ html[data-theme="light"] .crz-stock-summary strong {
     grid-template-columns:1fr 1fr;
   }
 }
+
+.crz-confirm-backdrop{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:20px;background:rgba(0,4,10,.76);backdrop-filter:blur(8px)}.crz-confirm-dialog{width:min(460px,100%);border:1px solid rgba(62,145,255,.3);border-radius:14px;padding:18px;background:#07111e;box-shadow:0 24px 80px rgba(0,0,0,.55);display:grid;gap:12px}.crz-confirm-dialog h2,.crz-confirm-dialog p{margin:0}.crz-confirm-dialog h2{color:#f2f7ff}.crz-confirm-dialog p,.crz-confirm-dialog label span{color:#8fa1b6;font-size:12px}.crz-confirm-dialog label{display:grid;gap:6px}.crz-confirm-dialog input{min-height:40px;border:1px solid rgba(72,130,207,.25);border-radius:8px;padding:0 10px;color:#eef6ff;background:#0b1725;outline:0}.crz-confirm-dialog>div{display:flex;justify-content:flex-end;gap:8px}.crz-confirm-dialog button{min-height:38px;border:1px solid rgba(75,132,207,.25);border-radius:8px;padding:0 13px;color:#dce9f8;background:#0b1725;cursor:pointer}.crz-confirm-dialog button:last-child{border-color:rgba(255,75,118,.42);background:rgba(170,20,58,.24);color:#ffb4c6}

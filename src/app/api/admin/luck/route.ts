@@ -16,14 +16,14 @@ export async function GET(){
   const {supabase,user,admin}=await context();
   if(!user)return NextResponse.json({error:"UNAUTHENTICATED"},{status:401});
   if(!admin)return NextResponse.json({error:"FORBIDDEN"},{status:403});
-  const [campaigns,prizes,plays,awards]=await Promise.all([
+  const [campaigns,prizes,plays,awards,products,plans]=await Promise.all([
     supabase.from("luck_campaigns").select("*").order("sort_order").order("created_at"),
     supabase.from("luck_prizes").select("*").order("campaign_id").order("sort_order"),
     supabase.from("luck_plays").select("id,user_id,campaign_id,prize_id,status,result,created_at").order("created_at",{ascending:false}).limit(200),
-    supabase.from("luck_awards").select("*").order("created_at",{ascending:false}).limit(200),
+    supabase.from("luck_awards").select("*").order("created_at",{ascending:false}).limit(200),\n    supabase.from("products").select("id,name,active").eq("active",true).order("name"),\n    supabase.from("product_plans").select("id,product_id,name,active").eq("active",true).order("sort_order"),
   ]);
-  if([campaigns,prizes,plays,awards].some(x=>x.error))return NextResponse.json({error:"LUCK_MANAGER_UNAVAILABLE"},{status:500});
-  return NextResponse.json({campaigns:campaigns.data||[],prizes:prizes.data||[],plays:plays.data||[],awards:awards.data||[]},{headers:{"Cache-Control":"private, no-store"}});
+  if([campaigns,prizes,plays,awards,products,plans].some(x=>x.error))return NextResponse.json({error:"LUCK_MANAGER_UNAVAILABLE"},{status:500});
+  const planRows=plans.data||[];\n  const productRows=(products.data||[]).map(product=>({...product,plans:planRows.filter(plan=>plan.product_id===product.id)}));\n  return NextResponse.json({campaigns:campaigns.data||[],prizes:prizes.data||[],plays:plays.data||[],awards:awards.data||[],products:productRows},{headers:{"Cache-Control":"private, no-store"}});
 }
 
 export async function POST(request:NextRequest){

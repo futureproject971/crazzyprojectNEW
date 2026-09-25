@@ -19,13 +19,13 @@ export function ClubManagerPage(){
   if(state==="error"||!data)return <main className="crz-clubmanager-state"><strong>Club Manager indisponível.</strong><button type="button" onClick={()=>void load()}>Tentar novamente</button></main>;
 
   const modules=[
-    {title:"Reward Manager",href:"/admin/rewards",icon:"crown" as const,badge:data.rewards.activeCampaigns+" ativa(s)",main:data.rewards.sessions+" sessões",sub:data.rewards.pending+" aguardando ação",alert:data.rewards.pending>0},
-    {title:"Luck Manager",href:"/admin/luck",icon:"lightning" as const,badge:data.luck.activeCampaigns+" ativa(s)",main:data.luck.plays+" jogadas",sub:data.luck.pendingAwards+" prêmio(s) pendentes",alert:data.luck.pendingAwards>0},
-    {title:"Coupon Manager",href:"/admin/cupons",icon:"featured" as const,badge:data.coupons.active+" ativo(s)",main:data.coupons.uses+" usos",sub:data.coupons.total+" cupons cadastrados",alert:false},
+    {title:"FREE + Rewards",href:"/admin/rewards",icon:"crown" as const,badge:data.rewards.activeCampaigns+" ativa(s)",main:data.rewards.sessions+" sessões",sub:data.rewards.pending+" aguardando ação",alert:data.rewards.pending>0},
+    {title:"Prêmios • Luck",href:"/admin/luck",icon:"lightning" as const,badge:data.luck.activeCampaigns+" ativa(s)",main:data.luck.plays+" jogadas",sub:data.luck.pendingAwards+" prêmio(s) pendentes",alert:data.luck.pendingAwards>0},
+    {title:"Cupons",href:"/admin/cupons",icon:"featured" as const,badge:data.coupons.active+" ativo(s)",main:data.coupons.uses+" usos",sub:data.coupons.total+" cupons cadastrados",alert:false},
     {title:"CRAZZY Rank",href:"/club/rank",icon:"community" as const,badge:data.rank.tiers+" tiers",main:"Progressão",sub:"badges e pontos",alert:false},
   ];
   return <main className="crz-clubmanager"><div className="crz-container">
-    <PageHeader eyebrow="M35 • CLUB MANAGER" title="O cérebro do CRAZZY CLUB" description="Rewards, Luck, Coupons e Rank vistos como um único sistema de retenção." actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">Abrir CLUB</a>}/>
+    <PageHeader eyebrow="M35 • CLUB MANAGER" title="FREE, prêmios e vantagens" description="Rewards, roleta, raspadinha, cupons e progressão organizados em uma única central." actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">Abrir CLUB</a>}/>
     <section className="crz-clubmanager-grid">{modules.map(item=><a href={item.href} key={item.title} className={item.alert?"has-alert":""}><NeonIcon name={item.icon} size={38}/><div><span><small>MÓDULO</small><Badge tone={item.alert?"gold":"blue"}>{item.badge}</Badge></span><h2>{item.title}</h2><strong>{item.main}</strong><p>{item.sub}</p></div><b>→</b></a>)}</section>
     <section className="crz-clubmanager-health"><article><small>REWARD DELIVERIES</small><strong>{data.rewards.deliveries}</strong></article><article><small>LUCK AWARDS</small><strong>{data.luck.awards}</strong></article><article><small>CUPONS ATIVOS</small><strong>{data.coupons.active}</strong></article><article><small>RANK TIERS</small><strong>{data.rank.tiers}</strong></article></section>
   </div></main>

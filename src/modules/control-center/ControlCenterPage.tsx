@@ -37,68 +37,44 @@ function EmptyCheck({ text }: { text: string }) {
 
 
 const ADMIN_GROUPS = [
-  {
-    title: "Catálogo",
-    description: "Organize o que o cliente vê e recebe.",
-    tools: [
-      { label: "Produtos", description: "Cadastre produtos, planos, preços e disponibilidade.", href: "/admin/produtos", icon: "/icons/package.svg" },
-      { label: "Categorias", description: "Organize jogos e vitrines sem mexer no código.", href: "/admin/categorias", icon: "/icons/neon-v2/gamepad.svg" },
-      { label: "Estoque avançado", description: "Audite keys já cadastradas. Para adicionar estoque, use Produtos.", href: "/admin/estoque", icon: "/icons/package.svg" },
-      { label: "Tutoriais", description: "Crie e publique guias liberados por produto.", href: "/admin/academy", icon: "/icons/book.svg" },
-    ],
-  },
-  {
-    title: "Comercial",
-    description: "Venda, receba e acompanhe o dinheiro com clareza.",
-    tools: [
-      { label: "Vendas", description: "Veja pedidos, status e histórico comercial.", href: "/admin/vendas", icon: "/icons/shopping-cart.svg" },
-      { label: "Pagamentos", description: "Acompanhe PIX e demais cobranças confirmadas.", href: "/admin/pagamentos", icon: "/icons/credit-card.svg" },
-      { label: "Financeiro", description: "Resumo de valores, divergências e operação financeira.", href: "/admin/finance", icon: "/icons/credit-card.svg" },
-      { label: "Campanhas", description: "Monte mensagens do Discord com preview antes de enviar.", href: "/admin/campanhas", icon: "/icons/flame.svg" },
-      { label: "Cupons", description: "Crie descontos e regras sem caixas externas do navegador.", href: "/admin/cupons", icon: "/icons/star.svg" },
-    ],
-  },
-  {
-    title: "Fidelização",
-    description: "Controle bônus, recompensas e experiências do cliente.",
-    tools: [
-      { label: "CRAZZY BONUS", description: "Configure carteira promocional e regras de crédito.", href: "/admin/bonus", icon: "/icons/crown.svg" },
-      { label: "CRAZZY ARCADE", description: "Gerencie roleta, raspadinha, pesos e prêmios.", href: "/admin/luck", icon: "/icons/bolt.svg" },
-      { label: "Rewards", description: "Controle recompensas, elegibilidade e resgates.", href: "/admin/rewards", icon: "/icons/diamond.svg" },
-      { label: "Club", description: "Gerencie benefícios e experiências do CRAZZY CLUB.", href: "/admin/club", icon: "/icons/crown.svg" },
-    ],
-  },
-  {
-    title: "Atendimento",
-    description: "Tudo que envolve clientes, suporte e comunicação.",
-    tools: [
-      { label: "Tickets", description: "Atenda conversas, prioridades, status e histórico.", href: "/admin/suporte", icon: "/icons/headset.svg" },
-      { label: "Clientes", description: "Visão 360° do usuário sem misturar dados de outros clientes.", href: "/admin/clientes", icon: "/icons/users.svg" },
-      { label: "CRAZZY CALL", description: "Gerencie salas, participantes e atendimento por chamada.", href: "/admin/calls", icon: "/icons/headset.svg" },
-      { label: "Comunidade", description: "Modere o chat e acompanhe ações da comunidade.", href: "/admin/comunidade", icon: "/icons/users.svg" },
-    ],
-  },
-  {
-    title: "Integrações",
-    description: "Conecte serviços externos e veja o estado de cada integração.",
-    tools: [
-      { label: "Discord", description: "Bot, membros, cargos e sincronização da guild.", href: "/admin/discord", icon: "/icons/brand-discord.svg" },
-      { label: "Discord Bridge", description: "Acompanhe grants, retries e sincronizações.", href: "/admin/discord-bridge", icon: "/icons/users.svg" },
-      { label: "Integrações", description: "PIX, APIs e conexões com estado e explicação do erro.", href: "/admin/integracoes", icon: "/icons/bolt.svg" },
-      { label: "Entregas", description: "Monitore fulfillment sem duplicar entrega.", href: "/admin/fulfillment", icon: "/icons/package.svg" },
-    ],
-  },
-  {
-    title: "Sistema",
-    description: "Configurações avançadas e segurança ficam juntas, longe da navegação do cliente.",
-    tools: [
-      { label: "Marca & Aparência", description: "Logo, capas, wallpaper, cores, favicon e modo marca branca.", href: "/admin/aparencia", icon: "/icons/diamond.svg" },
-      { label: "Segurança", description: "Veja incidentes, tentativas suspeitas e auditoria.", href: "/admin/security", icon: "/icons/shield-check.svg" },
-      { label: "Notificações", description: "Configure avisos e mensagens operacionais.", href: "/admin/notificacoes", icon: "/icons/flame.svg" },
-      { label: "Revendedores", description: "Gerencie acessos e regras da operação B2B.", href: "/admin/revendedores", icon: "/icons/users.svg" },
-      { label: "Parceiros", description: "Cadastre e acompanhe parceiros da plataforma.", href: "/admin/parceiros", icon: "/icons/crown.svg" },
-    ],
-  },
+  { title: "Visão Geral", description: "Saúde da operação e atalhos essenciais.", tools: [
+    { label: "Control Center", description: "Alertas, estoque baixo, entregas e incidentes.", href: "/admin", icon: "/icons/home.svg" },
+  ]},
+  { title: "Produtos", description: "Produto, plano, mídia, estoque e conteúdo no mesmo fluxo.", tools: [
+    { label: "Product Manager", description: "Crie e edite produtos, planos, preço, entrega, mídia e estoque.", href: "/admin/produtos", icon: "/icons/shopping-bag.svg" },
+    { label: "Categorias", description: "Organize jogos e vitrines.", href: "/admin/categorias", icon: "/icons/neon-v2/gamepad.svg" },
+    { label: "Estoque", description: "Audite keys já cadastradas e estados de entrega.", href: "/admin/estoque", icon: "/icons/package.svg" },
+    { label: "Tutoriais", description: "Conteúdo liberado por produto e plano.", href: "/admin/academy", icon: "/icons/book.svg" },
+  ]},
+  { title: "Clientes", description: "Cliente, Discord e atendimento sem IDs técnicos.", tools: [
+    { label: "Customer 360", description: "Compras, produtos, Discord, entregas e histórico.", href: "/admin/clientes", icon: "/icons/users.svg" },
+    { label: "Suporte", description: "Tickets, prioridades e conversa.", href: "/admin/suporte", icon: "/icons/headset.svg" },
+    { label: "Comunidade", description: "Moderação e atividade da comunidade.", href: "/admin/comunidade", icon: "/icons/users.svg" },
+    { label: "CRAZZY CALL", description: "Salas e atendimento por chamada.", href: "/admin/calls", icon: "/icons/headset.svg" },
+  ]},
+  { title: "Vendas", description: "Venda, pagamento, entrega, financeiro e B2B.", tools: [
+    { label: "Vendas", description: "Pedidos e histórico comercial.", href: "/admin/vendas", icon: "/icons/shopping-cart.svg" },
+    { label: "Pagamentos", description: "Cobranças e confirmações.", href: "/admin/pagamentos", icon: "/icons/credit-card.svg" },
+    { label: "Financeiro", description: "Receita, taxas e divergências.", href: "/admin/finance", icon: "/icons/credit-card.svg" },
+    { label: "Entregas", description: "Fulfillment e pós-pagamento.", href: "/admin/fulfillment", icon: "/icons/package.svg" },
+    { label: "Revendedores", description: "Regras e acessos B2B.", href: "/admin/revendedores", icon: "/icons/users.svg" },
+    { label: "Parceiros", description: "Parceiros e comissões.", href: "/admin/parceiros", icon: "/icons/crown.svg" },
+  ]},
+  { title: "CRAZZY Club", description: "FREE, bônus, prêmios, roleta, raspadinha e cupons.", tools: [
+    { label: "Club Manager", description: "Visão geral do ecossistema de recompensas.", href: "/admin/club", icon: "/icons/crown.svg" },
+    { label: "FREE + Rewards", description: "Missões, testes e recompensas.", href: "/admin/rewards", icon: "/icons/diamond.svg" },
+    { label: "Luck / Arcade", description: "Roleta, raspadinha, drops e prêmios.", href: "/admin/luck", icon: "/icons/bolt.svg" },
+    { label: "Cupons", description: "Descontos por público e produto.", href: "/admin/cupons", icon: "/icons/star.svg" },
+    { label: "Bônus", description: "Carteira promocional do cliente.", href: "/admin/bonus", icon: "/icons/crown.svg" },
+  ]},
+  { title: "Sistema", description: "Configurações técnicas ficam concentradas aqui.", tools: [
+    { label: "Discord", description: "Bot, guild e automações.", href: "/admin/discord", icon: "/icons/brand-discord.svg" },
+    { label: "Integrações", description: "APIs, pagamentos e serviços externos.", href: "/admin/integracoes", icon: "/icons/bolt.svg" },
+    { label: "Marca & Aparência", description: "Wallpaper, capas, cores e identidade.", href: "/admin/aparencia", icon: "/icons/diamond.svg" },
+    { label: "Segurança", description: "Incidentes e auditoria.", href: "/admin/security", icon: "/icons/shield-check.svg" },
+    { label: "Notificações", description: "Avisos operacionais.", href: "/admin/notificacoes", icon: "/icons/flame.svg" },
+    { label: "Campanhas Discord", description: "Mensagens, preview e disparos.", href: "/admin/campanhas", icon: "/icons/flame.svg" },
+  ]},
 ] as const;
 
 export function ControlCenterPage() {
@@ -219,7 +195,7 @@ export function ControlCenterPage() {
           </header>
           <div className="crz-admin-groups">
             {ADMIN_GROUPS.map(group => (
-              <section className="crz-admin-group" key={group.title}>
+              <section className="crz-admin-group" key={group.title} id={group.title==="Sistema"?"sistema":undefined}>
                 <div className="crz-admin-group__head">
                   <h3>{group.title}</h3>
                   <p>{group.description}</p>

@@ -1,6 +1,6 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
-import {Badge,PageHeader} from "@/core/design-system";
+import {Badge,PageHeader} from "@/core/design-system";\nimport {adminConfirm,adminPrompt} from "@/core/ui/adminDialog";
 type Row=Record<string,any>;
 const money=(c:number)=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format((Number(c)||0)/100);
 
@@ -46,8 +46,8 @@ export function PartnerManagerPage(){
     if(!selected)return;
     const available=Number(selected.totals?.available_cents||0);
     if(available<=0)return setNotice("Este parceiro não tem saldo disponível.");
-    const reference=window.prompt("Referência do pagamento (Pix, banco, observação):","")||"";
-    if(!window.confirm("Confirmar payout de "+money(available)+" para "+selected.display_name+"?"))return;
+    const reference=(await adminPrompt("Registrar pagamento",{label:"Referência do pagamento (Pix, banco ou observação)",defaultValue:""}))||"";
+    if(!(await adminConfirm("Confirmar pagamento","Pagar "+money(available)+" para "+selected.display_name+"?","Confirmar pagamento")))return;
     const r=await fetch("/api/admin/partners",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"payout_available",partnerId:selected.id,reference})});
     const p=await r.json().catch(()=>({}));
     setNotice(r.ok?"Payout registrado: "+money(Number(p.amount_cents||0)):"Falha: "+(p.detail||p.error||"erro"));
@@ -64,13 +64,13 @@ export function PartnerManagerPage(){
     <div className="crz-partner-layout">
       <section className="crz-partner-list">
         <header><strong>Parceiros</strong></header>
-        {(data.partners||[]).map((p:Row)=><button key={p.id} className={selected?.id===p.id?"is-active":""} onClick={()=>choose(p)}><span><strong>{p.display_name}</strong><small>{p.code} • {p.commission_percent}% • {p.profile?.discord_global_name||p.profile?.username||p.user_id}</small></span><Badge tone={p.active?"green":"neutral"}>{p.active?"ATIVO":"OFF"}</Badge></button>)}
+        {(data.partners||[]).map((p:Row)=><button key={p.id} className={selected?.id===p.id?"is-active":""} onClick={()=>choose(p)}><span><strong>{p.display_name}</strong><small>{p.code} • {p.commission_percent}% • {p.profile?.discord_global_name||p.profile?.username||"Perfil conectado"}</small></span><Badge tone={p.active?"green":"neutral"}>{p.active?"ATIVO":"OFF"}</Badge></button>)}
         {!data.partners?.length&&<div className="crz-partner-empty">Nenhum parceiro cadastrado.</div>}
       </section>
 
       <section className="crz-partner-editor">
         <header><strong>{selected?"Editar parceiro":"Novo parceiro"}</strong>{selected&&<small>{link}</small>}</header>
-        {!selected&&!candidate&&<div className="crz-partner-search"><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Discord ID, username ou nome"/><button onClick={()=>void load(q)}>Buscar perfil</button>{(data.candidates||[]).map((c:Row)=><button className="is-candidate" key={c.user_id} onClick={()=>newFrom(c)}><strong>{c.discord_global_name||c.username||c.discord_username||c.user_id}</strong><small>{c.discord_user_id||"sem Discord ID"} {c.guild_member?"• no servidor":""}</small></button>)}</div>}
+        {!selected&&!candidate&&<div className="crz-partner-search"><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Nome ou usuário do Discord"/><button onClick={()=>void load(q)}>Buscar perfil</button>{(data.candidates||[]).map((c:Row)=><button className="is-candidate" key={c.user_id} onClick={()=>newFrom(c)}><strong>{c.discord_global_name||c.username||c.discord_username||"Perfil Discord"}</strong><small>{c.guild_member?"No servidor CRAZZY":"Fora do servidor"}</small></button>)}</div>}
         {(selected||candidate)&&<>
           <div className="crz-partner-grid">
             <label><span>Código/link</span><input value={form.code} onChange={e=>setForm({...form,code:e.target.value.toLowerCase()})}/></label>

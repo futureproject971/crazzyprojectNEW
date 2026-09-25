@@ -43,7 +43,7 @@ function checkedFlags(flags: Record<string, unknown>, key: string) {
   return flags?.[key] === true;
 }
 
-type ProductFilter = "all" | "active" | "inactive" | "out";
+type ProductFilter = "all" | "active" | "inactive" | "new" | "updating" | "out";
 
 function brl(value: number) {
   return new Intl.NumberFormat("pt-BR", {
@@ -238,6 +238,8 @@ export function ProductManagerPage() {
       if (!queryMatch) return false;
       if (productFilter === "active") return product.active;
       if (productFilter === "inactive") return !product.active;
+      if (productFilter === "new") return product.is_new;
+      if (productFilter === "updating") return String(product.status || "").toLowerCase() === "updating";
       if (productFilter === "out") {
         const internalPlans = product.plans.filter(plan => plan.delivery_mode === "internal_stock");
         return internalPlans.length > 0 && productInternalStock(product) === 0;
@@ -675,7 +677,8 @@ export function ProductManagerPage() {
 
                     <label>
                       <span>Categoria</span>
-                      <select
+                      <div className="crz-pm-category-buttons">{catalog.games.filter(game => game.active).map(game => <button type="button" key={game.id} className={newProduct.gameId===game.id?"is-active":""} onClick={()=>setNewProduct({...newProduct,gameId:game.id})}>{game.name}</button>)}</div>
+                      <select className="crz-pm-category-fallback"
                         value={newProduct.gameId}
                         onChange={event => setNewProduct({...newProduct,gameId:event.target.value})}
                       >
@@ -833,7 +836,7 @@ export function ProductManagerPage() {
                   <button
                     type="button"
                     className="is-icon"
-                    title="Copiar ProductID"
+                    title="Copiar referência técnica"
                     onClick={() => void copyText(productDraft.id, "ProductID")}
                   >
                     ⧉
@@ -841,7 +844,7 @@ export function ProductManagerPage() {
                   <button
                     type="button"
                     className="is-icon"
-                    title="Hooks e automações"
+                    title="Entrega e integrações"
                     onClick={() => setEditorTab("hooks")}
                   >
                     ⌘
@@ -905,7 +908,8 @@ export function ProductManagerPage() {
 
                       <label>
                         <span>Categoria</span>
-                        <select
+                        <div className="crz-pm-category-buttons">{catalog.games.filter(game => game.active).map(game => <button type="button" key={game.id} className={productDraft.game_id===game.id?"is-active":""} onClick={()=>setProductDraft({...productDraft,game_id:game.id,game_name:game.name})}>{game.name}</button>)}</div>
+                        <select className="crz-pm-category-fallback"
                           value={productDraft.game_id}
                           onChange={event => {
                             const game = catalog.games.find(item => item.id === event.target.value);
@@ -1022,7 +1026,7 @@ export function ProductManagerPage() {
                     <section className="crz-purin-display crz-purin-display--compact">
                       <div>
                         <span className="crz-purin-eye">◆</span>
-                        <strong>Catálogo</strong>
+                        <strong>Status do produto</strong>
                       </div>
                       <button
                         type="button"
@@ -1035,6 +1039,13 @@ export function ProductManagerPage() {
                         </span>
                         <i />
                       </button>
+                      <div className="crz-pm-status-presets" aria-label="Status interno">
+                        {[
+                          ["online","ONLINE"],
+                          ["offline","OFFLINE"],
+                          ["updating","EM UPDATE"],
+                        ].map(([value,label]) => <button type="button" key={value} className={String(productDraft.status||"").toLowerCase()===value?"is-active":""} onClick={()=>setProductDraft({...productDraft,status:value,status_label:label,active:value==="online"?true:value==="offline"?false:productDraft.active})}>{label}</button>)}
+                      </div>
                       <button
                         type="button"
                         className={"crz-purin-toggle-row " + (productDraft.is_new ? "is-on" : "")}
@@ -1460,8 +1471,10 @@ export function ProductManagerPage() {
             <div className="crz-pm-overview__filters" aria-label="Filtros de produto">
               {([
                 ["all", "Todos"],
-                ["active", "Ativos"],
-                ["inactive", "Desativados"],
+                ["active", "Online"],
+                ["inactive", "Offline"],
+                ["new", "Novos"],
+                ["updating", "Atualizando"],
                 ["out", "Sem estoque"],
               ] as Array<[ProductFilter, string]>).map(([value, label]) => (
                 <button

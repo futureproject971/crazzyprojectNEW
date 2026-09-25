@@ -37,6 +37,8 @@ export function StockManagerPage() {
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
+  const [reasonItem, setReasonItem] = useState<StockManagerItem | null>(null);
+  const [disableReason, setDisableReason] = useState("");
 
   const loadCatalog = async (preserve = true) => {
     setState("loading");
@@ -124,45 +126,23 @@ export function StockManagerPage() {
     [catalog]
   );
 
-  const toggleDisabled = async (item: StockManagerItem) => {
+  const toggleDisabled = async (item: StockManagerItem, reason: string | null = null) => {
     if (item.used || busy) return;
-
-    let reason: string | null = null;
-    if (!item.disabled) {
-      reason = window.prompt("Motivo para desativar esta key? (opcional)")?.trim() || null;
-    }
-
     setBusy(item.id);
     setNotice("");
-
     try {
       const response = await fetch("/api/admin/stock", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          stockItemId: item.id,
-          disabled: !item.disabled,
-          reason,
-        }),
+        body: JSON.stringify({ stockItemId: item.id, disabled: !item.disabled, reason }),
       });
       const payload = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(
-          payload.error === "STOCK_ITEM_RESERVED"
-            ? "Esta key está reservada e não pode ser alterada agora."
-            : "Falha ao atualizar a key."
-        );
-      }
-
+      if (!response.ok) throw new Error(payload.error === "STOCK_ITEM_RESERVED" ? "Esta key está reservada e não pode ser alterada agora." : "Falha ao atualizar a key.");
       setNotice(item.disabled ? "Key reativada." : "Key desativada.");
-      await loadCatalog(true);
-      await loadItems(selectedPlanId);
-    } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Falha ao atualizar a key.");
-    } finally {
-      setBusy(null);
-    }
+      setReasonItem(null); setDisableReason("");
+      await loadCatalog(true); await loadItems(selectedPlanId);
+    } catch (error) { setNotice(error instanceof Error ? error.message : "Falha ao atualizar a key."); }
+    finally { setBusy(null); }
   };
 
   if (state === "loading" && !catalog) {
@@ -327,7 +307,7 @@ export function StockManagerPage() {
                                 <button
                                   type="button"
                                   disabled={busy === item.id || status === "reserved"}
-                                  onClick={() => void toggleDisabled(item)}
+                                  onClick={() => item.disabled ? void toggleDisabled(item) : (setReasonItem(item), setDisableReason(""))}
                                 >
                                   {item.disabled ? "Reativar" : "Desativar"}
                                 </button>
@@ -352,6 +332,16 @@ export function StockManagerPage() {
           </section>
         </div>
       </div>
+      {reasonItem && (
+        <div className="crz-confirm-backdrop" role="presentation" onMouseDown={() => setReasonItem(null)}>
+          <section className="crz-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="stock-confirm-title" onMouseDown={event => event.stopPropagation()}>
+            <h2 id="stock-confirm-title">Desativar esta key?</h2>
+            <p>Ela deixa de ser entregue até você reativá-la.</p>
+            <label><span>Motivo opcional</span><input autoFocus value={disableReason} onChange={event => setDisableReason(event.target.value)} placeholder="Ex.: key em revisão" /></label>
+            <div><button type="button" onClick={() => setReasonItem(null)}>Cancelar</button><button type="button" onClick={() => void toggleDisabled(reasonItem, disableReason.trim() || null)}>Desativar key</button></div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }

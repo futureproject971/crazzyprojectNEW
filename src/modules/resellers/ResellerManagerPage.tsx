@@ -12,7 +12,7 @@ export function ResellerManagerPage(){
   const [state,setState]=useState<"loading"|"ready"|"auth"|"forbidden"|"error">("loading");
   const [selected,setSelected]=useState<ResellerAdminRow|null>(null);
   const [query,setQuery]=useState("");
-  const [userId,setUserId]=useState("");
+  const [userId,setUserId]=useState("");\n  const [customerQuery,setCustomerQuery]=useState("");\n  const [customerResults,setCustomerResults]=useState<any[]>([]);
   const [discount,setDiscount]=useState("50");
   const [active,setActive]=useState(true);
   const [expiresAt,setExpiresAt]=useState("");
@@ -40,9 +40,9 @@ export function ResellerManagerPage(){
     setActive(item.active);setExpiresAt(item.expires_at?item.expires_at.slice(0,10):"");
     setNotes(item.notes||"");setProductIds(item.product_ids||[]);setNotice("");
   };
-  const fresh=()=>{setSelected(null);setUserId("");setDiscount("50");setActive(true);setExpiresAt("");setNotes("");setProductIds([]);setNotice("")};
+  const fresh=()=>{setSelected(null);setUserId("");setCustomerQuery("");setCustomerResults([]);setDiscount("50");setActive(true);setExpiresAt("");setNotes("");setProductIds([]);setNotice("")};
 
-  const save=async()=>{
+  const searchCustomer=async()=>{const q=customerQuery.trim();if(!q)return setCustomerResults([]);const r=await fetch("/api/admin/customers?q="+encodeURIComponent(q)+"&limit=12",{cache:"no-store"});const p=await r.json().catch(()=>({}));setCustomerResults(r.ok?p.customers||[]:[])};\n\n  const save=async()=>{
     if(busy)return;
     setBusy(true);setNotice("");
     try{
@@ -60,7 +60,7 @@ export function ResellerManagerPage(){
 
   const visible=useMemo(()=>{
     const q=query.trim().toLowerCase();
-    return(data?.resellers||[]).filter(item=>!q||(item.customer.discord_username||"").toLowerCase().includes(q)||(item.customer.username||"").toLowerCase().includes(q)||item.user_id.includes(q));
+    return(data?.resellers||[]).filter(item=>!q||(item.customer.discord_username||"").toLowerCase().includes(q)||(item.customer.username||"").toLowerCase().includes(q));
   },[data,query]);
 
   if(state==="loading"&&!data)return <main className="crz-resellers-state"><span className="crz-spinner"/><strong>Carregando revendedores...</strong></main>;
@@ -80,9 +80,9 @@ export function ResellerManagerPage(){
 
     <div className="crz-resellers-layout">
       <section className="crz-resellers-list">
-        <header><label>⌕ <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Discord, usuário ou UUID..."/></label><button onClick={fresh}>+ Novo</button></header>
+        <header><label>⌕ <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Discord ou usuário..."/></label><button onClick={fresh}>+ Novo</button></header>
         {visible.map(item=><button key={item.id} className={selected?.id===item.id?"is-selected":""} onClick={()=>choose(item)}>
-          <span><strong>{item.customer.discord_username||item.customer.username||item.user_id.slice(0,8)}</strong><small>{item.customer.guild_member?"✓ Discord":"Discord não verificado"} • {item.product_ids.length} produto(s)</small></span>
+          <span><strong>{item.customer.discord_username||item.customer.username||"Cliente CRAZZY"}</strong><small>{item.customer.guild_member?"✓ Discord":"Discord não verificado"} • {item.product_ids.length} produto(s)</small></span>
           <span><Badge tone={item.active?"green":"neutral"}>{item.active?"ATIVO":"OFF"}</Badge><strong>{item.discount_percent}%</strong><small>{date(item.expires_at)}</small></span>
         </button>)}
         {!visible.length&&<div className="crz-resellers-empty">Nenhum revendedor encontrado.</div>}
@@ -90,7 +90,7 @@ export function ResellerManagerPage(){
 
       <aside className="crz-resellers-editor">
         <header><div><small>{selected?"EDITAR":"NOVO REVENDEDOR"}</small><h2>{selected?.customer.discord_username||selected?.customer.username||"Configuração"}</h2></div>{selected&&<a href={"/admin/clientes?userId="+encodeURIComponent(selected.user_id)}>Customer 360 →</a>}</header>
-        <label><span>User UUID</span><input value={userId} onChange={e=>setUserId(e.target.value)} placeholder="UUID do cliente"/></label>
+        <label><span>Cliente</span><input value={customerQuery} onChange={e=>setCustomerQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();void searchCustomer()}}} placeholder="Nome, e-mail ou Discord"/><button type="button" onClick={()=>void searchCustomer()}>Buscar cliente</button></label>{customerResults.length>0&&<div className="crz-resellers-products">{customerResults.map((u:any)=><button type="button" key={u.user_id} onClick={()=>{setUserId(u.user_id);setCustomerQuery(u.discord_global_name||u.discord_username||u.username||u.email||"Cliente CRAZZY");setCustomerResults([])}}>{u.discord_global_name||u.discord_username||u.username||u.email||"Cliente CRAZZY"}</button>)}</div>}
         <div className="crz-resellers-editor__row">
           <label><span>Desconto %</span><input type="number" min="0" max="80" step="0.5" value={discount} onChange={e=>setDiscount(e.target.value)}/></label>
           <label><span>Validade</span><input type="date" value={expiresAt} onChange={e=>setExpiresAt(e.target.value)}/></label>

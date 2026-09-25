@@ -23,7 +23,22 @@ export async function GET(request: NextRequest) {
       const notFound = String(error?.message || "").includes("CUSTOMER_NOT_FOUND");
       return NextResponse.json({ error: notFound ? "CUSTOMER_NOT_FOUND" : "CUSTOMER_DETAIL_UNAVAILABLE" }, { status: notFound ? 404 : 500 });
     }
-    return NextResponse.json({ customer: data }, { headers: { "Cache-Control": "private, no-store" } });
+    const [wallet,rewards,luck,coupons] = await Promise.all([
+      supabase.from("bonus_wallets").select("balance_cents,updated_at").eq("user_id",userId).maybeSingle(),
+      supabase.from("reward_sessions").select("id",{count:"exact",head:true}).eq("user_id",userId),
+      supabase.from("luck_plays").select("id",{count:"exact",head:true}).eq("user_id",userId),
+      supabase.from("coupon_users").select("coupon_id",{count:"exact",head:true}).eq("user_id",userId),
+    ]);
+    const customer = {
+      ...data,
+      club: {
+        bonus_balance_cents: Number(wallet.data?.balance_cents || 0),
+        reward_sessions: rewards.count || 0,
+        luck_plays: luck.count || 0,
+        coupons: coupons.count || 0,
+      },
+    };
+    return NextResponse.json({ customer }, { headers: { "Cache-Control": "private, no-store" } });
   }
 
   const q = String(request.nextUrl.searchParams.get("q") || "").trim().slice(0, 160);
