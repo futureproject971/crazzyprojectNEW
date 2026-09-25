@@ -9,6 +9,7 @@ const files = {
   hub: await readFile("src/modules/client-hub/ClientHubPage.tsx", "utf8"),
   library: await readFile("src/modules/library/LibraryPage.tsx", "utf8"),
   benefits: await readFile("src/components/hero/BenefitsBar.tsx", "utf8"),
+  featuredProducts: await readFile("src/components/products/FeaturedProductsCarousel.tsx", "utf8"),
   migration: await readFile("supabase/migrations/20260924231500_m14_live_home_community.sql", "utf8"),
 };
 
@@ -65,6 +66,11 @@ if (files.benefits.includes("+50.000") || files.benefits.includes("Produtos Orig
   throw new Error("Homepage still contains unsupported template claims");
 }
 console.log("[PASS] homepage template claims removed");
+
+if (files.featuredProducts.includes('<span className="product-art-brand">{product.name}</span>')) {
+  throw new Error("Featured product name must not be duplicated over the artwork");
+}
+console.log("[PASS] featured product name appears only in the info area");
 
 if (!files.community.includes('table: "community_messages"') || files.community.includes("}, 4000)")) {
   throw new Error("Full Community must use Realtime instead of 4-second polling");
