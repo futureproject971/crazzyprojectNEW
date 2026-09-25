@@ -43,7 +43,7 @@ const ADMIN_GROUPS = [
     tools: [
       { label: "Produtos", description: "Cadastre produtos, planos, preços e disponibilidade.", href: "/admin/produtos", icon: "/icons/package.svg" },
       { label: "Categorias", description: "Organize jogos e vitrines sem mexer no código.", href: "/admin/categorias", icon: "/icons/neon-v2/gamepad.svg" },
-      { label: "Estoque", description: "Acompanhe keys e itens com alerta de estoque baixo.", href: "/admin/estoque", icon: "/icons/package.svg" },
+      { label: "Estoque avançado", description: "Audite keys já cadastradas. Para adicionar estoque, use Produtos.", href: "/admin/estoque", icon: "/icons/package.svg" },
       { label: "Tutoriais", description: "Crie e publique guias liberados por produto.", href: "/admin/academy", icon: "/icons/book.svg" },
     ],
   },

@@ -5,16 +5,15 @@ import { Badge, NeonIcon, PageHeader } from "@/core/design-system";
 import type { ManagerCatalog, ManagerPlan, ManagerPlanCode, ManagerProduct } from "./types";
 
 const deliveryModes = [
-  ["internal_stock", "Estoque interno"],
-  ["ghost_stock", "Estoque Fantasma • ilimitado / ticket"],
-  ["purincash_supplier", "Supplier PurinCash"],
+  ["internal_stock", "Keys / estoque automático"],
+  ["ghost_stock", "Ilimitado / ticket"],
+  ["purincash_supplier", "Fornecedor PurinCash"],
   ["lzt_account", "Conta externa"],
   ["manual", "Entrega manual"],
   ["service", "Serviço"],
 ] as const;
 
 const automationKeys = [
-  ["auto_delivery", "Entrega automática"],
   ["auto_discord_role", "Cargo Discord automático"],
   ["auto_tutorial_unlock", "Tutorial automático"],
   ["auto_expire", "Expiração automática"],
@@ -141,7 +140,7 @@ export function ProductManagerPage() {
     description: "",
     iconUrl: "",
     bannerUrl: "",
-    autoDelivery: true,
+    autoDelivery: false,
     hideDeliveryBadge: false,
     createDefaultPlans: false,
   });
@@ -225,15 +224,6 @@ export function ProductManagerPage() {
     [stockText]
   );
 
-  const productAvailableStock = useMemo(
-    () => productDraft?.plans.reduce((total, plan) => total + Number(plan.available_stock || 0), 0) || 0,
-    [productDraft]
-  );
-
-  const activePlans = useMemo(
-    () => productDraft?.plans.filter(plan => plan.active).length || 0,
-    [productDraft]
-  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -285,6 +275,18 @@ export function ProductManagerPage() {
     setStockText("");
     setStockNotice("");
     setNotice("");
+  };
+
+  const setPlanDeliveryMode = (mode: ManagerPlan["delivery_mode"]) => {
+    if (!planDraft) return;
+    setPlanDraft({
+      ...planDraft,
+      delivery_mode: mode,
+      automation_flags: {
+        ...planDraft.automation_flags,
+        auto_delivery: mode === "internal_stock",
+      },
+    });
   };
 
   const copyText = async (value: string, label: string) => {
@@ -365,19 +367,6 @@ export function ProductManagerPage() {
     });
   };
 
-  const togglePlanTutorial = (id: string) => {
-    if (!planDraft) return;
-    const exists = planDraft.tutorials.some(item => item.id === id);
-    const tutorial = catalog?.tutorials.find(item => item.id === id);
-    if (!tutorial) return;
-
-    setPlanDraft({
-      ...planDraft,
-      tutorials: exists
-        ? planDraft.tutorials.filter(item => item.id !== id)
-        : [...planDraft.tutorials, tutorial],
-    });
-  };
 
   const createProduct = async () => {
     if (busy || !newProduct.name.trim() || !newProduct.gameId) return;
@@ -458,33 +447,6 @@ export function ProductManagerPage() {
     }
   };
 
-  const saveProduct = async () => {
-    if (!productDraft || busy) return;
-    setBusy(true);
-    setNotice("");
-
-    try {
-      const response = await fetch("/api/admin/products", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          kind: "product",
-          product: {
-            ...productDraft,
-            tutorial_ids: productDraft.tutorials.map(item => item.id),
-          },
-        }),
-      });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload?.error || "Falha ao salvar produto.");
-      await load(true);
-      setNotice("Produto salvo.");
-    } catch (e) {
-      setNotice(e instanceof Error ? e.message : "Falha ao salvar produto.");
-    } finally {
-      setBusy(false);
-    }
-  };
 
   const savePlan = async () => {
     if (!planDraft || busy) return;
@@ -619,19 +581,6 @@ export function ProductManagerPage() {
     }
   };
 
-  const prepareAutomaticStock = () => {
-    if (!planDraft) return;
-    setPlanDraft({
-      ...planDraft,
-      delivery_mode: "internal_stock",
-      automation_flags: {
-        ...planDraft.automation_flags,
-        auto_delivery: true,
-      },
-    });
-    setStockNotice("Entrega automática preparada. Salve o plano para publicar essa configuração.");
-  };
-
   if (state === "loading" && !catalog) {
     return <main className="crz-product-manager-page crz-pm-state"><span className="crz-spinner" /><p>Carregando produtos...</p></main>;
   }
@@ -707,7 +656,7 @@ export function ProductManagerPage() {
 
               <nav className="crz-purin-tabs" aria-label="Etapas do produto">
                 <button type="button" className="is-active">Geral</button>
-                <button type="button" disabled>Campos</button>
+                <button type="button" disabled>Planos & Estoque</button>
                 <button type="button" disabled>Hooks</button>
               </nav>
 
@@ -800,27 +749,6 @@ export function ProductManagerPage() {
                       placeholder="Descrição completa do produto..."
                     />
                   </label>
-
-                  <section className="crz-purin-delivery">
-                    <span>Tipo de Entrega</span>
-                    <div>
-                      <button
-                        type="button"
-                        className={!newProduct.autoDelivery ? "is-active" : ""}
-                        onClick={() => setNewProduct({...newProduct,autoDelivery:false})}
-                      >
-                        Manual
-                      </button>
-                      <button
-                        type="button"
-                        className={newProduct.autoDelivery ? "is-active" : ""}
-                        onClick={() => setNewProduct({...newProduct,autoDelivery:true})}
-                      >
-                        Automática
-                      </button>
-                    </div>
-                  </section>
-
                   <section className="crz-purin-display">
                     <div>
                       <span className="crz-purin-eye">◉</span>
@@ -952,7 +880,7 @@ export function ProductManagerPage() {
                   className={editorTab === "fields" ? "is-active" : ""}
                   onClick={() => setEditorTab("fields")}
                 >
-                  Campos
+                  Planos & Estoque
                 </button>
                 <button
                   type="button"
@@ -1069,33 +997,6 @@ export function ProductManagerPage() {
                         onChange={event => setProductDraft({...productDraft,description:event.target.value})}
                       />
                     </label>
-
-                    <section className="crz-purin-delivery">
-                      <span>Tipo de Entrega</span>
-                      <div>
-                        <button
-                          type="button"
-                          className={!checkedFlags(productDraft.automation_flags,"auto_delivery") ? "is-active" : ""}
-                          onClick={() => setProductDraft({
-                            ...productDraft,
-                            automation_flags:{...productDraft.automation_flags,auto_delivery:false},
-                          })}
-                        >
-                          Manual
-                        </button>
-                        <button
-                          type="button"
-                          className={checkedFlags(productDraft.automation_flags,"auto_delivery") ? "is-active" : ""}
-                          onClick={() => setProductDraft({
-                            ...productDraft,
-                            automation_flags:{...productDraft.automation_flags,auto_delivery:true},
-                          })}
-                        >
-                          Automática
-                        </button>
-                      </div>
-                    </section>
-
                     <section className="crz-purin-display">
                       <div>
                         <span className="crz-purin-eye">◉</span>
@@ -1152,7 +1053,7 @@ export function ProductManagerPage() {
                 {editorTab === "fields" && (
                   <section className="crz-purin-fields">
                     <header className="crz-purin-fields__head">
-                      <strong>Variações ({productDraft.plans.length})</strong>
+                      <strong>Planos ({productDraft.plans.length})</strong>
                       <div>
                         <button
                           type="button"
@@ -1166,7 +1067,7 @@ export function ProductManagerPage() {
                           className="crz-purin-add-button"
                           onClick={() => setCreatingPlan(value => !value)}
                         >
-                          ＋ Adicionar Campo ＋
+                          ＋ Adicionar Plano
                         </button>
                       </div>
                     </header>
@@ -1206,7 +1107,7 @@ export function ProductManagerPage() {
                           disabled={busy || !newPlan.name.trim()}
                           onClick={() => void createPlan()}
                         >
-                          {busy ? "Criando..." : "Criar campo"}
+                          {busy ? "Criando..." : "Criar plano"}
                         </button>
                       </div>
                     )}
@@ -1314,71 +1215,60 @@ export function ProductManagerPage() {
                                   <i />
                                 </button>
 
-                                <section className="crz-purin-custom-stock">
+                                <section className="crz-purin-stock-simple">
                                   <header>
                                     <div>
-                                      <strong>Estoque Personalizado</strong>
-                                      <span>•</span>
-                                      <b>{workingPlan.available_stock} em estoque</b>
+                                      <strong>Entrega e estoque</strong>
+                                      <small>Escolha uma vez como este plano será entregue.</small>
                                     </div>
+                                    <span className={"crz-purin-stock-pill is-" + planStockMeta(workingPlan).tone}>
+                                      {workingPlan.delivery_mode === "internal_stock"
+                                        ? workingPlan.available_stock + " em estoque"
+                                        : planStockMeta(workingPlan).detail}
+                                    </span>
                                   </header>
 
-                                  <div className="crz-purin-custom-stock__row">
-                                    <button
-                                      type="button"
-                                      className={"crz-purin-toggle-row " + (workingPlan.delivery_mode === "internal_stock" ? "is-on" : "")}
-                                      onClick={() => setPlanDraft({
-                                        ...planDraft,
-                                        delivery_mode: planDraft.delivery_mode === "internal_stock" ? "manual" : "internal_stock",
-                                        automation_flags:{
-                                          ...planDraft.automation_flags,
-                                          auto_delivery: planDraft.delivery_mode !== "internal_stock",
-                                        },
-                                      })}
-                                    >
-                                      <span>
-                                        <strong>Usar estoque</strong>
-                                        <small>Usar estoque para esse campo.</small>
-                                      </span>
-                                      <i />
-                                    </button>
+                                  <div className="crz-purin-stock-simple__controls">
+                                    <label>
+                                      <span>Tipo</span>
+                                      <select
+                                        value={planDraft.delivery_mode}
+                                        onChange={event => setPlanDeliveryMode(event.target.value as ManagerPlan["delivery_mode"])}
+                                      >
+                                        {deliveryModes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}
+                                      </select>
+                                    </label>
+
+                                    {planDraft.delivery_mode === "internal_stock" && (
+                                      <button
+                                        type="button"
+                                        className="crz-purin-add-stock"
+                                        onClick={() => {
+                                          setStockText("");
+                                          setStockNotice("");
+                                          setStockModalOpen(true);
+                                        }}
+                                      >
+                                        ＋ Adicionar Estoque
+                                      </button>
+                                    )}
 
                                     <button
                                       type="button"
-                                      className="crz-purin-add-stock"
-                                      onClick={() => {
-                                        setStockText("");
-                                        setStockNotice("");
-                                        setStockModalOpen(true);
-                                      }}
+                                      className="crz-purin-save-field"
+                                      disabled={busy}
+                                      onClick={() => void savePlan()}
                                     >
-                                      ＋ Adicionar Estoque
+                                      {busy ? "Salvando..." : "Salvar plano"}
                                     </button>
                                   </div>
-                                </section>
 
-                                <div className="crz-purin-variation__advanced">
-                                  <label>
-                                    <span>Modo de entrega</span>
-                                    <select
-                                      value={planDraft.delivery_mode}
-                                      onChange={event => setPlanDraft({
-                                        ...planDraft,
-                                        delivery_mode:event.target.value as ManagerPlan["delivery_mode"],
-                                      })}
-                                    >
-                                      {deliveryModes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}
-                                    </select>
-                                  </label>
-                                  <button
-                                    type="button"
-                                    className="crz-purin-save-field"
-                                    disabled={busy}
-                                    onClick={() => void savePlan()}
-                                  >
-                                    {busy ? "Salvando..." : "Salvar campo"}
-                                  </button>
-                                </div>
+                                  {planDraft.delivery_mode === "internal_stock" && (
+                                    <p className="crz-purin-stock-simple__hint">
+                                      Cada linha adicionada vira 1 key disponível para este plano.
+                                    </p>
+                                  )}
+                                </section>
                               </div>
                             )}
                           </article>
@@ -1388,7 +1278,7 @@ export function ProductManagerPage() {
                       {!productDraft.plans.length && (
                         <div className="crz-purin-fields__empty">
                           <strong>Nenhuma variação criada.</strong>
-                          <span>Clique em "Adicionar Campo +" para criar Diário, Semanal, Mensal ou qualquer outro plano.</span>
+                          <span>Clique em "Adicionar Plano" para criar Diário, Semanal, Mensal ou qualquer outro plano.</span>
                         </div>
                       )}
                     </div>
@@ -1403,7 +1293,7 @@ export function ProductManagerPage() {
                     </header>
 
                     <div className="crz-purin-hooks__block">
-                      <strong>Produto</strong>
+                      <strong>Automação extra</strong>
                       <div className="crz-pm-automation">
                         {automationKeys.map(([key,label]) => {
                           const active = checkedFlags(productDraft.automation_flags,key);
@@ -1446,7 +1336,7 @@ export function ProductManagerPage() {
                         </div>
                       </>
                     ) : (
-                      <div className="crz-purin-hooks__empty">Selecione uma variação na aba Campos para editar hooks específicos.</div>
+                      <div className="crz-purin-hooks__empty">Selecione um plano na aba Planos & Estoque para editar integrações específicas.</div>
                     )}
 
                     <div className="crz-purin-hooks__block">
@@ -1501,8 +1391,8 @@ export function ProductManagerPage() {
 
                 {planDraft.delivery_mode !== "internal_stock" && (
                   <div className="crz-pm-stock-warning">
-                    <span>Este campo ainda não usa estoque interno. Ative para a compra consumir uma key automaticamente.</span>
-                    <button type="button" onClick={prepareAutomaticStock}>Ativar estoque automático</button>
+                    <span>Este plano não está no modo de keys.</span>
+                    <button type="button" onClick={() => setPlanDeliveryMode("internal_stock")}>Usar keys neste plano</button>
                   </div>
                 )}
 
@@ -1638,512 +1528,6 @@ export function ProductManagerPage() {
           </div>
         </section>
 
-        <div className="crz-pm-layout">
-          <aside className="crz-pm-products">
-            <div className="crz-pm-products__head">
-              <span>CATÁLOGO</span>
-              <button type="button" onClick={() => setCreatingProduct(value => !value)}>
-                {creatingProduct ? "Cancelar" : "+ Produto"}
-              </button>
-            </div>
-
-            <div className="crz-pm-search">
-              <span>⌕</span>
-              <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Buscar produto..." />
-            </div>
-
-            <div className="crz-pm-products__list">
-              {filtered.map(product => (
-                <button
-                  type="button"
-                  key={product.id}
-                  className={selectedProductId === product.id ? "is-active" : ""}
-                  onClick={() => selectProduct(product)}
-                >
-                  <div className="crz-pm-product-art" style={{ "--accent": product.accent_color || "#1687ff" } as React.CSSProperties}>
-                    {product.image_url ? <img src={product.image_url} alt="" /> : <span>{product.emoji || "◆"}</span>}
-                  </div>
-                  <span>
-                    <strong>{product.name}</strong>
-                    <small>{product.game_name} • {product.plans.length} plano(s)</small>
-                  </span>
-                  <Badge tone={product.active ? "green" : "neutral"}>{product.active ? "ATIVO" : "OFF"}</Badge>
-                </button>
-              ))}
-            </div>
-          </aside>
-
-          <section id="pm-editor" className="crz-pm-editor">
-            {!productDraft ? (
-              <div className="crz-pm-state"><p>Nenhum produto selecionado.</p></div>
-            ) : (
-              <>
-                <section className="crz-pm-visual-summary">
-                  <div
-                    className="crz-pm-visual-cover"
-                    style={{ "--accent": productDraft.accent_color || "#1687ff" } as React.CSSProperties}
-                  >
-                    {productDraft.banner_url || productDraft.image_url ? (
-                      <img src={productDraft.banner_url || productDraft.image_url || ""} alt={productDraft.name} />
-                    ) : (
-                      <span>{productDraft.emoji || "🎮"}</span>
-                    )}
-                    {productDraft.is_new && <b>NOVO</b>}
-                  </div>
-
-                  <div className="crz-pm-visual-copy">
-                    <div className="crz-pm-visual-kicker">
-                      <Badge tone={productDraft.active ? "green" : "neutral"}>
-                        {productDraft.active ? "PRODUTO ATIVO" : "PRODUTO DESATIVADO"}
-                      </Badge>
-                      <span>{productDraft.game_name}</span>
-                    </div>
-                    <h2>{productDraft.name}</h2>
-                    <p>{productDraft.description || "Adicione uma descrição clara para o cliente entender exatamente o que está comprando."}</p>
-                    <div className="crz-pm-visual-metrics">
-                      <div><small>PLANOS</small><strong>{productDraft.plans.length}</strong><span>{activePlans} ativos</span></div>
-                      <div><small>ESTOQUE TOTAL</small><strong>{productAvailableStock}</strong><span>keys disponíveis</span></div>
-                      <div><small>STATUS</small><strong>{productDraft.status_label || "Sem status"}</strong><span>visível no catálogo</span></div>
-                    </div>
-                  </div>
-
-                  <div className="crz-pm-visual-actions">
-                    <button className="crz-button crz-button--primary crz-button--md" type="button" disabled={busy} onClick={() => void saveProduct()}>
-                      {busy ? "Salvando..." : "Salvar produto"}
-                    </button>
-                    <a className="crz-button crz-button--secondary crz-button--md" href="/admin/estoque">
-                      Gerenciar estoque
-                    </a>
-                  </div>
-                </section>
-
-                <nav className="crz-pm-section-nav" aria-label="Seções do produto">
-                  <a href="#pm-planos-rapido">Planos & Estoque</a>
-                  <a href="#pm-geral">Geral</a>
-                  <a href="#pm-automacao">Automação</a>
-                  <a href="#pm-academy">Academy</a>
-                </nav>
-
-                <section id="pm-planos-rapido" className="crz-pm-plan-quick crz-pm-anchor-section">
-                  <header className="crz-pm-plan-quick__head">
-                    <div>
-                      <small>PLANOS & ESTOQUE</small>
-                      <h2>Venda por plano, estoque por plano</h2>
-                      <p>Crie o plano aqui e cole as keys logo abaixo. Não precisa descer a página para achar o estoque.</p>
-                    </div>
-                    <div className="crz-pm-plan-quick__actions">
-                      <Badge tone={productDraft.plans.length ? "blue" : "pink"}>
-                        {productDraft.plans.length} PLANO(S)
-                      </Badge>
-                      <button
-                        type="button"
-                        className="crz-button crz-button--primary crz-button--md"
-                        onClick={() => setCreatingPlan(value => !value)}
-                      >
-                        {creatingPlan ? "Fechar criador" : "+ Criar plano"}
-                      </button>
-                    </div>
-                  </header>
-
-                  {creatingPlan && (
-                    <div className="crz-pm-plan-quick__creator">
-                      <label>
-                        <span>Nome do plano</span>
-                        <input
-                          autoFocus
-                          value={newPlan.name}
-                          onChange={event => setNewPlan({...newPlan,name:event.target.value.slice(0,80)})}
-                          placeholder="Ex.: Diário"
-                        />
-                      </label>
-                      <label>
-                        <span>Duração</span>
-                        <select
-                          value={newPlan.planCode}
-                          onChange={event => setNewPlan({...newPlan,planCode:event.target.value as ManagerPlanCode})}
-                        >
-                          {planCodes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}
-                        </select>
-                      </label>
-                      <label>
-                        <span>Preço</span>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={newPlan.price}
-                          onChange={event => setNewPlan({...newPlan,price:Number(event.target.value)})}
-                          placeholder="10,00"
-                        />
-                      </label>
-                      <button
-                        type="button"
-                        className="crz-button crz-button--primary crz-button--md"
-                        disabled={busy || !newPlan.name.trim()}
-                        onClick={() => void createPlan()}
-                      >
-                        {busy ? "Criando..." : "Criar e abrir plano"}
-                      </button>
-                    </div>
-                  )}
-
-                  {productDraft.plans.length === 0 ? (
-                    <div className="crz-pm-plan-quick__empty">
-                      <div className="crz-pm-plan-quick__empty-icon">＋</div>
-                      <div>
-                        <strong>Este produto ainda não tem nenhum plano.</strong>
-                        <span>Crie Diário, Semanal, Mensal ou o período que quiser. Depois o campo de estoque aparece aqui mesmo.</span>
-                      </div>
-                      {!creatingPlan && (
-                        <button
-                          type="button"
-                          className="crz-button crz-button--primary crz-button--md"
-                          onClick={() => setCreatingPlan(true)}
-                        >
-                          + Criar primeiro plano
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <div className="crz-pm-plan-quick__cards">
-                        {productDraft.plans.map(plan => {
-                          const stock = planStockMeta(plan);
-                          return (
-                            <button
-                              type="button"
-                              key={plan.id}
-                              className={selectedPlanId === plan.id ? "is-active" : ""}
-                              onClick={() => selectPlan(plan)}
-                            >
-                              <span className="crz-pm-plan-quick__card-top">
-                                <strong>{plan.name}</strong>
-                                <i className={plan.active ? "is-live" : ""}>{plan.active ? "ATIVO" : "OFF"}</i>
-                              </span>
-                              <b>{brl(Number(plan.price))}</b>
-                              <span className={"crz-pm-plan-quick__card-stock is-" + stock.tone}>
-                                <em>{stock.label}</em>
-                                <small>{stock.detail}</small>
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {planDraft && (
-                        <div className="crz-pm-plan-quick__stock">
-                          <header>
-                            <div>
-                              <small>ESTOQUE DO PLANO SELECIONADO</small>
-                              <h3>{planDraft.name}</h3>
-                              <p>Uma linha = uma key. Ex.: 100 linhas adicionadas = 100 unidades deste plano.</p>
-                            </div>
-                            <div>
-                              <Badge tone={planDraft.available_stock > 0 ? "green" : "pink"}>
-                                {planDraft.available_stock} DISPONÍVEL
-                              </Badge>
-                              <button
-                                type="button"
-                                className="crz-button crz-button--secondary crz-button--sm"
-                                onClick={() => document.getElementById("pm-planos")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                              >
-                                Configurar plano completo
-                              </button>
-                            </div>
-                          </header>
-
-                          {planDraft.delivery_mode === "internal_stock" && checkedFlags(planDraft.automation_flags, "auto_delivery") ? (
-                            <div className="crz-pm-stock-ready">✓ Estoque interno + entrega automática configurados.</div>
-                          ) : (
-                            <div className="crz-pm-stock-warning">
-                              <span>Para entregar a key automaticamente após a compra, use <strong>Estoque interno</strong> + <strong>Entrega automática</strong>.</span>
-                              <button type="button" onClick={prepareAutomaticStock}>Preparar automaticamente</button>
-                            </div>
-                          )}
-
-                          <label className="crz-pm-stock-import">
-                            <span>Colar keys / códigos deste plano</span>
-                            <textarea
-                              rows={7}
-                              value={stockText}
-                              onChange={event => setStockText(event.target.value)}
-                              placeholder={"KEY-0001\nKEY-0002\nKEY-0003"}
-                              spellCheck={false}
-                            />
-                          </label>
-
-                          <div className="crz-pm-stock-footer">
-                            <div>
-                              <strong>{stockItems.length} key(s) prontas para adicionar</strong>
-                              <small>Duplicadas são ignoradas. Limite de 5.000 por lote.</small>
-                            </div>
-                            <button
-                              type="button"
-                              className="crz-button crz-button--primary crz-button--md"
-                              disabled={stockBusy || !stockItems.length || stockItems.length > 5000}
-                              onClick={() => void importPlanStock()}
-                            >
-                              {stockBusy ? "Adicionando..." : "Adicionar ao estoque deste plano"}
-                            </button>
-                          </div>
-
-                          {stockItems.length > 5000 && (
-                            <div className="crz-pm-stock-error">Este lote passou de 5.000 linhas. Divida em dois lotes.</div>
-                          )}
-                          {stockNotice && <div className="crz-pm-stock-notice">{stockNotice}</div>}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </section>
-
-                <div id="pm-geral" className="crz-pm-editor__header crz-pm-editor__header--section">
-                  <div>
-                    <small>INFORMAÇÕES DO PRODUTO</small>
-                    <h2>Apresentação e catálogo</h2>
-                    <span>Campos grandes, legíveis e organizados para editar sem caça ao tesouro.</span>
-                  </div>
-                </div>
-
-                <div className="crz-pm-form-grid">
-                  <label><span>Nome</span><input value={productDraft.name} onChange={e => setProductDraft({...productDraft,name:e.target.value})} /></label>
-                  <label><span>Jogo / categoria</span><select value={productDraft.game_id} onChange={e => {
-                    const game = catalog.games.find(item => item.id === e.target.value);
-                    setProductDraft({...productDraft,game_id:e.target.value,game_name:game?.name || productDraft.game_name});
-                  }}>{catalog.games.map(game => <option key={game.id} value={game.id}>{game.name}{game.active ? "" : " (inativa)"}</option>)}</select></label>
-                  <label><span>Emoji</span><input value={productDraft.emoji || ""} onChange={e => setProductDraft({...productDraft,emoji:e.target.value})} placeholder="🎮" /></label>
-                  <label><span>Cor</span><div className="crz-pm-color"><input type="color" value={productDraft.accent_color || "#1687ff"} onChange={e => setProductDraft({...productDraft,accent_color:e.target.value})} /><input value={productDraft.accent_color || ""} onChange={e => setProductDraft({...productDraft,accent_color:e.target.value})} placeholder="#1687FF" /></div></label>
-                  <label><span>Status interno</span><input value={productDraft.status} onChange={e => setProductDraft({...productDraft,status:e.target.value})} /></label>
-                  <label><span>Label de status</span><input value={productDraft.status_label} onChange={e => setProductDraft({...productDraft,status_label:e.target.value})} /></label>
-                  <label><span>Ordem</span><input type="number" value={productDraft.sort_order} onChange={e => setProductDraft({...productDraft,sort_order:Number(e.target.value)})} /></label>
-                  <div className="crz-pm-media-field is-wide">
-                    <div className="crz-pm-media-preview" style={{ "--accent": productDraft.accent_color || "#1687ff" } as React.CSSProperties}>
-                      {productDraft.image_url ? <img src={productDraft.image_url} alt="" /> : <span>{productDraft.emoji || "🎮"}</span>}
-                    </div>
-                    <div className="crz-pm-media-controls">
-                      <span>Capa / imagem do produto</span>
-                      <p>Envie PNG, JPG, WEBP ou GIF de até 10 MB. A prévia aparece na hora.</p>
-                      <label className="crz-pm-upload-button">
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/webp,image/gif"
-                          disabled={imageUploading}
-                          onChange={event => {
-                            const file = event.target.files?.[0];
-                            if (file) void uploadProductAsset(file, "banner", "edit");
-                            event.currentTarget.value = "";
-                          }}
-                        />
-                        {imageUploading ? "Enviando..." : "Escolher imagem do PC"}
-                      </label>
-                      <input
-                        value={productDraft.image_url || ""}
-                        onChange={e => setProductDraft({...productDraft,image_url:e.target.value})}
-                        placeholder="Ou cole uma URL https://..."
-                      />
-                    </div>
-                  </div>
-                  <label className="is-wide"><span>Descrição</span><textarea value={productDraft.description || ""} onChange={e => setProductDraft({...productDraft,description:e.target.value})} rows={3} /></label>
-                  <label className="is-wide"><span>Features</span><textarea value={productDraft.features_text || ""} onChange={e => setProductDraft({...productDraft,features_text:e.target.value})} rows={3} /></label>
-                </div>
-
-                <div className="crz-pm-switch-row">
-                  <button type="button" className={productDraft.active ? "is-on" : ""} onClick={() => setProductDraft({...productDraft,active:!productDraft.active})}><i /> Produto ativo</button>
-                  <button type="button" className={productDraft.is_new ? "is-on" : ""} onClick={() => setProductDraft({...productDraft,is_new:!productDraft.is_new})}><i /> Marcar como novo</button>
-                </div>
-
-                <div id="pm-automacao" className="crz-pm-subsection crz-pm-anchor-section">
-                  <header><small>AUTOMAÇÃO DO PRODUTO</small><strong>Comportamentos padrão</strong></header>
-                  <div className="crz-pm-automation">
-                    {automationKeys.map(([key,label]) => {
-                      const active = checkedFlags(productDraft.automation_flags,key);
-                      return <button type="button" key={key} className={active ? "is-on" : ""} onClick={() => setProductDraft({...productDraft,automation_flags:{...productDraft.automation_flags,[key]:!active}})}><i />{label}</button>;
-                    })}
-                  </div>
-                </div>
-
-                <section id="pm-academy" className="crz-pm-tutorials crz-pm-anchor-section">
-                  <header><small>ACADEMY</small><h3>Tutorial por produto</h3></header>
-                  <div>
-                    {catalog.tutorials.map(tutorial => {
-                      const active = productDraft.tutorials.some(item => item.id === tutorial.id);
-                      return <button type="button" key={tutorial.id} className={active ? "is-active" : ""} onClick={() => toggleProductTutorial(tutorial.id)}>{active ? "✓ " : ""}{tutorial.title}</button>;
-                    })}
-                  </div>
-                </section>
-
-                <section id="pm-planos" className="crz-pm-plans crz-pm-anchor-section">
-                  <header>
-                    <div><small>PLANOS</small><h3>Configuração de entrega</h3></div>
-                    <div className="crz-pm-plans__actions">
-                      <span>{productDraft.plans.length} plano(s)</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCreatingPlan(true);
-                          document.getElementById("pm-planos-rapido")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }}
-                      >
-                        + Criar plano
-                      </button>
-                    </div>
-                  </header>
-
-                  <div className="crz-pm-plan-tabs">
-                    {productDraft.plans.map(plan => {
-                      const stock = planStockMeta(plan);
-                      return (
-                        <button type="button" key={plan.id} className={selectedPlanId === plan.id ? "is-active" : ""} onClick={() => selectPlan(plan)}>
-                          <span className="crz-pm-plan-tab__top">
-                            <strong>{plan.name}</strong>
-                            <i className={plan.active ? "is-live" : "is-off"}>{plan.active ? "ATIVO" : "OFF"}</i>
-                          </span>
-                          <b>{brl(Number(plan.price))}</b>
-                          <span className={"crz-pm-plan-tab__stock is-" + stock.tone}>
-                            <em>{stock.label}</em> {stock.detail}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {planDraft && (
-                    <div className="crz-pm-plan-editor">
-                      <div className="crz-pm-form-grid">
-                        <label><span>Nome do plano</span><input value={planDraft.name} onChange={e => setPlanDraft({...planDraft,name:e.target.value})} /></label>
-                        <label><span>Preço</span><input type="number" step="0.01" value={planDraft.price} onChange={e => setPlanDraft({...planDraft,price:Number(e.target.value)})} /></label>
-                        <label><span>Código</span><select value={planDraft.plan_code || "custom"} onChange={e => setPlanDraft({...planDraft,plan_code:e.target.value as ManagerPlanCode})}>{planCodes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-                        <label><span>Modo de entrega</span><select value={planDraft.delivery_mode} onChange={e => setPlanDraft({...planDraft,delivery_mode:e.target.value as ManagerPlan["delivery_mode"]})}>{deliveryModes.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-                        {planDraft.delivery_mode==="ghost_stock"&&<div className="crz-pm-ghost-note">👻 Estoque Fantasma: sempre disponível na loja, não consome key e abre entrega por suporte após o pagamento.</div>}
-                        <label><span>Emoji</span><input value={planDraft.emoji || ""} onChange={e => setPlanDraft({...planDraft,emoji:e.target.value})} /></label>
-                        <label><span>Cor</span><div className="crz-pm-color"><input type="color" value={planDraft.accent_color || productDraft.accent_color || "#1687ff"} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /><input value={planDraft.accent_color || ""} onChange={e => setPlanDraft({...planDraft,accent_color:e.target.value})} /></div></label>
-                        <label><span>Duração entitlement (min)</span><input type="number" value={planDraft.entitlement_duration_minutes ?? ""} onChange={e => setPlanDraft({...planDraft,entitlement_duration_minutes:e.target.value ? Number(e.target.value) : null})} placeholder="vazio = sem expiração" /></label>
-                        <label><span>Ordem</span><input type="number" value={planDraft.sort_order} onChange={e => setPlanDraft({...planDraft,sort_order:Number(e.target.value)})} /></label>
-                      </div>
-
-                      <div id="pm-stock-detalhado" className="crz-pm-stock-section">
-                        <header className="crz-pm-stock-head">
-                          <div>
-                            <small>ESTOQUE DESTE PLANO</small>
-                            <strong>Keys separadas por plano, sem misturar produtos</strong>
-                            <span>Cada linha abaixo vira 1 unidade vendável deste plano.</span>
-                          </div>
-                          <div className="crz-pm-stock-head__actions">
-                            <Badge tone={planDraft.available_stock > 0 ? "green" : "pink"}>
-                              {planDraft.available_stock} DISPONÍVEL
-                            </Badge>
-                            <a className="crz-button crz-button--secondary crz-button--sm" href="/admin/estoque">
-                              Estoque avançado
-                            </a>
-                          </div>
-                        </header>
-
-                        <div className="crz-pm-stock-flow">
-                          <div>
-                            <b>1</b>
-                            <span><strong>Crie o plano</strong><small>Ex.: Diário • R$ 10,00</small></span>
-                          </div>
-                          <div>
-                            <b>2</b>
-                            <span><strong>Cole as keys</strong><small>Ex.: 100 linhas = 100 unidades</small></span>
-                          </div>
-                          <div>
-                            <b>3</b>
-                            <span><strong>Cliente compra</strong><small>1 unidade sai deste plano</small></span>
-                          </div>
-                        </div>
-
-                        {planDraft.delivery_mode === "internal_stock" && checkedFlags(planDraft.automation_flags, "auto_delivery") ? (
-                          <div className="crz-pm-stock-ready">✓ Entrega automática pronta para usar o estoque interno deste plano.</div>
-                        ) : (
-                          <div className="crz-pm-stock-warning">
-                            <span>As keys podem ser cadastradas agora, mas para entrega automática o plano precisa usar <strong>Estoque interno</strong> + <strong>Entrega automática</strong>.</span>
-                            <button type="button" onClick={prepareAutomaticStock}>Preparar automaticamente</button>
-                          </div>
-                        )}
-
-                        <label className="crz-pm-stock-import">
-                          <span>Adicionar keys / códigos ao estoque</span>
-                          <textarea
-                            rows={8}
-                            value={stockText}
-                            onChange={event => setStockText(event.target.value)}
-                            placeholder={"KEY-0001\nKEY-0002\nKEY-0003"}
-                            spellCheck={false}
-                          />
-                        </label>
-
-                        <div className="crz-pm-stock-footer">
-                          <div>
-                            <strong>{stockItems.length} key(s) para adicionar</strong>
-                            <small>Máximo de 5.000 por lote. Duplicatas são ignoradas com segurança.</small>
-                          </div>
-                          <button
-                            type="button"
-                            className="crz-button crz-button--primary crz-button--md"
-                            disabled={stockBusy || !stockItems.length || stockItems.length > 5000}
-                            onClick={() => void importPlanStock()}
-                          >
-                            {stockBusy ? "Adicionando..." : "Adicionar ao estoque"}
-                          </button>
-                        </div>
-
-                        {stockItems.length > 5000 && (
-                          <div className="crz-pm-stock-error">Este lote passou de 5.000 linhas. Divida em dois lotes.</div>
-                        )}
-                        {stockNotice && <div className="crz-pm-stock-notice">{stockNotice}</div>}
-                      </div>
-
-                      <div className="crz-pm-subsection">
-                        <header><small>DISCORD</small><strong>Cargo automático</strong></header>
-                        <div className="crz-pm-form-grid">
-                          <label><span>Role ID</span><input value={planDraft.discord_role_id || ""} onChange={e => setPlanDraft({...planDraft,discord_role_id:e.target.value})} /></label>
-                          <label><span>Nome</span><input value={planDraft.discord_role_name || ""} onChange={e => setPlanDraft({...planDraft,discord_role_name:e.target.value})} /></label>
-                          <label><span>Cor</span><input value={planDraft.discord_role_color || ""} onChange={e => setPlanDraft({...planDraft,discord_role_color:e.target.value})} placeholder="#0000FF" /></label>
-                          <label><span>Prioridade</span><input type="number" value={planDraft.discord_role_position ?? ""} onChange={e => setPlanDraft({...planDraft,discord_role_position:e.target.value ? Number(e.target.value) : null})} /></label>
-                        </div>
-                      </div>
-
-                      <div className="crz-pm-subsection">
-                        <header><small>SUPPLIER</small><strong>Vínculo externo opcional</strong></header>
-                        <div className="crz-pm-form-grid">
-                          <label><span>Provider</span><input value={planDraft.supplier_provider || ""} onChange={e => setPlanDraft({...planDraft,supplier_provider:e.target.value})} placeholder="purincash" /></label>
-                          <label><span>Produto externo</span><input value={planDraft.supplier_product_id || ""} onChange={e => setPlanDraft({...planDraft,supplier_product_id:e.target.value})} /></label>
-                          <label className="is-wide"><span>Variação externa</span><input value={planDraft.supplier_variation_id || ""} onChange={e => setPlanDraft({...planDraft,supplier_variation_id:e.target.value})} /></label>
-                        </div>
-                      </div>
-
-                      <div className="crz-pm-automation">
-                        {automationKeys.map(([key,label]) => {
-                          const active = checkedFlags(planDraft.automation_flags,key);
-                          return <button type="button" key={key} className={active ? "is-on" : ""} onClick={() => setPlanDraft({...planDraft,automation_flags:{...planDraft.automation_flags,[key]:!active}})}><i />{label}</button>;
-                        })}
-                      </div>
-
-                      <section className="crz-pm-tutorials">
-                        <header><small>ACADEMY</small><h3>Tutorial específico do plano</h3></header>
-                        <div>
-                          {catalog.tutorials.map(tutorial => {
-                            const active = planDraft.tutorials.some(item => item.id === tutorial.id);
-                            return <button type="button" key={tutorial.id} className={active ? "is-active" : ""} onClick={() => togglePlanTutorial(tutorial.id)}>{active ? "✓ " : ""}{tutorial.title}</button>;
-                          })}
-                        </div>
-                      </section>
-
-                      <div className="crz-pm-plan-footer">
-                        <div className="crz-pm-switch-row">
-                          <button type="button" className={planDraft.active ? "is-on" : ""} onClick={() => setPlanDraft({...planDraft,active:!planDraft.active})}><i /> Plano ativo</button>
-                          <button type="button" className={planDraft.show_when_out_of_stock ? "is-on" : ""} onClick={() => setPlanDraft({...planDraft,show_when_out_of_stock:!planDraft.show_when_out_of_stock})}><i /> Mostrar sem estoque</button>
-                        </div>
-                        <button className="crz-button crz-button--primary crz-button--sm" type="button" disabled={busy} onClick={() => void savePlan()}>{busy ? "Salvando..." : "Salvar plano"}</button>
-                      </div>
-                    </div>
-                  )}
-                </section>
-              </>
-            )}
-          </section>
-        </div>
       </div>
     </main>
   );

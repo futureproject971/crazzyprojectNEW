@@ -16,6 +16,10 @@ const productStyles = await readFile(
   "src/modules/product-manager/styles.css",
   "utf8"
 );
+const stockManagerUi = await readFile(
+  "src/modules/stock-manager/StockManagerPage.tsx",
+  "utf8"
+);
 const commerceHardening = await readFile(
   "supabase/migrations/20260923191639_discord_partner_commerce_hardening.sql",
   "utf8"
@@ -30,41 +34,41 @@ const productsRoute = await readFile(
 );
 
 for (const required of [
-  "ESTOQUE DESTE PLANO",
-  "Adicionar keys / códigos ao estoque",
   "productPlanId: planDraft.id",
   'source: "product-manager"',
-  "Escolher imagem do PC",
   "/api/admin/products/upload",
-  "Planos & Estoque",
-  'href="#pm-geral"',
-  'href="#pm-planos-rapido"',
-  'href="#pm-automacao"',
   "VISÃO GERAL DO CATÁLOGO",
   "productStockMeta(product)",
   "productPriceRange(product)",
   "Sem estoque",
   "crz-purin-dialog",
-  "await load(true, createdId, null)",
-  "await load(true, productDraft.id, createdPlanId)",
-  "Venda por plano, estoque por plano",
-  "+ Criar primeiro plano",
-  "Adicionar ao estoque deste plano",
-  'id="pm-planos-rapido"',
   "crz-purin-dialog--editor",
-  "Estoque Personalizado",
-  "Adicionar Estoque",
-  "Adicionar Campo ＋",
-  "Venda oculta",
-  "Ocultar selo de entrega",
-  "uploadProductAsset",
+  "Planos & Estoque",
+  "＋ Adicionar Plano",
+  "Entrega e estoque",
+  "Keys / estoque automático",
+  "＋ Adicionar Estoque",
   "saveEditorChanges",
+  "setPlanDeliveryMode",
 ]) {
   if (!productManager.includes(required)) {
     throw new Error("Product Manager per-plan stock UX missing: " + required);
   }
 }
 console.log("[PASS] Product Manager exposes visual per-plan stock workflow");
+
+for (const forbidden of [
+  'className="crz-pm-layout"',
+  "Estoque Personalizado",
+  "Modo de entrega",
+  "Adicionar keys / códigos ao estoque",
+  "ESTOQUE DESTE PLANO",
+]) {
+  if (productManager.includes(forbidden)) {
+    throw new Error("Product Manager still contains duplicated legacy product/stock editor: " + forbidden);
+  }
+}
+console.log("[PASS] Product Manager keeps one clear plan/stock editing flow");
 
 for (const required of [
   'supabase.rpc("import_stock_batch"',
@@ -76,6 +80,16 @@ for (const required of [
   }
 }
 console.log("[PASS] Product Manager stock import reuses guarded Stock Manager API");
+
+for (const forbidden of ["+ Importar keys", "importText", "importBatch"]) {
+  if (stockManagerUi.includes(forbidden)) {
+    throw new Error("Advanced Stock Manager must not duplicate stock import UI: " + forbidden);
+  }
+}
+if (!stockManagerUi.includes("+ Adicionar estoque no produto")) {
+  throw new Error("Advanced Stock Manager must route stock additions back to Products");
+}
+console.log("[PASS] Stock Manager is audit-only; stock addition lives in Products");
 
 for (const required of [
   'supabase.rpc("is_current_admin")',
@@ -89,21 +103,13 @@ for (const required of [
 console.log("[PASS] Product image upload is admin-only and size-limited");
 
 for (const required of [
-  ".crz-pm-visual-summary",
-  ".crz-pm-stock-section",
-  ".crz-pm-section-nav",
   ".crz-pm-overview",
   ".crz-pm-overview__stock.is-low",
   ".crz-pm-overview__stock.is-out",
-  ".crz-pm-create-dialog",
-  ".crz-pm-create-dialog__flow",
-  ".crz-pm-plan-quick",
-  ".crz-pm-plan-quick__stock",
-  ".crz-pm-plan-quick__creator",
   ".crz-purin-dialog",
   ".crz-purin-tabs",
   ".crz-purin-variation__editor",
-  ".crz-purin-custom-stock",
+  ".crz-purin-stock-simple",
   ".crz-purin-stock-modal",
 ]) {
   if (!productStyles.includes(required)) {

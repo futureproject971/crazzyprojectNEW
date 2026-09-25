@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Badge, NeonIcon, PageHeader } from "@/core/design-system";
+import { NeonIcon, PageHeader } from "@/core/design-system";
 import type {
   StockManagerCatalog,
   StockManagerItem,
   StockItemsResponse,
-  StockPlanSummary,
 } from "./types";
 
 function statusOf(item: StockManagerItem) {
@@ -20,8 +19,8 @@ function statusOf(item: StockManagerItem) {
 
 function deliveryLabel(value: string) {
   const labels: Record<string, string> = {
-    internal_stock: "Estoque interno",
-    purincash_supplier: "PurinCash supplier",
+    internal_stock: "Keys / estoque automático",
+    purincash_supplier: "Fornecedor PurinCash",
     lzt_account: "Conta LZT",
     manual: "Manual",
     service: "Serviço",
@@ -37,10 +36,6 @@ export function StockManagerPage() {
   const [itemsTotal, setItemsTotal] = useState(0);
   const [itemsLoading, setItemsLoading] = useState(false);
   const [query, setQuery] = useState("");
-  const [showImport, setShowImport] = useState(false);
-  const [importText, setImportText] = useState("");
-  const [importSource, setImportSource] = useState("manual");
-  const [importNote, setImportNote] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
 
@@ -131,54 +126,6 @@ export function StockManagerPage() {
     );
   }, [catalog]);
 
-  const importItems = useMemo(
-    () =>
-      importText
-        .split(/\r?\n/)
-        .map((item) => item.trim())
-        .filter(Boolean),
-    [importText]
-  );
-
-  const importBatch = async () => {
-    if (!selectedPlan || busy || !importItems.length) return;
-    setBusy("import");
-    setNotice("");
-
-    try {
-      const response = await fetch("/api/admin/stock", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productPlanId: selectedPlan.plan_id,
-          items: importItems,
-          source: importSource,
-          note: importNote,
-        }),
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok || !payload.batch) throw new Error("Falha ao importar o lote.");
-
-      const batch = payload.batch as {
-        accepted_count: number;
-        duplicate_count: number;
-        submitted_count: number;
-      };
-
-      setNotice(
-        `Lote processado: ${batch.accepted_count} adicionada(s), ${batch.duplicate_count} duplicada(s) ignorada(s).`
-      );
-      setImportText("");
-      setImportNote("");
-      setShowImport(false);
-      await loadCatalog(true);
-      await loadItems(selectedPlan.plan_id);
-    } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Falha ao importar lote.");
-    } finally {
-      setBusy(null);
-    }
-  };
 
   const toggleDisabled = async (item: StockManagerItem) => {
     if (item.used || busy) return;
@@ -262,12 +209,12 @@ export function StockManagerPage() {
     <main className="crz-stock-manager">
       <div className="crz-container crz-stock-container">
         <PageHeader
-          eyebrow="M27 • CRAZZY STOCK"
-          title="Estoque seguro por produto e plano"
-          description="Importe keys em lote, acompanhe disponibilidade, reservas e consumo sem expor o conteúdo completo na interface."
+          eyebrow="ESTOQUE AVANÇADO"
+          title="Auditoria de estoque"
+          description="Use esta tela para conferir, localizar e desativar keys. Para adicionar estoque, abra o produto e o plano correspondente."
           actions={
             <a className="crz-button crz-button--secondary crz-button--sm" href="/admin/produtos">
-              Product Manager
+              Produtos
             </a>
           }
         />
@@ -275,8 +222,8 @@ export function StockManagerPage() {
         <section className="crz-stock-summary">
           <div><small>DISPONÍVEIS</small><strong>{totals.available}</strong><span>prontas para entrega</span></div>
           <div><small>RESERVADAS</small><strong>{totals.reserved}</strong><span>aguardando consumo</span></div>
-          <div><small>UTILIZADAS</small><strong>{totals.used}</strong><span>nunca retornam ao pool</span></div>
-          <div><small>DESATIVADAS</small><strong>{totals.disabled}</strong><span>fora da entrega automática</span></div>
+          <div><small>UTILIZADAS</small><strong>{totals.used}</strong><span>já entregues</span></div>
+          <div><small>DESATIVADAS</small><strong>{totals.disabled}</strong><span>temporariamente bloqueadas</span></div>
         </section>
 
         {notice && <div className="crz-stock-notice">{notice}</div>}
@@ -321,13 +268,12 @@ export function StockManagerPage() {
                       {selectedPlan.supplier_provider ? ` • fornecedor: ${selectedPlan.supplier_provider}` : ""}
                     </span>
                   </div>
-                  <button
-                    type="button"
+                  <a
                     className="crz-button crz-button--primary crz-button--sm"
-                    onClick={() => setShowImport((value) => !value)}
+                    href="/admin/produtos"
                   >
-                    {showImport ? "Fechar importação" : "+ Importar keys"}
-                  </button>
+                    + Adicionar estoque no produto
+                  </a>
                 </header>
 
                 <div className="crz-stock-plan-metrics">
@@ -338,53 +284,10 @@ export function StockManagerPage() {
                   <div><span>Total local</span><strong>{selectedPlan.local_stock}</strong></div>
                 </div>
 
-                {showImport && (
-                  <section className="crz-stock-import">
-                    <header>
-                      <div>
-                        <small>IMPORTAÇÃO EM LOTE</small>
-                        <strong>Uma key/credencial por linha</strong>
-                      </div>
-                      <Badge tone={importItems.length > 5000 ? "pink" : "blue"}>
-                        {importItems.length} linha(s)
-                      </Badge>
-                    </header>
-                    <textarea
-                      rows={10}
-                      value={importText}
-                      onChange={(event) => setImportText(event.target.value)}
-                      placeholder={"KEY-0001\nKEY-0002\nKEY-0003"}
-                      spellCheck={false}
-                      autoComplete="off"
-                    />
-                    <div className="crz-stock-import-fields">
-                      <label>
-                        <span>Origem</span>
-                        <input value={importSource} onChange={(event) => setImportSource(event.target.value.slice(0, 80))} placeholder="manual" />
-                      </label>
-                      <label>
-                        <span>Observação do lote</span>
-                        <input value={importNote} onChange={(event) => setImportNote(event.target.value.slice(0, 500))} placeholder="Opcional" />
-                      </label>
-                    </div>
-                    <div className="crz-stock-import-foot">
-                      <span>Duplicatas são bloqueadas por hash SHA-256 e não entram novamente no estoque.</span>
-                      <button
-                        type="button"
-                        className="crz-button crz-button--primary crz-button--sm"
-                        disabled={busy === "import" || !importItems.length || importItems.length > 5000}
-                        onClick={() => void importBatch()}
-                      >
-                        {busy === "import" ? "Importando..." : "Processar lote"}
-                      </button>
-                    </div>
-                  </section>
-                )}
-
                 <section className="crz-stock-items">
                   <header>
                     <div>
-                      <small>ITENS LOCAIS</small>
+                      <small>KEYS DESTE PLANO</small>
                       <strong>{itemsTotal} item(ns)</strong>
                     </div>
                     <button type="button" disabled={itemsLoading} onClick={() => void loadItems(selectedPlan.plan_id)}>
@@ -425,8 +328,8 @@ export function StockManagerPage() {
                   ) : (
                     <div className="crz-stock-empty">
                       <NeonIcon name="cube" size={30} />
-                      <strong>Sem estoque local neste plano</strong>
-                      <span>Importe um lote ou configure fornecedor externo no Product Manager.</span>
+                      <strong>Nenhuma key cadastrada neste plano</strong>
+                      <span>Adicione as keys pelo produto e plano correspondente.</span>
                     </div>
                   )}
                 </section>
@@ -454,7 +357,7 @@ export function StockManagerPage() {
           </article>
 
           <article>
-            <header><small>AUDITORIA</small><strong>Eventos de estoque</strong></header>
+            <header><small>HISTÓRICO</small><strong>Movimentações de estoque</strong></header>
             <div>
               {catalog.recent_events.length ? catalog.recent_events.map((event) => (
                 <div key={event.id}>
