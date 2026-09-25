@@ -6,7 +6,6 @@ import type {
   StockManagerCatalog,
   StockManagerItem,
   StockItemsResponse,
-  StockPlanSummary,
 } from "./types";
 
 function statusOf(item: StockManagerItem) {
@@ -20,8 +19,8 @@ function statusOf(item: StockManagerItem) {
 
 function deliveryLabel(value: string) {
   const labels: Record<string, string> = {
-    internal_stock: "Estoque interno",
-    purincash_supplier: "PurinCash supplier",
+    internal_stock: "Keys / estoque automático",
+    purincash_supplier: "Fornecedor PurinCash",
     lzt_account: "Conta LZT",
     manual: "Manual",
     service: "Serviço",
