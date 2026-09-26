@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge, PageHeader } from "@/core/design-system";\nimport { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
+import { Badge, PageHeader } from "@/core/design-system";
+import { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
 import type {
   FinanceMethodRow,
   FinancePayload,
@@ -61,7 +62,7 @@ function shortId(value: string) {
 
 function feeSourceLabel(value: FinancePaymentRow["fee_source"]) {
   const map = {
-    provedor: "REAL / PROVIDER",
+    provider: "REAL / PROVEDOR",
     manual: "REAL / MANUAL",
     estimated: "ESTIMADA",
     unconfigured: "NÃO PRECIFICADA",
@@ -72,7 +73,7 @@ function feeSourceLabel(value: FinancePaymentRow["fee_source"]) {
 function feeSourceTone(
   value: FinancePaymentRow["fee_source"]
 ): "green" | "blue" | "gold" | "pink" | "neutral" {
-  if (value === "provedor") return "green";
+  if (value === "provider") return "green";
   if (value === "manual") return "blue";
   if (value === "estimated") return "gold";
   if (value === "unconfigured") return "pink";
@@ -420,7 +421,7 @@ export function FinanceManagerPage() {
     }
 
     const paymentId =
-      await adminPrompt("Nova retenção",{label:"Pagamento relacionado (opcional)"})?.trim() || "";
+      (await adminPrompt("Nova retenção",{label:"Pagamento relacionado (opcional)"}))?.trim() || "";
     const reason = await adminPrompt("Nova retenção",{label:"Motivo da retenção",required:true}) || "";
     const providerRef =
       await adminPrompt("Nova retenção",{label:"Referência externa ou provedor (opcional)"}) || "";

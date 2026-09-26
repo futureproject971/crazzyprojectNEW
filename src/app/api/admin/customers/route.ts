@@ -25,10 +25,11 @@ export async function GET(request: NextRequest) {
     }
     const [wallet,rewards,luck,coupons] = await Promise.all([
       supabase.from("bonus_wallets").select("balance_cents,updated_at").eq("user_id",userId).maybeSingle(),
-      supabase.from("reward_sessions").select("id",{count:"exact",head:true}).eq("user_id",userId),
-      supabase.from("luck_plays").select("id",{count:"exact",head:true}).eq("user_id",userId),
-      supabase.from("coupon_users").select("coupon_id",{count:"exact",head:true}).eq("user_id",userId),
+      supabase.from("reward_sessions").select("id,status,created_at,products(name)",{count:"exact"}).eq("user_id",userId).order("created_at",{ascending:false}).limit(20),
+      supabase.from("luck_plays").select("id,status,result,created_at",{count:"exact"}).eq("user_id",userId).order("created_at",{ascending:false}).limit(20),
+      supabase.from("coupon_users").select("coupon_id,coupons(code,active,expires_at)",{count:"exact"}).eq("user_id",userId).limit(20),
     ]);
+    if([wallet,rewards,luck,coupons].some(item=>item.error)) return NextResponse.json({error:"CUSTOMER_CLUB_UNAVAILABLE"},{status:500});
     const customer = {
       ...data,
       club: {
@@ -36,6 +37,9 @@ export async function GET(request: NextRequest) {
         reward_sessions: rewards.count || 0,
         luck_plays: luck.count || 0,
         coupons: coupons.count || 0,
+        recent_rewards: rewards.data || [],
+        recent_luck: luck.data || [],
+        recent_coupons: coupons.data || [],
       },
     };
     return NextResponse.json({ customer }, { headers: { "Cache-Control": "private, no-store" } });

@@ -1286,3 +1286,30 @@ html[data-theme="light"] .crz-shell-user__ticket-badge {
   border-color: #fff;
   background: #e92d3a;
 }
+
+/* M48 client navigation: FREE and PRÊMIOS are first-class CRAZZY destinations. */
+.crz-shell-nav__item.is-free,
+.crz-shell-mobile-link.is-free{
+  color:#dff7ff;
+  border-color:rgba(30,190,255,.45);
+  background:linear-gradient(180deg,rgba(0,113,255,.28),rgba(0,63,150,.18));
+  box-shadow:0 0 16px rgba(0,132,255,.18);
+}
+.crz-shell-nav__item.is-prizes,
+.crz-shell-mobile-link.is-prizes{
+  color:#fff2bd;
+  border-color:rgba(255,196,54,.43);
+  background:linear-gradient(180deg,rgba(122,74,0,.32),rgba(58,35,0,.2));
+  box-shadow:0 0 16px rgba(255,184,0,.16);
+}
+.crz-shell-nav__item.is-mtsounds,
+.crz-shell-mobile-link.is-mtsounds{
+  border-color:rgba(93,135,255,.48);
+  background:linear-gradient(180deg,rgba(42,76,166,.28),rgba(18,31,78,.2));
+}
+.crz-shell-nav__item.is-free b{background:#00a7ff;color:#fff;box-shadow:0 0 10px rgba(0,167,255,.55)}
+.crz-shell-nav__item.is-prizes b{background:#f7b500;color:#161004;box-shadow:0 0 10px rgba(247,181,0,.42)}
+.crz-shell-nav__item.is-free:hover,.crz-shell-nav__item.is-prizes:hover{transform:translateY(-1px)}
+
+
+.crz-admin-primary{display:flex;gap:8px;flex-wrap:wrap;padding:12px 4%;padding-top:100px;background:#07111e;border-bottom:1px solid #183454}.crz-admin-primary a{min-height:44px;display:flex;align-items:center;padding:8px 15px;border:1px solid #203859;border-radius:10px;color:#dbeaff}.crz-admin-primary a:hover{background:#0000ff}.crz-app-shell--admin:has(.crz-admin-primary) .crz-app-shell__content main{padding-top:24px}@media(max-width:600px){.crz-admin-primary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding-top:100px}.crz-admin-primary a{font-size:13px}}

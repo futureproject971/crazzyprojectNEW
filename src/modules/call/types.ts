@@ -7,6 +7,8 @@ export type CallRoom = {
   code: string;
   owner_id: string;
   title: string | null;
+  room_mode: "call" | "live";
+  password_protected: boolean;
   status: CallRoomStatus;
   locked: boolean;
   max_participants: number;
@@ -36,7 +38,10 @@ export type CallParticipant = {
 export type CallRoomPreview = {
   id: string;
   code: string;
+  owner_id: string;
   title: string | null;
+  room_mode: "call" | "live";
+  password_protected: boolean;
   status: CallRoomStatus;
   locked: boolean;
   max_participants: number;

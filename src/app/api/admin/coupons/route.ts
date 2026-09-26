@@ -16,14 +16,15 @@ export async function GET(){
   if(!user)return NextResponse.json({error:"UNAUTHENTICATED"},{status:401});
   if(!admin)return NextResponse.json({error:"FORBIDDEN"},{status:403});
 
-  const [coupons,products,links,users,usage]=await Promise.all([
+  const [coupons,products,games,links,users,usage]=await Promise.all([
     supabase.from("coupons").select("*").order("created_at",{ascending:false}).limit(500),
-    supabase.from("products").select("id,name,slug,active,image_url").eq("active",true).order("name"),
+    supabase.from("products").select("id,name,slug,active,image_url,game_id").eq("active",true).order("name"),
+    supabase.from("games").select("id,name,slug,active").eq("active",true).order("name"),
     supabase.from("coupon_products").select("coupon_id,product_id"),
     supabase.from("coupon_users").select("coupon_id,user_id"),
     supabase.rpc("admin_coupon_usage_counts"),
   ]);
-  if([coupons,products,links,users,usage].some(x=>x.error))return NextResponse.json({error:"COUPON_MANAGER_UNAVAILABLE"},{status:500});
+  if([coupons,products,games,links,users,usage].some(x=>x.error))return NextResponse.json({error:"COUPON_MANAGER_UNAVAILABLE"},{status:500});
 
   const userIds=[...new Set((users.data||[]).map(x=>x.user_id))];
   const profiles=userIds.length
@@ -40,7 +41,8 @@ export async function GET(){
 
   return NextResponse.json({
     coupons:(coupons.data||[]).map(item=>({...item,product_ids:productMap.get(item.id)||[],users:userMap.get(item.id)||[],real_uses:usageMap.get(item.id)||0})),
-    products:products.data||[]
+    products:products.data||[],
+    categories:games.data||[]
   },{headers:{"Cache-Control":"private, no-store"}});
 }
 
@@ -52,12 +54,16 @@ export async function POST(request:NextRequest){
   if(clean(body?.action,40)!=="save_coupon")return NextResponse.json({error:"INVALID_ACTION"},{status:400});
 
   const id=body?.id?uuid(body.id):null;
-  const productIds=Array.isArray(body?.productIds)?[...new Set(body.productIds.map(uuid).filter(Boolean))]:[];
+  const requestedProductIds=Array.isArray(body?.productIds)?[...new Set(body.productIds.map(uuid).filter(Boolean))]:[];
+  const categoryIds=Array.isArray(body?.categoryIds)?[...new Set(body.categoryIds.map(uuid).filter(Boolean))]:[];
+  const scopeMode=["all","selected","categories","exclude"].includes(clean(body?.scopeMode,20))?clean(body?.scopeMode,20):"all";
+  if(scopeMode==="selected"&&!requestedProductIds.length)return NextResponse.json({error:"Selecione pelo menos um produto."},{status:400});
+  if(scopeMode==="categories"&&!categoryIds.length)return NextResponse.json({error:"Selecione pelo menos uma categoria."},{status:400});
   const userIds=Array.isArray(body?.userIds)?[...new Set(body.userIds.map(uuid).filter(Boolean))]:[];
   let expiresAt:string|null=null;
   if(body?.expiresAt){const d=new Date(String(body.expiresAt));if(Number.isNaN(d.getTime()))return NextResponse.json({error:"INVALID_EXPIRY"},{status:400});expiresAt=d.toISOString()}
 
-  const {data,error}=await supabase.rpc("admin_upsert_coupon",{
+  const {data,error}=await supabase.rpc("admin_save_scoped_coupon",{
     p_id:id,
     p_code:clean(body?.code,40),
     p_discount_type:clean(body?.discountType,20),
@@ -67,7 +73,9 @@ export async function POST(request:NextRequest){
     p_active:body?.active!==false,
     p_expires_at:expiresAt,
     p_origin:clean(body?.origin,30)||"admin",
-    p_product_ids:productIds,
+    p_product_ids:requestedProductIds,
+    p_scope_mode:scopeMode,
+    p_category_ids:categoryIds,
     p_user_ids:userIds,
   });
   if(error||!data){

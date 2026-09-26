@@ -22,6 +22,8 @@ function messageFor(error?: string) {
   if (value.includes("ROOM_ENDED")) return "Esta sala já foi encerrada.";
   if (value.includes("ROOM_DISABLED")) return "Esta sala foi desativada.";
   if (value.includes("ROOM_LOCKED")) return "Esta sala está bloqueada pelo host.";
+  if (value.includes("INVALID_ROOM_PASSWORD")) return "Senha incorreta.";
+  if (value.includes("PASSWORD_RATE_LIMITED")) return "Muitas tentativas. Aguarde alguns minutos.";
   if (value.includes("ROOM_FULL")) return "Sala lotada.";
   if (value.includes("PARTICIPANT_KICKED")) return "Você foi removido pelo host.";
   if (value.includes("LIVEKIT_NOT_CONFIGURED")) {
@@ -46,20 +48,20 @@ export function CallExperience({ code }: { code: string }) {
   const loadPreview = useCallback(async () => {
     if (!user) return;
     setState("loading");
-    const response = await fetch(
-      "/api/call/preview?code=" + encodeURIComponent(code),
-      { cache: "no-store" }
-    );
-    const payload = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      setError(messageFor(payload.error));
+    try {
+      const response = await fetch("/api/call/preview?code=" + encodeURIComponent(code), { cache: "no-store" });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(messageFor(payload.error));
+        setState("error");
+        return;
+      }
+      setPreview(payload.room as CallRoomPreview);
+      setState("ready");
+    } catch {
+      setError("Não foi possível alcançar a sala agora.");
       setState("error");
-      return;
     }
-
-    setPreview(payload.room as CallRoomPreview);
-    setState("ready");
   }, [code, user]);
 
   useEffect(() => {
@@ -80,7 +82,7 @@ export function CallExperience({ code }: { code: string }) {
     void loadPreview();
   }, [authLoading, code, loadPreview, user]);
 
-  const join = async (nextPreferences: CallMediaPreferences) => {
+  const join = async (nextPreferences: CallMediaPreferences, password: string) => {
     if (!user || joining) return;
     setJoining(true);
     setError(null);
@@ -90,7 +92,7 @@ export function CallExperience({ code }: { code: string }) {
       const joinResponse = await fetch("/api/call/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code, password }),
       });
       const joinPayload = await joinResponse.json().catch(() => ({}));
       if (!joinResponse.ok || !joinPayload.snapshot) {
@@ -111,6 +113,8 @@ export function CallExperience({ code }: { code: string }) {
 
       setSnapshot(joinPayload.snapshot as CallRoomSnapshot);
       setCredentials(tokenPayload as Credentials);
+    } catch {
+      setError("A conexão caiu antes de entrar. Tente novamente.");
     } finally {
       setJoining(false);
     }
@@ -156,7 +160,7 @@ export function CallExperience({ code }: { code: string }) {
       user={user}
       busy={joining}
       error={error}
-      onJoin={(next) => void join(next)}
+      onJoin={(next, password) => void join(next, password)}
     />
   );
 }

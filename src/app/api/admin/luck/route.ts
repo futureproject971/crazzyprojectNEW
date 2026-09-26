@@ -20,10 +20,14 @@ export async function GET(){
     supabase.from("luck_campaigns").select("*").order("sort_order").order("created_at"),
     supabase.from("luck_prizes").select("*").order("campaign_id").order("sort_order"),
     supabase.from("luck_plays").select("id,user_id,campaign_id,prize_id,status,result,created_at").order("created_at",{ascending:false}).limit(200),
-    supabase.from("luck_awards").select("*").order("created_at",{ascending:false}).limit(200),\n    supabase.from("products").select("id,name,active").eq("active",true).order("name"),\n    supabase.from("product_plans").select("id,product_id,name,active").eq("active",true).order("sort_order"),
+    supabase.from("luck_awards").select("*").order("created_at",{ascending:false}).limit(200),
+    supabase.from("products").select("id,name,active").eq("active",true).order("name"),
+    supabase.from("product_plans").select("id,product_id,name,active").eq("active",true).order("sort_order"),
   ]);
   if([campaigns,prizes,plays,awards,products,plans].some(x=>x.error))return NextResponse.json({error:"LUCK_MANAGER_UNAVAILABLE"},{status:500});
-  const planRows=plans.data||[];\n  const productRows=(products.data||[]).map(product=>({...product,plans:planRows.filter(plan=>plan.product_id===product.id)}));\n  return NextResponse.json({campaigns:campaigns.data||[],prizes:prizes.data||[],plays:plays.data||[],awards:awards.data||[],products:productRows},{headers:{"Cache-Control":"private, no-store"}});
+  const planRows=plans.data||[];
+  const productRows=(products.data||[]).map(product=>({...product,plans:planRows.filter(plan=>plan.product_id===product.id)}));
+  return NextResponse.json({campaigns:campaigns.data||[],prizes:prizes.data||[],plays:plays.data||[],awards:awards.data||[],products:productRows},{headers:{"Cache-Control":"private, no-store"}});
 }
 
 export async function POST(request:NextRequest){

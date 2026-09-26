@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Badge, NeonIcon, PageHeader } from "@/core/design-system";
 import type { ManagerCatalog, ManagerPlan, ManagerPlanCode, ManagerProduct } from "./types";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 const deliveryModes = [
   ["internal_stock", "Keys / estoque automático"],
@@ -20,6 +21,7 @@ const automationKeys = [
 ] as const;
 
 const planCodes: Array<[ManagerPlanCode, string]> = [
+  ["trial", "Trial"],
   ["1d", "1 dia"],
   ["3d", "3 dias"],
   ["7d", "7 dias"],
@@ -93,6 +95,28 @@ function productStockMeta(product: ManagerProduct) {
   return { label: "MAN", detail: "entrega manual", tone: "manual" };
 }
 
+const compatibilityGroups = [
+  ["Windows", ["Windows 10","Windows 11"]],
+  ["GPU", ["NVIDIA","AMD","Intel"]],
+  ["CPU", ["Intel","AMD"]],
+  ["HVCI", ["ON","OFF"]],
+  ["Secure Boot", ["Suportado","Não suportado","Tanto faz"]],
+] as const;
+
+function toggleFeatureOption(features: Array<{id:string;label:string;value:string;sort_order:number}>, label:string, option:string, sortOrder:number) {
+  const current = features.find(item => item.label === label);
+  const values = String(current?.value || "").split(",").map(value=>value.trim()).filter(Boolean);
+  const next = values.includes(option) ? values.filter(value=>value!==option) : [...values,option];
+  const others = features.filter(item=>item.label!==label);
+  if (!next.length) return others;
+  return [...others,{id:current?.id||("draft-"+label),label,value:next.join(", "),sort_order:sortOrder}]
+    .sort((a,b)=>a.sort_order-b.sort_order);
+}
+
+function hasFeatureOption(features: Array<{label:string;value:string}>, label:string, option:string) {
+  return String(features.find(item=>item.label===label)?.value||"").split(",").map(value=>value.trim()).includes(option);
+}
+
 function planStockMeta(plan: ManagerPlan) {
   if (plan.delivery_mode === "internal_stock") {
     const value = Number(plan.available_stock || 0);
@@ -126,6 +150,8 @@ export function ProductManagerPage() {
   const [stockBusy, setStockBusy] = useState(false);
   const [stockNotice, setStockNotice] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
+  const [mediaUrl, setMediaUrl] = useState("");
+  const [mediaType, setMediaType] = useState<"image"|"youtube"|"streamable"|"video">("image");
   const [creatingProduct, setCreatingProduct] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorTab, setEditorTab] = useState<"general" | "fields" | "hooks">("general");
@@ -143,6 +169,11 @@ export function ProductManagerPage() {
     autoDelivery: false,
     hideDeliveryBadge: false,
     createDefaultPlans: false,
+    status: "offline",
+    isNew: true,
+    presetPlans: [] as ManagerPlanCode[],
+    media: [] as Array<{id:string;media_type:string;url:string;sort_order:number}>,
+    features: [] as Array<{id:string;label:string;value:string;sort_order:number}>,
   });
   const [newPlan, setNewPlan] = useState<{
     name: string;
@@ -236,8 +267,8 @@ export function ProductManagerPage() {
           .some(value => String(value || "").toLowerCase().includes(q));
 
       if (!queryMatch) return false;
-      if (productFilter === "active") return product.active;
-      if (productFilter === "inactive") return !product.active;
+      if (productFilter === "active") return product.active && !["offline","updating"].includes(product.status);
+      if (productFilter === "inactive") return !product.active || product.status === "offline";
       if (productFilter === "new") return product.is_new;
       if (productFilter === "updating") return String(product.status || "").toLowerCase() === "updating";
       if (productFilter === "out") {
@@ -307,7 +338,7 @@ export function ProductManagerPage() {
   };
 
   const saveEditorChanges = async () => {
-    if (!productDraft || busy) return;
+    if (!productDraft || busy || imageUploading) return;
     setBusy(true);
     setNotice("");
 
@@ -371,7 +402,7 @@ export function ProductManagerPage() {
 
 
   const createProduct = async () => {
-    if (busy || !newProduct.name.trim() || !newProduct.gameId) return;
+    if (busy || imageUploading || !newProduct.name.trim() || !newProduct.gameId) return;
     setBusy(true);
     setNotice("");
 
@@ -391,6 +422,11 @@ export function ProductManagerPage() {
           bannerUrl: newProduct.bannerUrl,
           autoDelivery: newProduct.autoDelivery,
           hideDeliveryBadge: newProduct.hideDeliveryBadge,
+          status: newProduct.status,
+          isNew: newProduct.isNew,
+          presetPlans: newProduct.presetPlans,
+          media: newProduct.media,
+          features: newProduct.features,
         }),
       });
       const payload = await response.json().catch(() => ({}));
@@ -404,6 +440,11 @@ export function ProductManagerPage() {
         description: "",
         iconUrl: "",
         bannerUrl: "",
+        status: "offline",
+        isNew: true,
+        presetPlans: [],
+        media: [],
+        features: [],
       }));
       await load(true, createdId, null);
       setEditorTab("fields");
@@ -480,7 +521,7 @@ export function ProductManagerPage() {
 
   const uploadProductAsset = async (
     file: File,
-    target: "icon" | "banner",
+    target: "icon" | "banner" | "gallery" | "video",
     mode: "create" | "edit"
   ) => {
     if (imageUploading) return;
@@ -489,36 +530,45 @@ export function ProductManagerPage() {
     setNotice("");
 
     try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("kind", target);
-
-      const response = await fetch("/api/admin/products/upload", {
-        method: "POST",
-        body: form,
-      });
-      const payload = await response.json().catch(() => ({}));
-
-      if (!response.ok || !payload?.url) {
-        throw new Error(payload?.error || "Falha ao enviar imagem.");
-      }
-
-      const url = String(payload.url);
-      if (mode === "create") {
-        setNewProduct(current =>
-          target === "icon"
-            ? { ...current, iconUrl: url }
-            : { ...current, bannerUrl: url }
+      let url = "";
+      {
+        const max = target === "video" ? 48 * 1024 * 1024 : 10 * 1024 * 1024;
+        if (file.size <= 0 || file.size > max) throw new Error(target === "video" ? "Vídeo acima de 48 MB." : "Imagem acima de 10 MB.");
+        const signedResponse = await fetch("/api/admin/products/upload/sign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kind: target, contentType: file.type, size: file.size }),
+        });
+        const signed = await signedResponse.json().catch(() => ({}));
+        if (!signedResponse.ok || !signed?.path || !signed?.token || !signed?.url) {
+          throw new Error(signed?.error || "Falha ao preparar upload.");
+        }
+        const supabase = createBrowserSupabaseClient();
+        const uploaded = await supabase.storage.from("site-branding").uploadToSignedUrl(
+          String(signed.path),
+          String(signed.token),
+          file,
+          { contentType: file.type }
         );
+        if (uploaded.error) throw new Error("Falha ao enviar mídia.");
+        url = String(signed.url);
+      }
+      if (mode === "create") {
+        setNewProduct(current => {
+          if (target === "icon") return { ...current, iconUrl: url };
+          if (target === "banner") return { ...current, bannerUrl: url };
+          return {...current,media:[...current.media,{id:crypto.randomUUID(),media_type:target==="video"?"video":"image",url,sort_order:current.media.length}]};
+        });
       } else {
         setProductDraft(current => {
           if (!current) return current;
           if (target === "icon") return { ...current, icon_url: url };
-          return { ...current, banner_url: url, image_url: url };
+          if (target === "banner") return { ...current, banner_url: url, image_url: url };
+          return {...current,media:[...(current.media||[]),{id:crypto.randomUUID(),media_type:target==="video"?"video":"image",url,sort_order:(current.media||[]).length}]};
         });
       }
 
-      setNotice(target === "icon" ? "Ícone enviado." : "Banner enviado.");
+      setNotice(target === "icon" ? "Ícone enviado." : target === "banner" ? "Banner enviado." : target === "video" ? "Vídeo adicionado." : "Imagem adicionada.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Falha ao enviar imagem.");
     } finally {
@@ -629,20 +679,14 @@ export function ProductManagerPage() {
                 </div>
 
                 <div className="crz-purin-dialog__actions">
-                  <button type="button" className="is-muted" disabled>ProductID</button>
-                  <button type="button" className="is-green-outline" disabled>➤ Enviar Embed</button>
-                  <button type="button" className="is-blue-outline" disabled>⤨ Sincronizar</button>
                   <button
                     type="button"
                     className="is-save"
                     disabled={busy || !newProduct.name.trim() || !newProduct.gameId}
                     onClick={() => void createProduct()}
                   >
-                    {busy ? "Criando..." : "Salvar alterações"}
+                    {busy ? "Criando..." : "Criar produto"}
                   </button>
-                  <button type="button" className="is-icon" disabled>⧉</button>
-                  <button type="button" className="is-icon" disabled>⌘</button>
-                  <button type="button" className="is-danger-icon" disabled>♲</button>
                 </div>
 
                 <button
@@ -656,11 +700,7 @@ export function ProductManagerPage() {
                 </button>
               </header>
 
-              <nav className="crz-purin-tabs" aria-label="Etapas do produto">
-                <button type="button" className="is-active">Geral</button>
-                <button type="button" disabled>Planos & Estoque</button>
-                <button type="button" disabled>Hooks</button>
-              </nav>
+              <div className="crz-purin-create-note">Preencha o essencial. Planos, estoque, mídia e integrações continuam neste mesmo módulo.</div>
 
               <div className="crz-purin-dialog__scroll">
                 <section className="crz-purin-general">
@@ -749,9 +789,42 @@ export function ProductManagerPage() {
                       rows={8}
                       value={newProduct.description}
                       onChange={event => setNewProduct({...newProduct,description:event.target.value.slice(0,6000)})}
-                      placeholder="Descrição completa do produto..."
+                      placeholder="Uma descrição principal. O resto o site organiza."
                     />
                   </label>
+
+                  <section className="crz-pm-quick-block">
+                    <header><strong>Status</strong><span>Clique. Não precisa escrever.</span></header>
+                    <div className="crz-pm-status-presets">
+                      {[["online","ONLINE"],["updating","EM UPDATE"],["offline","OFFLINE"]].map(([value,label])=><button type="button" key={value} className={newProduct.status===value?"is-active":""} onClick={()=>setNewProduct({...newProduct,status:value})}>{label}</button>)}
+                      <button type="button" className={newProduct.isNew?"is-active":""} onClick={()=>setNewProduct({...newProduct,isNew:!newProduct.isNew})}>NOVO ✨</button>
+                    </div>
+                  </section>
+
+                  <section className="crz-pm-quick-block">
+                    <header><strong>Planos sugeridos</strong><span>Selecione os que quer criar agora.</span></header>
+                    <div className="crz-pm-plan-presets">
+                      {planCodes.filter(([code])=>!["custom","single"].includes(code)).map(([code,label])=>{const on=newProduct.presetPlans.includes(code);return <button type="button" key={code} className={on?"is-active":""} onClick={()=>setNewProduct({...newProduct,presetPlans:on?newProduct.presetPlans.filter(item=>item!==code):[...newProduct.presetPlans,code]})}>{on?"✓ ":""}{label}</button>})}
+                    </div>
+                  </section>
+
+                  <section className="crz-pm-quick-block">
+                    <header><strong>Compatibilidade</strong><span>Marque apenas o que vale para este produto.</span></header>
+                    {compatibilityGroups.map(([label,options],groupIndex)=><div className="crz-pm-compat" key={label}><span>{label}</span><div>{options.map(option=><button type="button" key={option} className={hasFeatureOption(newProduct.features,label,option)?"is-active":""} onClick={()=>setNewProduct({...newProduct,features:toggleFeatureOption(newProduct.features,label,option,groupIndex)})}>{option}</button>)}</div></div>)}
+                  </section>
+
+                  <section className="crz-pm-quick-block">
+                    <header><strong>Demonstração</strong><span>Imagem, vídeo enviado, YouTube ou Streamable.</span></header>
+                    <div className="crz-pm-media-compose">
+                      <select value={mediaType} onChange={event=>setMediaType(event.target.value as typeof mediaType)}><option value="image">Imagem</option><option value="video">Vídeo</option><option value="youtube">YouTube</option><option value="streamable">Streamable</option></select>
+                      <input value={mediaUrl} onChange={event=>setMediaUrl(event.target.value)} placeholder="Cole a URL da mídia"/>
+                      <button type="button" onClick={()=>{const url=mediaUrl.trim();if(!url)return;setNewProduct({...newProduct,media:[...newProduct.media,{id:crypto.randomUUID(),media_type:mediaType,url,sort_order:newProduct.media.length}]});setMediaUrl("")}}>Adicionar</button>
+                      <label className="crz-purin-upload"><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={imageUploading} onChange={event=>{const file=event.target.files?.[0];if(file)void uploadProductAsset(file,"gallery","create");event.currentTarget.value=""}}/>+ Imagem</label>
+                      <label className="crz-purin-upload"><input type="file" accept="video/mp4,video/webm" disabled={imageUploading} onChange={event=>{const file=event.target.files?.[0];if(file)void uploadProductAsset(file,"video","create");event.currentTarget.value=""}}/>+ Vídeo</label>
+                    </div>
+                    {newProduct.media.length>0&&<div className="crz-pm-media-list">{newProduct.media.map((item,index)=><div key={item.id}><span><b>{item.media_type}</b>{item.url}</span><button type="button" onClick={()=>setNewProduct({...newProduct,media:newProduct.media.filter((_,i)=>i!==index)})}>Remover</button></div>)}</div>}
+                  </section>
+
                   <section className="crz-purin-display">
                     <div>
                       <span className="crz-purin-eye">◉</span>
@@ -804,58 +877,8 @@ export function ProductManagerPage() {
                 </div>
 
                 <div className="crz-purin-dialog__actions">
-                  <button
-                    type="button"
-                    className="is-muted"
-                    onClick={() => void copyText(productDraft.id, "ProductID")}
-                  >
-                    ProductID
-                  </button>
-                  <a
-                    className="is-green-outline"
-                    href={`/admin/campanhas?product=${encodeURIComponent(productDraft.id)}`}
-                  >
-                    ➤ Enviar Embed
-                  </a>
-                  <button
-                    type="button"
-                    className="is-blue-outline"
-                    disabled={busy}
-                    onClick={() => void syncCurrentProduct()}
-                  >
-                    ⤨ Sincronizar
-                  </button>
-                  <button
-                    type="button"
-                    className="is-save"
-                    disabled={busy || stockBusy || imageUploading}
-                    onClick={() => void saveEditorChanges()}
-                  >
+                  <button type="button" className="is-save" disabled={busy || stockBusy || imageUploading} onClick={() => void saveEditorChanges()}>
                     {busy ? "Salvando..." : "Salvar alterações"}
-                  </button>
-                  <button
-                    type="button"
-                    className="is-icon"
-                    title="Copiar referência técnica"
-                    onClick={() => void copyText(productDraft.id, "ProductID")}
-                  >
-                    ⧉
-                  </button>
-                  <button
-                    type="button"
-                    className="is-icon"
-                    title="Entrega e integrações"
-                    onClick={() => setEditorTab("hooks")}
-                  >
-                    ⌘
-                  </button>
-                  <button
-                    type="button"
-                    className="is-danger-icon"
-                    title="Exclusão protegida"
-                    onClick={() => setNotice("Exclusão de produto permanece protegida para evitar remoção acidental.")}
-                  >
-                    ♲
                   </button>
                 </div>
 
@@ -890,7 +913,7 @@ export function ProductManagerPage() {
                   className={editorTab === "hooks" ? "is-active" : ""}
                   onClick={() => setEditorTab("hooks")}
                 >
-                  Hooks
+                  Entrega & Integrações
                 </button>
               </nav>
 
@@ -999,8 +1022,27 @@ export function ProductManagerPage() {
                         rows={9}
                         value={productDraft.description || ""}
                         onChange={event => setProductDraft({...productDraft,description:event.target.value})}
+                        placeholder="Uma descrição principal."
                       />
                     </label>
+
+                    <section className="crz-pm-quick-block">
+                      <header><strong>Compatibilidade</strong><span>Botões rápidos.</span></header>
+                      {compatibilityGroups.map(([label,options],groupIndex)=><div className="crz-pm-compat" key={label}><span>{label}</span><div>{options.map(option=><button type="button" key={option} className={hasFeatureOption(productDraft.features||[],label,option)?"is-active":""} onClick={()=>setProductDraft({...productDraft,features:toggleFeatureOption(productDraft.features||[],label,option,groupIndex)})}>{option}</button>)}</div></div>)}
+                    </section>
+
+                    <section className="crz-pm-quick-block">
+                      <header><strong>Galeria e vídeo</strong><span>Upload, YouTube ou Streamable.</span></header>
+                      <div className="crz-pm-media-compose">
+                        <select value={mediaType} onChange={event=>setMediaType(event.target.value as typeof mediaType)}><option value="image">Imagem</option><option value="video">Vídeo</option><option value="youtube">YouTube</option><option value="streamable">Streamable</option></select>
+                        <input value={mediaUrl} onChange={event=>setMediaUrl(event.target.value)} placeholder="Cole a URL da mídia"/>
+                        <button type="button" onClick={()=>{const url=mediaUrl.trim();if(!url)return;setProductDraft({...productDraft,media:[...(productDraft.media||[]),{id:crypto.randomUUID(),media_type:mediaType,url,sort_order:(productDraft.media||[]).length}]});setMediaUrl("")}}>Adicionar</button>
+                        <label className="crz-purin-upload"><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={imageUploading} onChange={event=>{const file=event.target.files?.[0];if(file)void uploadProductAsset(file,"gallery","edit");event.currentTarget.value=""}}/>+ Imagem</label>
+                        <label className="crz-purin-upload"><input type="file" accept="video/mp4,video/webm" disabled={imageUploading} onChange={event=>{const file=event.target.files?.[0];if(file)void uploadProductAsset(file,"video","edit");event.currentTarget.value=""}}/>+ Vídeo</label>
+                      </div>
+                      {(productDraft.media||[]).length>0&&<div className="crz-pm-media-list">{(productDraft.media||[]).map((item,index)=><div key={item.id}><span><b>{item.media_type}</b>{item.url}</span><button type="button" onClick={()=>setProductDraft({...productDraft,media:(productDraft.media||[]).filter((_,i)=>i!==index)})}>Remover</button></div>)}</div>}
+                    </section>
+
                     <section className="crz-purin-display">
                       <div>
                         <span className="crz-purin-eye">◉</span>
@@ -1068,13 +1110,6 @@ export function ProductManagerPage() {
                       <div>
                         <button
                           type="button"
-                          className="crz-purin-secondary-button"
-                          onClick={() => setEditorTab("hooks")}
-                        >
-                          ◉ Importar do fornecedor
-                        </button>
-                        <button
-                          type="button"
                           className="crz-purin-add-button"
                           onClick={() => setCreatingPlan(value => !value)}
                         >
@@ -1084,6 +1119,10 @@ export function ProductManagerPage() {
                     </header>
 
                     {creatingPlan && (
+                      <>
+                      <div className="crz-pm-plan-presets crz-pm-plan-presets--editor">
+                        {planCodes.map(([code,label])=><button type="button" key={code} className={newPlan.planCode===code?"is-active":""} onClick={()=>setNewPlan({...newPlan,planCode:code,name:code==="custom"?"Plano personalizado":label.charAt(0).toUpperCase()+label.slice(1)})}>{label}</button>)}
+                      </div>
                       <div className="crz-purin-add-field">
                         <label>
                           <span>Nome</span>
@@ -1121,6 +1160,7 @@ export function ProductManagerPage() {
                           {busy ? "Criando..." : "Criar plano"}
                         </button>
                       </div>
+                      </>
                     )}
 
                     <div className="crz-purin-variation-list">
@@ -1154,23 +1194,6 @@ export function ProductManagerPage() {
                               <span className="crz-purin-chevron">{isExpanded ? "⌃" : "⌄"}</span>
                             </button>
 
-                            <div className="crz-purin-variation__tools">
-                              <button
-                                type="button"
-                                title="Copiar ID da variação"
-                                onClick={() => void copyText(plan.id, "ProductID da variação")}
-                              >
-                                ⧉
-                              </button>
-                              <button
-                                type="button"
-                                title="Exclusão protegida"
-                                onClick={() => setNotice("Exclusão de variação permanece protegida para evitar perda de estoque.")}
-                              >
-                                ♲
-                              </button>
-                            </div>
-
                             {isExpanded && selectedPlanId === plan.id && planDraft && (
                               <div className="crz-purin-variation__editor">
                                 <div className="crz-purin-variation__grid">
@@ -1180,18 +1203,6 @@ export function ProductManagerPage() {
                                       value={workingPlan.name}
                                       onChange={event => setPlanDraft({...planDraft,name:event.target.value})}
                                     />
-                                  </label>
-                                  <label>
-                                    <span>Produto ID</span>
-                                    <div className="crz-purin-copy-input">
-                                      <input value={workingPlan.id} readOnly />
-                                      <button
-                                        type="button"
-                                        onClick={() => void copyText(workingPlan.id, "ProductID da variação")}
-                                      >
-                                        ⧉
-                                      </button>
-                                    </div>
                                   </label>
                                   <label>
                                     <span>Valor</span>
@@ -1214,14 +1225,16 @@ export function ProductManagerPage() {
                                   </label>
                                 </div>
 
+                                {workingPlan.plan_code==="custom"&&<label><span>Duração personalizada (minutos)</span><input type="number" min="1" max="5256000" placeholder="Sem expiração" value={workingPlan.entitlement_duration_minutes??""} onChange={event=>setPlanDraft({...planDraft,entitlement_duration_minutes:event.target.value?Number(event.target.value):null})}/></label>}
+
                                 <button
                                   type="button"
                                   className={"crz-purin-hidden-sale " + (!workingPlan.active ? "is-on" : "")}
                                   onClick={() => setPlanDraft({...planDraft,active:!planDraft.active})}
                                 >
                                   <span>
-                                    <strong>Venda oculta</strong>
-                                    <small>Não será exibido no produto e só pode ser comprado via URL.</small>
+                                    <strong>Pausar vendas</strong>
+                                    <small>Este plano fica indisponível para novas compras.</small>
                                   </span>
                                   <i />
                                 </button>
@@ -1299,8 +1312,8 @@ export function ProductManagerPage() {
                 {editorTab === "hooks" && (
                   <section className="crz-purin-hooks">
                     <header>
-                      <strong>Hooks & Automação</strong>
-                      <span>Integrações e comportamentos do produto selecionado.</span>
+                      <strong>Entrega & Integrações</strong>
+                      <span>Configurações avançadas de entrega. Só mexa quando precisar.</span>
                     </header>
 
                     <div className="crz-purin-hooks__block">
@@ -1340,9 +1353,9 @@ export function ProductManagerPage() {
                         <div className="crz-purin-hooks__block">
                           <strong>Fornecedor</strong>
                           <div className="crz-purin-hooks__grid">
-                            <label><span>Provider</span><input value={planDraft.supplier_provider || ""} onChange={event => setPlanDraft({...planDraft,supplier_provider:event.target.value})} placeholder="purincash" /></label>
-                            <label><span>Produto externo</span><input value={planDraft.supplier_product_id || ""} onChange={event => setPlanDraft({...planDraft,supplier_product_id:event.target.value})} /></label>
-                            <label className="is-wide"><span>Variação externa</span><input value={planDraft.supplier_variation_id || ""} onChange={event => setPlanDraft({...planDraft,supplier_variation_id:event.target.value})} /></label>
+                            <label><span>Fornecedor</span><input value={planDraft.supplier_provider || ""} onChange={event => setPlanDraft({...planDraft,supplier_provider:event.target.value})} placeholder="purincash" /></label>
+                            <label><span>Produto no fornecedor</span><input value={planDraft.supplier_product_id || ""} onChange={event => setPlanDraft({...planDraft,supplier_product_id:event.target.value})} /></label>
+                            <label className="is-wide"><span>Variação no fornecedor</span><input value={planDraft.supplier_variation_id || ""} onChange={event => setPlanDraft({...planDraft,supplier_variation_id:event.target.value})} /></label>
                           </div>
                         </div>
                       </>

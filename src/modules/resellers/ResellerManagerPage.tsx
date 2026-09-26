@@ -12,7 +12,9 @@ export function ResellerManagerPage(){
   const [state,setState]=useState<"loading"|"ready"|"auth"|"forbidden"|"error">("loading");
   const [selected,setSelected]=useState<ResellerAdminRow|null>(null);
   const [query,setQuery]=useState("");
-  const [userId,setUserId]=useState("");\n  const [customerQuery,setCustomerQuery]=useState("");\n  const [customerResults,setCustomerResults]=useState<any[]>([]);
+  const [userId,setUserId]=useState("");
+  const [customerQuery,setCustomerQuery]=useState("");
+  const [customerResults,setCustomerResults]=useState<any[]>([]);
   const [discount,setDiscount]=useState("50");
   const [active,setActive]=useState(true);
   const [expiresAt,setExpiresAt]=useState("");
@@ -42,7 +44,9 @@ export function ResellerManagerPage(){
   };
   const fresh=()=>{setSelected(null);setUserId("");setCustomerQuery("");setCustomerResults([]);setDiscount("50");setActive(true);setExpiresAt("");setNotes("");setProductIds([]);setNotice("")};
 
-  const searchCustomer=async()=>{const q=customerQuery.trim();if(!q)return setCustomerResults([]);const r=await fetch("/api/admin/customers?q="+encodeURIComponent(q)+"&limit=12",{cache:"no-store"});const p=await r.json().catch(()=>({}));setCustomerResults(r.ok?p.customers||[]:[])};\n\n  const save=async()=>{
+  const searchCustomer=async()=>{const q=customerQuery.trim();if(!q)return setCustomerResults([]);const r=await fetch("/api/admin/customers?q="+encodeURIComponent(q)+"&limit=12",{cache:"no-store"});const p=await r.json().catch(()=>({}));setCustomerResults(r.ok?p.customers||[]:[])};
+
+  const save=async()=>{
     if(busy)return;
     setBusy(true);setNotice("");
     try{

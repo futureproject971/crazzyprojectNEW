@@ -15,6 +15,7 @@ export type ManagerDeliveryMode =
   | "service";
 
 export type ManagerPlanCode =
+  | "trial"
   | "1d"
   | "3d"
   | "7d"
@@ -49,6 +50,9 @@ export type ManagerPlan = {
   tutorials: ManagerTutorial[];
 };
 
+export type ManagerMedia = { id: string; media_type: string; url: string; sort_order: number };
+export type ManagerFeature = { id: string; label: string; value: string; sort_order: number };
+
 export type ManagerProduct = {
   id: string;
   name: string;
@@ -70,6 +74,8 @@ export type ManagerProduct = {
   automation_flags: Record<string, unknown>;
   tutorials: ManagerTutorial[];
   plans: ManagerPlan[];
+  media: ManagerMedia[];
+  features: ManagerFeature[];
 };
 
 export type ManagerGame = {

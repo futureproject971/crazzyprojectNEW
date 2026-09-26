@@ -1,7 +1,8 @@
-export type StandardPlanCode = "1d" | "3d" | "7d" | "15d" | "30d" | "90d" | "lifetime";
+export type StandardPlanCode = "trial" | "1d" | "3d" | "7d" | "15d" | "30d" | "90d" | "lifetime";
 export type ComboPlanFamily = "30d" | "lifetime";
 
 export const CRAZZY_STANDARD_PLANS = [
+  { code: "trial" as const, name: "Trial", duration: "1 hora", note: "Teste por 1 hora." },
   { code: "1d" as const, name: "Diário", duration: "1 dia", note: "Acesso por 24 horas." },
   { code: "3d" as const, name: "3 Dias", duration: "3 dias", note: "Acesso por 3 dias." },
   { code: "7d" as const, name: "7 Dias", duration: "7 dias", note: "Acesso por 7 dias." },

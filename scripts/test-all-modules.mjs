@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 
 const tests = [
+  "scripts/test-m48-commerce.mjs",
   "scripts/test-lzt-preview.mjs",
   "scripts/test-m08-checkout.mjs",
   "scripts/test-m09-auth.mjs",

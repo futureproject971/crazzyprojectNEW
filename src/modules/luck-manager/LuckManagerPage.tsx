@@ -20,7 +20,9 @@ export function LuckManagerPage(){
 
  const load=useCallback(async()=>{try{const r=await fetch("/api/admin/luck",{cache:"no-store"});const p=await r.json();if(!r.ok)throw new Error();setData(p);setState("ready")}catch{setState("error")}},[]);
  useEffect(()=>{void load()},[load]);
- const prizes=useMemo(()=>campaign?data?.prizes?.filter((p:Row)=>p.campaign_id===campaign.id)||[]:[],[campaign,data]);\n const products:Row[]=data?.products||[];\n const selectedProduct=products.find(p=>p.id===prizeForm?.productId);
+ const prizes=useMemo(()=>campaign?data?.prizes?.filter((p:Row)=>p.campaign_id===campaign.id)||[]:[],[campaign,data]);
+ const products:Row[]=data?.products||[];
+ const selectedProduct=products.find(p=>p.id===prizeForm?.productId);
 
  const openCampaign=(row?:Row)=>setCampaignForm({
   id:row?.id,

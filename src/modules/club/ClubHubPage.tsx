@@ -2,9 +2,9 @@
 import { NeonIcon, PageHeader } from "@/core/design-system";
 import { useAuth } from "@/modules/auth/AuthProvider";
 const clubModules=[
- {id:"bonus",title:"FREE • GRÁTIS",description:"Ganhe testes, bônus promocional e benefícios disponíveis para sua conta.",href:"/bonus",icon:"crown" as const,tone:"blue",status:"Carteira promocional"},
- {id:"arcade",title:"PRÊMIOS • ROLETA + RASPADINHA",description:"Gire a roleta, raspe e acompanhe os prêmios do CRAZZY Club.",href:"/club/luck",icon:"lightning" as const,tone:"pink",status:"Raspadinha e minigames"},
- {id:"rewards",title:"REWARDS",description:"Complete missões e resgate recompensas grátis.",href:"/club/rewards",icon:"crown" as const,tone:"blue",status:"Missões e recompensas"},
+ {id:"bonus",title:"CRAZZY BONUS",description:"Veja seu saldo promocional, movimentações e benefícios.",href:"/bonus",icon:"crown" as const,tone:"blue",status:"Carteira promocional"},
+ {id:"arcade",title:"PRÊMIOS • ROLETA + RASPADINHA",description:"Gire a roleta, raspe e acompanhe os prêmios do CRAZZY Club.",href:"/club/luck",icon:"lightning" as const,tone:"gold",status:"Raspadinha e minigames"},
+ {id:"rewards",title:"FREE • GRÁTIS",description:"Complete missões e resgate recompensas grátis.",href:"/club/rewards",icon:"crown" as const,tone:"blue",status:"Missões e recompensas"},
  {id:"coupons",title:"MEUS CUPONS",description:"Cupons liberados, regras de uso e validade.",href:"/painel/cupons",icon:"featured" as const,tone:"gold",status:"Descontos e prêmios"},
  {id:"rank",title:"CRAZZY RANK",description:"Badges, progressão e destaques da comunidade.",href:"/club/rank",icon:"community" as const,tone:"green",status:"Ranking e badges"},
 ];

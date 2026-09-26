@@ -1,4 +1,5 @@
 "use client";
+import { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -113,6 +114,9 @@ export function CallRoom({
   const isOwner = snapshot.room.owner_id === user.id;
   const canModerate = isOwner || self?.role === "cohost" || user.role === "admin";
   const canEnd = isOwner || user.role === "admin";
+  const canPublish = snapshot.room.room_mode === "call"
+    ? self?.role !== "viewer"
+    : self?.role === "host" || self?.role === "cohost";
 
   const selectedShare = useMemo(
     () => shares.find((share) => share.key === selectedKey) || null,
@@ -289,7 +293,7 @@ export function CallRoom({
   const screenShare = Boolean(localMedia?.screenShare);
 
   const toggleMicrophone = async () => {
-    if (!liveRoom || !snapshot.room.allow_microphone) return;
+    if (!liveRoom || !canPublish || !snapshot.room.allow_microphone) return;
     setBusy("mic");
     setNotice(null);
     try {
@@ -303,7 +307,7 @@ export function CallRoom({
   };
 
   const toggleCamera = async () => {
-    if (!liveRoom || !snapshot.room.allow_camera) return;
+    if (!liveRoom || !canPublish || !snapshot.room.allow_camera) return;
     setBusy("camera");
     setNotice(null);
     try {
@@ -317,7 +321,7 @@ export function CallRoom({
   };
 
   const toggleScreenShare = async () => {
-    if (!liveRoom || !snapshot.room.allow_screen_share) return;
+    if (!liveRoom || !canPublish || !snapshot.room.allow_screen_share) return;
     setBusy("screen");
     setNotice(null);
     try {
@@ -417,7 +421,7 @@ export function CallRoom({
   };
 
   const kick = async (participant: CallParticipant) => {
-    if (!window.confirm("Remover " + participant.display_name + " da CRAZZY CALL?")) return;
+    if (!await adminConfirm("Confirmar ação", "Remover " + participant.display_name + " da CRAZZY CALL?")) return;
     setBusy(participant.id);
     try {
       const response = await fetch("/api/call/kick", {
@@ -446,7 +450,7 @@ export function CallRoom({
   };
 
   const end = async () => {
-    if (!window.confirm("Encerrar esta CRAZZY CALL para todos?")) return;
+    if (!await adminConfirm("Confirmar ação", "Encerrar esta CRAZZY CALL para todos?")) return;
     setBusy("end");
     const response = await fetch("/api/call/end", {
       method: "POST",
@@ -590,6 +594,7 @@ export function CallRoom({
         pipCanSwitch={pipCanSwitch}
         hasSelectedShare={Boolean(selectedShare)}
         roomLocked={snapshot.room.locked}
+        canPublish={canPublish}
         canModerate={canModerate}
         canEnd={canEnd}
         busy={busy}

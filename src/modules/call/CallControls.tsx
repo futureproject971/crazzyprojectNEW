@@ -9,6 +9,7 @@ export function CallControls({
   pipCanSwitch,
   hasSelectedShare,
   roomLocked,
+  canPublish,
   canModerate,
   canEnd,
   busy,
@@ -30,6 +31,7 @@ export function CallControls({
   pipCanSwitch: boolean;
   hasSelectedShare: boolean;
   roomLocked: boolean;
+  canPublish: boolean;
   canModerate: boolean;
   canEnd: boolean;
   busy: string | null;
@@ -45,15 +47,15 @@ export function CallControls({
 }) {
   return (
     <div className="crz-call-controls">
-      <button type="button" className={microphone ? "is-on" : "is-off"} disabled={busy === "mic"} onClick={onMicrophone}>
+      <button type="button" className={microphone ? "is-on" : "is-off"} disabled={!canPublish || busy === "mic"} onClick={onMicrophone} title={!canPublish ? "Você está assistindo esta live." : undefined}>
         <span>🎙</span>{microphone ? "MIC ON" : "MIC OFF"}
       </button>
 
-      <button type="button" className={camera ? "is-on" : "is-off"} disabled={busy === "camera"} onClick={onCamera}>
+      <button type="button" className={camera ? "is-on" : "is-off"} disabled={!canPublish || busy === "camera"} onClick={onCamera} title={!canPublish ? "Você está assistindo esta live." : undefined}>
         <span>📷</span>{camera ? "CÂMERA ON" : "CÂMERA OFF"}
       </button>
 
-      <button type="button" className={screenShare ? "is-on" : ""} disabled={busy === "screen"} onClick={onScreenShare}>
+      <button type="button" className={screenShare ? "is-on" : ""} disabled={!canPublish || busy === "screen"} onClick={onScreenShare} title={!canPublish ? "Você está assistindo esta live." : undefined}>
         <span>🖥</span>{screenShare ? "PARAR TELA" : "COMPARTILHAR TELA"}
       </button>
 

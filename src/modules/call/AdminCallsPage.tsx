@@ -1,4 +1,5 @@
 "use client";
+import { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
 
 import { useCallback, useEffect, useState } from "react";
 import { NeonIcon, PageHeader } from "@/core/design-system";
@@ -43,7 +44,7 @@ export function AdminCallsPage() {
   }, [load]);
 
   const endRoom = async (room: AdminRoom) => {
-    if (!window.confirm("Encerrar esta CRAZZY CALL administrativamente?")) return;
+    if (!await adminConfirm("Confirmar ação", "Encerrar esta CRAZZY CALL administrativamente?")) return;
     setBusy(room.id);
     try {
       const response = await fetch("/api/call/end", {

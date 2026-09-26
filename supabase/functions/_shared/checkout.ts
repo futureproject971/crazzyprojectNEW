@@ -270,12 +270,17 @@ export async function calculateServerTotal(
       return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Valor mínimo do cupom não atingido" };
     }
 
-    const [{ data: allowedUsers }, { data: allowedProducts }, { data: usage }, { count: totalUses }] = await Promise.all([
+    const scopeResults = await Promise.all([
       supabaseAdmin.from("coupon_users").select("user_id").eq("coupon_id", coupon.id),
       supabaseAdmin.from("coupon_products").select("product_id").eq("coupon_id", coupon.id),
       supabaseAdmin.from("coupon_usage").select("id").eq("coupon_id", coupon.id).eq("user_id", userId).limit(1),
       supabaseAdmin.from("coupon_usage").select("id", { count: "exact", head: true }).eq("coupon_id", coupon.id),
     ]);
+
+    if(scopeResults.some(result=>result.error)) {
+      return {total:0,subtotal,discountAmount:0,cartSnapshot,couponId:null,error:"Não foi possível validar as regras do cupom. Tente novamente."};
+    }
+    const [{data:allowedUsers},{data:allowedProducts},{data:usage},{count:totalUses}]=scopeResults;
 
     // Treat the immutable usage ledger as the source of truth instead of trusting
     // coupons.current_uses, which can drift after a failed/old client-side flow.
@@ -286,35 +291,61 @@ export async function calculateServerTotal(
     if (allowedUsers?.length && !allowedUsers.some((row: any) => row.user_id === userId)) {
       return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Cupom não disponível para este usuário" };
     }
-    // A restricted coupon discounts only the eligible product lines. Merely having one
-    // eligible item in a mixed cart must never discount unrelated products.
+    // Coupon scope is human-configured in Coupon Manager. Technical IDs stay internal.
+    // Legacy coupons without scope metadata keep the historical coupon_products behavior.
     let couponBaseCents = subtotal;
-    if (allowedProducts?.length) {
-      const allowedIds = new Set(allowedProducts.map((row: any) => row.product_id));
-      couponBaseCents = cartSnapshot.reduce((sum, item) => {
-        if (!allowedIds.has(item.productId)) return sum;
-        const unitCents = Math.round(Number(item.price || 0) * 100);
-        const quantity = Math.max(1, Number(item.quantity || 1));
-        return sum + (Number.isFinite(unitCents) ? unitCents * quantity : 0);
-      }, 0);
-      if (couponBaseCents <= 0) {
-        return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Cupom não aplicável aos produtos deste carrinho" };
-      }
-    }
+    const scopeMode = String(coupon?.metadata?.scope_mode || "");
     const allowedPlanId = coupon?.metadata?.allowed_plan_id ? String(coupon.metadata.allowed_plan_id) : "";
-    if (allowedPlanId) {
-      const planBaseCents = cartSnapshot.reduce((sum, item) => {
-        if (String(item.planId || "") !== allowedPlanId) return sum;
-        const unitCents = Math.round(Number(item.price || 0) * 100);
-        const quantity = Math.max(1, Number(item.quantity || 1));
-        return sum + (Number.isFinite(unitCents) ? unitCents * quantity : 0);
-      }, 0);
-      couponBaseCents = Math.min(couponBaseCents, planBaseCents);
-      if (couponBaseCents <= 0) {
-        return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Este CRAZZY BONUS só vale para o plano selecionado" };
+    const lineTotal = (item: any) => {
+      if(allowedPlanId && String(item.planId || "") !== allowedPlanId) return 0;
+      const unitCents = Math.round(Number(item.price || 0) * 100);
+      const quantity = Math.max(1, Number(item.quantity || 1));
+      return Number.isFinite(unitCents) ? unitCents * quantity : 0;
+    };
+
+    couponBaseCents = cartSnapshot.reduce((sum,item)=>sum+lineTotal(item),0);
+
+    if (scopeMode === "exclude") {
+      const excludedIds = new Set(
+        Array.isArray(coupon?.metadata?.excluded_product_ids)
+          ? coupon.metadata.excluded_product_ids.map((id: unknown) => String(id))
+          : []
+      );
+      couponBaseCents = cartSnapshot.reduce(
+        (sum, item) => excludedIds.has(String(item.productId || "")) ? sum : sum + lineTotal(item),
+        0
+      );
+    } else if (scopeMode === "categories") {
+      const categoryIds = Array.isArray(coupon?.metadata?.category_ids)
+        ? coupon.metadata.category_ids.map((id: unknown) => String(id)).filter(Boolean)
+        : [];
+      if (!categoryIds.length) {
+        couponBaseCents = 0;
+      } else {
+        const { data: categoryProducts, error: categoryProductsError } = await supabaseAdmin
+          .from("products")
+          .select("id")
+          .in("game_id", categoryIds);
+        if (categoryProductsError) {
+          return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Não foi possível validar as categorias deste cupom" };
+        }
+        const categoryProductIds = new Set((categoryProducts || []).map((row: any) => String(row.id)));
+        couponBaseCents = cartSnapshot.reduce(
+          (sum, item) => categoryProductIds.has(String(item.productId || "")) ? sum + lineTotal(item) : sum,
+          0
+        );
       }
+    } else if (scopeMode === "selected" || (scopeMode !== "all" && allowedProducts?.length)) {
+      const allowedIds = new Set((allowedProducts || []).map((row: any) => String(row.product_id)));
+      couponBaseCents = cartSnapshot.reduce(
+        (sum, item) => allowedIds.has(String(item.productId || "")) ? sum + lineTotal(item) : sum,
+        0
+      );
     }
 
+    if (couponBaseCents <= 0) {
+      return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Cupom não aplicável aos produtos deste carrinho" };
+    }
     if (usage?.length) {
       return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Cupom já utilizado" };
     }
@@ -677,7 +708,7 @@ async function fulfillLztAccount(supabaseAdmin: any, payment: any, item: any) {
   try {
     // Fast-buy the account on LZT Market
     const buyUrl = `https://api.lzt.market/${encodeURIComponent(itemId)}/fast-buy?price=${encodeURIComponent(price)}${currency ? `&currency=${encodeURIComponent(currency)}` : ""}`;
-    
+
     const buyRes = await fetch(buyUrl, {
       method: "POST",
       headers: {
@@ -702,12 +733,12 @@ async function fulfillLztAccount(supabaseAdmin: any, payment: any, item: any) {
     if (buyRes.ok && buyData.item) {
       const boughtItem = buyData.item;
       const loginData = boughtItem.loginData;
-      
+
       if (loginData) {
         email = loginData.login || loginData.email || "";
         password = loginData.password || "";
         rawCredentials = loginData.raw || "";
-        
+
         // If no separate fields, try to parse raw (format: login:password)
         if (!email && rawCredentials) {
           const parts = rawCredentials.split(":");
@@ -721,7 +752,7 @@ async function fulfillLztAccount(supabaseAdmin: any, payment: any, item: any) {
       // Fallback to item-level fields
       if (!email && boughtItem.email) email = boughtItem.email;
       if (!password && boughtItem.password) password = boughtItem.password;
-      
+
       // Extract actual account email (auto-registered email)
       accountEmail = loginData?.email || boughtItem.email || boughtItem.emailLoginData || "";
       // If accountEmail equals login (username), try to find a real email elsewhere

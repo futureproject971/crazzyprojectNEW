@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge, PageHeader } from "@/core/design-system";\nimport { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
+import { Badge, PageHeader } from "@/core/design-system";
+import { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
 import type {
   PaymentManagerDetail,
   PaymentManagerRow,

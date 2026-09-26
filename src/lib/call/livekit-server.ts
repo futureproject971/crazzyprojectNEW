@@ -59,7 +59,7 @@ export async function createLiveKitJoinToken(input: {
     roomJoin: true,
     room: roomName,
     canSubscribe: true,
-    canPublish: role !== "viewer",
+    canPublish: room.room_mode === "call" ? role !== "viewer" : role === "host" || role === "cohost",
     canPublishData: false,
     canUpdateOwnMetadata: false,
   });
@@ -94,7 +94,7 @@ export async function updateLiveKitParticipantRole(
     await service.updateParticipant(liveKitRoomName(roomId), userId, {
       permission: {
         canSubscribe: true,
-        canPublish: role !== "viewer",
+        canPublish: role === "host" || role === "cohost",
         canPublishData: false,
       },
     });

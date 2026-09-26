@@ -1,4 +1,5 @@
 "use client";
+import { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
 import {useCallback,useEffect,useState} from "react";
 import {Badge,PageHeader} from "@/core/design-system";
 
@@ -47,9 +48,9 @@ export function SecuritySentinelPage(){
   };
 
   const config=async()=>{
-    const channelId=window.prompt("ID do canal privado #security-logs:");
+    const channelId=await adminPrompt("ID do canal privado #security-logs:");
     if(channelId===null)return;
-    const roleId=window.prompt("ID do cargo que será pingado SOMENTE em CRITICAL (opcional):")||"";
+    const roleId=await adminPrompt("ID do cargo que será pingado SOMENTE em CRITICAL (opcional):")||"";
     const r=await fetch("/api/admin/security",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"set_discord",channelId,roleId})});
     setNotice(r.ok?"Configuração de segurança salva.":"Falha ao salvar configuração.");
     if(r.ok)await load();

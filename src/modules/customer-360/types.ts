@@ -58,5 +58,6 @@ export type Customer360Snapshot = {
   entitlements: Array<Record<string, any>>;
   deliveries: Array<Record<string, any>>;
   tickets: Array<Record<string, any>>;
-  discord_role_grants: Array<Record<string, any>>;\n  club: { bonus_balance_cents: number; reward_sessions: number; luck_plays: number; coupons: number };
+  discord_role_grants: Array<Record<string, any>>;
+  club: { bonus_balance_cents: number; reward_sessions: number; luck_plays: number; coupons: number; recent_rewards: Array<Record<string,any>>; recent_luck: Array<Record<string,any>>; recent_coupons: Array<Record<string,any>> };
 };

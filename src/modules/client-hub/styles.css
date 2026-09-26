@@ -677,3 +677,10 @@
 .crz-hub-panel > header a:hover {
   color: #fff;
 }
+
+.crz-hub-club-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.crz-hub-club-strip>a{min-height:76px;border:1px solid rgba(79,133,204,.2);border-radius:11px;padding:11px 12px;display:grid;grid-template-columns:31px minmax(0,1fr) auto;align-items:center;gap:10px;background:rgba(7,15,27,.82);color:#eaf1fb}
+.crz-hub-club-strip>a.is-free{border-color:rgba(0,151,255,.38);background:linear-gradient(180deg,rgba(0,87,195,.2),rgba(6,15,28,.88))}
+.crz-hub-club-strip>a.is-prizes{border-color:rgba(255,188,41,.34);background:linear-gradient(180deg,rgba(106,68,0,.2),rgba(8,15,25,.9))}
+.crz-hub-club-strip span{display:grid;gap:1px}.crz-hub-club-strip small{color:#7890aa;font-size:8px;font-weight:900;letter-spacing:.08em}.crz-hub-club-strip .is-free small{color:#5cc9ff}.crz-hub-club-strip .is-prizes small{color:#ffd35b}.crz-hub-club-strip strong{font-size:13px}.crz-hub-club-strip em{color:#8392a6;font-size:9.5px;font-style:normal}.crz-hub-club-strip b{color:#6faaff}
+@media(max-width:820px){.crz-hub-club-strip{grid-template-columns:1fr}.crz-hub-club-strip>a{min-height:68px}}

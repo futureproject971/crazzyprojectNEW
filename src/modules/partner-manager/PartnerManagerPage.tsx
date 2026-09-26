@@ -1,6 +1,7 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
-import {Badge,PageHeader} from "@/core/design-system";\nimport {adminConfirm,adminPrompt} from "@/core/ui/adminDialog";
+import {Badge,PageHeader} from "@/core/design-system";
+import {adminConfirm,adminPrompt} from "@/core/ui/adminDialog";
 type Row=Record<string,any>;
 const money=(c:number)=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format((Number(c)||0)/100);
 

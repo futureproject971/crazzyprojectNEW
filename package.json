@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run build"
+    "check": "npm run typecheck && npm run build",
+    "lint": "node scripts/lint.mjs",
+    "test:commerce": "node scripts/test-m48-commerce.mjs"
   },
   "dependencies": {
     "next": "^15.5.0",

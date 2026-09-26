@@ -5,6 +5,7 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const COLOR_RE = /^#[0-9a-f]{6}$/i;
 const PLAN_CODES = new Set([
+  "trial",
   "1d",
   "3d",
   "7d",
@@ -53,13 +54,44 @@ function safeColor(value: unknown) {
 function safeAssetUrl(value: unknown) {
   const normalized = nullableString(value, 1200);
   if (!normalized) return null;
-  if (normalized.startsWith("/") || normalized.startsWith("https://")) return normalized;
+  if ((normalized.startsWith("/") && !normalized.startsWith("//")) || normalized.startsWith("https://")) return normalized;
   return null;
 }
 
 function safeTutorialIds(value: unknown) {
   if (!Array.isArray(value)) return [];
   return [...new Set(value.map(String).filter((item) => UUID_RE.test(item)))].slice(0, 200);
+}
+
+function safeMedia(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 24).map((raw, index) => {
+    const item = raw && typeof raw === "object" ? raw as Record<string, unknown> : {};
+    const type = cleanString(item.media_type || item.type || "image", 20).toLowerCase();
+    const url = safeAssetUrl(item.url);
+    if (!url || !["image","video","youtube","streamable"].includes(type)) return null;
+    return { media_type: type, url, sort_order: safeInteger(item.sort_order, index) };
+  }).filter(Boolean) as Array<{media_type:string;url:string;sort_order:number}>;
+}
+
+function safeFeatures(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 40).map((raw, index) => {
+    const item = raw && typeof raw === "object" ? raw as Record<string, unknown> : {};
+    const label = cleanString(item.label, 80);
+    const featureValue = cleanString(item.value, 240);
+    if (!label || !featureValue) return null;
+    return { label, value: featureValue, sort_order: safeInteger(item.sort_order, index) };
+  }).filter(Boolean) as Array<{label:string;value:string;sort_order:number}>;
+}
+
+async function syncProductExtras(supabase: any, productId: string, mediaInput: unknown, featuresInput: unknown) {
+  const {error} = await supabase.rpc("admin_sync_product_extras", {
+    p_product_id: productId,
+    p_media: Array.isArray(mediaInput) ? safeMedia(mediaInput) : null,
+    p_features: Array.isArray(featuresInput) ? safeFeatures(featuresInput) : null,
+  });
+  if(error) throw new Error("PRODUCT_EXTRAS_SYNC_FAILED");
 }
 
 function safeAutomationFlags(value: unknown) {
@@ -106,8 +138,35 @@ export async function GET() {
     return NextResponse.json({ error: "PRODUCT_MANAGER_UNAVAILABLE" }, { status: 500 });
   }
 
+  const catalog = data as any;
+  const productIds = Array.isArray(catalog?.products) ? catalog.products.map((p:any)=>String(p.id||"")).filter((id:string)=>UUID_RE.test(id)) : [];
+  const [mediaResult, featuresResult] = productIds.length ? await Promise.all([
+    supabase.from("product_media").select("id,product_id,media_type,url,sort_order").in("product_id",productIds).order("sort_order"),
+    supabase.from("product_features").select("id,product_id,label,value,sort_order").in("product_id",productIds).order("sort_order"),
+  ]) : [{data:[],error:null},{data:[],error:null}];
+
+  if (mediaResult.error || featuresResult.error) {
+    return NextResponse.json({ error: "PRODUCT_MANAGER_EXTRAS_UNAVAILABLE" }, { status: 500 });
+  }
+
+  const mediaByProduct = new Map<string, any[]>();
+  for (const item of mediaResult.data || []) {
+    const list = mediaByProduct.get(item.product_id) || [];
+    list.push(item); mediaByProduct.set(item.product_id,list);
+  }
+  const featuresByProduct = new Map<string, any[]>();
+  for (const item of featuresResult.data || []) {
+    const list = featuresByProduct.get(item.product_id) || [];
+    list.push(item); featuresByProduct.set(item.product_id,list);
+  }
+  catalog.products = (catalog.products || []).map((product:any)=>({
+    ...product,
+    media: mediaByProduct.get(product.id) || [],
+    features: featuresByProduct.get(product.id) || [],
+  }));
+
   return NextResponse.json(
-    { catalog: data },
+    { catalog },
     { headers: { "Cache-Control": "private, no-store" } }
   );
 }
@@ -127,12 +186,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
     }
 
+    const presetPlans = Array.isArray(body?.presetPlans)
+      ? [...new Set<string>(body.presetPlans.map((item:unknown)=>cleanString(item,20).toLowerCase()).filter((item:string)=>PLAN_CODES.has(item) && item !== "custom" && item !== "single"))]
+      : [];
     const { data, error } = await supabase.rpc("create_product_manager_product", {
       p_game_id: gameId,
       p_name: name,
       p_emoji: nullableString(body?.emoji, 32),
       p_accent_color: safeColor(body?.accentColor),
-      p_create_default_plans: body?.createDefaultPlans !== false,
+      p_create_default_plans: presetPlans.length ? false : body?.createDefaultPlans !== false,
     });
 
     if (error || !data) {
@@ -155,6 +217,38 @@ export async function POST(request: NextRequest) {
           { error: "PRODUCT_PRESENTATION_SAVE_FAILED", created: data },
           { status: 400 }
         );
+      }
+
+      const status = cleanString(body?.status || "offline",40).toLowerCase();
+      const statusMap: Record<string,string> = {online:"Online",offline:"Offline",updating:"Em atualização"};
+      const statusResult = await supabase.from("products").update({
+        status: statusMap[status] ? status : "offline",
+        status_label: statusMap[status] || "Offline",
+        active: body?.active === true || status === "online" || status === "updating",
+        is_new: body?.isNew !== false,
+      }).eq("id", createdId);
+
+      if (statusResult.error) return NextResponse.json({error:"PRODUCT_STATUS_SAVE_FAILED",created:data},{status:400});
+
+      if (presetPlans.length) {
+        const names: Record<string,string> = {"trial":"Trial","1d":"1 Dia","3d":"3 Dias","7d":"7 Dias","15d":"15 Dias","30d":"30 Dias","90d":"90 Dias","lifetime":"Lifetime"};
+        for (const code of presetPlans) {
+          const createdPlan = await supabase.rpc("create_product_manager_plan",{
+            p_product_id: createdId,
+            p_name: names[code] || code.toUpperCase(),
+            p_plan_code: code,
+            p_price: 0,
+          });
+          if (createdPlan.error) {
+            return NextResponse.json({error:"PLAN_PRESET_CREATE_FAILED",created:data},{status:400});
+          }
+        }
+      }
+
+      try {
+        await syncProductExtras(supabase, createdId, body?.media, body?.features);
+      } catch {
+        return NextResponse.json({error:"PRODUCT_EXTRAS_SAVE_FAILED",created:data},{status:400});
       }
     }
 
@@ -244,6 +338,12 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "PRODUCT_PRESENTATION_SAVE_FAILED" }, { status: 400 });
     }
 
+    try {
+      await syncProductExtras(supabase, productId, product.media, product.features);
+    } catch {
+      return NextResponse.json({ error: "PRODUCT_EXTRAS_SAVE_FAILED" }, { status: 400 });
+    }
+
     return NextResponse.json({ saved: data, presentation });
   }
 
@@ -265,7 +365,8 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "INVALID_PLAN" }, { status: 400 });
     }
 
-    const duration =
+    const presetDurations: Record<string, number | null> = {trial:60,"1d":1440,"3d":4320,"7d":10080,"15d":21600,"30d":43200,"90d":129600,lifetime:null,single:null};
+    const duration = planCode in presetDurations ? presetDurations[planCode] :
       plan.entitlement_duration_minutes === null ||
       plan.entitlement_duration_minutes === ""
         ? null

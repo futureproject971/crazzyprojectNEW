@@ -34,6 +34,7 @@ const tabItems = [
 function durationLabel(plan: PublicStorePlan) {
   const code = String(plan.plan_code || "").toLowerCase();
   const known: Record<string, string> = {
+    trial: "1 hora",
     "1d": "1 dia",
     "3d": "3 dias",
     "7d": "7 dias",
@@ -47,8 +48,8 @@ function durationLabel(plan: PublicStorePlan) {
 
 function cartPlanCode(plan: PublicStorePlan) {
   const code = String(plan.plan_code || "").toLowerCase();
-  if (["1d", "3d", "7d", "15d", "30d", "90d", "lifetime"].includes(code)) {
-    return code as "1d" | "3d" | "7d" | "15d" | "30d" | "90d" | "lifetime";
+  if (["trial", "1d", "3d", "7d", "15d", "30d", "90d", "lifetime"].includes(code)) {
+    return code as "trial" | "1d" | "3d" | "7d" | "15d" | "30d" | "90d" | "lifetime";
   }
   return "custom" as const;
 }
@@ -80,8 +81,33 @@ function gallery(product: PublicStoreProduct) {
   return items;
 }
 
-function ProductVisual({ product, media }: { product: PublicStoreProduct; media?: PublicStoreMedia }) {
+function mediaEmbed(media?: PublicStoreMedia) {
+  if(!media?.url)return "";
+  try{
+    const url=new URL(media.url);
+    if(url.protocol!=="https:")return "";
+    if(media.media_type==="youtube"){
+      const host=url.hostname.toLowerCase();
+      if(!["youtube.com","www.youtube.com","m.youtube.com","youtu.be","www.youtu.be","youtube-nocookie.com","www.youtube-nocookie.com"].includes(host))return "";
+      const id=host.endsWith("youtu.be")?url.pathname.slice(1):url.searchParams.get("v")||url.pathname.split("/").filter(Boolean).pop()||"";
+      return /^[a-zA-Z0-9_-]{11}$/.test(id)?"https://www.youtube-nocookie.com/embed/"+id:"";
+    }
+    if(media.media_type==="streamable"&&["streamable.com","www.streamable.com"].includes(url.hostname)){
+      const id=url.pathname.split("/").filter(Boolean).pop()||"";
+      return /^[a-zA-Z0-9]+$/.test(id)?"https://streamable.com/e/"+id:"";
+    }
+  }catch{}
+  return "";
+}
+
+function ProductVisual({ product, media, thumbnail=false }: { product: PublicStoreProduct; media?: PublicStoreMedia; thumbnail?: boolean }) {
+  const type = String(media?.media_type || "image").toLowerCase();
   const src = media?.url || product.image_url || product.game?.image_url;
+  if (media && type !== "image") {
+    if (thumbnail) return <div className="crz-product-gallery__media-thumb"><NeonIcon name="lightning" size={24}/><span>{type === "video" ? "VÍDEO" : type.toUpperCase()}</span></div>;
+    if (type === "video") return <video className="crz-product-gallery__video" src={src || undefined} controls playsInline preload="metadata" />;
+    if ((type === "youtube" || type === "streamable") && mediaEmbed(media)) return <iframe className="crz-product-gallery__embed" src={mediaEmbed(media)} title={"Demonstração de "+product.name} allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />;
+  }
   if (src) return <img src={src} alt={product.name} />;
 
   return (
@@ -117,8 +143,10 @@ export function ProductView({
   const selectedPlanData = plans.find((plan) => plan.id === selectedPlan) || preferred;
   const stock = getProductStock(product);
   const canBuy = Boolean(selectedPlanData && planAvailable(selectedPlanData) && Number(selectedPlanData.price) >= 0);
+  const compatibilityLabels = new Set(["Windows","GPU","CPU","HVCI","Secure Boot"]);
+  const compatibilityFeatures = (product.features || []).filter(item => compatibilityLabels.has(item.label));
   const featureLines = [
-    ...(product.features || []).map((item) => ({ label: item.label, value: item.value })),
+    ...(product.features || []).filter(item => !compatibilityLabels.has(item.label)).map((item) => ({ label: item.label, value: item.value })),
     ...String(product.features_text || "")
       .split("\n")
       .map((value) => value.trim())
@@ -165,15 +193,21 @@ export function ProductView({
 
         <section className="crz-product-main">
           <div className="crz-product-gallery">
-            <button
-              type="button"
-              className="crz-product-gallery__stage"
-              onClick={() => setZoomOpen(true)}
-              aria-label="Ampliar imagem do produto"
-            >
-              <ProductVisual product={product} media={activeMedia} />
-              <span className="crz-product-gallery__zoom"><span aria-hidden="true">⌕</span>Ampliar</span>
-            </button>
+            {activeMedia && activeMedia.media_type !== "image" ? (
+              <div className="crz-product-gallery__stage crz-product-gallery__stage--media">
+                <ProductVisual product={product} media={activeMedia} />
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="crz-product-gallery__stage"
+                onClick={() => setZoomOpen(true)}
+                aria-label="Ampliar imagem do produto"
+              >
+                <ProductVisual product={product} media={activeMedia} />
+                <span className="crz-product-gallery__zoom"><span aria-hidden="true">⌕</span>Ampliar</span>
+              </button>
+            )}
 
             {productGallery.length > 1 && (
               <div className="crz-product-gallery__thumbs" aria-label="Galeria do produto">
@@ -261,7 +295,7 @@ export function ProductView({
                 {canBuy ? "Adicionar ao carrinho" : "Indisponível"}
               </Button>
 
-              
+
             </div>
 
             {notice && (
@@ -303,12 +337,13 @@ export function ProductView({
             {activeTab === "features" && (
               <div className="crz-product-compatibility">
                 <div>
-                  <SectionTitle icon={<NeonIcon name="gear" size={28} />} title="Recursos" description="Veja os principais recursos disponíveis neste produto." />
+                  <SectionTitle icon={<NeonIcon name="gear" size={28} />} title="Compatibilidade e recursos" description="O essencial para saber se este produto combina com seu PC." />
+                  {compatibilityFeatures.length > 0 && <div className="crz-product-compat-cards">{compatibilityFeatures.map(item=><article key={item.id}><small>{item.label.toUpperCase()}</small><strong>{item.value}</strong></article>)}</div>}
                   {featureLines.length ? (
                     <ul>{featureLines.map((item, index) => <li key={item.label + index}><strong>{item.label}:</strong> {item.value}</li>)}</ul>
-                  ) : (
+                  ) : compatibilityFeatures.length===0 ? (
                     <p>Confira a descrição e escolha o plano que combina com você.</p>
-                  )}
+                  ) : null}
                 </div>
               </div>
             )}

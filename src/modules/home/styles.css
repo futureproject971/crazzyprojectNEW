@@ -687,3 +687,12 @@ html[data-motion="off"] .crz-home-hero__smoke::after {
 .open-ticket-button {
   text-decoration: none;
 }
+
+.crz-home-shortcuts{width:min(1420px,calc(100% - 24px));margin:12px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.crz-home-shortcut{position:relative;min-height:92px;overflow:hidden;border:1px solid rgba(72,137,226,.25);border-radius:12px;padding:14px 16px;display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:13px;background:linear-gradient(180deg,rgba(8,17,30,.98),rgba(4,10,18,.99));box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 14px 34px rgba(0,0,0,.24);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.crz-home-shortcut::after{content:"";position:absolute;inset:auto -8% -80% 30%;height:150px;border-radius:50%;filter:blur(32px);opacity:.35;pointer-events:none}
+.crz-home-shortcut--free{border-color:rgba(0,157,255,.38)}.crz-home-shortcut--free::after{background:#007dff}.crz-home-shortcut--prizes{border-color:rgba(255,188,34,.34)}.crz-home-shortcut--prizes::after{background:#ffb300}
+.crz-home-shortcut:hover{transform:translateY(-2px);border-color:rgba(85,160,255,.7);box-shadow:0 0 28px rgba(0,105,255,.14),0 18px 40px rgba(0,0,0,.3)}
+.crz-home-shortcut__icon{position:relative;z-index:1;width:46px;height:46px;border:1px solid rgba(255,255,255,.08);border-radius:11px;display:grid;place-items:center;background:rgba(7,17,31,.82);font-size:23px}
+.crz-home-shortcut>span:nth-child(2){position:relative;z-index:1;display:grid;gap:2px}.crz-home-shortcut small{color:#74baff;font-size:9px;font-weight:900;letter-spacing:.11em}.crz-home-shortcut--prizes small{color:#ffd45c}.crz-home-shortcut strong{color:#fff;font-size:18px;letter-spacing:.02em}.crz-home-shortcut em{color:#8d9caf;font-size:10.5px;font-style:normal}.crz-home-shortcut>b{position:relative;z-index:1;border:1px solid rgba(61,139,255,.34);border-radius:8px;padding:8px 11px;color:#eaf5ff;background:rgba(8,24,48,.66);font-size:9.5px}.crz-home-shortcut--prizes>b{border-color:rgba(255,194,43,.32);background:rgba(54,39,6,.55);color:#fff3c5}
+@media(max-width:760px){.crz-home-shortcuts{grid-template-columns:1fr}.crz-home-shortcut{grid-template-columns:44px minmax(0,1fr)}.crz-home-shortcut>b{grid-column:2;width:max-content}}

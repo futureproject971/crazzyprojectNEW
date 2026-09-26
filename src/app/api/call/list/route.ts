@@ -7,7 +7,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("call_rooms")
-    .select("id,code,owner_id,title,status,locked,max_participants,created_at,started_at,ended_at,updated_at")
+    .select("id,code,owner_id,title,status,locked,room_mode,password_protected,max_participants,created_at,started_at,ended_at,updated_at")
     .order("updated_at", { ascending: false })
     .limit(50);
 

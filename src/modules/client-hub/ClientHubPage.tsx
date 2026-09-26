@@ -285,6 +285,12 @@ export function ClientHubPage({ initialTab = "overview" }: { initialTab?: HubTab
                 ))}
               </div>
 
+              <section className="crz-hub-club-strip" aria-label="CRAZZY Club">
+                <a href="/club/rewards" className="is-free"><NeonIcon name="lightning" size={24}/><span><small>GRÁTIS</small><strong>FREE</strong><em>Testes e recompensas</em></span><b>→</b></a>
+                <a href="/club/luck" className="is-prizes"><NeonIcon name="crown" size={24}/><span><small>CRAZZY CLUB</small><strong>PRÊMIOS</strong><em>Roleta e raspadinha</em></span><b>→</b></a>
+                <a href="/painel/cupons"><NeonIcon name="featured" size={24}/><span><small>CARTEIRA</small><strong>Cupons</strong><em>Seus descontos</em></span><b>→</b></a>
+              </section>
+
               <div className="crz-hub-overview-grid">
                 <Panel className="crz-hub-panel">
                   <header>

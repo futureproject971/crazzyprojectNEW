@@ -1,4 +1,5 @@
 "use client";
+import { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
 
 import {useCallback,useEffect,useMemo,useState} from "react";
 import {Badge,PageHeader} from "@/core/design-system";
@@ -47,7 +48,7 @@ export function CommunityModPage(){
   const moderate=async(action:"delete_message"|"ban_user"|"unban_user",item:CommunityModMessage)=>{
     if(busy)return;
     const label=action==="delete_message"?"apagar a mensagem":action==="ban_user"?"banir o usuário":"desbanir o usuário";
-    const reason=window.prompt("Motivo para "+label+":");
+    const reason=await adminPrompt("Motivo para "+label+":");
     if(!reason?.trim()||reason.trim().length<3)return;
 
     setBusy(true);
@@ -73,13 +74,13 @@ export function CommunityModPage(){
 
     <section className="crz-communitymod-summary">
       <article><small>MENSAGENS</small><strong>{data.messages.length}</strong><span>últimas carregadas</span></article>
-      <article><small>REMOVIDAS</small><strong>{data.messages.filter(item=>item.deleted).length}</strong><span>soft delete</span></article>
+      <article><small>REMOVIDAS</small><strong>{data.messages.filter(item=>item.deleted).length}</strong><span>com histórico preservado</span></article>
       <article><small>USUÁRIOS BANIDOS</small><strong>{new Set(data.messages.filter(item=>item.author.banned).map(item=>item.userId)).size}</strong><span>na amostra</span></article>
       <article><small>AÇÕES</small><strong>{data.actions.length}</strong><span>histórico recente</span></article>
     </section>
 
     <section className="crz-communitymod-toolbar">
-      <label><span>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Mensagem, usuário ou UUID..."/></label>
+      <label><span>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Mensagem ou usuário..."/></label>
       <select value={channel} onChange={e=>setChannel(e.target.value)}><option value="">Todos os canais</option>{channels.map(item=><option key={item.slug} value={item.slug}>#{item.name}</option>)}</select>
       <button className="crz-button crz-button--secondary crz-button--sm" onClick={()=>void load()}>↻ Atualizar</button>
     </section>
@@ -90,7 +91,7 @@ export function CommunityModPage(){
       <section className="crz-communitymod-feed">
         {messages.map(item=><button key={item.id} className={"crz-communitymod-message"+(selected?.id===item.id?" is-selected":"")+(item.deleted?" is-deleted":"")} onClick={()=>setSelected(item)}>
           <div className="crz-communitymod-message__head">
-            <strong>{item.author.discordUsername||item.author.username||item.userId.slice(0,8)}</strong>
+            <strong>{item.author.discordUsername||item.author.username||"Cliente"}</strong>
             <span>#{item.channel.name} • {dateTime(item.createdAt)}</span>
             {item.author.banned&&<Badge tone="pink">BANIDO</Badge>}
             {item.deleted&&<Badge tone="neutral">REMOVIDA</Badge>}
@@ -103,12 +104,12 @@ export function CommunityModPage(){
 
       <aside className="crz-communitymod-detail">
         {!selected?<div className="crz-communitymod-empty"><strong>Selecione uma mensagem</strong><span>As ações de moderação aparecem aqui.</span></div>:<>
-          <header><div><small>USUÁRIO</small><h2>{selected.author.discordUsername||selected.author.username||selected.userId}</h2><span>{selected.userId}</span></div><Badge tone={selected.author.banned?"pink":"green"}>{selected.author.banned?"BANIDO":"ATIVO"}</Badge></header>
+          <header><div><small>USUÁRIO</small><h2>{selected.author.discordUsername||selected.author.username||"Cliente"}</h2></div><Badge tone={selected.author.banned?"pink":"green"}>{selected.author.banned?"BANIDO":"ATIVO"}</Badge></header>
           <div className="crz-communitymod-kv">
             <span><small>Discord ID</small><strong>{selected.author.discordUserId||"—"}</strong></span>
             <span><small>Servidor</small><strong>{selected.author.guildMember?"Membro":"Não verificado"}</strong></span>
             <span><small>Roles</small><strong>{selected.author.roles.join(", ")||"user"}</strong></span>
-            <span><small>Mensagem</small><strong>{selected.id}</strong></span>
+
           </div>
           <div className="crz-communitymod-actions">
             {!selected.deleted&&<button disabled={busy} onClick={()=>void moderate("delete_message",selected)}>Apagar com motivo</button>}

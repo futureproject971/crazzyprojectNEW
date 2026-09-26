@@ -17,8 +17,11 @@ async function req(path, init = {}) {
 
 const rpcChecks = [
   ["create_call_room", "/rpc/create_call_room", { p_title: "anon-test", p_max_participants: 2 }],
+  ["create_call_room_secure", "/rpc/create_call_room_secure", { p_title: "anon-test", p_max_participants: 2, p_room_mode: "live", p_password: "1234" }],
   ["get_call_room_preview", "/rpc/get_call_room_preview", { p_code: "AAAAAAAAAAAA" }],
   ["join_call_room", "/rpc/join_call_room", { p_code: "AAAAAAAAAAAA", p_display_name: null }],
+  ["join_call_room_secure", "/rpc/join_call_room_secure", { p_code: "AAAAAAAAAAAA", p_display_name: null, p_password: "1234" }],
+  ["list_call_broadcasts", "/rpc/list_call_broadcasts", {}],
   ["get_call_room_snapshot", "/rpc/get_call_room_snapshot", { p_code: "AAAAAAAAAAAA" }],
   ["leave_call_room", "/rpc/leave_call_room", { p_room_id: "00000000-0000-4000-8000-000000000000" }],
   ["set_call_presence", "/rpc/set_call_presence", { p_room_id: "00000000-0000-4000-8000-000000000000", p_connected: true }],
@@ -102,5 +105,17 @@ for (const required of [
   }
 }
 console.log("[PASS] native Picture-in-Picture API is implemented");
+
+const createRoute = await readFile("src/app/api/call/create/route.ts", "utf8");
+const joinRoute = await readFile("src/app/api/call/join/route.ts", "utf8");
+const liveTypes = await readFile("src/modules/call/types.ts", "utf8");
+for (const [file, content, required] of [
+  ["create route", createRoute, "create_call_room_secure"],
+  ["join route", joinRoute, "join_call_room_secure"],
+  ["call types", liveTypes, "room_mode"],
+]) {
+  if (!content.includes(required)) throw new Error(file + " is missing protected/live call wiring");
+}
+console.log("[PASS] password-protected rooms and live spectator mode are wired");
 
 console.log("[PASS] CRAZZY CALL security smoke");

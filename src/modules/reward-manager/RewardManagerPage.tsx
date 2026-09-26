@@ -1,6 +1,7 @@
 "use client";
 import {useCallback,useEffect,useMemo,useState} from "react";
-import {Badge,PageHeader} from "@/core/design-system";\nimport {adminPrompt} from "@/core/ui/adminDialog";
+import {Badge,PageHeader} from "@/core/design-system";
+import {adminPrompt} from "@/core/ui/adminDialog";
 
 type AnyRow=Record<string,any>;
 export function RewardManagerPage(){

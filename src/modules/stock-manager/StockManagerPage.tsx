@@ -323,7 +323,7 @@ export function StockManagerPage() {
                     <div className="crz-stock-empty">
                       <NeonIcon name="cube" size={30} />
                       <strong>Nenhuma key neste plano</strong>
-                      <span>Adicione novas keys em Produtos → Campos → plano → Adicionar Estoque.</span>
+                      <span>Adicione novas keys em Produtos → Planos & Estoque → Adicionar estoque.</span>
                     </div>
                   )}
                 </section>

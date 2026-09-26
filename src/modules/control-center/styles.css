@@ -431,3 +431,5 @@ html[data-theme="light"] .crz-control-manual__list article {background:#f7fbff}
   .crz-admin-tool-grid { grid-template-columns: 1fr; }
   .crz-admin-group { padding: 12px; }
 }
+
+.crz-admin-groups{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}.crz-admin-group[open]{grid-column:1/-1}.crz-admin-group__head{cursor:pointer;min-height:70px;margin:0;list-style-position:inside}.crz-admin-group[open] .crz-admin-group__head{margin-bottom:16px}.crz-admin-group:target{outline:2px solid #0000ff}@media(max-width:900px){.crz-admin-groups{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.crz-admin-groups{grid-template-columns:1fr}.crz-admin-tool-grid{grid-template-columns:1fr}}

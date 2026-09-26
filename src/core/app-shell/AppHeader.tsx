@@ -6,7 +6,7 @@ import { Drawer, Dropdown, LineIcon } from "@/core/design-system";
 import { useAuth } from "@/modules/auth/AuthProvider";
 import { useCart } from "@/modules/cart/CartProvider";
 import { useTheme } from "@/core/theme/ThemeProvider";
-import { getNavigation } from "./navigation";
+import { adminNavigation, getNavigation } from "./navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import type { ShellMode, ShellNavItem } from "./types";
 
@@ -14,7 +14,7 @@ function ShellIcon({src}:{src:string}){return <span className="crz-shell-icon" a
 
 function NavLinks({items,activeNav,cartCount,compact=false,onNavigate}:{items:ShellNavItem[];activeNav?:string;cartCount:number;compact?:boolean;onNavigate?:()=>void}){
  return <nav className={compact?"crz-shell-mobile-nav":"crz-shell-nav"} aria-label={compact?"Navegação móvel":"Navegação principal"}>
-  {items.map(item=>{const active=item.id===activeNav;const badge=item.id==="cart"&&cartCount>0?String(cartCount):item.badge;return <Link key={item.id} href={item.href} className={compact?"crz-shell-mobile-link "+(item.id==="mtsounds"?"is-mtsounds":""):"crz-shell-nav__item "+(item.id==="mtsounds"?"is-mtsounds ":"")+(item.subtitle?"has-subtitle ":"")+(active?"is-active":"")} aria-current={active?"page":undefined} onClick={onNavigate}><ShellIcon src={item.icon}/><span className="crz-shell-nav__copy"><span>{item.label}</span>{item.subtitle&&<small>{item.subtitle}</small>}</span>{badge&&<b>{badge}</b>}</Link>})}
+  {items.map(item=>{const active=item.id===activeNav;const badge=item.id==="cart"&&cartCount>0?String(cartCount):item.badge;const special=item.id==="mtsounds"?"is-mtsounds":item.id==="free"?"is-free":item.id==="prizes"?"is-prizes":item.id==="call"?"is-call":"";return <Link key={item.id} href={item.href} className={compact?"crz-shell-mobile-link "+special:"crz-shell-nav__item "+special+" "+(item.subtitle?"has-subtitle ":"")+(active?"is-active":"")} aria-current={active?"page":undefined} onClick={onNavigate}><ShellIcon src={item.icon}/><span className="crz-shell-nav__copy"><span>{item.label}</span>{item.subtitle&&<small>{item.subtitle}</small>}</span>{badge&&<b>{badge}</b>}</Link>})}
  </nav>
 }
 
@@ -104,13 +104,14 @@ export function AppHeader({mode="visitor",activeNav="home",cartCount:fallbackCar
  const ticketHref="/tickets";
  return <>
   <header className="crz-shell-header">
-   <div className="crz-shell-header__main"><Link className="crz-shell-brand" href="/" aria-label={brandName+", início"}><img src={logoNavbarUrl} alt={brandName}/></Link><NavLinks items={items} activeNav={activeNav} cartCount={cartCount}/>{effectiveMode!=="visitor"&&<button type="button" className="crz-shell-search" aria-label="Pesquisar"><ShellIcon src="/icons/search.svg"/></button>}</div>
+   <div className="crz-shell-header__main"><Link className="crz-shell-brand" href="/" aria-label={brandName+", início"}><img src={logoNavbarUrl} alt={brandName}/></Link><NavLinks items={items} activeNav={activeNav} cartCount={cartCount}/>{effectiveMode!=="visitor"&&<button type="button" className="crz-shell-search" aria-label="Pesquisar produtos" onClick={()=>go("/produtos")}><ShellIcon src="/icons/search.svg"/></button>}</div>
    <div className="crz-shell-header__account" aria-label="Conta e acesso">
     <Link href={ticketHref} className="crz-shell-auth crz-shell-auth--ticket"><ShellIcon src="/icons/headset.svg"/><span>Ticket</span></Link>
     {!user?(discordEnabled?<button type="button" className="crz-shell-auth crz-shell-auth--discord" disabled={authLoading} onClick={()=>void signIn("discord",window.location.pathname)}><img src="/icons/brand-discord.svg" alt="" aria-hidden="true"/><span>{authLoading?"Verificando...":"Entrar com Discord"}</span></button>:<Link href="/login" className="crz-shell-auth"><LineIcon name="user" size={14}/><span>Discord indisponível</span></Link>):<Dropdown items={accountItems} trigger={<span className="crz-shell-user"><span className="crz-shell-user__avatar" aria-hidden="true">{user.avatarUrl?<img src={user.avatarUrl} alt=""/>:null}{effectiveMode==="admin"&&openTicketCount>0&&<b className="crz-shell-user__ticket-badge">{openTicketCount>99?"99+":openTicketCount}</b>}</span><span>{displayName}</span><LineIcon name="user" size={14}/></span>}/>}
    </div>
    <button type="button" className="crz-shell-menu" aria-label="Abrir menu" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(true)}><span/><span/><span/></button>
   </header>
+  {mode==="admin"&&effectiveMode==="admin"&&<nav className="crz-admin-primary" aria-label="Centrais administrativas">{adminNavigation.map(item=><Link key={item.id} href={item.href}>{item.label}</Link>)}</nav>}
   <Drawer open={mobileOpen} title="CRAZZY PROJECT" onClose={()=>setMobileOpen(false)}><div className="crz-shell-mobile"><img className="crz-shell-mobile__logo" src={logoNavbarUrl} alt={brandName}/><NavLinks items={items} activeNav={activeNav} cartCount={cartCount} compact onNavigate={()=>setMobileOpen(false)}/><div className="crz-shell-mobile__account"><Link className="crz-button crz-button--secondary crz-button--md" href={ticketHref}>Abrir Ticket</Link>{!user?(discordEnabled?<button type="button" className="crz-button crz-button--primary crz-button--md" onClick={()=>void signIn("discord",window.location.pathname)}><img src="/icons/brand-discord.svg" alt="" aria-hidden="true"/> Entrar com Discord</button>:<Link className="crz-button crz-button--primary crz-button--md" href="/login">Discord indisponível</Link>):<><Link className="crz-button crz-button--secondary crz-button--md" href="/painel">{displayName}</Link>{effectiveMode==="admin"&&<Link className="crz-button crz-button--danger crz-button--md" href="/admin" onClick={()=>setMobileOpen(false)}>Painel Admin</Link>}<button type="button" className="crz-button crz-button--ghost crz-button--md" onClick={()=>void signOut()}>Sair</button></>}</div></div></Drawer>
  </>;
 }

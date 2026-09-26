@@ -7,6 +7,7 @@ export const visitorNavigation: ShellNavItem[] = [
   { id: "free", label: "FREE", href: "/club/rewards", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
   { id: "prizes", label: "PRÊMIOS", href: "/club/luck", icon: "/icons/crown.svg", badge: "CLUB" },
   { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
+  { id: "call", label: "CRAZZY CALL", href: "/call", icon: "/icons/headset.svg" },
   { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
 ];
@@ -18,6 +19,7 @@ export const clientNavigation: ShellNavItem[] = [
   { id: "free", label: "FREE", href: "/club/rewards", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
   { id: "prizes", label: "PRÊMIOS", href: "/club/luck", icon: "/icons/crown.svg", badge: "CLUB" },
   { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
+  { id: "call", label: "CRAZZY CALL", href: "/call", icon: "/icons/headset.svg" },
   { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
 ];

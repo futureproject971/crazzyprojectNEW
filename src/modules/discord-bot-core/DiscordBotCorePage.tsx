@@ -1,4 +1,5 @@
 "use client";
+import { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge, PageHeader } from "@/core/design-system";
@@ -136,8 +137,8 @@ export function DiscordBotCorePage() {
     }));
   };
 
-  const removeCategory = (index: number) => {
-    if (!window.confirm("Remover esta categoria do TEMPLATE? Isso não apaga nada do Discord.")) return;
+  const removeCategory = async (index: number) => {
+    if (!await adminConfirm("Confirmar ação", "Remover esta categoria do TEMPLATE? Isso não apaga nada do Discord.")) return;
     setTemplate((current) => ({
       ...current,
       categories: current.categories.filter((_, itemIndex) => itemIndex !== index),
@@ -231,7 +232,7 @@ export function DiscordBotCorePage() {
     const text = diff.length
       ? "Executar SAFE MODE e criar " + diff.length + " item(ns) que estão faltando?"
       : "O template já parece completo. Executar uma verificação SAFE MODE mesmo assim?";
-    if (!window.confirm(text)) return;
+    if (!await adminConfirm("Confirmar ação", text)) return;
 
     setBusy("queue");
     setNotice("");
@@ -263,7 +264,7 @@ export function DiscordBotCorePage() {
   };
 
   const cancelJob = async (id: string) => {
-    if (!window.confirm("Cancelar este job do Server Builder?")) return;
+    if (!await adminConfirm("Confirmar ação", "Cancelar este job do Server Builder?")) return;
     setBusy(id);
     try {
       const response = await fetch("/api/admin/discord-bot", {

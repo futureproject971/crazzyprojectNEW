@@ -15,12 +15,14 @@ export function CallLobby({
   user: AuthMe;
   busy: boolean;
   error: string | null;
-  onJoin: (preferences: CallMediaPreferences) => void;
+  onJoin: (preferences: CallMediaPreferences, password: string) => void;
 }) {
   const [preferences, setPreferences] = useState<CallMediaPreferences>({
     microphone: false,
     camera: false,
   });
+  const [password, setPassword] = useState("");
+  const isLive = room.room_mode === "live";
 
   return (
     <section className="crz-call-lobby">
@@ -30,7 +32,7 @@ export function CallLobby({
       </div>
 
       <div className="crz-call-lobby__card">
-        <span>PRONTO PARA ENTRAR</span>
+        <span>{isLive ? "TRANSMISSÃO AO VIVO" : "PRONTO PARA ENTRAR"}</span>
         <h1>{room.title || "CRAZZY CALL"}</h1>
         <code>{room.code}</code>
 
@@ -42,12 +44,19 @@ export function CallLobby({
           <small>{room.participant_count}/{room.max_participants} participantes</small>
         </div>
 
+        {isLive && <div className="crz-call-lobby__warning">Você entra como espectador. Apenas o dono da live e cohosts autorizados podem transmitir; o chat continua liberado.</div>}
+        {room.password_protected && (
+          <label className="crz-call-lobby__password">
+            <span>Esta sala tem senha</span>
+            <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="off" placeholder="Digite a senha" />
+          </label>
+        )}
         <div className="crz-call-lobby__toggles">
           <button
             type="button"
             className={preferences.microphone ? "is-on" : ""}
             onClick={() => setPreferences((current) => ({ ...current, microphone: !current.microphone }))}
-            disabled={!room.allow_microphone}
+            disabled={isLive || !room.allow_microphone}
           >
             🎙 Microfone {preferences.microphone ? "ON" : "OFF"}
           </button>
@@ -55,7 +64,7 @@ export function CallLobby({
             type="button"
             className={preferences.camera ? "is-on" : ""}
             onClick={() => setPreferences((current) => ({ ...current, camera: !current.camera }))}
-            disabled={!room.allow_camera}
+            disabled={isLive || !room.allow_camera}
           >
             📷 Câmera {preferences.camera ? "ON" : "OFF"}
           </button>
@@ -68,8 +77,8 @@ export function CallLobby({
         <button
           type="button"
           className="crz-button crz-button--primary crz-button--lg"
-          disabled={busy || room.locked || room.status === "ended"}
-          onClick={() => onJoin(preferences)}
+          disabled={busy || (room.locked && room.owner_id !== user.id) || room.status === "ended"}
+          onClick={() => onJoin(preferences, password)}
         >
           {busy ? "ENTRANDO..." : "ENTRAR NA SALA"}
         </button>

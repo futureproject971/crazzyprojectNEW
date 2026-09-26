@@ -195,11 +195,11 @@ export function ControlCenterPage() {
           </header>
           <div className="crz-admin-groups">
             {ADMIN_GROUPS.map(group => (
-              <section className="crz-admin-group" key={group.title} id={group.title==="Sistema"?"sistema":undefined}>
-                <div className="crz-admin-group__head">
+              <details className="crz-admin-group" key={group.title} id={group.title==="Sistema"?"sistema":undefined}>
+                <summary className="crz-admin-group__head">
                   <h3>{group.title}</h3>
                   <p>{group.description}</p>
-                </div>
+                </summary>
                 <div className="crz-admin-tool-grid">
                   {group.tools.map(tool => (
                     <Link className="crz-admin-tool" href={tool.href} key={tool.href}>
@@ -209,7 +209,7 @@ export function ControlCenterPage() {
                     </Link>
                   ))}
                 </div>
-              </section>
+              </details>
             ))}
           </div>
         </section>
