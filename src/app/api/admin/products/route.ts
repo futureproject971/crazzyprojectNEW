@@ -222,10 +222,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
     }
 
-    const allowedPresets = new Set(["1d", "3d", "7d", "15d", "30d", "90d", "lifetime"]);
-    const presetPlans = Array.isArray(body?.presetPlans)
-      ? [...new Set(body.presetPlans.map((value: unknown) => cleanString(value, 20).toLowerCase()))]
-          .filter((code) => allowedPresets.has(code))
+    const allowedPresets = new Set<string>(["1d", "3d", "7d", "15d", "30d", "90d", "lifetime"]);
+    const presetPlans: string[] = Array.isArray(body?.presetPlans)
+      ? [...new Set<string>(
+          body.presetPlans.map((value: unknown): string => cleanString(value, 20).toLowerCase())
+        )].filter((code: string) => allowedPresets.has(code))
       : [];
     if (body?.createDefaultPlans === true && presetPlans.length === 0) {
       presetPlans.push("1d", "3d", "7d", "15d", "30d", "90d", "lifetime");
