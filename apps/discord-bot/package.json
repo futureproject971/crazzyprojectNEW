@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "check": "node --check src/index.js && node --check src/config.js && node --check src/supabase.js && node --check src/modules/campaigns.js && node --check src/modules/commands.js && node --check src/modules/server-builder.js && node --check src/modules/role-bridge.js && node --check src/modules/notifications.js && node --check src/modules/security-sentinel.js && node --check src/modules/guild-gate.js",
+    "check": "node --check src/index.js && node --check src/config.js && node --check src/supabase.js && node --check src/modules/campaigns.js && node --check src/modules/commands.js && node --check src/modules/server-builder.js && node --check src/modules/role-bridge.js && node --check src/modules/notifications.js && node --check src/modules/security-sentinel.js && node --check src/modules/guild-gate.js && node --check src/modules/voice-rooms.js",
     "prestart": "npm run check",
     "start": "node src/index.js",
     "import-legacy-templates": "node scripts/import-legacy-templates.js"
@@ -13,7 +13,8 @@
   "dependencies": {
     "@supabase/supabase-js": "2.109.0",
     "discord.js": "14.19.3",
-    "dotenv": "16.6.1"
+    "dotenv": "16.6.1",
+    "livekit-server-sdk": "2.19.1"
   },
   "engines": {
     "node": ">=22.0.0"

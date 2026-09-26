@@ -15,7 +15,7 @@ import { VerifiedReviewFeed } from "@/modules/reviews";
 import { InteractiveImGuiDemo } from "@/modules/interactive-demo";
 import { HelpFaqPreview } from "@/modules/help";
 import {
-  formatBrl,
+  formatBrl, durationLabel, cartPlanCode, planAvailable,
   getProductStartingPrice,
   getProductStock,
   type PublicStoreMedia,
@@ -30,33 +30,6 @@ const tabItems = [
   { id: "reviews", label: "Avaliações" },
   { id: "faq", label: "Dúvidas" },
 ];
-
-function durationLabel(plan: PublicStorePlan) {
-  const code = String(plan.plan_code || "").toLowerCase();
-  const known: Record<string, string> = {
-    trial: "1 hora",
-    "1d": "1 dia",
-    "3d": "3 dias",
-    "7d": "7 dias",
-    "15d": "15 dias",
-    "30d": "30 dias",
-    "90d": "90 dias",
-    lifetime: "Vitalício",
-  };
-  return known[code] || plan.name;
-}
-
-function cartPlanCode(plan: PublicStorePlan) {
-  const code = String(plan.plan_code || "").toLowerCase();
-  if (["trial", "1d", "3d", "7d", "15d", "30d", "90d", "lifetime"].includes(code)) {
-    return code as "trial" | "1d" | "3d" | "7d" | "15d" | "30d" | "90d" | "lifetime";
-  }
-  return "custom" as const;
-}
-
-function planAvailable(plan: PublicStorePlan) {
-  return !plan.stock_managed || Number(plan.stock_count || 0) > 0;
-}
 
 function gallery(product: PublicStoreProduct) {
   const media = (product.media || [])
@@ -225,6 +198,7 @@ export function ProductView({
                 ))}
               </div>
             )}
+            {compatibilityFeatures.length > 0 && <section className="crz-product-compat-cards" aria-label="Compatibilidade">{compatibilityFeatures.map(item=><article key={item.id}><small>{item.label.toUpperCase()}</small><strong>{item.value}</strong></article>)}</section>}
           </div>
 
           <aside className="crz-product-summary">

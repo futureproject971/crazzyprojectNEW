@@ -1,4 +1,5 @@
 "use client";
+import { VoiceSettings } from "./VoiceSettings";
 import { adminConfirm, adminPrompt } from "@/core/ui/adminDialog";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -510,6 +511,6 @@ export function DiscordBotCorePage() {
           </div>
         </section>
       </div>
-    </main>
+    <VoiceSettings/></main>
   );
 }

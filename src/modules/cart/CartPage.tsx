@@ -10,7 +10,8 @@ import {
   Panel,
   Select,
 } from "@/core/design-system";
-import { getProductDetail } from "@/modules/product-view";
+import { useStoreCatalog } from "@/modules/catalog/useStoreCatalog";
+import { durationLabel, cartPlanCode, planAvailable } from "@/modules/catalog/live";
 import { CouponQuickPicker } from "@/modules/coupons";
 import { formatBrl } from "./pricing";
 import { useCart } from "./CartProvider";
@@ -29,7 +30,8 @@ function ItemArt({ item }: { item: CartItem }) {
 }
 
 function ComboStatus() {
-  const { totals } = useCart();
+  const { totals, comboTiers, comboStatus } = useCart();
+  const maxDiscount = Math.max(0, ...comboTiers.map(tier => tier.discountPercent));
   const groups = totals.comboGroups.filter((group) => group.uniqueProducts > 0);
 
   return (
@@ -38,7 +40,7 @@ function ComboStatus() {
         <NeonIcon name="crown" size={28} />
         <div>
           <small>MONTE SEU COMBO</small>
-          <strong>Mensal ou Lifetime, até 35% OFF</strong>
+          <strong>{comboStatus !== "ready" ? "Desconto será confirmado no checkout" : maxDiscount ? `Mensal ou Lifetime, até ${maxDiscount}% OFF` : "Combine produtos Mensais ou Lifetime"}</strong>
         </div>
         <a href="/combo">Montar combo →</a>
       </div>
@@ -69,7 +71,7 @@ function ComboStatus() {
                     Faltam {group.nextProducts - group.uniqueProducts} para {group.nextDiscountPercent}%
                   </span>
                 ) : (
-                  <span>Teto máximo atingido 🔥</span>
+                  <span>{comboStatus !== "ready" ? "Regras indisponíveis" : maxDiscount ? "Maior faixa disponível" : "Sem desconto ativo"}</span>
                 )}
               </footer>
             </div>
@@ -99,6 +101,7 @@ export function CartPage() {
     clearCart,
   } = useCart();
   const [couponSaved, setCouponSaved] = useState(false);
+  const { products } = useStoreCatalog();
 
   const checkoutBlocked = !items.length || totals.hasUnpricedItems;
 
@@ -146,8 +149,8 @@ export function CartPage() {
           <div className="crz-cart-layout">
             <section className="crz-cart-items">
               {items.map((item) => {
-                const detail = item.slug ? getProductDetail(item.slug) : undefined;
-                const availablePlans = detail?.plans ?? [];
+                const detail = products.find(product => product.id === item.productId);
+                const availablePlans = (detail?.plans ?? []).filter(planAvailable);
 
                 return (
                   <article key={item.key} className="crz-cart-item">
@@ -176,17 +179,18 @@ export function CartPage() {
                                 if (!plan) return;
                                 changePlan(item.key, {
                                   planId: plan.id,
-                                  planCode: plan.code,
+                                  planCode: cartPlanCode(plan),
                                   planName: plan.name,
-                                  durationLabel: plan.duration,
+                                  durationLabel: durationLabel(plan),
                                   price: plan.price,
-                                  priceLabel: plan.priceLabel,
+                                  priceLabel: formatBrl(Number(plan.price)),
                                 });
                               }}
                             >
+                              {!availablePlans.some(plan => plan.id === item.planId) && <option value={item.planId} disabled>{item.planName} • indisponível</option>}
                               {availablePlans.map((plan) => (
                                 <option key={plan.id} value={plan.id}>
-                                  {plan.name} • {plan.duration}
+                                  {plan.name} • {formatBrl(Number(plan.price))}
                                 </option>
                               ))}
                             </Select>

@@ -1,3 +1,5 @@
+import { discountForCount, type ComboTier } from "../../../supabase/functions/_shared/combo-policy";
+export { comboTiersFromDiscounts, validComboDiscounts, type ComboTier } from "../../../supabase/functions/_shared/combo-policy";
 export type StandardPlanCode = "trial" | "1d" | "3d" | "7d" | "15d" | "30d" | "90d" | "lifetime";
 export type ComboPlanFamily = "30d" | "lifetime";
 
@@ -23,16 +25,13 @@ export const CRAZZY_COMBO_TIERS = [
 
 export const CRAZZY_COMBO_MAX_DISCOUNT = 35;
 
-export function getComboDiscountPercent(uniqueProducts: number) {
-  let discount = 0;
-  for (const tier of CRAZZY_COMBO_TIERS) {
-    if (uniqueProducts >= tier.products) discount = tier.discountPercent;
-  }
-  return discount;
+export function getComboDiscountPercent(uniqueProducts: number, tiers: readonly ComboTier[] = CRAZZY_COMBO_TIERS) {
+  return discountForCount(uniqueProducts, tiers);
 }
 
-export function getNextComboTier(uniqueProducts: number) {
-  return CRAZZY_COMBO_TIERS.find((tier) => tier.products > uniqueProducts) ?? null;
+export function getNextComboTier(uniqueProducts: number, tiers: readonly ComboTier[] = CRAZZY_COMBO_TIERS) {
+  const current = getComboDiscountPercent(uniqueProducts, tiers);
+  return tiers.find(tier => tier.products > uniqueProducts && tier.discountPercent > current) ?? null;
 }
 
 export function isComboPlan(code: string): code is ComboPlanFamily {

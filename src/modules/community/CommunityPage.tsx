@@ -1,5 +1,7 @@
 "use client";
 
+import { sendOnEnter } from "@/core/ui/chatKeyboard";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Badge,
@@ -718,16 +720,7 @@ export function CommunityPage() {
                       : "Digite sua mensagem..."
                   }
                   onChange={(event) => setMessage(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (
-                      event.key === "Enter" &&
-                      !event.shiftKey &&
-                      !event.nativeEvent.isComposing
-                    ) {
-                      event.preventDefault();
-                      void send();
-                    }
-                  }}
+                  onKeyDown={event => sendOnEnter(event, send)}
                 />
 
                 <Button

@@ -61,7 +61,7 @@
 }
 .crz-pm-switch-row button i,.crz-pm-automation button i {width:7px;height:7px;border-radius:50%;background:#53657a}
 .crz-pm-switch-row button.is-on,.crz-pm-automation button.is-on {color:#9ed6ff;border-color:rgba(42,146,255,.36);background:rgba(0,91,204,.1)}
-.crz-pm-switch-row button.is-on i,.crz-pm-automation button.is-on i {background:#27d17f;box-shadow:0 0 7px rgba(39,209,127,.55)}
+.crz-pm-switch-row button.is-on i,.crz-pm-automation button.is-on i {background:#0000ff;box-shadow:0 0 7px rgba(0, 80, 255,.55)}
 
 .crz-pm-tutorials,.crz-pm-plans,.crz-pm-subsection {margin-top:11px;border-top:1px solid rgba(72,126,198,.12);padding-top:10px}
 .crz-pm-tutorials header {display:grid;gap:2px}
@@ -180,8 +180,8 @@ html[data-theme="light"] .crz-pm-form-grid input,html[data-theme="light"] .crz-p
   border-color:rgba(42,146,255,.36);
 }
 .crz-pm-create-card > button:not(.crz-button).is-on i {
-  background:#27d17f;
-  box-shadow:0 0 7px rgba(39,209,127,.55);
+  background:#0000ff;
+  box-shadow:0 0 7px rgba(0, 80, 255,.55);
 }
 .crz-pm-plans__actions {
   display:flex;
@@ -328,8 +328,8 @@ html[data-theme="light"] .crz-pm-create-plan select {
 }
 .crz-pm-stock-ready {
   color:#c8ffe5;
-  border:1px solid rgba(39,209,127,.32);
-  background:rgba(18,128,78,.14);
+  border:1px solid rgba(0, 80, 255,.32);
+  background:rgba(0, 80, 255,.14);
 }
 .crz-pm-stock-warning {
   color:#d8e7f8;
@@ -642,8 +642,8 @@ html[data-theme="light"] .crz-pm-stock-import textarea {
 }
 .crz-pm-plan-tab__top i.is-live {
   color:#bcffda;
-  border-color:rgba(31,215,135,.36);
-  background:rgba(19,126,79,.14);
+  border-color:rgba(0, 80, 255,.36);
+  background:rgba(0, 80, 255,.14);
 }
 .crz-pm-plan-tabs button > b {
   color:#fff;
@@ -655,7 +655,7 @@ html[data-theme="light"] .crz-pm-stock-import textarea {
   font-size:11.5px;
 }
 .crz-pm-plan-tab__stock em {
-  color:#52cb91;
+  color:#9dbfff;
   font-size:13px;
   font-style:normal;
   font-weight:800;
@@ -1004,7 +1004,7 @@ button.crz-pm-overview__row.is-selected {
   font-size:10.5px !important;
 }
 .crz-pm-overview__stock.is-ok strong,
-.crz-pm-plan-tab__stock.is-ok em { color:#48db92; }
+.crz-pm-plan-tab__stock.is-ok em { color:#9dbfff; }
 .crz-pm-overview__stock.is-low strong,
 .crz-pm-plan-tab__stock.is-low em { color:#ffc65b; }
 .crz-pm-overview__stock.is-out strong,
@@ -1515,8 +1515,8 @@ html[data-theme="light"] .crz-pm-create-dialog__flow > div {
 }
 .crz-pm-plan-quick__card-top i.is-live {
   color:#bdffdb;
-  border-color:rgba(39,209,127,.35);
-  background:rgba(22,128,79,.14);
+  border-color:rgba(0, 80, 255,.35);
+  background:rgba(0, 80, 255,.14);
 }
 .crz-pm-plan-quick__cards > button > b {
   color:#fff;
@@ -1537,7 +1537,7 @@ html[data-theme="light"] .crz-pm-create-dialog__flow > div {
   color:#9dacc0;
   font-size:11.5px !important;
 }
-.crz-pm-plan-quick__card-stock.is-ok em { color:#4adb94; }
+.crz-pm-plan-quick__card-stock.is-ok em { color:#9dbfff; }
 .crz-pm-plan-quick__card-stock.is-low em { color:#ffc85c; }
 .crz-pm-plan-quick__card-stock.is-out em { color:#ff6b80; }
 .crz-pm-plan-quick__card-stock.is-infinite em { color:#70d8ff; }
@@ -1673,8 +1673,8 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
   border-radius:8px;
   display:grid;
   place-items:center;
-  color:#18d981;
-  background:#0a2018;
+  color:#9dbfff;
+  background:#0b173b;
   font-size:20px;
   font-weight:900;
 }
@@ -1715,9 +1715,9 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 }
 
 .crz-purin-dialog__actions .is-muted { color:#e7ebef;background:#111720; }
-.crz-purin-dialog__actions .is-green-outline { color:#39d98d;border-color:#206e50;background:#0b1815; }
+.crz-purin-dialog__actions .is-green-outline { color:#9dbfff;border-color:#0b173b;background:#0b1815; }
 .crz-purin-dialog__actions .is-blue-outline { color:#7287ff;border-color:#344793;background:#11152b; }
-.crz-purin-dialog__actions .is-save { color:#04110b;border-color:#20cf80;background:#25d68b; }
+.crz-purin-dialog__actions .is-save { color:#ffffff;border-color:#0000ff;background:#0000ff; }
 .crz-purin-dialog__actions .is-icon { width:36px;padding:0;color:#dfe7ef; }
 .crz-purin-dialog__actions .is-danger-icon { width:36px;padding:0;color:#ff5967;border-color:#67313a;background:#1b1116; }
 .crz-purin-dialog__actions > :disabled { opacity:.48;cursor:not-allowed; }
@@ -1755,8 +1755,8 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 }
 
 .crz-purin-tabs button.is-active {
-  color:#21dc91;
-  border-bottom-color:#21dc91;
+  color:#9dbfff;
+  border-bottom-color:#0000ff;
 }
 
 .crz-purin-tabs button:disabled {
@@ -1845,8 +1845,8 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 .crz-purin-add-field input:focus,
 .crz-purin-add-field select:focus,
 .crz-purin-stock-modal textarea:focus {
-  border-color:#28ca84;
-  box-shadow:0 0 0 3px rgba(40,202,132,.10);
+  border-color:#0000ff;
+  box-shadow:0 0 0 3px rgba(0, 80, 255,.10);
 }
 
 .crz-purin-media-row {
@@ -1907,11 +1907,11 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 
 .crz-purin-upload {
   min-height:32px;
-  border:1px solid #1b7652;
+  border:1px solid #0000ff;
   border-radius:7px;
   padding:0 10px;
-  color:#37d98d !important;
-  background:#0b1a15;
+  color:#9dbfff !important;
+  background:#0b173b;
   display:inline-flex !important;
   align-items:center;
   justify-content:center;
@@ -1962,7 +1962,7 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 
 .crz-purin-delivery button:first-child { border-radius:8px 0 0 8px; }
 .crz-purin-delivery button:last-child { border-radius:0 8px 8px 0; }
-.crz-purin-delivery button.is-active { color:#20d98e;border-color:#1b6f50;background:#0e2a20; }
+.crz-purin-delivery button.is-active { color:#9dbfff;border-color:#0000ff;background:#0b173b; }
 
 .crz-purin-display {
   border:1px solid #1c2531;
@@ -1985,7 +1985,7 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
   font-size:12.5px;
 }
 
-.crz-purin-eye { color:#1fd38a;font-size:16px; }
+.crz-purin-eye { color:#9dbfff;font-size:16px; }
 
 .crz-purin-toggle-row,
 .crz-purin-hidden-sale,
@@ -2055,7 +2055,7 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 .crz-purin-toggle-row.is-on > i,
 .crz-purin-hidden-sale.is-on > i,
 .crz-purin-default-plans.is-on > i {
-  background:#24ca83;
+  background:#0000ff;
   box-shadow:none;
 }
 
@@ -2063,7 +2063,7 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 .crz-purin-hidden-sale.is-on > i::after,
 .crz-purin-default-plans.is-on > i::after {
   left:21px;
-  background:#04110b;
+  background:#0b173b;
 }
 
 .crz-purin-display--compact .crz-purin-toggle-row + .crz-purin-toggle-row {
@@ -2115,14 +2115,14 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 
 .crz-purin-add-button,
 .crz-purin-save-field {
-  color:#04110b;
-  border-color:#27d88d;
-  background:#27d88d;
+  color:#ffffff;
+  border-color:#0000ff;
+  background:#0000ff;
 }
 
 .crz-purin-add-field {
   padding:12px;
-  border:1px solid #244232;
+  border:1px solid #0b173b;
   border-radius:10px;
   background:#0b1512;
   display:grid;
@@ -2133,11 +2133,11 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 
 .crz-purin-add-field > button {
   min-height:41px;
-  border:1px solid #22cd84;
+  border:1px solid #0000ff;
   border-radius:8px;
   padding:0 14px;
-  color:#05130c;
-  background:#24d58a;
+  color:#ffffff;
+  background:#0000ff;
   font-size:12px;
   font-weight:850;
   cursor:pointer;
@@ -2204,10 +2204,10 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
   white-space:nowrap;
 }
 
-.crz-purin-stock-pill.is-ok { color:#2bd98d;background:#0c2b20; }
+.crz-purin-stock-pill.is-ok { color:#9dbfff;background:#0b173b; }
 .crz-purin-stock-pill.is-low { color:#ffc756;background:#30250d; }
 .crz-purin-stock-pill.is-out { color:#ff6c78;background:#301217; }
-.crz-purin-stock-pill.is-infinite { color:#25d98c;background:#0b2b20; }
+.crz-purin-stock-pill.is-infinite { color:#9dbfff;background:#0b173b; }
 .crz-purin-stock-pill.is-external { color:#a896ff;background:#1b1731; }
 .crz-purin-stock-pill.is-manual { color:#aab5c3;background:#1a2028; }
 
@@ -2275,11 +2275,11 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 .crz-purin-add-stock {
   width:max-content;
   min-height:35px;
-  border:1px solid #22c980;
+  border:1px solid #0000ff;
   border-radius:8px;
   padding:0 13px;
-  color:#03120b;
-  background:#24d58a;
+  color:#ffffff;
+  background:#0000ff;
   font-size:11.5px;
   font-weight:850;
   cursor:pointer;
@@ -2336,9 +2336,9 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 }
 
 .crz-purin-tutorial-buttons button.is-active {
-  color:#24d58a;
-  border-color:#1b6d4e;
-  background:#0c2118;
+  color:#9dbfff;
+  border-color:#0b173b;
+  background:#0b173b;
 }
 
 .crz-purin-fields__empty,
@@ -2384,7 +2384,7 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 }
 
 .crz-purin-stock-modal > section > header small {
-  color:#27d58a;
+  color:#9dbfff;
   font-size:11px;
   font-weight:850;
   letter-spacing:.08em;
@@ -2435,7 +2435,7 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 }
 
 .crz-purin-stock-modal__summary strong {
-  color:#2ddd91;
+  color:#9dbfff;
   font-size:23px;
 }
 
@@ -2447,7 +2447,7 @@ html[data-theme="light"] .crz-pm-plan-quick__cards > button {
 }
 
 .crz-purin-stock-modal__counter strong {
-  color:#2ddb91;
+  color:#9dbfff;
   font-size:19px;
 }
 
@@ -2639,8 +2639,8 @@ html[data-theme="light"] .crz-purin-variation__editor select {
 }
 
 .crz-purin-stock-simple__controls select:focus {
-  border-color:#28ca84;
-  box-shadow:0 0 0 3px rgba(40,202,132,.10);
+  border-color:#0000ff;
+  box-shadow:0 0 0 3px rgba(0, 80, 255,.10);
 }
 
 .crz-purin-stock-simple__hint {
@@ -2683,7 +2683,7 @@ html[data-theme="light"] .crz-purin-stock-simple__controls select {
 .crz-purin-create-note{padding:10px 18px;border-bottom:1px solid #181f29;color:#8fa0b5;background:#0c1119;font-size:11.5px}
 .crz-pm-quick-block{padding:13px;border:1px solid #1c2531;border-radius:10px;background:#0b1018;display:grid;gap:10px}
 .crz-pm-quick-block>header{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.crz-pm-quick-block>header strong{color:#edf4fb;font-size:13px}.crz-pm-quick-block>header span{color:#73849a;font-size:10.5px}
-.crz-pm-plan-presets{display:flex;gap:7px;flex-wrap:wrap}.crz-pm-plan-presets button{min-height:34px;border:1px solid #25303d;border-radius:8px;padding:0 11px;color:#9aa8bb;background:#0d131c;font-size:11.5px;font-weight:800;cursor:pointer}.crz-pm-plan-presets button.is-active{color:#04110b;border-color:#28d890;background:#28d890}
+.crz-pm-plan-presets{display:flex;gap:7px;flex-wrap:wrap}.crz-pm-plan-presets button{min-height:34px;border:1px solid #25303d;border-radius:8px;padding:0 11px;color:#9aa8bb;background:#0d131c;font-size:11.5px;font-weight:800;cursor:pointer}.crz-pm-plan-presets button.is-active{color:#ffffff;border-color:#0000ff;background:#0000ff}
 .crz-pm-plan-presets--editor{padding:10px;border:1px solid #1c2531;border-radius:10px;background:#0b1018}
 .crz-pm-compat{display:grid;grid-template-columns:105px 1fr;gap:10px;align-items:center}.crz-pm-compat>span{color:#93a1b5;font-size:11.5px;font-weight:750}.crz-pm-compat>div{display:flex;gap:6px;flex-wrap:wrap}.crz-pm-compat button{min-height:31px;border:1px solid #27313e;border-radius:999px;padding:0 10px;color:#8e9db1;background:#0b1119;font-size:10.5px;cursor:pointer}.crz-pm-compat button.is-active{color:#fff;border-color:#1774ff;background:#0b49b4;box-shadow:0 0 12px rgba(0,103,255,.14)}
 .crz-pm-media-compose{display:grid;grid-template-columns:130px minmax(0,1fr) auto auto auto;gap:7px;align-items:center}.crz-pm-media-compose select,.crz-pm-media-compose input{min-height:36px;border:1px solid #26313f;border-radius:8px;padding:0 10px;color:#edf4fb;background:#0d131c;outline:0}.crz-pm-media-compose>button{min-height:36px;border:1px solid #1f6fbe;border-radius:8px;padding:0 12px;color:#eaf5ff;background:#0b376d;font-size:11px;font-weight:800;cursor:pointer}.crz-pm-media-compose .crz-purin-upload{min-height:36px}
@@ -2692,3 +2692,12 @@ html[data-theme="light"] .crz-purin-stock-simple__controls select {
 
 
 @media(max-width:760px){.crz-product-manager-page button,.crz-purin-dialog button,.crz-purin-dialog input,.crz-purin-dialog select{min-height:44px}.crz-pm-quick-block>header{align-items:flex-start;flex-direction:column}.crz-pm-media-list span{white-space:normal;overflow-wrap:anywhere}}
+
+.crz-pm-inline-stock{display:grid;gap:8px;padding:14px;font-size:13px;color:#a8bddc}.crz-pm-inline-stock textarea{width:100%;min-height:130px;border:1px solid #304c7e;border-radius:9px;padding:12px;background:#050c19;color:#edf4ff;font:13px/1.6 monospace;resize:vertical}.crz-pm-inline-stock textarea:focus{outline:2px solid #276bff;outline-offset:2px}.crz-purin-stock-simple__controls{display:flex;flex-wrap:wrap;gap:10px}.crz-purin-stock-simple__controls>a{display:flex;align-items:center;font-size:12px;padding:8px 12px}.crz-purin-stock-simple>p[role=status]{padding:0 14px;color:#a9caff}
+
+.crz-pm-product-access{display:grid;gap:14px;margin:16px;padding:20px;border:1px solid #263e67;border-radius:12px;background:#0a1221}.crz-pm-product-access h3,.crz-pm-product-access h4{color:#eef5ff}.crz-pm-product-access p,.crz-pm-product-access small{color:#9daec7;font-size:13px;line-height:1.6}.crz-pm-product-access label{display:grid;gap:8px}.crz-pm-product-access input{padding:10px;background:#050c18;border:1px solid #2a456e;color:#eaf2ff;border-radius:8px}.crz-pm-product-access a{color:#8bbaff;font-size:13px}
+
+.crz-plan-row-tools{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid #19334f}
+.crz-plan-row-tools button{min-width:36px;min-height:36px;border:1px solid #284c72;border-radius:7px;background:#0d2036;color:#b6d9ff;cursor:pointer}
+.crz-plan-row-tools .crz-purin-drag{cursor:grab}.crz-plan-row-tools .crz-plan-delete{margin-left:auto;padding:0 12px;color:#ffc3cf}
+.crz-plan-row-tools button:disabled{opacity:.35;cursor:default}

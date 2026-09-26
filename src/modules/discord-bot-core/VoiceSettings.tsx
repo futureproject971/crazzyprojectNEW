@@ -1,0 +1,27 @@
+"use client";
+import {useCallback,useEffect,useState} from 'react';
+type Channel={id:string;name:string;type:string};
+type Settings=Record<string,string|number|boolean|null>;
+const channels=[['category_id','Categoria das calls temporárias','category'],['panel_channel_id','Canal do botão Criar call','text'],['farm_channel_id','Canal farm XP','voice'],['afk_channel_id','Canal AFK (sem XP)','voice']];
+const economy=[['farm_xp_per_minute','XP por minuto no farm'],['social_xp_per_minute','XP por minuto nas calls'],['screen_xp_per_minute','XP por minuto compartilhando tela'],['daily_xp_cap','Limite diário de XP'],['session_xp_cap','Limite por sessão'],['xp_per_bonus_cent','XP por centavo de BONUS']];
+export function VoiceSettings(){
+ const [form,setForm]=useState<Settings|null>(null),[status,setStatus]=useState<Settings|null>(null),[options,setOptions]=useState<Channel[]>([]),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false);
+ const load=useCallback(async(replace=false)=>{try{const r=await fetch('/api/admin/voice',{cache:'no-store'}),p=await r.json();if(!r.ok)throw new Error(p.error);setStatus(p.settings);setOptions(p.worker?.channels||[]);if(replace)setForm(p.settings);}catch(e){setNotice(e instanceof Error?e.message:'Configuração indisponível.')}},[]);
+ useEffect(()=>{void load(true);const timer=setInterval(()=>void load(),30000);return()=>clearInterval(timer)},[load]);
+ const save=async()=>{if(busy)return;setBusy(true);try{const r=await fetch('/api/admin/voice',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});const p=await r.json();if(!r.ok)throw new Error(p.error);setNotice('Configurações salvas. O bot conectado aplica no próximo ciclo, em até 30 segundos.');await load();}catch(e){setNotice(e instanceof Error?e.message:'Falha de conexão.')}finally{setBusy(false)}};
+ const online=!!status?.worker_seen_at&&Date.now()-Date.parse(String(status.worker_seen_at))<90000;
+ const change=(key:string,value:string|boolean)=>setForm(current=>current?{...current,[key]:value}:current);
+ return <section className="crz-voice-settings" id="calls-xp"><h2>CRAZZY VOICE + XP</h2><p>Gerencie calls, canais e economia aqui. Voz no Discord; tela e webcam na CRAZZY CALL.</p>
+ <div className="crz-voice-health" aria-live="polite"><p><strong>{online?'Bot conectado':'Bot sem conexão confirmada'}</strong><br/>{online?(status?.enabled?'Calls ativadas':'Calls desativadas'):'As configurações ficam salvas, mas o bot precisa estar instalado e conectado para executá-las.'}</p><p><strong>{online&&status?.media_ready?'Compartilhamento conectado':'Compartilhamento ainda não confirmado'}</strong><br/>{status?.last_error?String(status.last_error):'O painel verifica o estado do bot a cada 30 segundos.'}</p></div>
+ {notice&&<p role="status">{notice}</p>}
+ {!form?<button onClick={()=>void load(true)}>Carregar configurações</button>:<form onSubmit={e=>{e.preventDefault();void save()}}>
+ <label className="crz-voice-toggle"><input type="checkbox" checked={form.enabled===true} onChange={e=>change('enabled',e.target.checked)}/> Ativar calls temporárias</label>
+ <h3>Canais do Discord</h3><p>Selecione pelo nome. Se o bot ainda não sincronizou os canais, cole o ID copiado do Discord.</p><div className="crz-voice-fields">{channels.map(([key,label,type])=>{const choices=options.filter(c=>c.type===type);return <label key={key}><span>{label}</span>{choices.length?<select value={String(form[key]||'')} onChange={e=>change(key,e.target.value)}><option value="">Não definido</option>{form[key]&&!choices.some(c=>c.id===form[key])&&<option value={String(form[key])}>Canal salvo · {String(form[key])}</option>}{choices.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select>:<input inputMode="numeric" pattern="[0-9]{17,20}" placeholder="ID do canal" value={String(form[key]||'')} onChange={e=>change(key,e.target.value)}/>}</label>})}</div>
+ <h3>Gerenciamento das salas</h3><div className="crz-voice-fields"><label>Espera para encerrar sala vazia (segundos)<input type="number" min={30} max={600} required value={String(form.grace_seconds??60)} onChange={e=>change('grace_seconds',e.target.value)}/></label><label>Máximo de calls simultâneas<input type="number" min={1} max={50} required value={String(form.max_rooms??20)} onChange={e=>change('max_rooms',e.target.value)}/></label></div>
+ <h3>XP e conversão para BONUS</h3><p>Defina as taxas e os dois limites para liberar XP. Com taxa zero ou qualquer limite zero, não há concessão de XP. Na conversão, zero impede trocar XP por BONUS.</p><div className="crz-voice-fields">{economy.map(([key,label])=><label key={key}><span>{label}</span><input type="number" min={0} max={key.endsWith('per_minute')?1000:key==='xp_per_bonus_cent'?1000000:100000} required value={String(form[key]??0)} onChange={e=>change(key,e.target.value)}/></label>)}</div>
+ {Number(form.xp_per_bonus_cent)>0&&<p>{Number(form.xp_per_bonus_cent)*100} XP = R$ 1,00 em BONUS. A conversão usa a carteira que o cliente já tem.</p>}
+ <button disabled={busy} className="crz-button crz-button--primary">{busy?'Salvando…':'Salvar calls e XP'}</button><button type="button" disabled={busy} onClick={()=>void load()}>Verificar conexão</button>
+ </form>}
+ <p>Outras configurações: <a href="/admin/luck">prêmios e drop</a> · <a href="/admin/combos">descontos dos combos</a> · <a href="/admin/discord-bridge">cargo Cliente</a> · <a href="/admin/produtos">estoque, planos e cargos dos produtos</a>.</p>
+ </section>
+}

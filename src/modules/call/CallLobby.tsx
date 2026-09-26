@@ -23,6 +23,7 @@ export function CallLobby({
   });
   const [password, setPassword] = useState("");
   const isLive = room.room_mode === "live";
+  const spectator = isLive && room.owner_id !== user.id;
 
   return (
     <section className="crz-call-lobby">
@@ -44,7 +45,7 @@ export function CallLobby({
           <small>{room.participant_count}/{room.max_participants} participantes</small>
         </div>
 
-        {isLive && <div className="crz-call-lobby__warning">Você entra como espectador. Apenas o dono da live e cohosts autorizados podem transmitir; o chat continua liberado.</div>}
+        {spectator && <div className="crz-call-lobby__warning">Você entra como espectador. Apenas o dono da live e cohosts autorizados podem transmitir; o chat continua liberado.</div>}
         {room.password_protected && (
           <label className="crz-call-lobby__password">
             <span>Esta sala tem senha</span>
@@ -52,19 +53,12 @@ export function CallLobby({
           </label>
         )}
         <div className="crz-call-lobby__toggles">
-          <button
-            type="button"
-            className={preferences.microphone ? "is-on" : ""}
-            onClick={() => setPreferences((current) => ({ ...current, microphone: !current.microphone }))}
-            disabled={isLive || !room.allow_microphone}
-          >
-            🎙 Microfone {preferences.microphone ? "ON" : "OFF"}
-          </button>
+          <p>🎧 Voz no Discord · Tela e webcam aqui</p>
           <button
             type="button"
             className={preferences.camera ? "is-on" : ""}
             onClick={() => setPreferences((current) => ({ ...current, camera: !current.camera }))}
-            disabled={isLive || !room.allow_camera}
+            disabled={spectator || !room.allow_camera}
           >
             📷 Câmera {preferences.camera ? "ON" : "OFF"}
           </button>

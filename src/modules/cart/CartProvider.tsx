@@ -12,6 +12,7 @@ import {
 import { calculateCartTotals } from "./pricing";
 import type { CartItem } from "./types";
 import { CartDrawer } from "./CartDrawer";
+import { comboTiersFromDiscounts, type ComboTier } from "@/core/commerce/policy";
 
 const STORAGE_KEY = "crazzy.cart.v1";
 const MAX_QUANTITY = 20;
@@ -23,6 +24,9 @@ type CartContextValue = {
   totalQuantity: number;
   totals: ReturnType<typeof calculateCartTotals>;
   couponCode: string;
+  comboTiers: ComboTier[];
+  comboStatus: "loading" | "ready" | "error";
+  refreshComboRules: () => Promise<void>;
   addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
   removeItem: (key: string) => void;
   setQuantity: (key: string, quantity: number) => void;
@@ -60,6 +64,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [couponCode, setCouponCodeState] = useState("");
+  const [comboTiers, setComboTiers] = useState<ComboTier[]>([]);
+  const [comboStatus, setComboStatus] = useState<"loading" | "ready" | "error">("loading");
+  const refreshComboRules = useCallback(async () => {
+    try {
+      const response = await fetch("/api/commerce/combos", { cache: "no-store" });
+      const payload = await response.json();
+      const tiers = comboTiersFromDiscounts(payload.discounts);
+      if (!response.ok || !tiers) throw new Error("COMBO_SETTINGS_UNAVAILABLE");
+      setComboTiers(tiers);
+      setComboStatus("ready");
+    } catch { setComboTiers([]); setComboStatus("error"); }
+  }, []);
+  useEffect(() => {
+    void refreshComboRules();
+    const refresh = () => { void refreshComboRules(); };
+    window.addEventListener("focus", refresh);
+    window.addEventListener("crz:combo-rules-updated", refresh);
+    const interval = window.setInterval(refresh, 60000);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("crz:combo-rules-updated", refresh);
+      window.clearInterval(interval);
+    };
+  }, [refreshComboRules]);
 
   useEffect(() => {
     setItems(safeStoredItems(window.localStorage.getItem(STORAGE_KEY)));
@@ -144,7 +172,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCouponCodeState("");
   }, []);
 
-  const totals = useMemo(() => calculateCartTotals(items), [items]);
+  const totals = useMemo(() => calculateCartTotals(items, comboTiers), [items, comboTiers]);
   const totalQuantity = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
     [items]
@@ -158,6 +186,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       totalQuantity,
       totals,
       couponCode,
+      comboTiers, comboStatus, refreshComboRules,
       addItem,
       removeItem,
       setQuantity,
@@ -174,6 +203,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       totalQuantity,
       totals,
       couponCode,
+      comboTiers, comboStatus, refreshComboRules,
       addItem,
       removeItem,
       setQuantity,

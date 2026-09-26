@@ -1,5 +1,7 @@
 "use client";
 
+import { sendOnEnter } from "@/core/ui/chatKeyboard";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NeonSectionIcon } from "@/components/ui/NeonSectionIcon";
 import { useAuth } from "@/modules/auth";
@@ -201,19 +203,14 @@ export function GeneralChat() {
       <div className="chat-compose">
         <div className="chat-input-shell chat-live-input-shell">
           <span className="compose-mini" aria-hidden="true">⊙</span>
-          <input
+          <textarea rows={2}
             className="chat-live-input"
             value={message}
             maxLength={2000}
             disabled={sending}
             placeholder={user ? "Escreva no Chat Geral..." : "Entre com Discord para conversar..."}
             onChange={(event) => setMessage(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.nativeEvent.isComposing) {
-                event.preventDefault();
-                void send();
-              }
-            }}
+            onKeyDown={event => sendOnEnter(event, send)}
           />
           <a className="compose-mini" href="/comunidade" aria-label="Abrir comunidade completa">↗</a>
         </div>

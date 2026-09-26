@@ -168,7 +168,7 @@ if (
 }
 console.log("[PASS] Finance UI distinguishes actual, estimated and unknown fees");
 
-const nav = await readFile("src/core/app-shell/navigation.ts", "utf8");
+const nav = await readFile("src/core/app-shell/admin-navigation.ts", "utf8");
 if (!nav.includes('href: "/admin/finance"')) {
   throw new Error("Finance Manager must be linked in admin navigation");
 }

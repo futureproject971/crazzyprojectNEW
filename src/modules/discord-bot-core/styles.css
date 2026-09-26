@@ -380,3 +380,6 @@ html[data-theme="light"] .crz-discord-builder-categories input { background:#fff
   }
   .crz-discord-builder-channel button:not(.is-danger) { grid-column:2/4; }
 }
+
+.crz-voice-settings{max-width:1300px;margin:24px auto;padding:24px;border:1px solid #234a70;border-radius:14px;background:#081728}.crz-voice-settings>div{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:20px 0}.crz-voice-settings label{display:grid;gap:6px}.crz-voice-settings input{padding:10px;color:#eef6ff;background:#07101e;border:1px solid #325777;border-radius:8px}
+.crz-voice-settings .crz-voice-fields,.crz-voice-health{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:18px 0}.crz-voice-settings select{padding:10px;color:#eef6ff;background:#07101e;border:1px solid #325777;border-radius:8px;max-width:100%}.crz-voice-settings h3{margin-top:24px}.crz-voice-settings .crz-voice-toggle{display:flex;align-items:center;gap:10px}.crz-voice-health p{padding:14px;border:1px solid #234a70;border-radius:10px}.crz-voice-settings form>button{margin:8px 12px 8px 0}.crz-voice-settings a{color:#76c9ff}

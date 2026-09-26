@@ -22,7 +22,7 @@ export async function GET(){
     supabase.from("luck_plays").select("id,user_id,campaign_id,prize_id,status,result,created_at").order("created_at",{ascending:false}).limit(200),
     supabase.from("luck_awards").select("*").order("created_at",{ascending:false}).limit(200),
     supabase.from("products").select("id,name,active").eq("active",true).order("name"),
-    supabase.from("product_plans").select("id,product_id,name,active").eq("active",true).order("sort_order"),
+    supabase.from("product_plans").select("id,product_id,name,active").is("archived_at",null).order("sort_order"),
   ]);
   if([campaigns,prizes,plays,awards,products,plans].some(x=>x.error))return NextResponse.json({error:"LUCK_MANAGER_UNAVAILABLE"},{status:500});
   const planRows=plans.data||[];
@@ -39,8 +39,8 @@ export async function POST(request:NextRequest){
   if(action==="save_campaign"){
     const id=uuid(body?.id), mode=clean(body?.mode,20), title=clean(body?.title,120), campaignSlug=slug(body?.slug||title);
     const cost=Math.trunc(Number(body?.bonusCostCents)||0), sort=Math.trunc(Number(body?.sortOrder)||0);
-    if(!["wheel","scratch","drop"].includes(mode)||!title||!campaignSlug||cost<0)return NextResponse.json({error:"INVALID_LUCK_CAMPAIGN"},{status:400});
-    const payload={slug:campaignSlug,mode,title,description:clean(body?.description,1000),active:body?.active!==false,daily_group:"bonus-arcade",free_plays_per_day:0,play_price_cents:0,bonus_cost_cents:cost,sort_order:sort,updated_at:new Date().toISOString()};
+    if(!["wheel","scratch","drop"].includes(mode)||!title||!campaignSlug||cost<0||(mode!=="drop"&&cost===0))return NextResponse.json({error:"INVALID_LUCK_CAMPAIGN"},{status:400});
+    const payload={slug:campaignSlug,mode,title,description:clean(body?.description,1000),active:body?.active!==false,daily_group:"bonus-arcade",free_plays_per_day:mode==="drop"?1:0,play_price_cents:0,bonus_cost_cents:mode==="drop"?0:cost,sort_order:sort,updated_at:new Date().toISOString()};
     const q=id?supabase.from("luck_campaigns").update(payload).eq("id",id).select().single():supabase.from("luck_campaigns").insert(payload).select().single();
     const {data,error}=await q;if(error||!data)return NextResponse.json({error:"LUCK_CAMPAIGN_SAVE_FAILED"},{status:400});
     return NextResponse.json({campaign:data},{status:id?200:201});
@@ -50,6 +50,9 @@ export async function POST(request:NextRequest){
     const weight=Math.trunc(Number(body?.weight)),sort=Math.trunc(Number(body?.sortOrder)||0);
     const stockRaw=body?.stockLimit,stockLimit=stockRaw===null||stockRaw===""||stockRaw===undefined?null:Math.trunc(Number(stockRaw));
     if(!campaignId||!label||!["coupon","bonus","product","reward","none"].includes(prizeType)||!Number.isFinite(weight)||weight<1||(stockLimit!==null&&stockLimit<1))return NextResponse.json({error:"INVALID_LUCK_PRIZE"},{status:400});
+    const {data:campaign}=await supabase.from("luck_campaigns").select("mode").eq("id",campaignId).single();
+    if(!campaign || (campaign.mode==="drop" && (prizeType!=="coupon" || body.discountType!=="percentage" || Number(body.discountValue)<5 || Number(body.discountValue)>50)))return NextResponse.json({error:"Drop permite apenas cupons de 5% a 50%."},{status:400});
+    if(campaign.mode!=="drop"&&!["product","none"].includes(prizeType))return NextResponse.json({error:"Roleta e raspadinha usam produto/plano ou sem prêmio."},{status:400});
     let config:Record<string,unknown>={};
     if(prizeType==="coupon"){
       const discountType=clean(body?.discountType,20),discountValue=Number(body?.discountValue),minOrder=Number(body?.minOrderValue||0),expiresHours=Math.trunc(Number(body?.expiresHours||72));
@@ -59,8 +62,10 @@ export async function POST(request:NextRequest){
       const bonusCents=Math.trunc(Number(body?.bonusCents)||0);if(bonusCents<=0)return NextResponse.json({error:"INVALID_LUCK_PRIZE"},{status:400});config={bonus_cents:bonusCents};
     }else if(prizeType==="product"){
       const productId=uuid(body?.productId),planId=body?.productPlanId?uuid(body.productPlanId):null,duration=Math.trunc(Number(body?.durationMinutes)||0);
-      if(!productId)return NextResponse.json({error:"INVALID_LUCK_PRIZE"},{status:400});
-      config={product_id:productId,product_plan_id:planId,duration_minutes:duration>0?duration:null};
+      if(!productId||!planId)return NextResponse.json({error:"INVALID_LUCK_PRIZE"},{status:400});
+      const {data:plan,error:planError}=await supabase.from("product_plans").select("id").eq("id",planId).eq("product_id",productId).is("archived_at",null).maybeSingle();
+      if(planError||!plan)return NextResponse.json({error:"Selecione um plano válido do produto."},{status:400});
+      config={product_id:productId,product_plan_id:planId};
     }else if(prizeType==="reward"){
       config={note:clean(body?.note,500)};
     }

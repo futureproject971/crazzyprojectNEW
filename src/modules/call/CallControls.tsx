@@ -1,7 +1,6 @@
 "use client";
 
 export function CallControls({
-  microphone,
   camera,
   screenShare,
   pipSupported,
@@ -13,7 +12,6 @@ export function CallControls({
   canModerate,
   canEnd,
   busy,
-  onMicrophone,
   onCamera,
   onScreenShare,
   onPip,
@@ -23,7 +21,6 @@ export function CallControls({
   onLeave,
   onEnd,
 }: {
-  microphone: boolean;
   camera: boolean;
   screenShare: boolean;
   pipSupported: boolean;
@@ -35,7 +32,6 @@ export function CallControls({
   canModerate: boolean;
   canEnd: boolean;
   busy: string | null;
-  onMicrophone: () => void;
   onCamera: () => void;
   onScreenShare: () => void;
   onPip: () => void;
@@ -47,9 +43,7 @@ export function CallControls({
 }) {
   return (
     <div className="crz-call-controls">
-      <button type="button" className={microphone ? "is-on" : "is-off"} disabled={!canPublish || busy === "mic"} onClick={onMicrophone} title={!canPublish ? "Você está assistindo esta live." : undefined}>
-        <span>🎙</span>{microphone ? "MIC ON" : "MIC OFF"}
-      </button>
+      <span className="crz-call-discord-audio">🎧 Voz no Discord</span>
 
       <button type="button" className={camera ? "is-on" : "is-off"} disabled={!canPublish || busy === "camera"} onClick={onCamera} title={!canPublish ? "Você está assistindo esta live." : undefined}>
         <span>📷</span>{camera ? "CÂMERA ON" : "CÂMERA OFF"}

@@ -86,7 +86,8 @@ export async function updateAuthSession(request: NextRequest) {
   });
 
   const pathname=request.nextUrl.pathname;
-  const pageProtected=matchesPrefix(pathname,protectedPrefixes);
+  // The handoff page stores its fragment before login; consumption still requires authenticated RPC.
+  const pageProtected=pathname!=="/call/handoff"&&matchesPrefix(pathname,protectedPrefixes);
   const apiProtected=matchesPrefix(pathname,protectedApiPrefixes)||isConditionallyProtectedApi(request);
   if(!pageProtected&&!apiProtected)return response;
 

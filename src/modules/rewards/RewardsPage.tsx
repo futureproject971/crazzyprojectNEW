@@ -203,6 +203,8 @@ export function RewardsPage() {
           actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club">Voltar ao CLUB</a>}
         />
 
+        <p><a className="crz-button crz-button--primary crz-button--md" href="/club/luck?mode=drop">Girar drop diário grátis · cupons de 5% a 50%</a></p>
+
         {!authLoading && !user && (
           <div className="crz-rewards-login">
             <NeonIcon name="crown" size={36} />

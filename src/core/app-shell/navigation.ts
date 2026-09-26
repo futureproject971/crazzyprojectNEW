@@ -3,25 +3,27 @@ import type { ShellMode, ShellNavItem } from "./types";
 export const visitorNavigation: ShellNavItem[] = [
   { id: "home", label: "Início", href: "/", icon: "/icons/home.svg" },
   { id: "products", label: "Produtos", href: "/produtos", icon: "/icons/shopping-bag.svg" },
+  { id: "combo", label: "Montar combo", href: "/combo", icon: "/icons/shopping-bag.svg" },
   { id: "accounts", label: "Contas", href: "/contas", icon: "/icons/package.svg" },
   { id: "free", label: "FREE", href: "/club/rewards", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
   { id: "prizes", label: "PRÊMIOS", href: "/club/luck", icon: "/icons/crown.svg", badge: "CLUB" },
   { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
   { id: "call", label: "CRAZZY CALL", href: "/call", icon: "/icons/headset.svg" },
-  { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
+  { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
 ];
 
 export const clientNavigation: ShellNavItem[] = [
   { id: "home", label: "Início", href: "/", icon: "/icons/home.svg" },
   { id: "products", label: "Produtos", href: "/produtos", icon: "/icons/shopping-bag.svg" },
+  { id: "combo", label: "Montar combo", href: "/combo", icon: "/icons/shopping-bag.svg" },
   { id: "accounts", label: "Contas", href: "/contas", icon: "/icons/package.svg" },
   { id: "free", label: "FREE", href: "/club/rewards", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
   { id: "prizes", label: "PRÊMIOS", href: "/club/luck", icon: "/icons/crown.svg", badge: "CLUB" },
   { id: "community", label: "Comunidade", href: "/comunidade", icon: "/icons/users.svg" },
   { id: "call", label: "CRAZZY CALL", href: "/call", icon: "/icons/headset.svg" },
-  { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg" },
   { id: "cart", label: "Carrinho", href: "/carrinho", icon: "/icons/shopping-cart.svg" },
+  { id: "mtsounds", label: "MTSOUNDS", href: "/mtsounds", icon: "/icons/bolt.svg", badge: "GRÁTIS" },
 ];
 
 // Catálogo interno das ferramentas administrativas.

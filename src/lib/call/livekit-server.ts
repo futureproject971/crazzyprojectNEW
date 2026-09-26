@@ -1,3 +1,4 @@
+import { canPublishInCall } from "./permissions";
 import { AccessToken, RoomServiceClient } from "livekit-server-sdk";
 import { getLiveKitServerConfig, liveKitRoomName } from "./config";
 import type { CallParticipantRole, CallRoom } from "@/modules/call/types";
@@ -59,7 +60,8 @@ export async function createLiveKitJoinToken(input: {
     roomJoin: true,
     room: roomName,
     canSubscribe: true,
-    canPublish: room.room_mode === "call" ? role !== "viewer" : role === "host" || role === "cohost",
+    canPublish: canPublishInCall(room.room_mode, role),
+    canPublishSources: [1, 3], // CAMERA and SCREEN_SHARE only; microphone/system audio denied server-side.
     canPublishData: false,
     canUpdateOwnMetadata: false,
   });
@@ -85,7 +87,8 @@ export async function removeLiveKitParticipant(roomId: string, userId: string) {
 export async function updateLiveKitParticipantRole(
   roomId: string,
   userId: string,
-  role: CallParticipantRole
+  role: CallParticipantRole,
+  mode: "call" | "live"
 ) {
   const config = getLiveKitServerConfig();
   if (!config.configured) return;
@@ -94,8 +97,9 @@ export async function updateLiveKitParticipantRole(
     await service.updateParticipant(liveKitRoomName(roomId), userId, {
       permission: {
         canSubscribe: true,
-        canPublish: role === "host" || role === "cohost",
-        canPublishData: false,
+        canPublish: canPublishInCall(mode, role),
+        canPublishSources: [1, 3], // CAMERA and SCREEN_SHARE only; microphone/system audio denied server-side.
+    canPublishData: false,
       },
     });
   } catch {

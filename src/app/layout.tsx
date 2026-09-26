@@ -1,3 +1,4 @@
+import { TicketAlerts } from "@/core/notifications/TicketAlerts";
 import type { Metadata } from "next";
 import { Inter, Orbitron, Poppins } from "next/font/google";
 import { AuthProvider } from "@/modules/auth/AuthProvider";
@@ -31,8 +32,11 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://crazzyproject.vercel.app"),
   title: "CRAZZY PROJECT",
-  description: "Jogos. Pessoas. Cultura. Sempre juntos.",
+  description: "Quem não xita não brilha. CRAZZY PROJECT — produtos, comunidade e recompensas.",
+  openGraph: { title: "CRAZZY PROJECT", description: "Quem não xita não brilha", images: [{url:"/brand/crazzy-logo-hero.png", alt:"CRAZZZY PROJECT"}] },
+  twitter: {card:"summary_large_image",title:"CRAZZY PROJECT",description:"Quem não xita não brilha",images:["/brand/crazzy-logo-hero.png"]},
 };
 
 export default function RootLayout({
@@ -46,7 +50,7 @@ export default function RootLayout({
         <PwaRegister />
         <PublicInteractionGuard />
         <ThemeProvider>
-          <AuthProvider>
+          <AuthProvider><TicketAlerts/>
             <GlobalMusicProvider><InternalNavigationBridge/><CartProvider>{children}</CartProvider></GlobalMusicProvider>
           </AuthProvider>
         </ThemeProvider>

@@ -1,3 +1,5 @@
+import { comboTiersFromDiscounts, discountForCount } from "./combo-policy.ts";
+
 export interface CheckoutCartItem {
   productId: string;
   planId: string;
@@ -200,7 +202,7 @@ export async function calculateServerTotal(
     }
 
     let unitPriceCents = Math.round(Number(planData.price) * 100);
-    if (!Number.isFinite(unitPriceCents) || unitPriceCents < 0) {
+    if (!Number.isFinite(unitPriceCents) || unitPriceCents <= 0) {
       return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Preço inválido no catálogo" };
     }
 
@@ -239,10 +241,13 @@ export async function calculateServerTotal(
     group.subtotal += Math.round(Number(item.price || 0) * 100) * Math.max(1, Number(item.quantity || 1));
     comboGroups.set(code, group);
   }
-  for (const group of comboGroups.values()) {
-    const count = group.products.size;
-    const percent = count >= 7 ? 35 : count === 6 ? 30 : count === 5 ? 25 : count === 4 ? 20 : count === 3 ? 15 : count === 2 ? 10 : 0;
-    comboDiscountAmount += Math.round(group.subtotal * (percent / 100));
+  if ([...comboGroups.values()].some(group => group.products.size >= 2)) {
+    const { data: settings, error } = await supabaseAdmin.from("commerce_combo_settings").select("discounts").eq("id", true).maybeSingle();
+    const tiers = comboTiersFromDiscounts(settings?.discounts);
+    if (error || !tiers) return { total: 0, subtotal, discountAmount: 0, cartSnapshot, couponId: null, error: "Não foi possível validar o desconto do combo. Tente novamente." };
+    for (const group of comboGroups.values()) {
+      comboDiscountAmount += Math.round(group.subtotal * discountForCount(group.products.size, tiers) / 100);
+    }
   }
 
   let couponDiscountAmount = 0;

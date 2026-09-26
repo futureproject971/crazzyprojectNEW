@@ -139,13 +139,18 @@ export async function GET() {
   }
 
   const catalog = data as any;
+  const archived = await supabase.from("product_plans").select("id").not("archived_at", "is", null);
+  if (archived.error) return NextResponse.json({error:"PRODUCT_MANAGER_UNAVAILABLE"},{status:500});
+  const archivedIds = new Set((archived.data || []).map(row => row.id));
+  catalog.products = (catalog.products || []).map((p:any) => ({...p, plans:(p.plans || []).filter((plan:any)=>!archivedIds.has(plan.id))}));
   const productIds = Array.isArray(catalog?.products) ? catalog.products.map((p:any)=>String(p.id||"")).filter((id:string)=>UUID_RE.test(id)) : [];
-  const [mediaResult, featuresResult] = productIds.length ? await Promise.all([
+  const [mediaResult, featuresResult, roleResult] = productIds.length ? await Promise.all([
     supabase.from("product_media").select("id,product_id,media_type,url,sort_order").in("product_id",productIds).order("sort_order"),
     supabase.from("product_features").select("id,product_id,label,value,sort_order").in("product_id",productIds).order("sort_order"),
-  ]) : [{data:[],error:null},{data:[],error:null}];
+    supabase.from("products").select("id,discord_role_id,discord_role_name").in("id",productIds),
+  ]) : [{data:[],error:null},{data:[],error:null},{data:[],error:null}];
 
-  if (mediaResult.error || featuresResult.error) {
+  if (mediaResult.error || featuresResult.error || roleResult.error) {
     return NextResponse.json({ error: "PRODUCT_MANAGER_EXTRAS_UNAVAILABLE" }, { status: 500 });
   }
 
@@ -161,6 +166,7 @@ export async function GET() {
   }
   catalog.products = (catalog.products || []).map((product:any)=>({
     ...product,
+    ...(roleResult.data || []).find((row:any)=>row.id===product.id),
     media: mediaByProduct.get(product.id) || [],
     features: featuresByProduct.get(product.id) || [],
   }));
@@ -179,6 +185,15 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
   const action = cleanString(body?.action, 40);
 
+  if (action === "reorder_plans" || action === "archive_plan") {
+    const productId = cleanString(body.productId, 36);
+    const planIds = Array.isArray(body.planIds) ? body.planIds.map(String) : [];
+    if (!UUID_RE.test(productId) || (action === "reorder_plans" && (!planIds.length || planIds.some((id:string)=>!UUID_RE.test(id)))) || (action === "archive_plan" && !UUID_RE.test(String(body.planId)))) return NextResponse.json({error:"Planos inválidos."},{status:400});
+    const {error} = await supabase.rpc(action === "reorder_plans" ? "admin_reorder_product_plans" : "admin_archive_product_plan", action === "reorder_plans" ? {p_product_id:productId,p_plan_ids:planIds} : {p_product_id:productId,p_plan_id:body.planId});
+    if (error) return NextResponse.json({error:"Não foi possível atualizar os planos. Atualize a página e tente novamente."},{status:409});
+    return NextResponse.json({saved:true});
+  }
+
   if (action === "create_product") {
     const gameId = cleanString(body?.gameId, 36);
     const name = cleanString(body?.name, 120);
@@ -186,15 +201,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
     }
 
-    const presetPlans = Array.isArray(body?.presetPlans)
-      ? [...new Set<string>(body.presetPlans.map((item:unknown)=>cleanString(item,20).toLowerCase()).filter((item:string)=>PLAN_CODES.has(item) && item !== "custom" && item !== "single"))]
-      : [];
+    const presetPlans: string[] = [];
     const { data, error } = await supabase.rpc("create_product_manager_product", {
       p_game_id: gameId,
       p_name: name,
       p_emoji: nullableString(body?.emoji, 32),
       p_accent_color: safeColor(body?.accentColor),
-      p_create_default_plans: presetPlans.length ? false : body?.createDefaultPlans !== false,
+      p_create_default_plans: false,
     });
 
     if (error || !data) {
@@ -209,7 +222,7 @@ export async function POST(request: NextRequest) {
         p_icon_url: safeAssetUrl(body?.iconUrl),
         p_banner_url: safeAssetUrl(body?.bannerUrl),
         p_hide_delivery_badge: Boolean(body?.hideDeliveryBadge),
-        p_auto_delivery: Boolean(body?.autoDelivery),
+        p_auto_delivery: true,
       });
 
       if (presentationError) {
@@ -300,6 +313,8 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
     }
 
+    const roleId = nullableString(product.discord_role_id, 24);
+    if (roleId && !/^[0-9]{17,20}$/.test(roleId)) return NextResponse.json({error:"Informe um ID de cargo Discord válido."},{status:400});
     const { data, error } = await supabase.rpc("save_product_manager_product", {
       p_product_id: productId,
       p_game_id: gameId,
@@ -344,6 +359,8 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "PRODUCT_EXTRAS_SAVE_FAILED" }, { status: 400 });
     }
 
+    const {error: roleError} = await supabase.from("products").update({discord_role_id: roleId, discord_role_name: nullableString(product.discord_role_name,100) || "Cliente " + name}).eq("id",productId);
+    if(roleError) return NextResponse.json({error:"Produto salvo, mas o cargo não foi atualizado. Tente novamente."},{status:500});
     return NextResponse.json({ saved: data, presentation });
   }
 

@@ -56,6 +56,7 @@ export function StockManagerPage() {
 
       const nextPlan =
         next.plans.find((plan) => plan.plan_id === (preserve ? selectedPlanId : null)) ||
+        next.plans.find((plan) => plan.plan_id === new URLSearchParams(window.location.search).get("planId")) ||
         next.plans[0] ||
         null;
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-const OPEN_STATUSES = ["open", "waiting_staff", "waiting_user"] as const;
+const OPEN_STATUSES = ["open", "waiting_staff"] as const;
 
 export async function GET() {
   const supabase = await createServerSupabaseClient();

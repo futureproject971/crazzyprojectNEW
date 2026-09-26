@@ -29,8 +29,10 @@ export async function POST(request: NextRequest) {
   });
   if (error) return callErrorResponse(error.message, "ROLE_UPDATE_FAILED");
 
+  const {data: room} = await supabase.from("call_rooms").select("room_mode").eq("id",roomId).single();
+  if (!room) return NextResponse.json({error:"ROOM_NOT_FOUND"},{status:404});
   if (participant?.user_id) {
-    await updateLiveKitParticipantRole(roomId, participant.user_id, role);
+    await updateLiveKitParticipantRole(roomId, participant.user_id, role, room.room_mode === "live" ? "live" : "call");
   }
 
   return NextResponse.json({ ok: true });

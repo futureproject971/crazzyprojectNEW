@@ -80,7 +80,7 @@ export function getProductStock(product: PublicStoreProduct) {
 export function getProductStartingPrice(product: PublicStoreProduct) {
   const prices = (product.plans || [])
     .map((plan) => Number(plan.price))
-    .filter((price) => Number.isFinite(price) && price >= 0);
+    .filter((price) => Number.isFinite(price) && price > 0);
   return prices.length ? Math.min(...prices) : null;
 }
 
@@ -108,4 +108,31 @@ export function normalizePublicCatalog(value: unknown): PublicStoreProduct[] {
       features: Array.isArray(item.features) ? item.features as PublicStoreFeature[] : [],
     }))
     .filter((item) => item.id && item.slug && item.name && item.game?.slug);
+}
+
+export function durationLabel(plan: PublicStorePlan) {
+  const code = String(plan.plan_code || "").toLowerCase();
+  const known: Record<string, string> = {
+    trial: "1 hora",
+    "1d": "1 dia",
+    "3d": "3 dias",
+    "7d": "7 dias",
+    "15d": "15 dias",
+    "30d": "30 dias",
+    "90d": "90 dias",
+    lifetime: "Vitalício",
+  };
+  return known[code] || plan.name;
+}
+
+export function cartPlanCode(plan: PublicStorePlan) {
+  const code = String(plan.plan_code || "").toLowerCase();
+  if (["trial", "1d", "3d", "7d", "15d", "30d", "90d", "lifetime"].includes(code)) {
+    return code as "trial" | "1d" | "3d" | "7d" | "15d" | "30d" | "90d" | "lifetime";
+  }
+  return "custom" as const;
+}
+
+export function planAvailable(plan: PublicStorePlan) {
+  return Number.isFinite(Number(plan.price)) && Number(plan.price) > 0 && (!plan.stock_managed || Number(plan.stock_count || 0) > 0);
 }

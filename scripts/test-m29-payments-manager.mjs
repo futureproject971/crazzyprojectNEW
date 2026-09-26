@@ -170,7 +170,7 @@ if (page.includes("qrCodeImage") || page.includes("_checkoutProof")) {
 }
 console.log("[PASS] Payments Manager UI does not render checkout secrets");
 
-const nav = await readFile("src/core/app-shell/navigation.ts", "utf8");
+const nav = await readFile("src/core/app-shell/admin-navigation.ts", "utf8");
 if (!nav.includes('href: "/admin/pagamentos"')) {
   throw new Error("Admin payments navigation must point to /admin/pagamentos");
 }

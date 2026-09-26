@@ -1,221 +1,81 @@
 "use client";
-
 import { useMemo, useState } from "react";
 import { Badge, Button, NeonIcon, PageHeader } from "@/core/design-system";
-import { catalogCategories, catalogProducts } from "@/modules/catalog";
-import { getProductDetail } from "@/modules/product-view";
+import { formatBrl } from "@/modules/catalog/live";
+import { useStoreCatalog } from "@/modules/catalog/useStoreCatalog";
 import { comboDiscountPercent, comboNextTier } from "./pricing";
 import { useCart } from "./CartProvider";
+import { getComboProducts } from "./combo-catalog";
 import type { ComboPlanFamily } from "@/core/commerce/policy";
 
-const eligibleProducts = catalogProducts.filter(
-  (product) =>
-    product.stock !== "out" &&
-    product.category !== "services" &&
-    product.category !== "accounts"
-);
-
-function planAvailableForCombo(productId: string, plan: ComboPlanFamily) {
-  const product = eligibleProducts.find((item) => item.id === productId);
-  if (!product) return false;
-  const detail = getProductDetail(product.slug);
-  const selectedPlan = detail?.plans.find((candidate) => candidate.code === plan);
-  return Boolean(selectedPlan && selectedPlan.stockCount !== 0);
-}
-
 export function ComboBuilderPage() {
-  const { addItem, openCart } = useCart();
+  const { addItem, openCart, comboTiers, comboStatus, refreshComboRules } = useCart();
+  const { products, state, reload } = useStoreCatalog();
   const [plan, setPlan] = useState<ComboPlanFamily>("30d");
   const [selected, setSelected] = useState<string[]>([]);
+  const [query, setQuery] = useState("");
+  const eligible = useMemo(() => getComboProducts(products, plan), [products, plan]);
+  const chosen = eligible.filter(({ product }) => selected.includes(product.id));
+  const visible = eligible.filter(({ product }) => `${product.name} ${product.game.name}`.toLocaleLowerCase("pt-BR").includes(query.trim().toLocaleLowerCase("pt-BR")));
+  const discount = comboDiscountPercent(chosen.length, comboTiers);
+  const next = comboNextTier(chosen.length, comboTiers);
+  const maxDiscount = Math.max(0, ...comboTiers.map(tier => tier.discountPercent));
+  const subtotalCents = chosen.reduce((sum, item) => sum + Math.round(Number(item.plan.price) * 100), 0);
+  const savingsCents = Math.round(subtotalCents * discount / 100);
+  const ready = state === "ready" && comboStatus === "ready";
 
-  const discount = comboDiscountPercent(selected.length);
-  const next = comboNextTier(selected.length);
-  const progress = Math.min(100, (selected.length / 7) * 100);
-
-  const toggle = (id: string) => {
-    setSelected((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id]
-    );
-  };
-
-  const selectionLabel = useMemo(
-    () => selected.length + " produto" + (selected.length === 1 ? "" : "s"),
-    [selected.length]
-  );
-
-  const addCombo = () => {
-    for (const productId of selected) {
-      const product = eligibleProducts.find((item) => item.id === productId);
-      if (!product) continue;
-      const detail = getProductDetail(product.slug);
-      const selectedPlan = detail?.plans.find((candidate) => candidate.code === plan);
-      if (!selectedPlan || selectedPlan.stockCount === 0) continue;
-
+  function addCombo() {
+    if (!ready || chosen.length < 2) return;
+    for (const { product, plan: selectedPlan } of chosen) {
       addItem({
-        key: "product:" + product.id + ":" + selectedPlan.id,
-        kind: "product",
-        productId: product.id,
-        slug: product.slug,
-        name: product.name,
-        subtitle: product.subtitle,
-        image: product.image ?? null,
-        planId: selectedPlan.id,
-        planCode: selectedPlan.code,
-        planName: selectedPlan.name,
-        durationLabel: selectedPlan.duration,
-        price: selectedPlan.price,
-        priceLabel: selectedPlan.priceLabel,
-        category: catalogCategories.find((category) => category.id === product.category)?.label,
-        comboEligible: true,
+        key: `product:${product.id}:${selectedPlan.id}`, kind: "product", productId: product.id,
+        slug: product.slug, name: product.name, subtitle: product.description || product.game.name,
+        image: product.image_url || product.game.image_url || null,
+        planId: selectedPlan.id, planCode: plan, planName: selectedPlan.name,
+        durationLabel: plan === "30d" ? "30 dias" : "Vitalício",
+        price: Number(selectedPlan.price), priceLabel: formatBrl(Number(selectedPlan.price)),
+        category: product.game.name, comboEligible: true,
       });
     }
-
     openCart();
-  };
-
-  return (
-    <main className="crz-combo-page">
-      <section className="crz-combo-hero">
-        <div className="crz-container">
-          <PageHeader
-            eyebrow="MONTE SEU COMBO"
-            title="Monte seu Combo CRAZZY"
-            description="Escolha vários produtos no mesmo plano Mensal ou Lifetime e desbloqueie até 35% de desconto."
-          />
-
-          <div className="crz-combo-plan-switch">
-            <button
-              type="button"
-              className={plan === "30d" ? "is-active" : ""}
-              onClick={() => {
-                setPlan("30d");
-                setSelected([]);
-              }}
-            >
-              <NeonIcon name="lightning" size={26} />
-              <span>
-                <small>COMBO</small>
-                <strong>Mensal • 30 dias</strong>
-              </span>
-            </button>
-            <button
-              type="button"
-              className={plan === "lifetime" ? "is-active" : ""}
-              onClick={() => {
-                setPlan("lifetime");
-                setSelected([]);
-              }}
-            >
-              <NeonIcon name="crown" size={26} />
-              <span>
-                <small>COMBO</small>
-                <strong>Lifetime</strong>
-              </span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <div className="crz-container crz-combo-layout">
-        <aside className="crz-combo-progress">
-          <div className="crz-combo-progress__ring">
-            <strong>{discount}%</strong>
-            <span>OFF</span>
-          </div>
-
-          <div>
-            <small>SELEÇÃO ATUAL</small>
-            <h2>{selectionLabel}</h2>
-            <div className="crz-combo-progress__track">
-              <i style={{ width: progress + "%" }} />
-            </div>
-
-            {next ? (
-              <p>
-                Adicione <strong>{next.products - selected.length}</strong> produto(s) diferente(s)
-                para liberar <strong>{next.discountPercent}% OFF</strong>.
-              </p>
-            ) : (
-              <p>
-                <strong>35% OFF desbloqueado.</strong> Este é o teto máximo do combo.
-              </p>
-            )}
-          </div>
-
-          <div className="crz-combo-tiers">
-            {[2, 3, 4, 5, 6, 7].map((count, index) => {
-              const percentages = [10, 15, 20, 25, 30, 35];
-              const reached = selected.length >= count;
-              return (
-                <span key={count} className={reached ? "is-reached" : ""}>
-                  <b>{count}{count === 7 ? "+" : ""}</b>
-                  <small>{percentages[index]}%</small>
-                </span>
-              );
-            })}
-          </div>
-
-          <Button
-            size="lg"
-            disabled={selected.length < 2}
-            onClick={addCombo}
-            leadingIcon={<NeonIcon name="crown" size={20} />}
-          >
-            Adicionar combo ao carrinho
-          </Button>
-
-          <small className="crz-combo-progress__rule">
-            Só produtos diferentes contam para a faixa. Quantidade repetida não aumenta desconto.
-            Mensal e Lifetime são calculados separadamente.
-          </small>
-        </aside>
-
-        <section className="crz-combo-products">
-          <header>
-            <div>
-              <small>ESCOLHA SEUS PRODUTOS</small>
-              <h2>{plan === "30d" ? "Combo Mensal" : "Combo Lifetime"}</h2>
-            </div>
-            <Badge tone="gold">ATÉ 35% OFF</Badge>
-          </header>
-
-          <div className="crz-combo-grid">
-            {eligibleProducts
-              .filter((product) => planAvailableForCombo(product.id, plan))
-              .map((product) => {
-              const active = selected.includes(product.id);
-              return (
-                <button
-                  type="button"
-                  key={product.id}
-                  className={"crz-combo-card " + (active ? "is-selected" : "")}
-                  aria-pressed={active}
-                  onClick={() => toggle(product.id)}
-                >
-                  <div className="crz-combo-card__art">
-                    {product.image ? (
-                      <img src={product.image} alt="" />
-                    ) : (
-                      <NeonIcon name={product.icon ?? "cube"} size={48} />
-                    )}
-                    <span className="crz-combo-card__check">{active ? "✓" : "+"}</span>
-                  </div>
-                  <div>
-                    <small>
-                      {catalogCategories.find((category) => category.id === product.category)?.label}
-                    </small>
-                    <strong>{product.name}</strong>
-                    <span>{product.subtitle}</span>
-                    <em>{plan === "30d" ? "30 dias" : "Lifetime"} • Consultar</em>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </section>
+  }
+  return <main className="crz-combo-page">
+    <section className="crz-combo-hero"><div className="crz-container">
+      <PageHeader eyebrow="MONTE SEU COMBO" title="Seus produtos. Seu combo." description="Combine produtos do catálogo no plano Mensal ou Lifetime. Veja os preços e o desconto antes de adicionar ao carrinho." />
+      <div className="crz-combo-plan-switch" aria-label="Duração do combo">
+        {(["30d", "lifetime"] as const).map(family => <button key={family} type="button" aria-pressed={plan === family} className={plan === family ? "is-active" : ""} onClick={() => { setPlan(family); setSelected([]); }}>
+          <NeonIcon name={family === "30d" ? "lightning" : "crown"} size={26} /><span><small>COMBO</small><strong>{family === "30d" ? "Mensal • 30 dias" : "Lifetime"}</strong></span>
+        </button>)}
       </div>
-    </main>
-  );
+    </div></section>
+    <div className="crz-container crz-combo-layout">
+      <aside className="crz-combo-progress">
+        <div className="crz-combo-progress__ring"><strong>{ready ? `${discount}%` : "—"}</strong><span>OFF</span></div>
+        <div aria-live="polite"><small>SELEÇÃO ATUAL</small><h2>{chosen.length} produto{chosen.length === 1 ? "" : "s"}</h2>
+          <div className="crz-combo-progress__track"><i style={{ width: `${Math.min(100, chosen.length / 7 * 100)}%` }} /></div>
+          {ready && (next ? <p>Adicione <strong>{next.products - chosen.length}</strong> produto(s) diferente(s) para liberar <strong>{next.discountPercent}% OFF</strong>.</p> : <p>{maxDiscount ? `${discount}% OFF: maior faixa disponível.` : "Sem desconto de combo ativo no momento."}</p>)}
+        </div>
+        <div className="crz-combo-tiers">{comboTiers.map(tier => <span key={tier.products} className={chosen.length >= tier.products ? "is-reached" : ""}><b>{tier.products}{tier.products === 7 ? "+" : ""}</b><small>{tier.discountPercent}%</small></span>)}</div>
+        <dl className="crz-combo-totals" aria-live="polite"><div><dt>Produtos</dt><dd>{formatBrl(subtotalCents / 100)}</dd></div><div><dt>Desconto</dt><dd>{ready ? `− ${formatBrl(savingsCents / 100)}` : "Aguardando regras"}</dd></div><div><dt>Total estimado</dt><dd>{ready ? formatBrl((subtotalCents - savingsCents) / 100) : "—"}</dd></div></dl>
+        <Button size="lg" disabled={!ready || chosen.length < 2} onClick={addCombo}>Adicionar combo ao carrinho</Button>
+        <small className="crz-combo-progress__rule">Produtos diferentes contam para a faixa. Mensal e Lifetime são calculados separadamente. Preço e disponibilidade são confirmados no checkout; cupom e combo não se somam.</small>
+      </aside>
+      <section className="crz-combo-products">
+        <header><div><small>CATÁLOGO DA LOJA</small><h2>{plan === "30d" ? "Combo Mensal" : "Combo Lifetime"}</h2></div>{comboStatus === "ready" && maxDiscount > 0 && <Badge tone="gold">ATÉ {maxDiscount}% OFF</Badge>}</header>
+        <label className="crz-combo-search"><span>Buscar produto ou categoria</span><input type="search" className="crz-input" value={query} onChange={event => setQuery(event.target.value)} placeholder="Nome do produto…" /></label>
+        {(state === "loading" || comboStatus === "loading") && <p role="status">Carregando catálogo e descontos…</p>}
+        {(state === "error" || comboStatus === "error") && <div className="crz-combo-message" role="alert"><p>Não foi possível carregar {state === "error" ? "os produtos" : "as regras de desconto"}. Tente novamente.</p><Button onClick={() => { void reload(); void refreshComboRules(); }}>Tentar novamente</Button></div>}
+        {ready && eligible.length === 0 && <div className="crz-combo-message"><h3>Nenhum produto disponível neste plano</h3><p>Os produtos da loja aparecem aqui quando têm um plano {plan === "30d" ? "Mensal" : "Lifetime"} com preço e disponibilidade.</p><a href="/produtos">Ver catálogo da loja →</a></div>}
+        {ready && eligible.length > 0 && visible.length === 0 && <p>Nenhum produto encontrado para essa busca.</p>}
+        <div className="crz-combo-grid">{state === "ready" && visible.map(({ product, plan: itemPlan }) => {
+          const active = selected.includes(product.id);
+          const image = product.image_url || product.game.image_url;
+          return <button type="button" key={product.id} className={`crz-combo-card ${active ? "is-selected" : ""}`} aria-pressed={active} onClick={() => setSelected(current => current.includes(product.id) ? current.filter(id => id !== product.id) : [...current, product.id])}>
+            <div className="crz-combo-card__art">{image ? <img className="crz-combo-card__image" src={image} alt="" loading="lazy" /> : <NeonIcon name="cube" size={48} />}<span className="crz-combo-card__check" aria-hidden="true">{active ? "✓" : "+"}</span></div>
+            <div><small>{product.game.name}</small><strong>{product.name}</strong><span>{product.description}</span><em>{itemPlan.name} • {formatBrl(Number(itemPlan.price))}</em></div>
+          </button>;
+        })}</div>
+      </section>
+    </div>
+  </main>;
 }

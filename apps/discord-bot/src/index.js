@@ -1,3 +1,4 @@
+import { startVoiceRooms } from "./modules/voice-rooms.js";
 import {
   Client,
   GatewayIntentBits,
@@ -26,6 +27,7 @@ const supabase = createBotSupabase(config);
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildVoiceStates,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.GuildPresences,
@@ -69,6 +71,7 @@ client.on("guildMemberRemove", (member) => {
   void syncGuildMembership(member, false);
 });
 
+let stopVoice = null;
 let stopCampaigns = null;
 let stopBuilder = null;
 let stopRoleBridge = null;
@@ -89,6 +92,7 @@ client.once("ready", async () => {
   await ensureOfficialDiscordInvite(client, supabase, config);
   stopGuildGateVerifier = startPendingGuildVerifier(client, supabase, config);
   stopHeartbeat = startWorkerHeartbeat(client, supabase, config);
+  stopVoice = startVoiceRooms(client, supabase, config);
   stopCampaigns = startCampaignWorker(client, supabase, config);
   stopBuilder = startBuilderWorker(client, supabase, config);
   stopRoleBridge = startDiscordRoleBridge(client, supabase, config);
@@ -99,6 +103,7 @@ client.once("ready", async () => {
 async function shutdown(signal) {
   console.log("[core] shutdown requested: " + signal);
 
+  stopVoice?.();
   stopCampaigns?.();
   stopBuilder?.();
   stopRoleBridge?.();

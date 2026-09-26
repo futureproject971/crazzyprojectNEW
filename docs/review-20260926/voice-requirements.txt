@@ -1,0 +1,2906 @@
+# ============================================================
+# CRAZZY PROJECT NEW
+# MÓDULO: CRAZZY VOICE + CRAZZY CALL + XP + BOT CORE
+# ============================================================
+
+IMPORTANTE: LEIA TODO O PROMPT ANTES DE ALTERAR QUALQUER ARQUIVO.
+
+Este projeto JÁ EXISTE e possui diversas funcionalidades prontas.
+
+NÃO recriar o projeto.
+NÃO iniciar outro projeto.
+NÃO substituir funcionalidades maduras por mocks.
+NÃO criar outro bot Discord.
+NÃO desmontar o CRAZZY CALL existente.
+NÃO remover recursos existentes que funcionam.
+NÃO simplificar interfaces já prontas.
+NÃO criar sistemas paralelos desnecessários.
+
+O objetivo é integrar corretamente:
+
+1. Discord
+2. BOT CORE existente
+3. CRAZZY PROJECT
+4. CRAZZY CALL
+5. sistema de XP
+6. CRAZZY BONUS
+7. recompensas existentes
+
+Tudo deve trabalhar como UM ÚNICO ECOSSISTEMA.
+
+Antes de implementar:
+
+- auditar o repositório atual;
+- localizar o BOT CORE existente;
+- localizar integração Discord existente;
+- localizar autenticação Discord;
+- localizar tabelas e migrations atuais;
+- localizar CRAZZY CALL;
+- localizar WebRTC/realtime utilizado;
+- localizar sistema FREE;
+- localizar CRAZZY BONUS;
+- localizar raspadinha;
+- localizar roleta;
+- localizar drop;
+- localizar carteira;
+- localizar sistema de usuário/perfil;
+- localizar logs;
+- localizar arquitetura de permissões;
+- localizar Supabase/backend atual.
+
+REUTILIZAR tudo que já existir.
+
+Somente criar estruturas novas quando realmente forem necessárias.
+
+
+# ============================================================
+# 1. VISÃO GERAL DA ARQUITETURA
+# ============================================================
+
+A arquitetura desejada é:
+
+DISCORD
+=
+VOZ + COMUNIDADE + CALLS TEMPORÁRIAS
+
+CRAZZY CALL
+=
+COMPARTILHAMENTO DE TELA + WEBCAM OPCIONAL
+
+BOT CORE
+=
+ORQUESTRADOR DE DISCORD + SITE
+
+CRAZZY PROJECT
+=
+AUTENTICAÇÃO + BANCO + XP + BONUS + RECOMPENSAS
+
+
+Fluxo:
+
+Discord Voice
+        |
+        |
+        v
+     BOT CORE
+        |
+        +----------------------+
+        |                      |
+        v                      v
+ Discord Voice Room       CRAZZY CALL
+        |                      |
+        |                      |
+        +----------+-----------+
+                   |
+                   v
+               Discord ID
+                   |
+                   v
+                  XP
+                   |
+                   v
+            CRAZZY BONUS
+                   |
+        +----------+-----------+
+        |          |           |
+        v          v           v
+   Raspadinha    Roleta       Drop
+
+
+A identidade principal deve ser o Discord ID.
+
+Não criar carteira separada no bot.
+
+Não criar XP independente no Discord e outro XP independente no site.
+
+Deve existir UMA IDENTIDADE CRAZZY.
+
+
+# ============================================================
+# 2. CRAZZY CALL NÃO É UM SISTEMA DE VOZ
+# ============================================================
+
+O CRAZZY CALL deve ser focado em:
+
+- compartilhamento de tela;
+- visualização de compartilhamentos;
+- webcam opcional;
+- chat privado da sala, caso já exista;
+- PiP existente;
+- interface de participantes;
+- modo focado.
+
+NÃO utilizar CRAZZY CALL para conversação por áudio.
+
+NÃO implementar chamada de voz WebRTC para substituir Discord.
+
+NÃO pedir permissão de microfone no navegador para o CRAZZY CALL.
+
+A conversa por voz ocorre no Discord.
+
+A interface pode informar claramente:
+
+🎙️ Áudio: Discord
+🖥️ Tela: CRAZZY CALL
+
+Webcam pode continuar opcional.
+
+
+# ============================================================
+# 3. ESTRUTURA DE CALLS NO DISCORD
+# ============================================================
+
+Estrutura conceitual:
+
+🎧 CRAZZY CALLS
+
+🎛️・criar-call
+
+🔊・Call 01
+🔊・Call 02
+
+⚡・farm-xp
+🌙・AFK
+
+CATEGORIA:
+CALLS TEMPORÁRIAS
+
+Essa categoria normalmente pode ficar vazia.
+
+Quando usuários criarem chamadas:
+
+🔊・Call 001
+🔊・Call 002
+🔊・Call 003
+
+Essas calls são criadas dinamicamente.
+
+Quando deixam de existir, são deletadas.
+
+
+# ============================================================
+# 4. NÃO CRIAR CARGO PARA CADA CALL
+# ============================================================
+
+NÃO implementar:
+
+@Call 001
+@Call 002
+@Call 003
+etc.
+
+Isso causaria excesso de cargos temporários.
+
+O BOT CORE deve controlar tudo.
+
+O criador da call será um OWNER LÓGICO.
+
+Esse owner fica registrado no banco.
+
+O cliente NÃO recebe poder administrativo real sobre o servidor.
+
+O BOT CORE executa todas as ações em nome dele depois de validar se ele realmente possui aquela sala.
+
+
+# ============================================================
+# 5. PAINEL ÚNICO DE CRIAÇÃO
+# ============================================================
+
+No canal:
+
+🎛️・criar-call
+
+deve existir UMA mensagem persistente do BOT CORE.
+
+Exemplo:
+
+━━━━━━━━━━━━━━━━━━━━━━
+🎧 CRAZZY VOICE
+━━━━━━━━━━━━━━━━━━━━━━
+
+Crie sua própria call temporária para jogar
+com seus amigos.
+
+🔊 Calls públicas lotadas?
+Crie uma sala em segundos.
+
+[ 🔊 CRIAR CALL ]
+
+[ ⚙️ MINHA CALL ]
+
+[ 📩 MEUS CONVITES ]
+
+[ 🖥️ ABRIR CRAZZY CALL ]
+
+
+IMPORTANTE:
+
+Esse painel é compartilhado por todo servidor.
+
+NÃO criar um painel diferente para cada pessoa.
+
+Discord Interactions identifica automaticamente quem clicou.
+
+Respostas pessoais devem ser EPHEMERAL.
+
+Exemplo:
+
+500 usuários podem clicar no mesmo botão.
+
+Cada pessoa recebe sua própria resposta privada.
+
+Nenhum usuário deve enxergar:
+
+- configuração da call do outro;
+- link da CRAZZY CALL do outro;
+- convite do outro;
+- gerenciamento do outro.
+
+
+# ============================================================
+# 6. BOTÃO CRIAR CALL
+# ============================================================
+
+Quando clicar:
+
+🔊 CRIAR CALL
+
+abrir interface/modal/select para configurar:
+
+PRIVACIDADE:
+
+🔓 Pública
+🔒 Privada
+
+LIMITE DE USUÁRIOS:
+
+2
+4
+6
+8
+10
+
+valor personalizado dentro dos limites permitidos
+
+ou:
+
+SEM LIMITE
+
+Para sem limite usar:
+
+user_limit = 0
+
+O cliente NÃO escolhe o nome da call.
+
+O bot define automaticamente.
+
+Exemplo:
+
+Call 001
+Call 002
+Call 003
+
+
+# ============================================================
+# 7. REUTILIZAÇÃO DOS NÚMEROS
+# ============================================================
+
+Não ficar aumentando números eternamente.
+
+Exemplo:
+
+Call 001
+Call 002
+Call 003
+
+Call 002 foi encerrada.
+
+Próxima criada pode reutilizar:
+
+Call 002.
+
+Implementar pool de números disponíveis.
+
+Não usar somente contador infinito.
+
+
+# ============================================================
+# 8. CRIAÇÃO REAL DA VOICE CALL
+# ============================================================
+
+Quando confirmar a criação:
+
+BOT CORE deve:
+
+1. validar se o usuário pode criar call;
+2. verificar se já possui call;
+3. escolher número disponível;
+4. criar voice channel;
+5. colocar dentro da categoria temporária;
+6. configurar user_limit;
+7. configurar permissões;
+8. registrar owner;
+9. registrar no banco;
+10. provisionar CRAZZY CALL correspondente;
+11. mover o owner para a nova voice call, se apropriado;
+12. retornar painel privado EPHEMERAL.
+
+
+Exemplo de resposta:
+
+✅ SUA CALL FOI CRIADA
+
+🔊 Call 017
+👑 Dono: @Lai
+👥 Limite: 4
+🔓 Pública
+
+[ 🔊 ENTRAR ]
+
+[ 🖥️ CRAZZY CALL ]
+
+[ ⚙️ GERENCIAR ]
+
+
+# ============================================================
+# 9. UM USUÁRIO NÃO PODE CRIAR 30 CALLS
+# ============================================================
+
+Antes da criação:
+
+verificar se owner_discord_id já possui uma room ativa.
+
+Se possuir:
+
+não criar outra.
+
+Responder:
+
+Você já possui:
+
+🔊 Call 017
+
+[ ENTRAR ]
+
+[ GERENCIAR ]
+
+[ CRAZZY CALL ]
+
+Também implementar rate limit para evitar spam.
+
+
+# ============================================================
+# 10. CALL PÚBLICA
+# ============================================================
+
+CALL PÚBLICA:
+
+- membros que possuem acesso à categoria podem visualizar;
+- podem entrar enquanto houver vagas;
+- owner controla a sala;
+- BOT CORE executa gerenciamento;
+- qualquer participante da sala pode abrir CRAZZY CALL daquela sala se autorizado.
+
+
+Exemplo:
+
+Call 017
+1/4
+
+João entra.
+
+João vai ao painel global e clica:
+
+🖥️ ABRIR CRAZZY CALL
+
+BOT CORE verifica:
+
+interaction.user.id
+↓
+voice state atual
+↓
+voice channel atual
+↓
+é uma call CRAZZY temporária?
+↓
+sim
+↓
+qual room?
+↓
+Call 017
+↓
+qual crazzy_call_room_id?
+↓
+gerar autorização individual
+↓
+responder EPHEMERAL
+
+
+# ============================================================
+# 11. CALL PRIVADA
+# ============================================================
+
+Para CALL PRIVADA:
+
+@everyone NÃO pode conectar.
+
+Preferencialmente a call também deve ficar invisível para quem não está autorizado.
+
+Configurar permission overwrites.
+
+Owner deve conseguir adicionar amigos usando:
+
+Discord User Select.
+
+
+Painel:
+
+🔒 CALL 017
+
+👑 Você é o dono
+👥 1/4
+
+[ ➕ ADICIONAR AMIGO ]
+
+[ ➖ REMOVER MEMBRO ]
+
+[ 👥 VER MEMBROS ]
+
+[ 🖥️ CRAZZY CALL ]
+
+[ 🔓 TORNAR PÚBLICA ]
+
+[ 🗑️ ENCERRAR ]
+
+
+# ============================================================
+# 12. ADICIONAR AMIGO
+# ============================================================
+
+Ao clicar:
+
+➕ ADICIONAR AMIGO
+
+abrir seletor nativo de usuários Discord.
+
+Permitir selecionar somente membros válidos da guild.
+
+Registrar convite.
+
+Preferencialmente usar estados:
+
+pending
+accepted
+rejected
+removed
+
+
+Fluxo:
+
+OWNER
+↓
+convida @João
+↓
+pending
+↓
+João visualiza convite
+↓
+aceita
+↓
+permission overwrite atualizado
+↓
+View Channel permitido
+↓
+Connect permitido
+↓
+membro registrado na call
+↓
+CRAZZY CALL autorizada
+
+
+# ============================================================
+# 13. MEUS CONVITES
+# ============================================================
+
+No painel global:
+
+📩 MEUS CONVITES
+
+Responder EPHEMERAL.
+
+Exemplo:
+
+━━━━━━━━━━━━━━━━
+📩 CONVITES
+━━━━━━━━━━━━━━━━
+
+🔒 Call 017
+👑 Criador: @Lai
+👥 2/4
+
+[ ✅ ACEITAR ]
+
+[ ❌ RECUSAR ]
+
+
+Se aceitar:
+
+- liberar permissões;
+- registrar membership;
+- permitir entrada Discord;
+- autorizar CRAZZY CALL.
+
+Se recusar:
+
+- marcar convite como rejected;
+- não liberar sala.
+
+
+# ============================================================
+# 14. DM É OPCIONAL, NÃO OBRIGATÓRIA
+# ============================================================
+
+Bot pode tentar enviar DM:
+
+🎧 Você recebeu convite para Call 017.
+
+Mas NÃO depender de DM.
+
+Muitos usuários bloqueiam DM de servidores.
+
+Por isso:
+
+📩 MEUS CONVITES
+
+deve funcionar sempre no painel.
+
+
+# ============================================================
+# 15. REMOVER MEMBRO DA CALL PRIVADA
+# ============================================================
+
+Owner clica:
+
+➖ REMOVER MEMBRO
+
+Seleciona usuário.
+
+BOT CORE:
+
+- valida owner;
+- remove acesso;
+- remove View Channel;
+- remove Connect;
+- remove membership;
+- desconecta usuário daquela voice call se estiver dentro;
+- revoga acesso CRAZZY CALL;
+- invalida tokens relacionados;
+- registra log.
+
+Não dar ao owner Discord permissions globais como:
+
+MOVE_MEMBERS
+MUTE_MEMBERS
+MANAGE_CHANNELS
+
+O BOT CORE possui as permissões necessárias e executa.
+
+
+# ============================================================
+# 16. GERENCIAMENTO DA CALL
+# ============================================================
+
+Botão:
+
+⚙️ MINHA CALL
+
+Responder EPHEMERAL.
+
+Exemplo:
+
+━━━━━━━━━━━━━━━━━━
+🎧 CALL 017
+━━━━━━━━━━━━━━━━━━
+
+👑 Dono: você
+👥 3/6
+🔓 Pública
+
+[ 🔒 TRANCAR ]
+
+[ 👥 ALTERAR LIMITE ]
+
+[ ➕ CONVIDAR ]
+
+[ ➖ REMOVER ]
+
+[ 👑 TRANSFERIR DONO ]
+
+[ 🖥️ CRAZZY CALL ]
+
+[ 🗑️ ENCERRAR ]
+
+
+# ============================================================
+# 17. ESTADOS DE PRIVACIDADE
+# ============================================================
+
+Implementar:
+
+1. PÚBLICA
+
+Qualquer membro autorizado no servidor pode entrar.
+
+2. PRIVADA
+
+Somente owner + convidados autorizados.
+
+3. TRANCADA
+
+Membros já autorizados permanecem.
+
+Novos membros não entram até owner destrancar.
+
+
+# ============================================================
+# 18. ALTERAR LIMITE
+# ============================================================
+
+Owner poderá alterar:
+
+2
+4
+6
+8
+10
+customizado
+sem limite
+
+Validar:
+
+novo limite não pode causar comportamento quebrado.
+
+Se já existem 6 pessoas e owner colocar limite 4:
+
+não expulsar automaticamente usuários.
+
+Pode impedir alteração ou aceitar limite somente >= ocupação atual.
+
+Escolher comportamento mais consistente e explicar na UI.
+
+
+# ============================================================
+# 19. OWNER NÃO RECEBE PODER REAL SOBRE DISCORD
+# ============================================================
+
+CRÍTICO.
+
+Owner é um papel lógico.
+
+Não confiar em permissões client-side.
+
+Sempre verificar:
+
+interaction.user.id
+===
+room.owner_discord_id
+
+ANTES de:
+
+remover membro
+alterar limite
+trancar
+destrancar
+convidar
+transferir
+encerrar
+
+Não confiar em:
+
+custom_id
+hidden field
+frontend
+query parameter.
+
+
+# ============================================================
+# 20. TRANSFERÊNCIA DE OWNER
+# ============================================================
+
+Owner poderá:
+
+👑 TRANSFERIR DONO
+
+Selecionar participante atual elegível.
+
+Atualizar owner_discord_id.
+
+Novo owner recebe painel administrativo.
+
+Antigo owner vira participante normal.
+
+
+# ============================================================
+# 21. SE OWNER SAIR
+# ============================================================
+
+Se owner sair da voice call:
+
+NÃO deletar imediatamente caso existam outras pessoas.
+
+Fluxo:
+
+owner saiu
+↓
+grace period
+↓
+owner voltou?
+↓
+SIM
+mantém
+↓
+NÃO
+↓
+existem membros?
+↓
+SIM
+↓
+transferir owner automaticamente
+para membro elegível
+↓
+NÃO
+↓
+cleanup normal
+
+
+Escolher preferencialmente:
+
+membro autorizado mais antigo na call.
+
+
+# ============================================================
+# 22. CALL VAZIA
+# ============================================================
+
+Quando última pessoa sair:
+
+NÃO deletar instantaneamente.
+
+Registrar:
+
+empty_since
+
+Esperar grace period configurável.
+
+Exemplo padrão:
+
+60 segundos.
+
+Depois:
+
+a sala ainda está vazia?
+
+SIM:
+
+- encerrar CRAZZY CALL;
+- invalidar acessos;
+- limpar memberships;
+- remover permission overwrites;
+- deletar Discord voice channel;
+- marcar room encerrada;
+- liberar número;
+- registrar log.
+
+NÃO:
+
+cancelar cleanup.
+
+
+# ============================================================
+# 23. CRAZZY CALL CRIADA AUTOMATICAMENTE
+# ============================================================
+
+Toda call temporária deve possuir CRAZZY CALL correspondente.
+
+Exemplo:
+
+Discord:
+
+Call 017
+
+Site:
+
+CRAZZY CALL ROOM 017
+
+Banco:
+
+discord_channel_id
+owner_discord_id
+room_number
+crazzy_call_room_id
+
+
+Fluxo:
+
+CRIAR CALL DISCORD
+↓
+BOT CORE
+↓
+BACKEND CRAZZY
+↓
+CRIAR/PROVISIONAR ROOM
+↓
+VINCULAR
+↓
+SALVAR
+
+
+NÃO recriar todo sistema CRAZZY CALL.
+
+Usar arquitetura existente.
+
+
+# ============================================================
+# 24. NÃO EXISTE UM LINK SECRETO COMPARTILHADO
+# ============================================================
+
+CRÍTICO.
+
+Não usar:
+
+"um link secreto que todo mundo da sala recebe".
+
+Existe:
+
+UMA ROOM
+
+e múltiplas autorizações individuais.
+
+Exemplo:
+
+ROOM 017
+
+Lai
+→ autorização A
+
+João
+→ autorização B
+
+Maria
+→ autorização C
+
+Todos entram na mesma room.
+
+Cada acesso pertence a um Discord ID.
+
+
+# ============================================================
+# 25. LINK DA CRAZZY CALL DEVE SER PRIVADO
+# ============================================================
+
+Quando usuário clicar:
+
+🖥️ ABRIR CRAZZY CALL
+
+responder EPHEMERAL.
+
+NUNCA postar token/link sensível em canal público.
+
+Mas esconder link NÃO é suficiente.
+
+O backend deve proteger a sala.
+
+
+# ============================================================
+# 26. HANDOFF TOKEN
+# ============================================================
+
+Implementar acesso temporário seguro entre Discord e site.
+
+Exemplo:
+
+crazzy_call_handoff_token
+
+Campos conceituais:
+
+id
+token_hash
+discord_user_id
+room_id
+created_at
+expires_at
+used_at
+revoked_at
+
+
+Fluxo:
+
+Discord interaction
+↓
+BOT CORE valida usuário
+↓
+valida participação/autorização
+↓
+backend gera token temporário
+↓
+resposta EPHEMERAL
+↓
+usuário abre site
+↓
+site valida token
+↓
+site valida sessão Discord
+↓
+token pertence ao mesmo Discord ID?
+↓
+sim
+↓
+troca token por autorização da room
+↓
+marca token usado
+
+
+Token:
+
+- criptograficamente seguro;
+- uso único;
+- validade curta;
+- não reutilizável;
+- não transferível entre usuários.
+
+
+# ============================================================
+# 27. URL COPIADA NÃO PODE DAR ACESSO
+# ============================================================
+
+Exemplo:
+
+João copia URL.
+
+Manda para Pedro.
+
+Pedro não está autorizado.
+
+Resultado:
+
+ACESSO NEGADO.
+
+Mesmo conhecendo room ID.
+
+Nunca utilizar somente:
+
+/call/17
+
+como mecanismo de segurança.
+
+Room ID não é segredo.
+
+Segurança acontece no backend.
+
+
+# ============================================================
+# 28. LOGIN DISCORD
+# ============================================================
+
+CRAZZY CALL exige identidade Discord.
+
+Se usuário ainda não está autenticado no site:
+
+guardar destino;
+fazer Discord login;
+retornar à room;
+validar autorização;
+abrir.
+
+Não perder room após OAuth.
+
+
+# ============================================================
+# 29. MODO FOCADO
+# ============================================================
+
+Permitir abrir CRAZZY CALL em rota focada.
+
+Exemplo conceitual:
+
+/call/[room]
+
+Essa rota deve parecer quase um aplicativo independente.
+
+Mostrar:
+
+CRAZZY CALL
+Call 017
+
+participantes
+
+tela compartilhada
+
+botão compartilhar tela
+
+webcam
+
+PiP
+
+sair
+
+
+Evitar elementos desnecessários:
+
+catálogo
+carrinho
+produtos
+cards comerciais
+home gigante
+
+Mas continua dentro da mesma aplicação CRAZZY PROJECT.
+
+Não criar novo projeto.
+
+
+# ============================================================
+# 30. PICTURE IN PICTURE
+# ============================================================
+
+Preservar CRAZZY CALL PiP existente.
+
+Se atualmente utiliza APIs reais:
+
+document.pictureInPictureEnabled
+requestPictureInPicture
+enterpictureinpicture
+leavepictureinpicture
+
+não substituir por modal fake.
+
+Manter fallback quando navegador não suporta.
+
+
+# ============================================================
+# 31. CHAT PRIVADO DA CRAZZY CALL
+# ============================================================
+
+Caso CRAZZY CALL atualmente possua chat por sala:
+
+preservar.
+
+Chat deve ser isolado por:
+
+crazzy_call_room_id
+
+Nunca vazar mensagens entre rooms.
+
+Revisar subscriptions realtime.
+
+Ao sair:
+
+unsubscribe.
+
+Ao trocar room:
+
+unsubscribe da anterior antes de entrar na nova.
+
+
+# ============================================================
+# 32. FARM XP NO DISCORD
+# ============================================================
+
+Criar/usar voice channel configurado:
+
+⚡・farm-xp
+
+Esse canal existe especificamente para XP.
+
+A lógica pedida:
+
+usuário conectado
++
+não self-muted
++
+não server-muted
++
+não self-deaf
++
+não server-deaf
++
+não suppressed quando aplicável
++
+permanece conectado
+=
+tempo válido de XP
+
+
+IMPORTANTE:
+
+Discord consegue informar Voice State.
+
+Isso NÃO significa que conseguimos provar que existe som real entrando no microfone.
+
+Não gravar áudio.
+
+Não analisar microfone.
+
+Na primeira versão:
+
+"microfone aberto"
+=
+usuário conectado e não mutado/deaf.
+
+
+# ============================================================
+# 33. AFK
+# ============================================================
+
+Canal:
+
+🌙・AFK
+
+NÃO deve gerar XP.
+
+Se servidor utiliza AFK automático:
+
+garantir que quando usuário for movido para AFK:
+
+timer de XP seja encerrado corretamente.
+
+
+# ============================================================
+# 34. XP DAS CALLS NORMAIS
+# ============================================================
+
+Preparar sistema para permitir políticas diferentes.
+
+Exemplo configurável:
+
+FARM XP
+=
+XP passivo
+
+CALL NORMAL
+=
+XP social
+
+CRAZZY CALL SCREEN SHARE
+=
+XP adicional
+
+Não hardcodar tudo espalhado pelo código.
+
+Centralizar configuração/regras.
+
+
+# ============================================================
+# 35. CRAZZY CALL TAMBÉM PODE DAR XP
+# ============================================================
+
+Quando usuário inicia compartilhamento:
+
+backend registra evento confiável.
+
+Exemplo:
+
+SCREEN_SHARE_STARTED
+
+Campos:
+
+discord_user_id
+room_id
+session_id
+timestamp
+
+
+Quando encerra:
+
+SCREEN_SHARE_ENDED
+
+Calcular tempo válido server-side.
+
+
+Não confiar em:
+
+setInterval frontend
+contador local
+JavaScript enviado pelo navegador
+valor de duração enviado pelo cliente.
+
+
+# ============================================================
+# 36. WEBCAM
+# ============================================================
+
+Webcam pode continuar opcional.
+
+Não precisa obrigatoriamente gerar XP.
+
+Se futuramente gerar:
+
+implementar de forma configurável.
+
+Não misturar webcam e screen share na primeira regra sem necessidade.
+
+
+# ============================================================
+# 37. ANTI FARM
+# ============================================================
+
+Como XP terá valor promocional:
+
+implementar proteção.
+
+Necessário:
+
+- idempotência;
+- máximo de XP diário;
+- máximo por sessão;
+- rate limit;
+- evitar múltiplas abas;
+- evitar múltiplas sessões do mesmo usuário pontuando ao mesmo tempo;
+- evitar reconnect spam;
+- evitar sair/entrar para gerar bônus;
+- auditar duração;
+- registrar origem;
+- registrar motivo de rejeição;
+- detectar sessões sobrepostas.
+
+
+# ============================================================
+# 38. TICK DE XP
+# ============================================================
+
+Não depender somente de:
+
+"usuário entrou"
+e
+"usuário saiu".
+
+Usar mecanismo robusto de sessão.
+
+Exemplo:
+
+voice_xp_session
+
+started_at
+last_validated_at
+ended_at
+valid_seconds
+xp_awarded
+status
+
+
+Pode haver heartbeat/tick idempotente.
+
+Se bot reiniciar:
+
+não duplicar minutos.
+
+
+# ============================================================
+# 39. XP NÃO É DINHEIRO
+# ============================================================
+
+Separar conceitos:
+
+⭐ XP
+=
+atividade
+
+💰 CRAZZY BONUS
+=
+saldo promocional
+
+Não chamar XP diretamente de reais.
+
+Fluxo:
+
+XP
+↓
+conversão / recompensa
+↓
+CRAZZY BONUS
+↓
+Raspadinha
+Roleta
+Drop
+Benefícios
+
+
+# ============================================================
+# 40. CRAZZY BONUS EXISTENTE
+# ============================================================
+
+O sistema atual já possui CRAZZY BONUS.
+
+NÃO criar outra carteira concorrente.
+
+Auditar implementação existente.
+
+Integrar XP com ela.
+
+Não quebrar:
+
+Raspadinha
+Roleta
+Drop
+Minha Carteira BONUS
+extrato
+regras
+
+
+# ============================================================
+# 41. LEDGER
+# ============================================================
+
+Preferir modelo de ledger.
+
+XP Ledger:
+
+id
+discord_user_id
+amount
+source
+reference_id
+reason
+created_at
+
+
+Bonus Ledger:
+
+id
+discord_user_id
+amount
+type
+source
+reference_id
+created_at
+
+
+Exemplo:
+
++50 XP
+source:
+discord_voice
+
++20 XP
+source:
+screen_share
+
+-1000 XP
+source:
+bonus_conversion
+
++R$ 5 CRAZZY BONUS
+source:
+xp_conversion
+
+
+Evitar depender somente de uma coluna:
+
+balance = 123
+
+
+Saldo pode existir como cache.
+
+Mas ledger deve permitir auditoria.
+
+
+# ============================================================
+# 42. BANCO DE CALLS
+# ============================================================
+
+Antes de criar tabela:
+
+AUDITAR schema atual.
+
+Se não existir estrutura equivalente, criar/adaptar:
+
+temp_voice_rooms
+
+id
+guild_id
+discord_channel_id
+room_number
+owner_discord_id
+privacy
+user_limit
+crazzy_call_room_id
+created_at
+empty_since
+closed_at
+status
+
+
+temp_voice_room_members
+
+id
+room_id
+discord_user_id
+role
+invite_status
+joined_at
+left_at
+removed_at
+
+
+Possíveis roles:
+
+owner
+member
+
+
+Possíveis invite statuses:
+
+pending
+accepted
+rejected
+removed
+
+
+# ============================================================
+# 43. CRAZZY CALL ACCESS
+# ============================================================
+
+Estrutura equivalente a:
+
+crazzy_call_access
+
+room_id
+discord_user_id
+access_role
+granted_at
+revoked_at
+
+
+Não criar duplicação se já existir sistema equivalente.
+
+
+# ============================================================
+# 44. HANDOFF TOKENS
+# ============================================================
+
+Estrutura equivalente:
+
+crazzy_call_handoff_tokens
+
+id
+room_id
+discord_user_id
+token_hash
+created_at
+expires_at
+used_at
+revoked_at
+
+
+Nunca armazenar token puro se não for necessário.
+
+Preferir hash.
+
+
+# ============================================================
+# 45. ÍNDICES
+# ============================================================
+
+Garantir índices úteis:
+
+discord_channel_id
+owner_discord_id
+discord_user_id
+crazzy_call_room_id
+room_number
+status
+expires_at
+created_at
+
+
+# ============================================================
+# 46. BOT CORE COMO ORQUESTRADOR
+# ============================================================
+
+NÃO criar outro bot.
+
+Organizar dentro do BOT CORE existente.
+
+Separar responsabilidade.
+
+Exemplo conceitual:
+
+discord/
+    voice-room-manager
+    interactions
+    invite-manager
+    voice-state-manager
+    room-cleanup
+    room-permissions
+    voice-xp
+
+crazzy/
+    crazzy-call-bridge
+    call-access
+    handoff-token
+    xp-bridge
+
+
+Adaptar aos padrões reais do repo.
+
+Não criar essa árvore literalmente se arquitetura existente usar outro padrão.
+
+
+# ============================================================
+# 47. EVENTOS DO DISCORD
+# ============================================================
+
+Auditar eventos existentes.
+
+Voice state update deve alimentar:
+
+- entrada em calls;
+- saída;
+- mute;
+- unmute;
+- deaf;
+- undeaf;
+- farm XP;
+- cleanup;
+- owner state;
+- occupancy.
+
+
+Não registrar somente no frontend.
+
+
+# ============================================================
+# 48. PERMISSÕES DO BOT
+# ============================================================
+
+Revisar permissões Discord necessárias.
+
+Bot pode precisar de:
+
+Manage Channels
+Move Members
+View Channels
+Connect
+Send Messages
+Use Application Commands
+
+e permissões necessárias para permission overwrites.
+
+NÃO conceder Administrator sem necessidade caso a arquitetura possa funcionar com permissões específicas.
+
+Documentar permissões finais.
+
+
+# ============================================================
+# 49. CRIAÇÃO DO CANAL
+# ============================================================
+
+Ao criar uma room:
+
+definir:
+
+type = voice
+
+parent = categoria temporária
+
+name = Call XXX
+
+user_limit configurado
+
+permission overwrites apropriados
+
+
+Se privada:
+
+everyone:
+View/Connect denied conforme design
+
+owner:
+View/Connect allowed
+
+accepted members:
+View/Connect allowed
+
+
+# ============================================================
+# 50. CRAZZY CALL NÃO DEVE APARECER PARA USUÁRIO ERRADO
+# ============================================================
+
+Toda autorização deve ser validada server-side.
+
+Não retornar dados da room de outro usuário.
+
+Validar:
+
+auth user Discord ID
+room membership
+room status
+access revoked?
+token valid?
+guild membership quando necessário?
+
+
+# ============================================================
+# 51. FECHAR CALL MANUALMENTE
+# ============================================================
+
+Owner pode clicar:
+
+🗑️ ENCERRAR CALL
+
+Pedir confirmação EPHEMERAL:
+
+Tem certeza?
+
+[ ENCERRAR ]
+
+[ CANCELAR ]
+
+
+Ao encerrar:
+
+- impedir novos joins;
+- encerrar CRAZZY CALL;
+- invalidar tokens;
+- desconectar/mover membros conforme estratégia definida;
+- deletar Discord voice;
+- limpar estado;
+- liberar número;
+- registrar log.
+
+
+# ============================================================
+# 52. CALL NÃO PODE SUMIR POR FALHA TRANSITÓRIA
+# ============================================================
+
+Não apagar sala por:
+
+- voice state atrasado;
+- pequeno reconnect;
+- troca de dispositivo;
+- queda curta de rede.
+
+Por isso existe grace period.
+
+
+# ============================================================
+# 53. RECUPERAÇÃO APÓS RESTART DO BOT
+# ============================================================
+
+CRÍTICO.
+
+NÃO guardar estado somente em Map/memória RAM.
+
+Se BOT CORE reiniciar:
+
+1. carregar rooms ativas do banco;
+2. consultar Discord;
+3. confirmar quais voice channels existem;
+4. reconstruir cache;
+5. reconciliar memberships;
+6. verificar CRAZZY CALL correspondente;
+7. limpar registros órfãos;
+8. restaurar timers;
+9. continuar XP quando seguro;
+10. evitar duplicação.
+
+
+# ============================================================
+# 54. RECONCILIAÇÃO
+# ============================================================
+
+Caso banco diga:
+
+Call 017 ativa
+
+mas Discord channel não existe:
+
+finalizar room.
+
+Caso Discord possua:
+
+Call 017
+
+mas banco não tenha:
+
+não assumir.
+
+Registrar anomalia.
+
+Determinar se é room gerenciada pelo BOT CORE antes de mexer.
+
+
+# ============================================================
+# 55. LOGS PRIVADOS
+# ============================================================
+
+Registrar eventos úteis no sistema administrativo/logs.
+
+Exemplos:
+
+VOICE_ROOM_CREATED
+VOICE_ROOM_CLOSED
+VOICE_ROOM_AUTO_CLEANED
+
+VOICE_ROOM_LOCKED
+VOICE_ROOM_UNLOCKED
+
+VOICE_ROOM_INVITE_CREATED
+VOICE_ROOM_INVITE_ACCEPTED
+VOICE_ROOM_INVITE_REJECTED
+
+VOICE_ROOM_MEMBER_REMOVED
+
+VOICE_ROOM_OWNER_TRANSFERRED
+
+CRAZZY_CALL_CREATED
+CRAZZY_CALL_JOINED
+CRAZZY_CALL_ACCESS_REVOKED
+
+SCREEN_SHARE_STARTED
+SCREEN_SHARE_ENDED
+
+XP_SESSION_STARTED
+XP_SESSION_STOPPED
+XP_GRANTED
+XP_REJECTED
+
+BONUS_GRANTED
+
+HANDOFF_CREATED
+HANDOFF_USED
+HANDOFF_REJECTED
+
+
+Esses logs são privados.
+
+Não mostrar detalhes técnicos para clientes.
+
+
+# ============================================================
+# 56. PAINEL ADMIN
+# ============================================================
+
+Se arquitetura atual permitir, adicionar/configurar regras administráveis:
+
+XP farm habilitado
+XP por período
+limite diário
+grace period de room
+limite máximo de pessoas
+limite de calls simultâneas
+screen share XP habilitado
+categorias Discord
+channel IDs
+etc.
+
+
+Evitar hardcode sempre que configuração administrativa fizer sentido.
+
+
+# ============================================================
+# 57. EXPERIÊNCIA DO CLIENTE
+# ============================================================
+
+Cliente não precisa saber:
+
+Supabase
+WebRTC internals
+token
+SQL
+row
+API
+service role
+permission overwrite
+ledger
+backend
+
+
+Ele vê:
+
+🎧 Criar Call
+
+🔒 Call Privada
+
+➕ Adicionar Amigo
+
+🖥️ Compartilhar Tela
+
+⭐ XP
+
+💰 CRAZZY BONUS
+
+🎁 Recompensas
+
+
+Tudo técnico fica escondido.
+
+
+# ============================================================
+# 58. UX DE ERROS
+# ============================================================
+
+Mensagens amigáveis.
+
+Exemplo:
+
+"Você já possui uma call ativa."
+
+"Essa call atingiu o limite."
+
+"Você não possui acesso a essa sala."
+
+"Esse convite expirou."
+
+"Sua call foi encerrada porque ficou vazia."
+
+"Seu acesso ao compartilhamento expirou. Clique novamente para abrir."
+
+Não exibir:
+
+HTTP 401
+RPC failed
+RLS
+Supabase error
+stack trace
+UUID
+SQL error
+
+
+# ============================================================
+# 59. TESTES DE DISCORD
+# ============================================================
+
+Testar:
+
+1 usuário criando call
+
+2 usuários criando simultaneamente
+
+10 usuários criando simultaneamente
+
+reutilização de número
+
+call pública
+
+call privada
+
+sem limite
+
+limite 2
+
+limite 4
+
+limite customizado
+
+usuário criando segunda call
+
+owner alterando limite
+
+owner trancando
+
+owner destrancando
+
+owner removendo participante
+
+owner transferindo ownership
+
+owner saindo
+
+owner retornando
+
+owner saindo definitivamente
+
+room vazia
+
+grace period
+
+auto delete
+
+
+# ============================================================
+# 60. TESTES DE PRIVACIDADE
+# ============================================================
+
+Testar:
+
+Usuário A clica no painel.
+
+Usuário B NÃO pode ver resposta A.
+
+Usuário A cria room.
+
+Usuário B NÃO pode gerenciar room A.
+
+Usuário não owner tenta alterar limite.
+
+Deve falhar.
+
+Usuário não autorizado tenta entrar em call privada.
+
+Deve falhar.
+
+Usuário copia URL CRAZZY CALL.
+
+Outra conta tenta abrir.
+
+Deve falhar.
+
+
+# ============================================================
+# 61. TESTES DE CONVITE
+# ============================================================
+
+Testar:
+
+owner convida amigo
+
+convite aparece em MEUS CONVITES
+
+aceitar
+
+recusar
+
+remover depois de aceitar
+
+tentar convidar usuário inválido
+
+tentar ultrapassar limite
+
+DM bloqueada
+
+fluxo deve continuar funcionando sem DM
+
+
+# ============================================================
+# 62. TESTES CRAZZY CALL
+# ============================================================
+
+Testar:
+
+room Discord cria CRAZZY CALL
+
+owner abre
+
+segundo participante abre
+
+ambos entram na mesma room
+
+tokens diferentes
+
+screen share funciona
+
+webcam funciona
+
+PiP funciona
+
+chat privado, se existente, funciona
+
+áudio NÃO é solicitado
+
+microfone NÃO é solicitado
+
+usuário não autorizado bloqueado
+
+room encerrada bloqueia reentrada
+
+
+# ============================================================
+# 63. TESTES DE XP
+# ============================================================
+
+FARM XP:
+
+entra
+↓
+XP começa
+
+self mute
+↓
+XP para
+
+unmute
+↓
+XP volta
+
+self deaf
+↓
+XP para
+
+AFK
+↓
+XP para
+
+sai
+↓
+sessão encerra
+
+
+Também testar:
+
+restart do bot
+
+reconnect
+
+voice state duplicado
+
+duas abas
+
+screen share duplo
+
+duas sessions concorrentes
+
+idempotência
+
+
+# ============================================================
+# 64. TESTES DE BONUS
+# ============================================================
+
+Confirmar que:
+
+XP não altera diretamente saldo errado.
+
+Conversão gera movimento correto.
+
+CRAZZY BONUS existente continua funcionando.
+
+Raspadinha continua funcionando.
+
+Roleta continua funcionando.
+
+Drop continua funcionando.
+
+Extrato continua consistente.
+
+
+# ============================================================
+# 65. SEGURANÇA
+# ============================================================
+
+NUNCA confiar no frontend para:
+
+discord_user_id
+owner_id
+room_id autorizado
+saldo
+XP
+tempo válido
+permission level
+invite status
+
+
+Todas essas informações precisam ser validadas no backend.
+
+
+# ============================================================
+# 66. SECRETS
+# ============================================================
+
+NUNCA expor:
+
+Discord bot token
+Discord client secret
+Supabase service role
+private signing key
+internal webhook secret
+database credentials
+
+
+Revisar logs para garantir que tokens não sejam logados.
+
+
+# ============================================================
+# 67. RLS / AUTORIZAÇÃO
+# ============================================================
+
+Auditar RLS e APIs atuais.
+
+Garantir que usuário autenticado não consiga consultar:
+
+rooms de outros usuários
+
+tokens de outros usuários
+
+XP ledger completo de outras pessoas
+
+bonus ledger de outras pessoas
+
+memberships de rooms privadas sem necessidade
+
+
+Admin/backend pode ter permissões apropriadas.
+
+
+# ============================================================
+# 68. PERFORMANCE
+# ============================================================
+
+Não fazer polling pesado desnecessário.
+
+Preferir:
+
+eventos Discord
+realtime existente
+queries indexadas
+
+Evitar query ao banco a cada segundo para milhares de pessoas.
+
+Sistema de XP precisa ser eficiente.
+
+
+# ============================================================
+# 69. CONCORRÊNCIA
+# ============================================================
+
+Evitar condição de corrida.
+
+Exemplo:
+
+dois usuários tentam pegar Call 002 ao mesmo tempo.
+
+Somente um pode receber o número.
+
+Usar operação atômica/constraint/transaction adequada.
+
+
+# ============================================================
+# 70. DUPLICAÇÃO
+# ============================================================
+
+Botão clicado duas vezes rapidamente não pode criar duas calls.
+
+Usar:
+
+idempotency
+locking
+status creating
+
+Fluxo conceitual:
+
+request
+↓
+creating
+↓
+created
+
+ou rollback.
+
+
+# ============================================================
+# 71. STATUS DE ROOM
+# ============================================================
+
+Estados sugeridos:
+
+creating
+active
+empty_grace
+closing
+closed
+error
+
+
+Não depender somente de booleano.
+
+
+# ============================================================
+# 72. STATUS DO CRAZZY CALL
+# ============================================================
+
+Pode reutilizar status atual.
+
+Se precisar:
+
+provisioning
+active
+closing
+closed
+
+
+Sincronizar sem duplicar estruturas existentes.
+
+
+# ============================================================
+# 73. SITE + DISCORD
+# ============================================================
+
+A integração precisa funcionar nos dois sentidos.
+
+Discord cria room
+→ site sabe.
+
+Site encerra room administrativamente
+→ Discord sabe.
+
+Discord remove membro
+→ site revoga acesso.
+
+Admin remove acesso no site
+→ Discord deve reconciliar quando aplicável.
+
+
+# ============================================================
+# 74. BOTÃO CRAZZY CALL NO DISCORD
+# ============================================================
+
+Se usuário NÃO está em call temporária CRAZZY:
+
+🖥️ ABRIR CRAZZY CALL
+
+retorna:
+
+"Você precisa estar conectado a uma CRAZZY Call para abrir o compartilhamento."
+
+Se está:
+
+identificar automaticamente room.
+
+Não obrigar usuário a digitar número.
+
+
+# ============================================================
+# 75. NOME DO USUÁRIO
+# ============================================================
+
+Usar identidade Discord atual.
+
+Mostrar:
+
+avatar
+display name
+Discord ID internamente
+
+Não usar nickname como identificador de banco.
+
+Nickname muda.
+
+Discord ID não.
+
+
+# ============================================================
+# 76. FREE + XP + RECOMPENSAS
+# ============================================================
+
+Esse sistema faz parte da área FREE da CRAZZY.
+
+Conceito:
+
+PARTICIPE
+↓
+GANHE XP
+↓
+CONVERTA / DESBLOQUEIE BONUS
+↓
+USE EM RECOMPENSAS
+
+
+Fontes possíveis:
+
+Discord voice
+CRAZZY CALL screen share
+outras atividades futuras
+
+
+Arquitetar para adicionar novas fontes depois sem refazer tudo.
+
+
+# ============================================================
+# 77. ESTRUTURA DE CONFIGURAÇÃO DE XP
+# ============================================================
+
+Criar configuração central.
+
+Conceitualmente:
+
+voice_farm_enabled
+voice_farm_xp_rate
+normal_voice_xp_rate
+screen_share_xp_rate
+daily_xp_cap
+session_cap
+minimum_session_time
+screen_share_minimum_time
+
+
+Não hardcodar valores em 15 lugares.
+
+
+# ============================================================
+# 78. NÃO DEFINIR ECONOMIA FINAL SEM AUDITAR
+# ============================================================
+
+NÃO escolher arbitrariamente valores finais de:
+
+XP/minuto
+XP necessário por real de BONUS
+limite diário
+
+Auditar regras existentes.
+
+Se não existir regra:
+
+deixar configurável e documentar valores de teste separados dos valores de produção.
+
+
+# ============================================================
+# 79. DISCORD CHANNEL CONFIG
+# ============================================================
+
+Não espalhar channel IDs no código.
+
+Usar env/config/admin.
+
+Exemplo conceitual:
+
+GUILD_ID
+TEMP_VOICE_CATEGORY_ID
+VOICE_PANEL_CHANNEL_ID
+XP_VOICE_CHANNEL_ID
+AFK_CHANNEL_ID
+
+
+Não colocar IDs sensíveis ou específicos onde não devem estar.
+
+
+# ============================================================
+# 80. SINGLE SOURCE OF TRUTH
+# ============================================================
+
+Definir claramente:
+
+BANCO/BACKEND CRAZZY
+=
+source of truth para:
+
+owner
+room status
+memberships
+XP
+bonus
+access
+
+
+Discord é interface/execução.
+
+Frontend é interface.
+
+Nenhum dos dois manda na regra sozinho.
+
+
+# ============================================================
+# 81. NÃO QUEBRAR O SITE EXISTENTE
+# ============================================================
+
+O site já possui:
+
+Início
+Produtos
+Contas
+FREE
+Prêmios
+Comunidade
+CRAZZY CALL
+MTSOUNDS
+Carrinho
+Ticket
+perfil
+
+Preservar tudo.
+
+Não reconstruir header.
+
+Não remover módulos.
+
+Não redesenhar o projeto inteiro por causa deste módulo.
+
+
+# ============================================================
+# 82. NÃO DUPLICAR CRAZZY CALL
+# ============================================================
+
+Antes de criar endpoints/tabelas:
+
+investigar implementação real.
+
+Se já existem:
+
+rooms
+participants
+signaling
+presence
+tokens
+realtime channels
+
+integrar neles.
+
+Não criar:
+
+crazzy_call_v2
+new_call
+call_new_new
+etc.
+
+Consolidar.
+
+
+# ============================================================
+# 83. NÃO DEIXAR TODO
+# ============================================================
+
+Não finalizar com:
+
+TODO
+placeholder
+fake button
+mock
+"implementar depois"
+"backend pendente"
+"configurar manualmente depois"
+
+Implementar fluxo funcional ponta a ponta.
+
+
+# ============================================================
+# 84. MIGRATIONS
+# ============================================================
+
+Se banco precisar mudar:
+
+criar migrations formais.
+
+Não modificar banco somente manualmente.
+
+Migrations devem ser reproduzíveis.
+
+
+# ============================================================
+# 85. TIPAGEM
+# ============================================================
+
+Manter tipos consistentes.
+
+Evitar any indiscriminado.
+
+Criar tipos/interfaces para:
+
+VoiceRoom
+VoiceRoomMember
+CallInvite
+CrazzyCallAccess
+XpSession
+XpLedgerEntry
+
+
+Adaptar ao stack real.
+
+
+# ============================================================
+# 86. OBSERVABILIDADE
+# ============================================================
+
+Logs técnicos devem facilitar investigação.
+
+Incluir identifiers úteis:
+
+room id
+discord channel id
+discord user id
+event
+timestamp
+
+Nunca logar secrets.
+
+
+# ============================================================
+# 87. FALHA AO CRIAR CRAZZY CALL
+# ============================================================
+
+Se Discord channel for criado, mas backend falhar ao provisionar CRAZZY CALL:
+
+não deixar estado quebrado.
+
+Executar rollback:
+
+deletar Discord channel
+liberar room number
+marcar erro
+informar usuário amigavelmente
+
+
+Ou implementar retry seguro.
+
+Escolher abordagem robusta.
+
+
+# ============================================================
+# 88. FALHA AO CRIAR DISCORD CHANNEL
+# ============================================================
+
+Se backend reservou room e Discord falhar:
+
+cancelar reserva.
+
+Não deixar room fantasma.
+
+
+# ============================================================
+# 89. FALHA AO DELETAR
+# ============================================================
+
+Cleanup precisa ser idempotente.
+
+Executar duas vezes não pode quebrar.
+
+Se channel já foi deletado:
+
+continuar encerramento.
+
+Se CRAZZY CALL já foi fechada:
+
+continuar.
+
+
+# ============================================================
+# 90. REENTRADA
+# ============================================================
+
+Se usuário cai da call e volta durante grace period:
+
+manter room.
+
+Se handoff antigo expirou:
+
+gerar novo quando clicar.
+
+Não deixar token eterno.
+
+
+# ============================================================
+# 91. EXPIRAÇÃO DE CONVITES
+# ============================================================
+
+Convites privados podem possuir validade configurável.
+
+Exemplo:
+
+enquanto room existir
+
+ou período definido.
+
+Quando room fechar:
+
+todos os convites expiram automaticamente.
+
+
+# ============================================================
+# 92. LIMITE DE CRIAÇÃO
+# ============================================================
+
+Configurar limites globais.
+
+Exemplo:
+
+máximo de calls temporárias simultâneas no servidor.
+
+Não permitir criação infinita que ultrapasse Discord/channel limits.
+
+
+# ============================================================
+# 93. UX MOBILE
+# ============================================================
+
+Discord já cuida do fluxo do bot no mobile.
+
+CRAZZY CALL precisa continuar utilizável em telas menores quando navegador permitir.
+
+Botões grandes.
+
+Não quebrar desktop.
+
+
+# ============================================================
+# 94. UI DO CRAZZY CALL
+# ============================================================
+
+Preservar estética CRAZZY PROJECT:
+
+preto
+azul intenso
+branco
+visual premium/futurista
+
+Modo focado deve continuar parecendo CRAZZY PROJECT.
+
+Não criar página genérica branca.
+
+
+# ============================================================
+# 95. RESULTADO FINAL ESPERADO
+# ============================================================
+
+Cenário:
+
+Lai entra no Discord.
+
+Calls fixas estão cheias.
+
+Ele abre:
+
+🎛️・criar-call
+
+Clica:
+
+CRIAR CALL
+
+Seleciona:
+
+PRIVADA
+4 pessoas
+
+BOT CORE cria:
+
+🔒 Call 017
+
+CRAZZY PROJECT cria:
+
+CRAZZY CALL ROOM 017
+
+Lai é movido para Call 017.
+
+Lai abre:
+
+MINHA CALL
+
+Clica:
+
+ADICIONAR AMIGO
+
+Seleciona:
+
+@João
+
+João abre:
+
+MEUS CONVITES
+
+Aceita.
+
+João passa a visualizar Call 017.
+
+João entra.
+
+Os dois conversam pelo Discord.
+
+Lai clica:
+
+ABRIR CRAZZY CALL
+
+Recebe acesso individual.
+
+João clica:
+
+ABRIR CRAZZY CALL
+
+Recebe outro acesso individual.
+
+Ambos entram na mesma CRAZZY CALL.
+
+Lai compartilha tela.
+
+João assiste.
+
+Webcam pode ser utilizada opcionalmente.
+
+Nenhum áudio é transmitido pela CRAZZY CALL.
+
+Discord continua cuidando do áudio.
+
+A atividade elegível gera XP.
+
+XP é salvo na mesma identidade Discord.
+
+XP pode alimentar CRAZZY BONUS conforme as regras.
+
+BONUS é utilizado em:
+
+Raspadinha
+Roleta
+Drop
+
+Depois Lai e João saem.
+
+Call fica vazia.
+
+Grace period inicia.
+
+Ninguém retorna.
+
+BOT CORE:
+
+encerra CRAZZY CALL
+revoga acessos
+deleta Discord Call 017
+libera número 017
+
+Sistema volta ao estado limpo.
+
+
+# ============================================================
+# 96. AUDITORIA ANTES DA IMPLEMENTAÇÃO
+# ============================================================
+
+ANTES DE CODIFICAR:
+
+entregar internamente uma análise curta contendo:
+
+1. onde está BOT CORE;
+2. onde está CRAZZY CALL;
+3. como autenticação Discord funciona hoje;
+4. como rooms funcionam hoje;
+5. como XP/bonus funcionam hoje;
+6. quais tabelas já existem;
+7. quais partes podem ser reutilizadas;
+8. quais mudanças são realmente necessárias.
+
+Depois implementar.
+
+NÃO parar somente na auditoria.
+
+
+# ============================================================
+# 97. TESTES ANTES DE FINALIZAR
+# ============================================================
+
+Executar conforme stack:
+
+lint
+typecheck
+build
+tests
+
+Além disso validar fluxos críticos reais.
+
+Corrigir erros encontrados.
+
+Não entregar build quebrado.
+
+
+# ============================================================
+# 98. DEPLOY
+# ============================================================
+
+Evitar commits/deploys desnecessários durante desenvolvimento.
+
+Preferir implementação coesa.
+
+Evitar estourar rate limits de deploy.
+
+Quando estiver estável:
+
+subir conjunto consistente.
+
+Não publicar meia implementação.
+
+
+# ============================================================
+# 99. GITHUB
+# ============================================================
+
+Preservar histórico.
+
+Não force push desnecessário.
+
+Não reverter funcionalidades não relacionadas.
+
+Preferir PR coeso para esse módulo.
+
+Descrever claramente as mudanças.
+
+
+# ============================================================
+# 100. RELATÓRIO FINAL
+# ============================================================
+
+Depois de concluir, entregar resumo com:
+
+IMPLEMENTADO
+- calls temporárias;
+- pública;
+- privada;
+- convites;
+- owner;
+- cleanup;
+- CRAZZY CALL integration;
+- access tokens;
+- XP;
+- bonus integration;
+- anti-farm;
+- logs;
+- restart recovery.
+
+ARQUIVOS ALTERADOS
+
+MIGRATIONS
+
+PERMISSÕES DISCORD NECESSÁRIAS
+
+NOVAS CONFIGURAÇÕES / ENVS
+
+TESTES EXECUTADOS
+
+BUGS ENCONTRADOS E CORRIGIDOS
+
+RISCOS RESTANTES REAIS
+
+Não listar tarefas como concluídas caso não tenham sido realmente implementadas.
+
+
+# ============================================================
+# REGRA FINAL
+# ============================================================
+
+O sistema precisa parecer simples para o cliente:
+
+CRIAR CALL
+↓
+CONVIDAR AMIGO
+↓
+ENTRAR
+↓
+COMPARTILHAR TELA
+↓
+GANHAR XP
+↓
+USAR RECOMPENSAS
+
+Toda a complexidade fica escondida no:
+
+BOT CORE
+backend
+Discord API
+banco
+CRAZZY CALL
+
+A experiência final deve ser rápida, segura e integrada.
+
+DISCORD = VOZ
+
+CRAZZY CALL = TELA + WEBCAM
+
+BOT CORE = ORQUESTRAÇÃO
+
+DISCORD ID = IDENTIDADE
+
+XP = ATIVIDADE
+
+CRAZZY BONUS = RECOMPENSA PROMOCIONAL
+
+NÃO criar sistemas duplicados.
+
+NÃO quebrar recursos existentes.
+
+NÃO entregar mocks.
+
+NÃO parar no meio.
+
+Auditar, implementar, integrar, testar e somente então considerar o módulo concluído.

@@ -34,7 +34,7 @@ const productsRoute = await readFile(
 );
 
 for (const required of [
-  "productPlanId: planDraft.id",
+  "productPlanId: plan.id",
   'source: "product-manager"',
   "/api/admin/products/upload",
   "VISÃO GERAL DO CATÁLOGO",
@@ -45,11 +45,11 @@ for (const required of [
   "crz-purin-dialog--editor",
   "Planos & Estoque",
   "＋ Adicionar Plano",
-  "Entrega e estoque",
-  "Keys / estoque automático",
-  "＋ Adicionar Estoque",
+  "Estoque do plano",
+  "Keys deste plano — uma por linha",
+  "Adicionar " + "\" + stockItems.length",
   "saveEditorChanges",
-  "setPlanDeliveryMode",
+  "managePlans",
 ]) {
   if (!productManager.includes(required)) {
     throw new Error("Product Manager per-plan stock UX missing: " + required);

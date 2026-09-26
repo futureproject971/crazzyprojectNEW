@@ -14,8 +14,8 @@ export default async function CallRoomRoute({
   const { code } = await params;
 
   return (
-    <AppShell mode="visitor" activeNav="call" showFooter={false}>
+    <div className="crz-call-focused">
       <CallExperience code={decodeURIComponent(code).toUpperCase()} />
-    </AppShell>
+    </div>
   );
 }

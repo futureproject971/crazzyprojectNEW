@@ -1,0 +1,32 @@
+begin;
+do $$
+declare u uuid:=gen_random_uuid(); discord text:='990000000000000001'; guild text:='990000000000000002'; r jsonb; r2 jsonb; token text:=encode(extensions.gen_random_bytes(32),'hex'); code text; denied boolean:=false; points integer;
+begin
+ insert into auth.users(id,aud,role,email) values(u,'authenticated','authenticated','voice-'||substr(u::text,1,8)||'@example.invalid');
+ insert into public.discord_identities(user_id,discord_user_id,guild_id,guild_member) values(u,discord,guild,true);
+ perform set_config('request.jwt.claim.sub',u::text,true);
+ update public.voice_settings set enabled=true,social_xp_per_minute=60,daily_xp_cap=100,session_xp_cap=80;
+ r:=public.reserve_voice_room(guild,discord,'private',4);
+ r2:=public.reserve_voice_room(guild,discord,'private',4);
+ if r->>'id' is distinct from r2->>'id' then raise exception 'duplicate owner room';end if;
+ if private.voice_authorized((r->>'call_room_id')::uuid,u) then raise exception 'provisioning room authorized';end if;
+ update public.voice_rooms set status='active' where id=(r->>'id')::uuid;
+ insert into public.voice_handoffs(token_hash,room_id,discord_user_id) values(encode(extensions.digest(token,'sha256'),'hex'),(r->>'id')::uuid,discord);
+ code:=public.consume_voice_handoff(token);
+ if code is null then raise exception 'handoff missing';end if;
+ begin perform public.consume_voice_handoff(token);exception when others then if sqlerrm='FORBIDDEN' then denied:=true;else raise;end if;end;
+ if not denied then raise exception 'handoff reused';end if;
+ update public.voice_members set status='removed' where room_id=(r->>'id')::uuid;
+ if private.voice_authorized((r->>'call_room_id')::uuid,u) then raise exception 'removed member authorized';end if;
+ perform public.record_activity_xp(discord,'voice',true,false);
+ update public.activity_xp_sessions set last_validated_at=now()-interval '60 seconds' where discord_user_id=discord;
+ points:=public.record_activity_xp(discord,'voice',true,false);
+ if points<>60 then raise exception 'XP rate mismatch %',points;end if;
+ if public.record_activity_xp(discord,'voice',true,false)<>0 then raise exception 'XP double count';end if;
+ update public.activity_xp_sessions set last_validated_at=now()-interval '60 seconds' where discord_user_id=discord;
+ if public.record_activity_xp(discord,'voice',true,false)<>20 then raise exception 'session cap exceeded';end if;
+ perform public.record_activity_xp(discord,'voice',false,false);
+ if exists(select 1 from public.activity_xp_sessions where discord_user_id=discord) then raise exception 'inactive session not cleared';end if;
+end $$;
+select 'PASS: owner uniqueness, private access, handoff single use, revocation, XP rates/idempotency/cap/inactivity' result;
+rollback;

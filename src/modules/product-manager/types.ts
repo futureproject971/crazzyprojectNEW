@@ -54,6 +54,8 @@ export type ManagerMedia = { id: string; media_type: string; url: string; sort_o
 export type ManagerFeature = { id: string; label: string; value: string; sort_order: number };
 
 export type ManagerProduct = {
+  discord_role_id?: string | null;
+  discord_role_name?: string | null;
   id: string;
   name: string;
   game_id: string;

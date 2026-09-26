@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 
 const header = await readFile("src/core/app-shell/AppHeader.tsx","utf8");
-const styles = await readFile("src/core/app-shell/styles.css","utf8");
+const styles = await readFile("src/core/app-shell/header.css","utf8");
 const route = await readFile("src/app/api/admin/support/open-count/route.ts","utf8");
 
 for (const required of [
@@ -9,23 +9,23 @@ for (const required of [
   "/api/admin/support/open-count",
   "admin-open-ticket-badge",
   "support_tickets",
-  "crz-shell-user__ticket-badge",
+  "crz-ticket-pending",
   'openTicketCount>99?"99+":openTicketCount',
 ]) {
   if (!header.includes(required)) throw new Error("Admin ticket badge header missing: "+required);
 }
 
 for (const required of [
-  ".crz-shell-user__ticket-badge",
-  "background: #ef3340",
-  "border-radius: 999px",
-  "bottom: -5px",
+  ".crz-ticket-pending",
+  "background:#123c72",
+  "border-radius:7px",
+  "border:1px solid #328aff",
 ]) {
   if (!styles.includes(required)) throw new Error("Admin ticket badge styles missing: "+required);
 }
 
 for (const required of [
-  '["open", "waiting_staff", "waiting_user"]',
+  '["open", "waiting_staff"]',
   '.from("support_tickets")',
   '.in("status"',
   'supabase.rpc("is_current_admin")',
@@ -33,4 +33,4 @@ for (const required of [
   if (!route.includes(required)) throw new Error("Admin open-ticket count API missing: "+required);
 }
 
-console.log("[PASS] admin profile shows realtime numeric open-ticket badge");
+console.log("[PASS] ticket action shows realtime pending-staff count");

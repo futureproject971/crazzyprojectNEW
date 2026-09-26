@@ -1,6 +1,7 @@
 "use client";
 
 import {useCallback,useEffect,useState} from "react";
+import {CustomerRoleSettings} from "./CustomerRoleSettings";
 import {Badge,PageHeader} from "@/core/design-system";
 
 type Row=Record<string,any>;
@@ -57,12 +58,14 @@ export function DiscordBridgePage(){
 
   return <main className="crz-bridge"><div className="crz-container">
     <PageHeader
-      eyebrow="M44 • DISCORD BRIDGE"
+      eyebrow="SISTEMA • CARGOS DISCORD"
       title="O site manda, o Discord sincroniza"
-      description="Entitlement é a fonte de direitos. O Bridge concede, remove, reconcilia e repete roles na guild oficial."
+      description="Compras liberam o acesso na loja. O bot aplica os cargos no Discord e registra aqui as concessões e falhas."
       actions={<Badge tone={online?"green":"pink"}>{online?"BOT CORE ONLINE":"BOT CORE OFFLINE"}</Badge>}
     />
 
+    <CustomerRoleSettings/>
+    {!online && <p role="status" className="crz-bridge-notice">Sem confirmação recente de atividade do bot. As concessões ficam na fila até a conexão ser restabelecida.</p>}
     <section className="crz-bridge-stats">
       <article><small>FILA</small><strong>{stats.pending}</strong></article>
       <article className={stats.failed?"is-danger":""}><small>FALHAS</small><strong>{stats.failed}</strong></article>

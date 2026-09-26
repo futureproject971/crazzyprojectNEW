@@ -5,6 +5,7 @@ import {
   getComboDiscountPercent,
   getNextComboTier,
   type ComboPlanFamily,
+  type ComboTier,
 } from "@/core/commerce/policy";
 import type { CartItem, CartTotals, ComboGroupSummary } from "./types";
 
@@ -15,7 +16,7 @@ export const COMBO_MAX_DISCOUNT = CRAZZY_COMBO_MAX_DISCOUNT;
 export const comboDiscountPercent = getComboDiscountPercent;
 export const comboNextTier = getNextComboTier;
 
-function summarizeComboGroup(items: CartItem[], plan: ComboPlanFamily): ComboGroupSummary {
+function summarizeComboGroup(items: CartItem[], plan: ComboPlanFamily, tiers: readonly ComboTier[]): ComboGroupSummary {
   const eligible = items.filter(
     (item) =>
       item.kind === "product" &&
@@ -24,13 +25,13 @@ function summarizeComboGroup(items: CartItem[], plan: ComboPlanFamily): ComboGro
   );
 
   const uniqueProducts = new Set(eligible.map((item) => item.productId)).size;
-  const discountPercent = comboDiscountPercent(uniqueProducts);
+  const discountPercent = comboDiscountPercent(uniqueProducts, tiers);
   const pricedSubtotal = eligible.reduce(
     (sum, item) => sum + (item.price ?? 0) * item.quantity,
     0
   );
-  const discount = pricedSubtotal * (discountPercent / 100);
-  const next = comboNextTier(uniqueProducts);
+  const discount = Math.round(pricedSubtotal * discountPercent) / 100;
+  const next = comboNextTier(uniqueProducts, tiers);
 
   return {
     plan,
@@ -43,14 +44,14 @@ function summarizeComboGroup(items: CartItem[], plan: ComboPlanFamily): ComboGro
   };
 }
 
-export function calculateCartTotals(items: CartItem[]): CartTotals {
+export function calculateCartTotals(items: CartItem[], tiers: readonly ComboTier[] = COMBO_TIERS): CartTotals {
   const knownSubtotal = items.reduce(
     (sum, item) => sum + (item.price ?? 0) * item.quantity,
     0
   );
   const comboGroups = [
-    summarizeComboGroup(items, "30d"),
-    summarizeComboGroup(items, "lifetime"),
+    summarizeComboGroup(items, "30d", tiers),
+    summarizeComboGroup(items, "lifetime", tiers),
   ];
   const comboDiscount = comboGroups.reduce((sum, group) => sum + group.discount, 0);
 

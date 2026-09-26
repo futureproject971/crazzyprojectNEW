@@ -222,14 +222,6 @@ export function CallRoom({
         await room.connect(credentials.url, credentials.token);
         if (cancelled) return;
 
-        if (preferences.microphone && snapshot.room.allow_microphone) {
-          try {
-            await room.localParticipant.setMicrophoneEnabled(true);
-          } catch {
-            setNotice("Não foi possível acessar o microfone.");
-          }
-        }
-
         if (preferences.camera && snapshot.room.allow_camera) {
           try {
             await room.localParticipant.setCameraEnabled(true);
@@ -292,20 +284,6 @@ export function CallRoom({
   const camera = Boolean(localMedia?.camera);
   const screenShare = Boolean(localMedia?.screenShare);
 
-  const toggleMicrophone = async () => {
-    if (!liveRoom || !canPublish || !snapshot.room.allow_microphone) return;
-    setBusy("mic");
-    setNotice(null);
-    try {
-      await liveRoom.localParticipant.setMicrophoneEnabled(!microphone);
-      refreshMedia(liveRoom);
-    } catch {
-      setNotice("Não foi possível acessar o microfone.");
-    } finally {
-      setBusy(null);
-    }
-  };
-
   const toggleCamera = async () => {
     if (!liveRoom || !canPublish || !snapshot.room.allow_camera) return;
     setBusy("camera");
@@ -326,9 +304,9 @@ export function CallRoom({
     setNotice(null);
     try {
       await liveRoom.localParticipant.setScreenShareEnabled(!screenShare, {
-        audio: true,
+        audio: false,
         contentHint: "detail",
-        systemAudio: "include",
+        systemAudio: "exclude",
         surfaceSwitching: "include",
       });
       refreshMedia(liveRoom);
@@ -586,7 +564,6 @@ export function CallRoom({
       </div>
 
       <CallControls
-        microphone={microphone}
         camera={camera}
         screenShare={screenShare}
         pipSupported={pip.supported}
@@ -598,7 +575,6 @@ export function CallRoom({
         canModerate={canModerate}
         canEnd={canEnd}
         busy={busy}
-        onMicrophone={() => void toggleMicrophone()}
         onCamera={() => void toggleCamera()}
         onScreenShare={() => void toggleScreenShare()}
         onPip={() => void togglePip()}

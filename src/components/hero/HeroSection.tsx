@@ -17,7 +17,7 @@ export function HeroSection() {
       <div
         className="crz-home-hero__backdrop"
         aria-hidden="true"
-        style={heroCoverUrl ? { backgroundImage: "url(\"" + heroCoverUrl + "\")" } : undefined}
+        style={{ backgroundImage: 'url("/backgrounds/crazzy-city.png")' }}
       />
       <div className="crz-home-hero__shade" aria-hidden="true" />
 

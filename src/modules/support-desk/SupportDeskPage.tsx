@@ -1,5 +1,7 @@
 "use client";
 
+import { sendOnEnter } from "@/core/ui/chatKeyboard";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge, PageHeader } from "@/core/design-system";
 import type { SupportDeskPayload, SupportDeskThread, SupportDeskTicket } from "./types";
@@ -245,7 +247,7 @@ export function SupportDeskPage(){
           </div>
 
           <div className="crz-supportdesk-compose">
-            <textarea value={message} onChange={e=>setMessage(e.target.value.slice(0,4000))} placeholder="Responder como CRAZZY Support..."/>
+            <textarea onKeyDown={event => sendOnEnter(event, sendMessage)} value={message} onChange={e=>setMessage(e.target.value.slice(0,4000))} placeholder="Responder como CRAZZY Support..."/>
             <button className="crz-button crz-button--primary crz-button--sm" onClick={()=>void sendMessage()} disabled={Boolean(busy)||!message.trim()}>{busy==="message"?"Enviando...":"Enviar resposta"}</button>
           </div>
         </>:null}

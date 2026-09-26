@@ -485,7 +485,7 @@
 .crz-call-chat__composer {
   min-height:49px;border-top:1px solid rgba(72,127,199,.11);padding:6px;display:grid;grid-template-columns:1fr auto;gap:5px;
 }
-.crz-call-chat__composer input {
+.crz-call-chat__composer textarea {
   min-width:0;border:1px solid rgba(75,132,208,.16);border-radius:7px;padding:0 8px;
   color:#dbe8f6;background:#06101c;outline:none;font-size:6.4px;
 }
@@ -606,3 +606,7 @@ html[data-theme="light"] .crz-call-admin__summary strong { color:#102033; }
   .crz-call-controls button { flex:0 0 auto; }
   .crz-call-admin__summary { grid-template-columns:1fr 1fr; }
 }
+
+.crz-call-chat__composer textarea{resize:vertical;min-height:44px;font:inherit}.crz-call-chat__error{font-size:12px;padding:8px;color:#ff9fae}
+
+.crz-call-focused{min-height:100dvh;background:#030915}.crz-call-focused .crz-call-room{padding-top:16px}.crz-call-discord-audio{padding:10px;color:#a6d2ff;font-size:13px}

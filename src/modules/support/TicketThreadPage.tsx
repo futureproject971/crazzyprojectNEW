@@ -1,5 +1,7 @@
 "use client";
 
+import { sendOnEnter } from "@/core/ui/chatKeyboard";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Badge,
@@ -458,7 +460,8 @@ export function TicketThreadPage({ ticketId }: { ticketId: string }) {
                   value={message}
                   maxLength={4000}
                   rows={4}
-                  placeholder="Escreva sua resposta..."
+                  placeholder="Escreva sua resposta… (Enter envia)"
+                  onKeyDown={event => sendOnEnter(event, send)}
                   onChange={(event) => setMessage(event.target.value)}
                 />
 

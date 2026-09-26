@@ -4,7 +4,7 @@ import { ComboBuilderPage } from "@/modules/cart";
 
 export const metadata: Metadata = {
   title: "Monte seu Combo | CRAZZY PROJECT",
-  description: "Monte combos Mensais ou Lifetime e desbloqueie até 35% OFF.",
+  description: "Combine produtos do catálogo nos planos Mensal ou Lifetime e confira os descontos da loja.",
 };
 
 export default function ComboRoute() {

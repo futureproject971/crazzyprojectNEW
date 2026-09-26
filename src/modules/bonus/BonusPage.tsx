@@ -1,4 +1,5 @@
 "use client";
+import {ActivityXp} from "./ActivityXp";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageHeader, NeonIcon } from "@/core/design-system";
 import { useAuth } from "@/modules/auth/AuthProvider";
@@ -42,6 +43,7 @@ export function BonusPage(){
   return <main className="crz-bonus-page"><div className="crz-container">
     <PageHeader eyebrow="CRAZZY BONUS" title="Carteira promocional" description="Bônus de compras e recompensas. Não é sacável, não é transferível e só pode ser usado nos planos elegíveis." actions={<a className="crz-button crz-button--secondary crz-button--sm" href="/club/luck">Abrir CRAZZY ARCADE</a>}/>
     {notice&&<div className="crz-bonus-notice">{notice}</div>}
+    <ActivityXp/>
     <section className="crz-bonus-balance"><div><small>SALDO DISPONÍVEL</small><strong>{money(balance)}</strong><span>CRAZZY BONUS</span></div><NeonIcon name="crown" size={70}/></section>
     <section className="crz-bonus-grid">
       <article><header><strong>Usar na loja</strong><span>{plans.length} plano(s) elegível(is)</span></header>

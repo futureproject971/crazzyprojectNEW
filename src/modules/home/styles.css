@@ -696,3 +696,9 @@ html[data-motion="off"] .crz-home-hero__smoke::after {
 .crz-home-shortcut__icon{position:relative;z-index:1;width:46px;height:46px;border:1px solid rgba(255,255,255,.08);border-radius:11px;display:grid;place-items:center;background:rgba(7,17,31,.82);font-size:23px}
 .crz-home-shortcut>span:nth-child(2){position:relative;z-index:1;display:grid;gap:2px}.crz-home-shortcut small{color:#74baff;font-size:9px;font-weight:900;letter-spacing:.11em}.crz-home-shortcut--prizes small{color:#ffd45c}.crz-home-shortcut strong{color:#fff;font-size:18px;letter-spacing:.02em}.crz-home-shortcut em{color:#8d9caf;font-size:10.5px;font-style:normal}.crz-home-shortcut>b{position:relative;z-index:1;border:1px solid rgba(61,139,255,.34);border-radius:8px;padding:8px 11px;color:#eaf5ff;background:rgba(8,24,48,.66);font-size:9.5px}.crz-home-shortcut--prizes>b{border-color:rgba(255,194,43,.32);background:rgba(54,39,6,.55);color:#fff3c5}
 @media(max-width:760px){.crz-home-shortcuts{grid-template-columns:1fr}.crz-home-shortcut{grid-template-columns:44px minmax(0,1fr)}.crz-home-shortcut>b{grid-column:2;width:max-content}}
+
+.chat-live-input-shell textarea.chat-live-input{resize:none;min-height:42px;max-height:110px;line-height:1.4;padding:8px 0;font:inherit;color:inherit;background:transparent;border:0;outline:0}.chat-live-input-shell textarea.chat-live-input:focus-visible{outline:1px solid #638fff;border-radius:4px}.chat-bubble p{white-space:pre-wrap}
+
+/* Supplied native background; characters and transparent logo remain separate layers. */
+.crz-home-hero__backdrop{background-position:center;filter:none;transform:none}
+.crz-home-hero__shade{background:linear-gradient(180deg,rgba(0,5,16,.12),rgba(0,5,16,.08) 65%,rgba(0,5,16,.58))}

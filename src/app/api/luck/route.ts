@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 function publicPlayError(message:string){
+  if(message.includes("DAILY_DROP_USED"))return {status:409,error:"Você já girou seu drop gratuito hoje. Volte amanhã!"};
   if(message.includes("AUTH_REQUIRED"))return {status:401,error:"Entre na sua conta para jogar."};
   if(message.includes("BONUS_BALANCE_LOW"))return {status:409,error:"Seu CRAZZY BONUS não é suficiente para esta jogada."};
   if(message.includes("CAMPAIGN_UNAVAILABLE"))return {status:404,error:"Esta campanha não está disponível."};
