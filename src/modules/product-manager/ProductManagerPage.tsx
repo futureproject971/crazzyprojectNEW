@@ -5,6 +5,7 @@ import { Badge, NeonIcon, PageHeader } from "@/core/design-system";
 import type { ManagerCatalog, ManagerPlan, ManagerPlanCode, ManagerProduct } from "./types";
 import { adminConfirm } from "@/core/ui/adminDialog";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { SupplierImportModal } from "./SupplierImportModal";
 
 const planCodes: Array<[ManagerPlanCode, string]> = [
   ["trial", "Trial"],
@@ -24,7 +25,7 @@ function cloneProduct(product: ManagerProduct): ManagerProduct {
 }
 
 function clonePlan(plan: ManagerPlan): ManagerPlan {
-  return { ...JSON.parse(JSON.stringify(plan)), delivery_mode: "internal_stock", automation_flags: { ...plan.automation_flags, auto_delivery: true } };
+  return JSON.parse(JSON.stringify(plan));
 }
 
 function checkedFlags(flags: Record<string, unknown>, key: string) {
@@ -149,6 +150,11 @@ export function ProductManagerPage() {
 
   const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
   const [creatingPlan, setCreatingPlan] = useState(false);
+  const [supplierImportFor, setSupplierImportFor] = useState<{
+    productId: string;
+    productName: string;
+    replacePlanId?: string | null;
+  } | null>(null);
   const [newProduct, setNewProduct] = useState({
     gameId: "",
     name: "",
@@ -163,6 +169,7 @@ export function ProductManagerPage() {
     status: "offline",
     isNew: true,
     presetPlans: [] as ManagerPlanCode[],
+    startMode: "empty" as "empty" | "presets" | "supplier",
     media: [] as Array<{id:string;media_type:string;url:string;sort_order:number}>,
     features: [] as Array<{id:string;label:string;value:string;sort_order:number}>,
   });
@@ -409,7 +416,7 @@ export function ProductManagerPage() {
           hideDeliveryBadge: newProduct.hideDeliveryBadge,
           status: newProduct.status,
           isNew: newProduct.isNew,
-          presetPlans: [],
+          presetPlans: newProduct.startMode === "presets" ? newProduct.presetPlans : [],
           media: newProduct.media,
           features: newProduct.features,
         }),
@@ -418,6 +425,8 @@ export function ProductManagerPage() {
       if (!response.ok || !payload?.created?.id) throw new Error("Falha ao criar produto.");
 
       const createdId = String(payload.created.id);
+      const createdName = newProduct.name.trim();
+      const openSupplierAfterCreate = newProduct.startMode === "supplier";
       setCreatingProduct(false);
       setNewProduct(current => ({
         ...current,
@@ -428,13 +437,19 @@ export function ProductManagerPage() {
         status: "offline",
         isNew: true,
         presetPlans: [],
+        startMode: "empty",
         media: [],
         features: [],
       }));
       await load(true, createdId, null);
       setEditorTab("fields");
       setEditorOpen(true);
-      setNotice("Produto criado. Agora adicione as variações, preços e estoque.");
+      if (openSupplierAfterCreate) {
+        setSupplierImportFor({ productId: createdId, productName: createdName });
+        setNotice("Produto criado. Agora selecione as variações do provedor.");
+      } else {
+        setNotice("Produto criado. Agora adicione as variações, preços e estoque.");
+      }
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Falha ao criar produto.");
     } finally {
@@ -477,11 +492,23 @@ export function ProductManagerPage() {
 
 
   const persistPlan = async (plan: ManagerPlan) => {
-    const response = await fetch("/api/admin/products", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "plan", plan: {...plan, delivery_mode: "internal_stock", automation_flags: {...plan.automation_flags, auto_delivery: true}, tutorial_ids: plan.tutorials.map(item => item.id)} }) });
+    const response = await fetch("/api/admin/products", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        kind: "plan",
+        plan: {
+          ...plan,
+          tutorial_ids: plan.tutorials.map(item => item.id),
+        },
+      }),
+    });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(payload.error || "Falha ao salvar " + plan.name);
     delete pendingPlans.current[plan.id];
-    const keys = (stockDrafts[plan.id] || "").split("\n").map(key => key.trim()).filter(Boolean);
+    const keys = plan.delivery_mode === "internal_stock"
+      ? (stockDrafts[plan.id] || "").split("\n").map(key => key.trim()).filter(Boolean)
+      : [];
     if (keys.length) {
       if (keys.length > 5000) throw new Error("Plano salvo. Limite de 5.000 keys por lote.");
       const imported = await fetch("/api/admin/stock", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({productPlanId: plan.id, items: keys, source: "product-manager"}) });
@@ -506,13 +533,69 @@ export function ProductManagerPage() {
     setBusy(true); setNotice("");
     try {
       const existing = new Set(productDraft.plans.map(plan => plan.plan_code));
-      for (const [code, name] of planCodes.filter(([code]) => ["1d", "3d", "7d", "15d", "30d", "lifetime"].includes(code) && !existing.has(code))) {
+      for (const [code, name] of planCodes.filter(([code]) => ["1d", "3d", "7d", "15d", "30d", "90d", "lifetime"].includes(code) && !existing.has(code))) {
         const response = await fetch("/api/admin/products", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({action:"create_plan",productId:productDraft.id,name,planCode:code,price:0}) });
         if (!response.ok) throw new Error("Alguns planos não foram criados. Tente novamente; os existentes serão preservados.");
       }
       await load(true); setNotice("Planos prontos. Ajuste os nomes, preços e keys de cada plano e libere as vendas.");
     } catch(error) { await load(true); setNotice(error instanceof Error ? error.message : "Falha ao criar planos."); }
     finally { setBusy(false); }
+  };
+
+  const syncSupplierPlan = async (planId: string) => {
+    if (busy || stockBusy) return;
+    setBusy(true);
+    setNotice("");
+    try {
+      const response = await fetch("/api/admin/purincash/supplier", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sync", planId }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.error || "Não foi possível sincronizar o provedor.");
+      await load(true, productDraft?.id || null, planId);
+      setNotice("Fornecedor sincronizado.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Não foi possível sincronizar o provedor.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const removeSupplierBinding = async (plan: ManagerPlan) => {
+    if (busy || stockBusy) return;
+    const confirmed = await adminConfirm(
+      "Remover fornecedor",
+      "Este plano passará a usar estoque próprio. O vínculo externo será removido, mas o histórico de vendas será preservado.",
+      "Remover vínculo",
+    );
+    if (!confirmed) return;
+
+    const automationFlags = { ...plan.automation_flags };
+    for (const key of Object.keys(automationFlags)) {
+      if (key.startsWith("supplier_")) delete automationFlags[key];
+    }
+    const next: ManagerPlan = {
+      ...clonePlan(plan),
+      delivery_mode: "internal_stock",
+      supplier_provider: null,
+      supplier_product_id: null,
+      supplier_variation_id: null,
+      automation_flags: { ...automationFlags, auto_delivery: true },
+    };
+
+    setBusy(true);
+    setNotice("");
+    try {
+      const message = await persistPlan(next);
+      await load(true, productDraft?.id || null, plan.id);
+      setNotice(message + " O plano agora usa estoque próprio.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Não foi possível remover o vínculo.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const uploadProductAsset = async (
@@ -605,6 +688,20 @@ export function ProductManagerPage() {
 
         {notice && <div className="crz-pm-notice">{notice}</div>}
 
+        {supplierImportFor && (
+          <SupplierImportModal
+            productId={supplierImportFor.productId}
+            productName={supplierImportFor.productName}
+            replacePlanId={supplierImportFor.replacePlanId}
+            onClose={() => setSupplierImportFor(null)}
+            onImported={async () => {
+              await load(true, supplierImportFor.productId, supplierImportFor.replacePlanId || null);
+              setEditorTab("fields");
+              setEditorOpen(true);
+            }}
+          />
+        )}
+
         {creatingProduct && (
           <div
             className="crz-purin-modal"
@@ -629,7 +726,12 @@ export function ProductManagerPage() {
                   <button
                     type="button"
                     className="is-save"
-                    disabled={busy || !newProduct.name.trim() || !newProduct.gameId}
+                    disabled={
+                      busy ||
+                      !newProduct.name.trim() ||
+                      !newProduct.gameId ||
+                      (newProduct.startMode === "presets" && newProduct.presetPlans.length === 0)
+                    }
                     onClick={() => void createProduct()}
                   >
                     {busy ? "Criando..." : "Criar produto"}
@@ -739,6 +841,32 @@ export function ProductManagerPage() {
                       placeholder="Uma descrição principal. O resto o site organiza."
                     />
                   </label>
+
+                  <section className="crz-pm-quick-block crz-pm-start-mode">
+                    <header><strong>Como quer começar?</strong><span>Escolha só a estrutura inicial. Você pode alterar tudo depois.</span></header>
+                    <div className="crz-pm-start-mode__choices">
+                      <button type="button" className={newProduct.startMode==="empty"?"is-active":""} onClick={()=>setNewProduct({...newProduct,startMode:"empty",presetPlans:[]})}>
+                        <strong>Vazio</strong><small>Criar só o produto.</small>
+                      </button>
+                      <button type="button" className={newProduct.startMode==="presets"?"is-active":""} onClick={()=>setNewProduct({...newProduct,startMode:"presets"})}>
+                        <strong>Planos predefinidos</strong><small>Escolher durações agora.</small>
+                      </button>
+                      <button type="button" className={newProduct.startMode==="supplier"?"is-active":""} onClick={()=>setNewProduct({...newProduct,startMode:"supplier",presetPlans:[]})}>
+                        <strong>🌐 Importar do provedor</strong><small>Criar vazio e abrir o catálogo PurinCash.</small>
+                      </button>
+                    </div>
+                    {newProduct.startMode==="presets" && (
+                      <div className="crz-pm-plan-presets crz-pm-plan-presets--create">
+                        {planCodes.filter(([code])=>["1d","3d","7d","15d","30d","90d","lifetime"].includes(code)).map(([code,label])=>{
+                          const active=newProduct.presetPlans.includes(code);
+                          return <button type="button" key={code} className={active?"is-active":""} onClick={()=>setNewProduct({
+                            ...newProduct,
+                            presetPlans:active?newProduct.presetPlans.filter(item=>item!==code):[...newProduct.presetPlans,code],
+                          })}>{active?"✓ ":""}{label}</button>;
+                        })}
+                      </div>
+                    )}
+                  </section>
 
                   <section className="crz-pm-quick-block">
                     <header><strong>Status</strong><span>Clique. Não precisa escrever.</span></header>
@@ -1059,7 +1187,15 @@ export function ProductManagerPage() {
                         >
                           ＋ Adicionar Plano
                         </button>
-                        <button type="button" className="crz-purin-add-button" disabled={busy || stockBusy} onClick={() => void createPresetPlans()}>Criar planos predefinidos</button>
+                        <button type="button" className="crz-purin-add-button" disabled={busy || stockBusy} onClick={() => void createPresetPlans()}>⚡ Criar predefinidos</button>
+                        <button
+                          type="button"
+                          className="crz-purin-add-button"
+                          disabled={busy || stockBusy}
+                          onClick={() => setSupplierImportFor({ productId: productDraft.id, productName: productDraft.name })}
+                        >
+                          🌐 Importar do provedor
+                        </button>
                       </div>
                     </header>
 
@@ -1136,11 +1272,21 @@ export function ProductManagerPage() {
 
                               <span className="crz-purin-flame">🔥</span>
                               <span className="crz-purin-variation__name">
-                                <strong>{plan.name}</strong><small>{!Number(plan.price) ? "Rascunho · falta preço" : !plan.active ? "Pausado" : Number(plan.available_stock)>0 ? "Disponível" : "Sem estoque"}</small>
+                                <strong>{plan.name}</strong><small>{
+                                  !Number(plan.price)
+                                    ? "Rascunho · falta preço"
+                                    : !plan.active
+                                      ? "Pausado"
+                                      : plan.delivery_mode === "purincash_supplier"
+                                        ? "Fornecedor automático"
+                                        : plan.delivery_mode === "internal_stock"
+                                          ? Number(plan.available_stock)>0 ? "Disponível" : "Sem estoque"
+                                          : stock.detail
+                                }</small>
                                 <small>{Number(plan.price).toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:2})}</small>
                               </span>
                               <span className={"crz-purin-stock-pill is-" + stock.tone}>
-                                {`${Number(plan.available_stock || 0)} em estoque`}
+                                {plan.delivery_mode === "internal_stock" ? `${stock.label} em estoque` : stock.label}
                               </span>
                               <span className="crz-purin-chevron">{isExpanded ? "⌃" : "⌄"}</span>
                             </button>
@@ -1178,6 +1324,8 @@ export function ProductManagerPage() {
 
                                 {workingPlan.plan_code==="custom"&&<label><span>Duração personalizada (minutos)</span><input type="number" min="1" max="5256000" placeholder="Sem expiração" value={workingPlan.entitlement_duration_minutes??""} onChange={event=>editPlan({...planDraft,entitlement_duration_minutes:event.target.value?Number(event.target.value):null})}/></label>}
 
+                                <h4 className="crz-purin-delivery-heading">Entrega e estoque</h4>
+
                                 <button
                                   type="button"
                                   className={"crz-purin-hidden-sale " + (!workingPlan.active ? "is-on" : "")}
@@ -1190,19 +1338,63 @@ export function ProductManagerPage() {
                                   <i />
                                 </button>
 
-                                <section className="crz-purin-stock-simple">
-                                  <header><div><strong>Estoque do plano</strong><small>Entrega automática após a confirmação do pagamento.</small></div>
-                                    <span className={"crz-purin-stock-pill is-" + (Number(workingPlan.available_stock) > 0 ? "ok" : "out")}>{Number(workingPlan.available_stock || 0)} em estoque</span>
-                                  </header>
-                                  <label className="crz-pm-inline-stock"><span>Keys deste plano — uma por linha</span><textarea rows={5} value={stockText} onChange={event => setStockText(event.target.value)} placeholder={"COLE-UMA-KEY-AQUI\nOUTRA-KEY-DO-MESMO-PLANO"} spellCheck={false} disabled={busy || stockBusy} /><small>{stockItems.length} key(s) no lote. Máximo de 5.000. Duplicadas são ignoradas.</small></label>
-                                  {stockNotice && <p role="status">{stockNotice}</p>}
-                                  <div className="crz-purin-stock-simple__controls">
-                                    <button type="button" className="crz-purin-add-stock" disabled={busy || stockBusy || !stockItems.length || stockItems.length > 5000} onClick={() => void importPlanStock()}>{stockBusy ? "Adicionando…" : "Adicionar " + stockItems.length + " key(s)"}</button>
-                                    <a className="crz-purin-secondary-button" href={"/admin/estoque?planId=" + plan.id}>Consultar estoque</a>
-                                    <button type="button" className="crz-purin-save-field" disabled={busy || stockBusy} onClick={() => void savePlan()}>{busy ? "Salvando..." : "Salvar plano"}</button>
-                                  </div>
-                                  <p className="crz-purin-stock-simple__hint">As keys ficam vinculadas somente a este plano. A quantidade é calculada pelas keys disponíveis.</p>
-                                </section>
+                                {workingPlan.delivery_mode === "internal_stock" && (
+                                  <section className="crz-purin-stock-simple">
+                                    <header><div><strong>Estoque do plano</strong><small>Entrega automática após a confirmação do pagamento.</small></div>
+                                      <span className={"crz-purin-stock-pill is-" + (Number(workingPlan.available_stock) > 0 ? "ok" : "out")}>{Number(workingPlan.available_stock || 0)} em estoque</span>
+                                    </header>
+                                    <label className="crz-pm-inline-stock"><span>Keys deste plano — uma por linha</span><textarea rows={5} value={stockText} onChange={event => setStockText(event.target.value)} placeholder={"COLE-UMA-KEY-AQUI\nOUTRA-KEY-DO-MESMO-PLANO"} spellCheck={false} disabled={busy || stockBusy} /><small>{stockItems.length} key(s) no lote. Máximo de 5.000. Duplicadas são ignoradas.</small></label>
+                                    {stockNotice && <p role="status">{stockNotice}</p>}
+                                    <div className="crz-purin-stock-simple__controls">
+                                      <button type="button" className="crz-purin-add-stock" aria-label="Adicionar Estoque" disabled={busy || stockBusy || !stockItems.length || stockItems.length > 5000} onClick={() => void importPlanStock()}>{stockBusy ? "Adicionando…" : "Adicionar " + stockItems.length + " key(s)"}</button>
+                                      <a className="crz-purin-secondary-button" href={"/admin/estoque?planId=" + plan.id}>Consultar estoque</a>
+                                      <button type="button" className="crz-purin-save-field" disabled={busy || stockBusy} onClick={() => void savePlan()}>{busy ? "Salvando..." : "Salvar plano"}</button>
+                                    </div>
+                                    <p className="crz-purin-stock-simple__hint">As keys ficam vinculadas somente a este plano. A quantidade é calculada pelas keys disponíveis.</p>
+                                  </section>
+                                )}
+
+                                {workingPlan.delivery_mode === "purincash_supplier" && (() => {
+                                  const flags = workingPlan.automation_flags || {};
+                                  const providerName = String(flags.supplier_display_name || "PurinCash");
+                                  const variationName = String(flags.supplier_variation_name || workingPlan.name);
+                                  const synced = String(flags.supplier_sync_status || "") === "synced";
+                                  const unlimited = flags.supplier_unlimited === true;
+                                  const supplierStock = Number(flags.supplier_stock);
+                                  const catalogCents = Number(flags.supplier_catalog_price_cents || 0);
+                                  return (
+                                    <section className="crz-supplier-binding-card">
+                                      <header>
+                                        <div><strong>🌐 Estoque automático</strong><small>Entrega direta pelo provedor, sem keys locais.</small></div>
+                                        <span className={synced ? "is-ok" : "is-warn"}>{synced ? "● Sincronizado" : "● Revisar"}</span>
+                                      </header>
+                                      <div className="crz-supplier-binding-grid">
+                                        <span><small>PROVEDOR</small><strong>PurinCash</strong></span>
+                                        <span><small>PRODUTO</small><strong>{providerName}</strong></span>
+                                        <span><small>VARIAÇÃO</small><strong>{variationName}</strong></span>
+                                        <span><small>ESTOQUE</small><strong>{unlimited ? "∞" : Number.isFinite(supplierStock) ? supplierStock : "Externo"}</strong></span>
+                                        <span><small>PREÇO INFORMADO</small><strong>{catalogCents > 0 ? brl(catalogCents / 100) : "Não informado"}</strong></span>
+                                        <span><small>SEU PREÇO</small><strong>{brl(Number(workingPlan.price || 0))}</strong></span>
+                                      </div>
+                                      <div className="crz-supplier-binding-actions">
+                                        <button type="button" disabled={busy || stockBusy} onClick={() => void syncSupplierPlan(plan.id)}>Sincronizar</button>
+                                        <button type="button" disabled={busy || stockBusy} onClick={() => setSupplierImportFor({ productId: productDraft.id, productName: productDraft.name, replacePlanId: plan.id })}>Trocar</button>
+                                        <button type="button" className="is-danger" disabled={busy || stockBusy} onClick={() => void removeSupplierBinding(workingPlan)}>Remover vínculo</button>
+                                        <button type="button" className="crz-purin-save-field" disabled={busy || stockBusy} onClick={() => void savePlan()}>{busy ? "Salvando..." : "Salvar preço"}</button>
+                                      </div>
+                                      <p>O conteúdo do fornecedor não é copiado para o estoque CRAZZY. A entrega só é revelada ao comprador pela Biblioteca após o pagamento confirmado.</p>
+                                    </section>
+                                  );
+                                })()}
+
+                                {!["internal_stock","purincash_supplier"].includes(workingPlan.delivery_mode) && (
+                                  <section className="crz-purin-stock-simple">
+                                    <header><div><strong>Entrega</strong><small>{workingPlan.delivery_mode === "ghost_stock" ? "Estoque virtual / atendimento por ticket." : "Este plano não utiliza o estoque local de keys."}</small></div><span className="crz-purin-stock-pill is-manual">{workingPlan.delivery_mode}</span></header>
+                                    <div className="crz-purin-stock-simple__controls">
+                                      <button type="button" className="crz-purin-save-field" disabled={busy || stockBusy} onClick={() => void savePlan()}>{busy ? "Salvando..." : "Salvar plano"}</button>
+                                    </div>
+                                  </section>
+                                )}
                               </div>
                             )}
                           </article>
@@ -1211,8 +1403,13 @@ export function ProductManagerPage() {
 
                       {!productDraft.plans.length && (
                         <div className="crz-purin-fields__empty">
-                          <strong>Nenhuma variação criada.</strong>
-                          <span>Clique em "Adicionar Plano" para criar Diário, Semanal, Mensal ou qualquer outro plano.</span>
+                          <strong>Nenhum plano criado ainda.</strong>
+                          <span>Crie manualmente, gere as durações mais usadas ou importe estoque automático do provedor.</span>
+                          <div>
+                            <button type="button" onClick={() => setCreatingPlan(true)}>＋ Adicionar plano</button>
+                            <button type="button" onClick={() => void createPresetPlans()}>⚡ Criar predefinidos</button>
+                            <button type="button" onClick={() => setSupplierImportFor({ productId: productDraft.id, productName: productDraft.name })}>🌐 Importar do provedor</button>
+                          </div>
                         </div>
                       )}
                     </div>

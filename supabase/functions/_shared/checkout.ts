@@ -17,6 +17,12 @@ export interface CheckoutCartItem {
   skinsCount?: number | null;
   planCode?: string | null;
   campaignSlug?: string;
+  deliveryMode?: string;
+  supplierProvider?: string;
+  supplierProductId?: string;
+  supplierStoreProductId?: string | null;
+  supplierVariationId?: string | null;
+  supplierVariationIndex?: number;
 }
 
 type DiscountSource = "none" | "combo" | "coupon";
@@ -34,6 +40,22 @@ export interface AuthoritativeCheckout {
 }
 
 const MAX_ITEM_QUANTITY = 20;
+
+function supplierUnavailable(error = "Este produto de fornecedor está temporariamente indisponível.") {
+  return {
+    total: 0,
+    subtotal: 0,
+    discountAmount: 0,
+    cartSnapshot: [] as CheckoutCartItem[],
+    couponId: null,
+    error,
+  };
+}
+
+type FulfillmentContext = {
+  providerPaymentId?: string | null;
+  supplierDeliveredContent?: string | null;
+};
 
 /**
  * Builds an authoritative checkout snapshot. Client prices/names are display-only and
@@ -201,13 +223,91 @@ export async function calculateServerTotal(
       return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Produto não encontrado ou inativo" };
     }
 
+    const operationResult = typeof supabaseAdmin?.rpc === "function"
+      ? await supabaseAdmin.rpc(
+          "resolve_checkout_plan_operation",
+          { p_plan_id: planData.id },
+        )
+      : { data: null, error: { code: "PGRST202", message: "resolve_checkout_plan_operation unavailable" } };
+    const operationRaw = operationResult?.data;
+    const operationError = operationResult?.error;
+    const operationFunctionMissing =
+      operationError &&
+      (
+        String(operationError?.code || "") === "PGRST202" ||
+        String(operationError?.code || "") === "42883" ||
+        String(operationError?.message || "").includes("resolve_checkout_plan_operation")
+      );
+    if (operationError && !operationFunctionMissing) {
+      return supplierUnavailable("Não foi possível validar a entrega deste produto. Tente novamente.");
+    }
+
+    const operation = operationFunctionMissing
+      ? { delivery_mode: "internal_stock" }
+      : operationRaw && typeof operationRaw === "object"
+        ? operationRaw
+        : {};
+    const deliveryMode = String(operation.delivery_mode || "internal_stock");
+    const isPurinSupplier = deliveryMode === "purincash_supplier";
+
+    let supplierProductId = "";
+    let supplierVariationId: string | null = null;
+    let supplierVariationIndex: number | undefined;
+
+    if (isPurinSupplier) {
+      if (cartItems.length !== 1 || qty !== 1) {
+        return supplierUnavailable("Produtos de fornecedor devem ser finalizados individualmente.");
+      }
+
+      const supplierProvider = String(operation.supplier_provider || "");
+      supplierProductId = String(operation.supplier_product_id || "");
+      supplierVariationId = operation.supplier_variation_id
+        ? String(operation.supplier_variation_id)
+        : null;
+      supplierVariationIndex = Number(operation.supplier_variation_index);
+      const syncStatus = String(operation.supplier_sync_status || "");
+      const supplierUnlimited = operation.supplier_unlimited === true;
+      const supplierStock =
+        operation.supplier_stock === null || operation.supplier_stock === undefined
+          ? null
+          : Number(operation.supplier_stock);
+
+      if (
+        supplierProvider !== "purincash" ||
+        !/^prod_[A-Za-z0-9_-]+$/.test(supplierProductId) ||
+        !Number.isInteger(supplierVariationIndex) ||
+        Number(supplierVariationIndex) < 0
+      ) {
+        return supplierUnavailable();
+      }
+
+      if (syncStatus === "needs_review" || syncStatus === "unavailable") {
+        return supplierUnavailable("Este produto de fornecedor precisa ser sincronizado antes da compra.");
+      }
+
+      if (
+        !supplierUnlimited &&
+        (
+          supplierStock === null ||
+          !Number.isFinite(supplierStock) ||
+          supplierStock <= 0
+        )
+      ) {
+        return supplierUnavailable("Este produto está sem estoque no fornecedor.");
+      }
+    }
+
     let unitPriceCents = Math.round(Number(planData.price) * 100);
     if (!Number.isFinite(unitPriceCents) || unitPriceCents <= 0) {
       return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Preço inválido no catálogo" };
     }
 
     let resellerDiscountPercent = 0;
-    if (activeReseller && (!resellerAllowedProductIds || resellerAllowedProductIds.includes(planData.product_id))) {
+    if (
+      !isPurinSupplier &&
+      activeReseller &&
+      (!resellerAllowedProductIds || resellerAllowedProductIds.includes(planData.product_id))
+    ) {
       resellerDiscountPercent = Math.max(0, Math.min(100, Number(activeReseller.discount_percent || 0)));
       unitPriceCents = Math.round(unitPriceCents * (1 - resellerDiscountPercent / 100));
     }
@@ -223,7 +323,24 @@ export async function calculateServerTotal(
       price: unitPriceCents / 100,
       resellerDiscountPercent,
       quantity: qty,
+      type: isPurinSupplier ? "purincash-supplier" : undefined,
+      deliveryMode,
+      supplierProvider: isPurinSupplier ? "purincash" : undefined,
+      supplierProductId: isPurinSupplier ? supplierProductId : undefined,
+      supplierStoreProductId: isPurinSupplier ? supplierStoreProductId : undefined,
+      supplierVariationId: isPurinSupplier ? supplierVariationId : undefined,
+      supplierVariationIndex: isPurinSupplier ? supplierVariationIndex : undefined,
     });
+  }
+
+  const supplierItems = cartSnapshot.filter((item) => item.type === "purincash-supplier");
+  if (supplierItems.length) {
+    if (supplierItems.length !== 1 || cartSnapshot.length !== 1 || Number(supplierItems[0].quantity) !== 1) {
+      return supplierUnavailable("Produtos de fornecedor devem ser finalizados individualmente.");
+    }
+    if (couponId) {
+      return supplierUnavailable("Cupons não estão disponíveis para produtos de fornecedor.");
+    }
   }
 
   let total = subtotal;
@@ -235,7 +352,7 @@ export async function calculateServerTotal(
   for (const item of cartSnapshot) {
     const code = String(item.planCode || "");
     if (code !== "30d" && code !== "lifetime") continue;
-    if (item.type === "lzt-account") continue;
+    if (item.type === "lzt-account" || item.type === "purincash-supplier") continue;
     const group = comboGroups.get(code) || { products: new Set<string>(), subtotal: 0 };
     group.products.add(item.productId);
     group.subtotal += Math.round(Number(item.price || 0) * 100) * Math.max(1, Number(item.quantity || 1));
@@ -493,7 +610,11 @@ export async function recomputeExpectedPayment(supabaseAdmin: any, payment: any)
 }
 
 // Helper: fulfill order (deliver stock, create tickets, record coupon)
-export async function fulfillOrder(supabaseAdmin: any, payment: any) {
+export async function fulfillOrder(
+  supabaseAdmin: any,
+  payment: any,
+  context: FulfillmentContext = {},
+) {
   const cartItems = payment.cart_snapshot as Array<{
     productId: string;
     planId: string;
@@ -504,6 +625,12 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
     quantity: number;
     type?: string;
     campaignSlug?: string;
+    deliveryMode?: string;
+    supplierProvider?: string;
+    supplierProductId?: string;
+    supplierStoreProductId?: string | null;
+    supplierVariationId?: string | null;
+    supplierVariationIndex?: number;
     lztItemId?: string;
     lztPrice?: number;
     lztCurrency?: string;
@@ -528,6 +655,57 @@ export async function fulfillOrder(supabaseAdmin: any, payment: any) {
     // A paid CRAZZY LUCK attempt is fulfilled by play_luck() after this payment reaches
     // COMPLETED. It never creates a product ticket, consumes a key or earns reseller credit.
     if (item.type === "luck-play") continue;
+
+    if (item.type === "purincash-supplier" || item.deliveryMode === "purincash_supplier") {
+      const deliveredContent = String(context.supplierDeliveredContent || "").trim();
+      if (!deliveredContent) {
+        throw new Error("SUPPLIER_DELIVERY_CONTENT_MISSING");
+      }
+      if (Number(item.quantity || 1) !== 1) {
+        throw new Error("SUPPLIER_QUANTITY_UNSUPPORTED");
+      }
+
+      const { data: externalRows, error: externalError } = await supabaseAdmin.rpc(
+        "claim_external_paid_delivery",
+        {
+          p_payment_id: payment.id,
+          p_user_id: payment.user_id,
+          p_product_id: item.productId,
+          p_product_plan_id: item.planId,
+          p_item_index: itemIndex,
+          p_unit_index: 0,
+          p_provider_payment_id: context.providerPaymentId || null,
+          p_payload: deliveredContent,
+        },
+      );
+      const externalDelivery = Array.isArray(externalRows) ? externalRows[0] : externalRows;
+      if (externalError || !externalDelivery?.ticket_id || !externalDelivery?.library_delivery_id) {
+        throw new Error(
+          "SUPPLIER_DELIVERY_PERSIST_FAILED:" + String(externalError?.message || "delivery missing"),
+        );
+      }
+
+      const { error: bonusGrantError } = await supabaseAdmin.rpc("grant_purchase_bonus", {
+        p_user_id: payment.user_id,
+        p_plan_id: item.planId,
+        p_payment_id: payment.id,
+        p_item_index: itemIndex,
+        p_unit_index: 0,
+      });
+      if (bonusGrantError) {
+        console.warn("[checkout] CRAZZY BONUS grant skipped for supplier", bonusGrantError.message || bonusGrantError);
+      }
+
+      if (externalDelivery.created === true) {
+        await supabaseAdmin.from("ticket_messages").insert({
+          ticket_id: externalDelivery.ticket_id,
+          sender_id: payment.user_id,
+          sender_role: "staff",
+          message: "✅ Seu produto foi entregue automaticamente! Abra sua Biblioteca CRAZZY para revelar a entrega com segurança.",
+        });
+      }
+      continue;
+    }
 
     // Handle LZT Market accounts (check type or planId fallback)
     const isLztAccount = item.type === "lzt-account" || item.planId === "lzt-account";
