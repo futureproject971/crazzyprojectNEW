@@ -2701,3 +2701,84 @@ html[data-theme="light"] .crz-purin-stock-simple__controls select {
 .crz-plan-row-tools button{min-width:36px;min-height:36px;border:1px solid #284c72;border-radius:7px;background:#0d2036;color:#b6d9ff;cursor:pointer}
 .crz-plan-row-tools .crz-purin-drag{cursor:grab}.crz-plan-row-tools .crz-plan-delete{margin-left:auto;padding:0 12px;color:#ffc3cf}
 .crz-plan-row-tools button:disabled{opacity:.35;cursor:default}
+
+
+/* PurinCash supplier engine */
+.crz-pm-start-mode__choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.crz-pm-start-mode__choices>button{min-height:72px;border:1px solid rgba(73,128,199,.18);border-radius:10px;padding:11px;color:#91a3b8;background:#07111c;text-align:left;display:grid;gap:4px;cursor:pointer}
+.crz-pm-start-mode__choices>button strong{color:#e7f1fc;font-size:12.5px}
+.crz-pm-start-mode__choices>button small{font-size:11px;line-height:1.35}
+.crz-pm-start-mode__choices>button.is-active{border-color:rgba(37,211,141,.55);background:rgba(18,148,93,.1);box-shadow:0 0 0 1px rgba(37,211,141,.08)}
+.crz-pm-plan-presets--create{margin-top:8px}
+.crz-purin-fields__empty>div{margin-top:10px;display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
+.crz-purin-fields__empty>div button{min-height:34px;border:1px solid rgba(65,133,215,.2);border-radius:8px;padding:0 11px;color:#c6d5e7;background:#07111c;cursor:pointer}
+
+.crz-supplier-modal{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:24px;background:rgba(0,2,7,.84);backdrop-filter:blur(8px)}
+.crz-supplier-dialog{width:min(820px,calc(100vw - 32px));max-height:min(820px,calc(100vh - 42px));overflow:hidden;border:1px solid rgba(45,213,145,.28);border-radius:15px;background:linear-gradient(180deg,#0a1019,#070c13);box-shadow:0 28px 100px rgba(0,0,0,.62);display:grid;grid-template-rows:auto auto auto minmax(0,1fr) auto}
+.crz-supplier-dialog>header{padding:17px 18px 12px;border-bottom:1px solid rgba(80,123,174,.14);display:flex;justify-content:space-between;gap:14px}
+.crz-supplier-dialog>header small{display:block;color:#2bd98e;font-size:10px;font-weight:900;letter-spacing:.12em}
+.crz-supplier-dialog>header h3{margin:3px 0 2px;color:#f3f7fc;font-size:19px}
+.crz-supplier-dialog>header p{margin:0;color:#8393a8;font-size:11.5px}
+.crz-supplier-close{width:32px;height:32px;border:1px solid rgba(110,137,172,.18);border-radius:8px;color:#7e8ca0;background:#0b111b;cursor:pointer}
+.crz-supplier-toolbar{padding:10px 18px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.crz-supplier-toolbar label{min-height:38px;border:1px solid rgba(76,128,194,.17);border-radius:9px;padding:0 10px;background:#080f18;display:flex;align-items:center;gap:8px;color:#60a7ff}
+.crz-supplier-toolbar input{width:100%;border:0;outline:0;background:transparent;color:#e4edf8;font-size:12px}
+.crz-supplier-toolbar>button,.crz-supplier-state button{border:1px solid rgba(61,136,220,.22);border-radius:8px;padding:0 11px;color:#bfd8f8;background:#0a1624;cursor:pointer}
+.crz-supplier-notice{margin:0 18px 8px;padding:8px 10px;border:1px solid rgba(39,205,137,.2);border-radius:8px;color:#a9e7cd;background:rgba(21,137,92,.08);font-size:11.5px}
+.crz-supplier-state{margin:8px 18px 14px;min-height:90px;display:flex;align-items:center;justify-content:center;gap:8px;color:#8798ad;font-size:12px}
+.crz-supplier-list{padding:2px 18px 16px;overflow:auto;display:grid;gap:9px}
+.crz-supplier-list>article{border:1px solid rgba(76,128,191,.14);border-radius:11px;background:#090f17;padding:10px}
+.crz-supplier-list>article.is-disabled{opacity:.55}
+.crz-supplier-product-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.crz-supplier-product-head>div{display:grid;gap:2px}
+.crz-supplier-product-head strong{color:#f1f6fb;font-size:13px}
+.crz-supplier-product-head small{color:#6f8299;font-size:10.5px}
+.crz-supplier-product-head>span{color:#6f9d87;font-size:10px}
+.crz-supplier-public-id{margin-top:8px;padding:8px;border:1px solid rgba(240,175,67,.18);border-radius:8px;background:rgba(123,80,9,.06);display:grid;gap:4px}
+.crz-supplier-public-id>span{color:#d5af66;font-size:10px;font-weight:800}
+.crz-supplier-public-id input{min-height:34px;border:1px solid rgba(160,126,69,.2);border-radius:7px;padding:0 9px;background:#080c12;color:#e8edf4;outline:0}
+.crz-supplier-public-id small{color:#876f49;font-size:9.5px;line-height:1.35}
+.crz-supplier-variations{margin-top:8px;display:grid;gap:6px}
+.crz-supplier-variations>button{min-height:58px;border:1px solid rgba(71,125,191,.14);border-radius:9px;padding:8px;color:#aebed0;background:#080e16;display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;text-align:left;cursor:pointer}
+.crz-supplier-variations>button i{width:19px;height:19px;border:1px solid rgba(87,142,209,.25);border-radius:5px;display:grid;place-items:center;color:#07110c;background:#07101a;font-style:normal;font-size:11px}
+.crz-supplier-variations>button>span{display:grid;gap:2px;min-width:0}
+.crz-supplier-variations>button strong{color:#eef4fb;font-size:12px}
+.crz-supplier-variations>button small{color:#6f8196;font-size:10.5px}
+.crz-supplier-variations>button em{color:#6f9f88;font-size:10px;font-style:normal}
+.crz-supplier-variations>button.is-selected{border-color:rgba(32,216,140,.55);background:rgba(14,125,80,.1)}
+.crz-supplier-variations>button.is-selected i{border-color:#25d98c;background:#25d98c;color:#00130b}
+.crz-supplier-variations>button:disabled{opacity:.42;cursor:not-allowed}
+.crz-supplier-dialog>footer{border-top:1px solid rgba(78,125,183,.13);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.crz-supplier-dialog>footer>span{color:#7f91a6;font-size:11px}
+.crz-supplier-dialog>footer>div{display:flex;gap:7px}
+.crz-supplier-dialog>footer button{min-height:36px;border:1px solid rgba(77,129,193,.18);border-radius:8px;padding:0 14px;color:#d5dfeb;background:#0a111b;cursor:pointer}
+.crz-supplier-dialog>footer button.is-primary{border-color:#27d991;background:#23c984;color:#03160e;font-weight:900}
+.crz-supplier-dialog>footer button:disabled{opacity:.45;cursor:not-allowed}
+
+.crz-supplier-binding-card{margin-top:12px;border:1px solid rgba(38,213,141,.25);border-radius:12px;padding:12px;background:linear-gradient(180deg,rgba(13,95,65,.08),rgba(5,12,18,.8))}
+.crz-supplier-binding-card>header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.crz-supplier-binding-card>header>div{display:grid;gap:2px}
+.crz-supplier-binding-card>header strong{color:#ebf8f2;font-size:13px}
+.crz-supplier-binding-card>header small{color:#739586;font-size:10.5px}
+.crz-supplier-binding-card>header>span{font-size:10px;font-weight:900}
+.crz-supplier-binding-card>header>span.is-ok{color:#2bd991}
+.crz-supplier-binding-card>header>span.is-warn{color:#f2b84b}
+.crz-supplier-binding-grid{margin-top:9px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.crz-supplier-binding-grid>span{min-height:58px;border:1px solid rgba(77,129,186,.13);border-radius:8px;padding:8px;background:#080f17;display:grid;align-content:center;gap:2px}
+.crz-supplier-binding-grid small{color:#4f7f70;font-size:9px;font-weight:900;letter-spacing:.08em}
+.crz-supplier-binding-grid strong{overflow:hidden;text-overflow:ellipsis;color:#e2edf7;font-size:11.5px}
+.crz-supplier-binding-actions{margin-top:9px;display:flex;gap:7px;flex-wrap:wrap}
+.crz-supplier-binding-actions button{min-height:34px;border:1px solid rgba(54,140,211,.2);border-radius:8px;padding:0 11px;color:#c8d8e9;background:#091522;cursor:pointer}
+.crz-supplier-binding-actions button.is-danger{margin-left:auto;border-color:rgba(239,68,68,.35);color:#ff8e8e;background:rgba(126,24,24,.08)}
+.crz-supplier-binding-card>p{margin:8px 0 0;color:#638072;font-size:10px;line-height:1.45}
+
+@media(max-width:760px){
+  .crz-pm-start-mode__choices,.crz-supplier-binding-grid{grid-template-columns:1fr}
+  .crz-supplier-modal{padding:8px}
+  .crz-supplier-dialog{width:100%;max-height:calc(100vh - 16px)}
+  .crz-supplier-toolbar{grid-template-columns:1fr}
+  .crz-supplier-product-head{align-items:flex-start;flex-direction:column}
+  .crz-supplier-variations>button{grid-template-columns:22px minmax(0,1fr)}
+  .crz-supplier-variations>button em{grid-column:2}
+  .crz-supplier-binding-actions button.is-danger{margin-left:0}
+}
