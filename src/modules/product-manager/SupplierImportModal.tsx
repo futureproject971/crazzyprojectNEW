@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 type SupplierVariation = {
   id: string | null;
@@ -45,6 +46,14 @@ function available(variation: SupplierVariation) {
   return variation.active && (variation.unlimited || (variation.stock !== null && variation.stock > 0));
 }
 
+function friendlySupplierError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error || "");
+  if (/NetworkError|Failed to fetch|fetch resource|network request failed/i.test(message)) {
+    return "A PurinCash não respondeu agora. Tente atualizar o catálogo em alguns segundos.";
+  }
+  return message || "Não foi possível consultar o provedor.";
+}
+
 export function SupplierImportModal({ productId, productName, replacePlanId = null, onClose, onImported }: Props) {
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -53,6 +62,16 @@ export function SupplierImportModal({ productId, productName, replacePlanId = nu
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
 
   const load = async () => {
     setState("loading");
@@ -66,7 +85,7 @@ export function SupplierImportModal({ productId, productName, replacePlanId = nu
       setProducts(payload.products);
       setState("ready");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Não foi possível consultar o provedor.");
+      setNotice(friendlySupplierError(error));
       setState("error");
     }
   };
@@ -144,13 +163,15 @@ export function SupplierImportModal({ productId, productName, replacePlanId = nu
       await onImported();
       if (replacePlanId || count > 0) onClose();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Não foi possível importar as variações.");
+      setNotice(friendlySupplierError(error));
     } finally {
       setBusy(false);
     }
   };
 
-  return (
+  if (!mounted) return null;
+
+  const modal = (
     <div className="crz-supplier-modal" role="presentation" onMouseDown={(event) => {
       if (event.target === event.currentTarget && !busy) onClose();
     }}>
@@ -249,4 +270,6 @@ export function SupplierImportModal({ productId, productName, replacePlanId = nu
       </section>
     </div>
   );
+
+  return createPortal(modal, document.body);
 }

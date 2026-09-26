@@ -138,16 +138,41 @@ function orderIdFromMetadata(payload: any): string {
 }
 
 async function purincashRequest(apiKey: string, path: string, init: RequestInit = {}) {
-  const response = await fetch(`${PURINCASH_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      ...(init.body ? JSON_HEADERS : {}),
-      ...(init.headers || {}),
-    },
-  });
-  const body = await response.json().catch(() => ({}));
-  return { response, body };
+  const method = String(init.method || "GET").toUpperCase();
+  const requestOnce = async () => {
+    try {
+      const response = await fetch(`${PURINCASH_BASE_URL}${path}`, {
+        ...init,
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Accept: "application/json",
+          ...(init.body ? JSON_HEADERS : {}),
+          ...(init.headers || {}),
+        },
+        signal: init.signal || AbortSignal.timeout(15_000),
+      });
+      const body = await response.json().catch(() => ({}));
+      return { response, body };
+    } catch {
+      return {
+        response: new Response(JSON.stringify({ error: "PURINCASH_NETWORK_UNAVAILABLE" }), {
+          status: 503,
+          headers: JSON_HEADERS,
+        }),
+        body: { error: "PURINCASH_NETWORK_UNAVAILABLE", networkError: true },
+      };
+    }
+  };
+
+  const first = await requestOnce();
+  const retryableGet =
+    method === "GET" &&
+    (first.body?.networkError === true || [502, 503, 504].includes(first.response.status));
+
+  if (!retryableGet) return first;
+
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  return requestOnce();
 }
 
 async function fetchProviderPayment(apiKey: string, providerId: string, kind: ProviderKind) {
@@ -282,8 +307,23 @@ function normalizeStoreProducts(payload: any) {
 }
 
 async function fetchSupplierCatalog(apiKey: string) {
-  const { response, body } = await purincashRequest(apiKey, "/store/products?includeInactive=true");
-  return { response, body, products: response.ok ? normalizeStoreProducts(body) : [] };
+  const primary = await purincashRequest(apiKey, "/store/products?includeInactive=true");
+  if (primary.response.ok) {
+    return {
+      response: primary.response,
+      body: primary.body,
+      products: normalizeStoreProducts(primary.body),
+    };
+  }
+
+  // PurinCash documents this second read-only view of the same store catalog.
+  // It is a safe fallback if the dedicated /store/products route is temporarily unavailable.
+  const fallback = await purincashRequest(apiKey, "/products?include=store&includeInactive=true");
+  return {
+    response: fallback.response,
+    body: fallback.body,
+    products: fallback.response.ok ? normalizeStoreProducts(fallback.body) : [],
+  };
 }
 
 function supplierFromCheckout(checkout: any) {
@@ -804,6 +844,9 @@ Deno.serve(async (req) => {
     if (!catalog.response.ok) {
       if (catalog.response.status === 429) {
         return json({ error: "A PurinCash limitou temporariamente as consultas. Aguarde e tente novamente." }, 429);
+      }
+      if ([502, 503, 504].includes(catalog.response.status)) {
+        return json({ error: "A PurinCash está temporariamente indisponível. Tente atualizar o catálogo em alguns segundos." }, 503);
       }
       return json({ error: "Não foi possível consultar o catálogo do provedor." }, 502);
     }

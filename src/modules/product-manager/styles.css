@@ -2713,7 +2713,7 @@ html[data-theme="light"] .crz-purin-stock-simple__controls select {
 .crz-purin-fields__empty>div{margin-top:10px;display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
 .crz-purin-fields__empty>div button{min-height:34px;border:1px solid rgba(65,133,215,.2);border-radius:8px;padding:0 11px;color:#c6d5e7;background:#07111c;cursor:pointer}
 
-.crz-supplier-modal{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:24px;background:rgba(0,2,7,.84);backdrop-filter:blur(8px)}
+.crz-supplier-modal{position:fixed;inset:0;z-index:5000;display:grid;place-items:center;padding:24px;background:rgba(0,2,7,.84);backdrop-filter:blur(8px)}
 .crz-supplier-dialog{width:min(820px,calc(100vw - 32px));max-height:min(820px,calc(100vh - 42px));overflow:hidden;border:1px solid rgba(45,213,145,.28);border-radius:15px;background:linear-gradient(180deg,#0a1019,#070c13);box-shadow:0 28px 100px rgba(0,0,0,.62);display:grid;grid-template-rows:auto auto auto minmax(0,1fr) auto}
 .crz-supplier-dialog>header{padding:17px 18px 12px;border-bottom:1px solid rgba(80,123,174,.14);display:flex;justify-content:space-between;gap:14px}
 .crz-supplier-dialog>header small{display:block;color:#2bd98e;font-size:10px;font-weight:900;letter-spacing:.12em}

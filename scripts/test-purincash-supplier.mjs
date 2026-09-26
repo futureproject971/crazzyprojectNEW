@@ -43,6 +43,19 @@ expect(
     supplierModal.includes('placeholder="prod_..."'),
   "provider importer is available in Product Manager",
 );
+
+expect(
+  supplierModal.includes('createPortal(modal, document.body)') &&
+    supplierModal.includes('document.body.style.overflow = "hidden"'),
+  "supplier importer escapes the Product Manager stacking context via a body portal",
+);
+
+expect(
+  supplierModal.includes("friendlySupplierError") &&
+    purin.includes("PURINCASH_NETWORK_UNAVAILABLE") &&
+    purin.includes('"/products?include=store&includeInactive=true"'),
+  "supplier catalog handles upstream network failures and retries through the documented store-catalog fallback",
+);
 expect(
   productsRoute.includes("allowedPresets") &&
     productsRoute.includes("SUPPLIER_BINDING_INVALID") &&
