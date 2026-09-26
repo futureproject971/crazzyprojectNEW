@@ -1346,7 +1346,7 @@ export function ProductManagerPage() {
                                     <label className="crz-pm-inline-stock"><span>Keys deste plano — uma por linha</span><textarea rows={5} value={stockText} onChange={event => setStockText(event.target.value)} placeholder={"COLE-UMA-KEY-AQUI\nOUTRA-KEY-DO-MESMO-PLANO"} spellCheck={false} disabled={busy || stockBusy} /><small>{stockItems.length} key(s) no lote. Máximo de 5.000. Duplicadas são ignoradas.</small></label>
                                     {stockNotice && <p role="status">{stockNotice}</p>}
                                     <div className="crz-purin-stock-simple__controls">
-                                      <button type="button" className="crz-purin-add-stock" disabled={busy || stockBusy || !stockItems.length || stockItems.length > 5000} onClick={() => void importPlanStock()}>{stockBusy ? "Adicionando…" : "Adicionar " + stockItems.length + " key(s)"}</button>
+                                      <button type="button" className="crz-purin-add-stock" aria-label="Adicionar Estoque" disabled={busy || stockBusy || !stockItems.length || stockItems.length > 5000} onClick={() => void importPlanStock()}>{stockBusy ? "Adicionando…" : "Adicionar " + stockItems.length + " key(s)"}</button>
                                       <a className="crz-purin-secondary-button" href={"/admin/estoque?planId=" + plan.id}>Consultar estoque</a>
                                       <button type="button" className="crz-purin-save-field" disabled={busy || stockBusy} onClick={() => void savePlan()}>{busy ? "Salvando..." : "Salvar plano"}</button>
                                     </div>
