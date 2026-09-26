@@ -1,170 +1,177 @@
-# CRAZZY CALL
+# CRAZZY CALL • CRAZZY SCREEN ENGINE
 
-CRAZZY CALL é o módulo de chamadas e compartilhamento em tempo real do CRAZZY PROJECT.
+CRAZZY CALL é o módulo de compartilhamento de tela em tempo real do CRAZZY PROJECT.
 
-## Arquitetura
+## Regra de arquitetura
 
-O módulo reutiliza o Supabase Auth já existente. Não existe segundo sistema de login.
+CRAZZY CALL **não é um Google Meet**.
 
-- **Next.js / React / TypeScript**: interface, lobby, sala e Route Handlers.
-- **Supabase**: salas, participantes, chat, eventos, permissões e histórico.
-- **LiveKit / WebRTC**: microfone, câmera, screen share, áudio e distribuição dos tracks.
-- **Picture-in-Picture**: API nativa do navegador sobre o stream selecionado.
+- **Discord**: voz, comunidade, presença e XP.
+- **CRAZZY CALL**: compartilhar tela, assistir transmissões, chat, PiP e moderação.
+- **LiveKit / WebRTC / SFU**: transporte e distribuição dos tracks.
+- **Supabase**: autenticação, salas, permissões, chat, histórico e vínculo com a call Discord.
+- **Discord Bot Core**: salas temporárias, handoff e presença real na voz.
 
-Vídeo e áudio nunca são armazenados no Supabase.
+A aplicação não captura, publica ou pede permissão de câmera/microfone.
 
-## Rotas
+## Login e presença Discord
 
-- `/call`: central CRAZZY CALL.
-- `/call/[code]`: lobby e sala.
-- `/admin/calls`: supervisão administrativa de metadados.
-- `/api/call/*`: create, list, preview, join, room, token, presence, leave, lock, role, kick, end e messages.
+A página e a API continuam exigindo a conta Discord vinculada e presença na guild.
 
-O código da sala é aleatório e o link não contém JWT, API key ou segredo.
+Para uma CRAZZY CALL criada pelo bot e vinculada a uma sala de voz:
 
-## Variáveis de ambiente
+1. o usuário precisa estar autorizado em `voice_members`;
+2. precisa estar fisicamente presente na call Discord;
+3. existe uma tolerância curta configurada por `voice_settings.media_grace_seconds`;
+4. passado esse tempo fora da voz, o bot remove o participante do LiveKit;
+5. novos tokens LiveKit também são bloqueados enquanto a presença de voz não voltar.
 
-Use os placeholders de `.env.example`.
+Salas antigas/site-only que não possuem vínculo com `voice_rooms` continuam compatíveis.
 
-### Browser-safe
+## Token LiveKit
 
-```env
-NEXT_PUBLIC_LIVEKIT_URL=wss://SEU-PROJETO.livekit.cloud
-```
+Tokens são curtos e criados apenas no servidor.
 
-### Somente servidor
+Fontes permitidas para publicação:
 
-```env
-LIVEKIT_URL=https://SEU-PROJETO.livekit.cloud
-LIVEKIT_API_KEY=...
-LIVEKIT_API_SECRET=...
-```
+- `SCREEN_SHARE`
+- `SCREEN_SHARE_AUDIO`
 
-**Nunca** use prefixo `NEXT_PUBLIC_` no API key/secret.
+Fontes não permitidas:
 
-## Banco
+- câmera;
+- microfone.
 
-Migrations:
+O browser nunca recebe `LIVEKIT_API_SECRET` ou `SUPABASE_SERVICE_ROLE_KEY`.
 
-- `supabase/migrations/202609220230_crazzy_call.sql`
-- `supabase/migrations/202609220235_crazzy_call_privileges.sql`
-- `supabase/migrations/202609220240_crazzy_call_table_privileges.sql`
+## Screen Engine
 
-Tabelas:
+O compartilhamento não usa mais controles de recepção fingindo criar 1080p/60.
 
-- `call_rooms`
-- `call_participants`
-- `call_messages`
-- `call_events`
+A captura é configurada **no transmissor**.
 
-Todas usam RLS. Ações sensíveis passam por RPC autenticado e validação server-side.
+Perfis:
 
-## LiveKit
+### AUTO
 
-O backend cria tokens curtos. O browser recebe somente o token temporário necessário para entrar na sala.
+Equilibra qualidade e estabilidade. Usa simulcast e permite que LiveKit faça adaptação de banda.
 
-A sala de mídia usa um nome interno baseado no UUID da sala, não no nome/e-mail do usuário.
+### NITIDEZ
 
-Configuração do cliente:
+Alvo de 1920×1080 a ~30 FPS.
 
-- adaptive stream;
-- dynacast;
-- background video pause desativado para manter PiP funcional quando a aba perde foco;
-- resolução de captura inicial 720p;
-- seletor de recepção AUTO / 720p / 1080p e 30 / 60 FPS, sujeito à disponibilidade real do track e conexão.
+- `contentHint = detail`
+- `degradationPreference = maintain-resolution`
+- encoding de screen share 1080p30
+- indicado para texto, navegador, menus, código e desktop
 
-## Screen share
+### GAME
 
-O botão usa LiveKit para iniciar a captura do navegador. O navegador mostra o seletor nativo de tela, janela ou aba.
+Tenta captura real 1920×1080 a até 60 FPS.
 
-Quando disponível, é solicitado áudio da captura. Se o browser não entregar um track de áudio, a interface informa o usuário.
+- `contentHint = motion`
+- `degradationPreference = maintain-framerate`
+- limite de encoding de até 60 FPS
+- se a rede/encoder apertar, preservar movimento é prioridade
 
-Múltiplos participantes podem compartilhar simultaneamente. Cada screen share vira um preview e o usuário escolhe qual fica no player principal.
+1080p60 nunca é prometido. O resultado real depende do browser, GPU/CPU, fonte escolhida e rede.
 
-## Picture-in-Picture real
+## Áudio da tela
 
-O PiP usa a API nativa:
+Áudio da tela inicia **OFF**.
 
-- `document.pictureInPictureEnabled`;
-- `video.requestPictureInPicture()`;
-- `document.exitPictureInPicture()`;
-- `enterpictureinpicture`;
-- `leavepictureinpicture`.
+Quando habilitado:
 
-A janela PiP usa o stream selecionado no momento em que o usuário entra no PiP.
+- a captura usa `audio: true`;
+- solicita `systemAudio: include`;
+- publica somente como `SCREEN_SHARE_AUDIO`;
+- microfone continua proibido.
 
-Selecionar outro preview **não troca silenciosamente** o PiP. A interface mostra `TROCAR TRANSMISSÃO NO PiP`, que fecha a sessão atual e abre a nova transmissão.
+A interface avisa que compartilhar o monitor inteiro pode capturar também o áudio do Discord. Para evitar eco, prefira aba/aplicativo ou mantenha o áudio da tela desligado.
 
-Se o track do PiP terminar ou desaparecer, o PiP é encerrado e a interface mostra `Esta transmissão foi encerrada.`.
+Browsers não garantem áudio para toda origem de captura.
 
-O PiP recebe o track de áudio do screen share quando ele existe, respeitando mute, volume e políticas do navegador.
+## Conexão e recuperação
 
-Se a API não existir, o botão fica desabilitado e informa que o navegador não suporta PiP.
+O cliente mantém:
 
-## Host e co-host
+- `adaptiveStream`;
+- `dynacast`;
+- reconexão nativa do LiveKit;
+- `prepareConnection()` antes de conectar;
+- eventos de conexão, qualidade, stream pausado e falha de subscription.
 
-Host:
+Não foi copiado o sistema de ICE/TURN do VDO.Ninja. LiveKit continua responsável por SFU, relay e reconexão.
 
-- tranca/destranca;
-- promove/remove co-host;
-- remove participante;
-- encerra a sala;
-- copia link.
+## Telemetria local
 
-Co-host:
+O player principal lê `getRTCStatsReport()` aproximadamente a cada 2 segundos e mostra, quando o browser fornece:
 
-- pode moderar participantes comuns;
-- não pode alterar o host;
-- não pode remover outro co-host;
-- não pode encerrar a sala inteira.
+- resolução real;
+- FPS real;
+- bitrate;
+- RTT;
+- jitter;
+- packets lost;
+- NACK;
+- PLI;
+- codec;
+- `qualityLimitationReason`;
+- qualidade de conexão LiveKit.
 
-Admin global pode encerrar uma sala pelo painel administrativo, mas não recebe acesso oculto ao áudio/vídeo.
+Os dados são usados apenas na interface/diagnóstico. Endereços IP e candidatos ICE não são armazenados.
 
-## Chat
+## Múltiplas telas
 
-Mensagens passam pelo backend, possuem limite de tamanho e rate limit básico no banco. A leitura em tempo real usa Supabase Realtime.
+Vários participantes podem compartilhar simultaneamente.
 
-HTML bruto do usuário não é renderizado.
+Cada screen share aparece como preview e o usuário escolhe qual transmissão fica no player principal. `adaptiveStream` e `dynacast` continuam responsáveis por reduzir trabalho desnecessário do SFU/client.
 
-## Reconexão
+## Picture-in-Picture
 
-LiveKit controla os estados de WebRTC:
+PiP continua usando a API nativa do navegador:
 
-- connecting;
-- connected;
-- reconnecting;
-- disconnected.
+- `document.pictureInPictureEnabled`
+- `requestPictureInPicture()`
+- `exitPictureInPicture()`
+- eventos `enterpictureinpicture` e `leavepictureinpicture`
 
-A interface sinaliza reconexão e mantém heartbeat leve no Supabase para histórico. O campo de presença do banco não substitui o estado real do LiveKit.
+Não existe PiP falso em CSS.
+
+## VDO.Ninja
+
+O source do VDO.Ninja foi estudado como referência técnica de:
+
+- captura;
+- hints de conteúdo;
+- adaptação;
+- telemetria;
+- comportamento em redes ruins;
+- robustez de screen sharing.
+
+Código VDO.Ninja **não foi copiado**. O projeto é AGPLv3 e CRAZZY CALL continua implementado sobre APIs LiveKit/WebRTC próprias.
 
 ## Testes
 
-Execute:
+Executar:
 
 ```bash
 npm ci
 npm run typecheck
 node scripts/test-crazzy-call.mjs
+node scripts/test-all-modules.mjs
 npm run build
+npm --prefix apps/discord-bot run check
 ```
 
-O smoke test verifica:
+O smoke deve falhar se:
 
-- RPCs do CALL bloqueados para anônimos;
-- tabelas sem leitura anônima;
-- ausência de referência a secrets nos componentes client;
-- presença da API nativa de Picture-in-Picture.
+- `setCameraEnabled` voltar ao runtime;
+- `setMicrophoneEnabled` voltar ao runtime;
+- o token autorizar CAMERA ou MICROPHONE;
+- o bot voltar a anunciar webcam;
+- screen share/audio deixarem de ser as únicas fontes publicáveis;
+- o gate da call Discord desaparecer;
+- PiP deixar de ser nativo.
 
-Testes manuais ainda são necessários para mídia real, pois dependem de permissões de browser, dois usuários e LiveKit configurado.
-
-## Deploy
-
-O site pode continuar em Vercel ou em hospedagem Next.js compatível. LiveKit permanece separado da hospedagem web.
-
-Configure as variáveis secretas diretamente no painel do deploy. Não cole o secret em arquivos do repositório.
-
-## Limitações reais
-
-1080p60 não é garantido. Qualidade depende do browser, máquina, track publicado, rede, simulcast e LiveKit.
-
-Áudio do sistema também não é universal. O navegador e o sistema operacional decidem quais opções de captura oferecem.
+Mídia real ainda exige teste manual com browser e LiveKit porque seletor de tela, áudio do sistema, resolução e FPS dependem da plataforma.

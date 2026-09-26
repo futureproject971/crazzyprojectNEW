@@ -1404,12 +1404,7 @@ export function ProductManagerPage() {
                       {!productDraft.plans.length && (
                         <div className="crz-purin-fields__empty">
                           <strong>Nenhum plano criado ainda.</strong>
-                          <span>Crie manualmente, gere as durações mais usadas ou importe estoque automático do provedor.</span>
-                          <div>
-                            <button type="button" onClick={() => setCreatingPlan(true)}>＋ Adicionar plano</button>
-                            <button type="button" onClick={() => void createPresetPlans()}>⚡ Criar predefinidos</button>
-                            <button type="button" onClick={() => setSupplierImportFor({ productId: productDraft.id, productName: productDraft.name })}>🌐 Importar do provedor</button>
-                          </div>
+                          <span>Use as ações acima para adicionar manualmente, criar durações predefinidas ou importar estoque automático do provedor.</span>
                         </div>
                       )}
                     </div>

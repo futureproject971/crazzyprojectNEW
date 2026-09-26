@@ -4,8 +4,6 @@ import type { CallParticipant } from "./types";
 
 export type ParticipantMediaState = {
   identity: string;
-  microphone: boolean;
-  camera: boolean;
   screenShare: boolean;
 };
 
@@ -61,19 +59,12 @@ export function ParticipantList({
                 <strong>{participant.display_name}{self ? " (você)" : ""}</strong>
                 <span>
                   <b>{participant.role === "host" ? "HOST" : participant.role === "cohost" ? "CO-HOST" : participant.role.toUpperCase()}</b>
-                  {media?.screenShare && <em>COMPARTILHANDO</em>}
-                  {!media?.microphone && <em>MUTADO</em>}
+                  {media?.screenShare && <em>COMPARTILHANDO TELA</em>}
                 </span>
               </div>
 
-              <div className="crz-call-media-badges" aria-label="Estado de mídia">
-                <span title={media?.microphone ? "Microfone ligado" : "Microfone desligado"}>
-                  {media?.microphone ? "🎙" : "🔇"}
-                </span>
-                <span title={media?.camera ? "Câmera ligada" : "Câmera desligada"}>
-                  {media?.camera ? "📷" : "◼"}
-                </span>
-                {media?.screenShare && <span title="Compartilhando tela">🖥</span>}
+              <div className="crz-call-media-badges" aria-label="Estado de compartilhamento">
+                {media?.screenShare ? <span title="Compartilhando tela">🖥</span> : <span title="Sem compartilhamento">○</span>}
               </div>
 
               {canTouch && (
@@ -81,29 +72,16 @@ export function ParticipantList({
                   <summary aria-label={"Opções de " + participant.display_name}>⋮</summary>
                   <div>
                     {isOwner && participant.role !== "cohost" && (
-                      <button
-                        type="button"
-                        disabled={busyId === participant.id}
-                        onClick={() => onRole(participant, "cohost")}
-                      >
+                      <button type="button" disabled={busyId === participant.id} onClick={() => onRole(participant, "cohost")}>
                         Tornar co-host
                       </button>
                     )}
                     {isOwner && participant.role === "cohost" && (
-                      <button
-                        type="button"
-                        disabled={busyId === participant.id}
-                        onClick={() => onRole(participant, "participant")}
-                      >
+                      <button type="button" disabled={busyId === participant.id} onClick={() => onRole(participant, "participant")}>
                         Remover co-host
                       </button>
                     )}
-                    <button
-                      type="button"
-                      className="is-danger"
-                      disabled={busyId === participant.id}
-                      onClick={() => onKick(participant)}
-                    >
+                    <button type="button" className="is-danger" disabled={busyId === participant.id} onClick={() => onKick(participant)}>
                       Remover da sala
                     </button>
                   </div>

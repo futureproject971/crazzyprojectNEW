@@ -355,18 +355,30 @@ function supplierFromCheckout(checkout: any) {
   };
 }
 
-async function markSupplierNeedsReview(supabaseAdmin: any, checkout: any) {
-  const item = (Array.isArray(checkout?.cartSnapshot) ? checkout.cartSnapshot : []).find(
-    (candidate: any) => candidate?.type === "purincash-supplier" || candidate?.deliveryMode === "purincash_supplier",
-  );
-  if (!item?.planId) return;
+async function markSupplierStatus(
+  supabaseAdmin: any,
+  planId: string | null | undefined,
+  status: "synced" | "stale" | "needs_review" | "unavailable",
+) {
+  if (!planId) return;
   await supabaseAdmin.rpc("mark_purincash_supplier_binding_status", {
-    p_plan_id: item.planId,
-    p_status: "needs_review",
+    p_plan_id: planId,
+    p_status: status,
   });
 }
 
-async function validateSupplierCheckout(apiKey: string, checkout: any) {
+async function markSupplierCheckoutStatus(
+  supabaseAdmin: any,
+  checkout: any,
+  status: "synced" | "stale" | "needs_review" | "unavailable",
+) {
+  const item = (Array.isArray(checkout?.cartSnapshot) ? checkout.cartSnapshot : []).find(
+    (candidate: any) => candidate?.type === "purincash-supplier" || candidate?.deliveryMode === "purincash_supplier",
+  );
+  await markSupplierStatus(supabaseAdmin, item?.planId, status);
+}
+
+async function validateSupplierCheckout(apiKey: string, checkout: any, supabaseAdmin: any) {
   const supplier = supplierFromCheckout(checkout);
   if (!supplier) return null;
 
@@ -377,23 +389,34 @@ async function validateSupplierCheckout(apiKey: string, checkout: any) {
     (supplier.storeProductId && candidate.storeProductId === supplier.storeProductId) ||
     candidate.supplierProductId === supplier.productId
   );
-  if (!product || product.active === false) throw new Error("SUPPLIER_PRODUCT_UNAVAILABLE");
+  if (!product || product.active === false) {
+    await markSupplierCheckoutStatus(supabaseAdmin, checkout, "unavailable");
+    throw new Error("SUPPLIER_PRODUCT_UNAVAILABLE");
+  }
 
   let variation = supplier.variationId
     ? product.variations.find((candidate: any) => candidate.id === supplier.variationId)
     : null;
   if (!variation) variation = product.variations[supplier.variationIndex] || null;
-  if (!variation || variation.active === false) throw new Error("SUPPLIER_VARIATION_UNAVAILABLE");
+  if (!variation || variation.active === false) {
+    await markSupplierCheckoutStatus(supabaseAdmin, checkout, "needs_review");
+    throw new Error("SUPPLIER_VARIATION_UNAVAILABLE");
+  }
   if (
     !variation.unlimited &&
     (variation.stock === null || !Number.isFinite(Number(variation.stock)) || Number(variation.stock) <= 0)
   ) {
+    await markSupplierCheckoutStatus(supabaseAdmin, checkout, "stale");
     throw new Error("SUPPLIER_OUT_OF_STOCK");
   }
 
   const publicId = product.supplierProductId || supplier.productId;
-  if (!/^prod_[A-Za-z0-9_-]+$/.test(publicId)) throw new Error("SUPPLIER_PUBLIC_ID_REQUIRED");
+  if (!/^prod_[A-Za-z0-9_-]+$/.test(publicId)) {
+    await markSupplierCheckoutStatus(supabaseAdmin, checkout, "needs_review");
+    throw new Error("SUPPLIER_PUBLIC_ID_REQUIRED");
+  }
   if (product.supplierProductId && product.supplierProductId !== supplier.productId) {
+    await markSupplierCheckoutStatus(supabaseAdmin, checkout, "needs_review");
     throw new Error("SUPPLIER_BINDING_CHANGED");
   }
 
@@ -911,7 +934,7 @@ Deno.serve(async (req) => {
         });
       }
 
-      const { data, error } = await supabaseUser.rpc("admin_import_purincash_supplier_plans", {
+      const { data, error } = await supabaseAdmin.rpc("admin_import_purincash_supplier_plans", {
         p_product_id: productId,
         p_items: importItems,
       });
@@ -956,7 +979,7 @@ Deno.serve(async (req) => {
         return json({ error: "O ID público informado não corresponde ao catálogo atual." }, 409);
       }
 
-      const { error } = await supabaseUser.rpc("admin_bind_purincash_supplier_plan", {
+      const { error } = await supabaseAdmin.rpc("admin_bind_purincash_supplier_plan", {
         p_plan_id: planId,
         p_item: {
           price_cents: variation.priceCents,
@@ -981,7 +1004,7 @@ Deno.serve(async (req) => {
         return json({ error: "Plano inválido." }, 400);
       }
 
-      const { data: binding, error: bindingError } = await supabaseUser.rpc(
+      const { data: binding, error: bindingError } = await supabaseAdmin.rpc(
         "admin_get_purincash_supplier_binding",
         { p_plan_id: planId },
       );
@@ -991,7 +1014,10 @@ Deno.serve(async (req) => {
         (binding.supplier_store_product_id && candidate.storeProductId === binding.supplier_store_product_id) ||
         candidate.supplierProductId === binding.supplier_product_id
       );
-      if (!product) return json({ error: "Produto não está mais disponível no provedor." }, 409);
+      if (!product) {
+        await markSupplierStatus(supabaseAdmin, planId, "unavailable");
+        return json({ error: "Produto não está mais disponível no provedor." }, 409);
+      }
 
       let variation = binding.supplier_variation_id
         ? product.variations.find((candidate: any) => candidate.id === binding.supplier_variation_id)
@@ -1000,10 +1026,17 @@ Deno.serve(async (req) => {
       if (!variation && Number.isInteger(oldIndex) && oldIndex >= 0) {
         variation = product.variations[oldIndex] || null;
       }
-      if (!variation) return json({ error: "A variação mudou ou foi removida no provedor." }, 409);
+      if (!variation) {
+        await markSupplierStatus(supabaseAdmin, planId, "needs_review");
+        return json({ error: "A variação mudou ou foi removida no provedor." }, 409);
+      }
+      if (!variation.active || (!variation.unlimited && (variation.stock === null || Number(variation.stock) <= 0))) {
+        await markSupplierStatus(supabaseAdmin, planId, "stale");
+        return json({ error: "A variação está indisponível ou sem estoque no provedor." }, 409);
+      }
 
       const supplierProductId = product.supplierProductId || String(binding.supplier_product_id || "");
-      const { error: syncError } = await supabaseUser.rpc("admin_sync_purincash_supplier_binding", {
+      const { error: syncError } = await supabaseAdmin.rpc("admin_sync_purincash_supplier_binding", {
         p_plan_id: planId,
         p_supplier_product_id: supplierProductId,
         p_supplier_variation_id: variation.id,
@@ -1405,7 +1438,7 @@ Deno.serve(async (req) => {
 
     let supplier: { productId: string; variationIndex: number } | null = null;
     try {
-      supplier = await validateSupplierCheckout(PURINCASH_API_KEY, checkout);
+      supplier = await validateSupplierCheckout(PURINCASH_API_KEY, checkout, supabaseAdmin);
     } catch {
       return json({ error: "O produto do fornecedor precisa ser atualizado antes da compra." }, 409);
     }
@@ -1445,7 +1478,7 @@ Deno.serve(async (req) => {
     });
     if (!response.ok || !provider?.paymentId) {
       if (supplier && (response.status === 400 || response.status === 403)) {
-        await markSupplierNeedsReview(supabaseAdmin, checkout);
+        await markSupplierCheckoutStatus(supabaseAdmin, checkout, "needs_review");
       }
       await failCheckoutAttempt(supabaseAdmin, internalPaymentId);
       return json({ error: provider?.error || "Erro ao criar cobrança PIX" }, response.status || 502);
@@ -1630,7 +1663,7 @@ Deno.serve(async (req) => {
 
     let supplier: { productId: string; variationIndex: number } | null = null;
     try {
-      supplier = await validateSupplierCheckout(PURINCASH_API_KEY, checkout);
+      supplier = await validateSupplierCheckout(PURINCASH_API_KEY, checkout, supabaseAdmin);
     } catch {
       return json({ error: "O produto do fornecedor precisa ser atualizado antes da compra." }, 409);
     }
@@ -1670,7 +1703,7 @@ Deno.serve(async (req) => {
     });
     if (!response.ok || !provider?.paymentId || !provider?.ltc?.address) {
       if (supplier && (response.status === 400 || response.status === 403)) {
-        await markSupplierNeedsReview(supabaseAdmin, checkout);
+        await markSupplierCheckoutStatus(supabaseAdmin, checkout, "needs_review");
       }
       await failCheckoutAttempt(supabaseAdmin, internalPaymentId);
       return json({ error: provider?.error || "Erro ao criar pagamento em Litecoin" }, response.status || 502);

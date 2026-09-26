@@ -76,3 +76,18 @@ Se a PurinCash não fornecer um identificador público inequívoco `prod_...` no
 - `supabase/functions/purincash-payment/index.ts`
 - `supabase/migrations/20260926210000_purincash_supplier_engine.sql`
 - `scripts/test-purincash-supplier.mjs`
+
+
+## Hardening operacional
+
+O catálogo administrativo tenta primeiro `/v1/store/products` e pode usar a visão oficial equivalente `/v1/products?include=store` como fallback de leitura. Falhas de rede GET recebem retry curto; criação de cobrança nunca é repetida automaticamente.
+
+Bindings deixam de ser confiáveis quando o provedor muda:
+
+- produto removido/inativo → `unavailable`;
+- variação removida/mudada → `needs_review`;
+- estoque externo esgotado/indefinido → `stale`.
+
+Planos fora de `synced` deixam de aparecer como disponíveis até nova sincronização.
+
+As RPCs mutáveis de supplier são `SECURITY DEFINER`, mas somente `service_role` pode executá-las. O browser prova a sessão/admin para a Edge Function, e a Edge faz a mutação privilegiada.

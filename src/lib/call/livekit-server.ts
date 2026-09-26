@@ -1,5 +1,6 @@
 import { canPublishInCall } from "./permissions";
 import { AccessToken, RoomServiceClient } from "livekit-server-sdk";
+import { TrackSource } from "@livekit/protocol";
 import { getLiveKitServerConfig, liveKitRoomName } from "./config";
 import type { CallParticipantRole, CallRoom } from "@/modules/call/types";
 
@@ -61,7 +62,7 @@ export async function createLiveKitJoinToken(input: {
     room: roomName,
     canSubscribe: true,
     canPublish: canPublishInCall(room.room_mode, role),
-    canPublishSources: [1, 3], // CAMERA and SCREEN_SHARE only; microphone/system audio denied server-side.
+    canPublishSources: [TrackSource.SCREEN_SHARE, TrackSource.SCREEN_SHARE_AUDIO],
     canPublishData: false,
     canUpdateOwnMetadata: false,
   });
@@ -98,7 +99,7 @@ export async function updateLiveKitParticipantRole(
       permission: {
         canSubscribe: true,
         canPublish: canPublishInCall(mode, role),
-        canPublishSources: [1, 3], // CAMERA and SCREEN_SHARE only; microphone/system audio denied server-side.
+        canPublishSources: [TrackSource.SCREEN_SHARE, TrackSource.SCREEN_SHARE_AUDIO],
     canPublishData: false,
       },
     });

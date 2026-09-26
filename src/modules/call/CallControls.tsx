@@ -1,8 +1,11 @@
 "use client";
 
+import { SCREEN_PROFILES, type ScreenShareProfile } from "./screen-share/profiles";
+
 export function CallControls({
-  camera,
   screenShare,
+  profile,
+  screenAudio,
   pipSupported,
   pipActive,
   pipCanSwitch,
@@ -12,7 +15,8 @@ export function CallControls({
   canModerate,
   canEnd,
   busy,
-  onCamera,
+  onProfile,
+  onScreenAudio,
   onScreenShare,
   onPip,
   onPipSwitch,
@@ -21,8 +25,9 @@ export function CallControls({
   onLeave,
   onEnd,
 }: {
-  camera: boolean;
   screenShare: boolean;
+  profile: ScreenShareProfile;
+  screenAudio: boolean;
   pipSupported: boolean;
   pipActive: boolean;
   pipCanSwitch: boolean;
@@ -32,7 +37,8 @@ export function CallControls({
   canModerate: boolean;
   canEnd: boolean;
   busy: string | null;
-  onCamera: () => void;
+  onProfile: (profile: ScreenShareProfile) => void;
+  onScreenAudio: () => void;
   onScreenShare: () => void;
   onPip: () => void;
   onPipSwitch: () => void;
@@ -43,14 +49,35 @@ export function CallControls({
 }) {
   return (
     <div className="crz-call-controls">
-      <span className="crz-call-discord-audio">🎧 Voz no Discord</span>
+      <span className="crz-call-discord-audio">🎧 VOZ PELO DISCORD</span>
 
-      <button type="button" className={camera ? "is-on" : "is-off"} disabled={!canPublish || busy === "camera"} onClick={onCamera} title={!canPublish ? "Você está assistindo esta live." : undefined}>
-        <span>📷</span>{camera ? "CÂMERA ON" : "CÂMERA OFF"}
+      <div className="crz-call-profile-switcher" aria-label="Perfil da transmissão">
+        {(Object.keys(SCREEN_PROFILES) as ScreenShareProfile[]).map((id) => (
+          <button
+            type="button"
+            key={id}
+            className={profile === id ? "is-on" : ""}
+            disabled={!canPublish || screenShare || busy === "screen"}
+            onClick={() => onProfile(id)}
+            title={screenShare ? "Pare a transmissão para trocar o perfil." : SCREEN_PROFILES[id].description}
+          >
+            {SCREEN_PROFILES[id].label}
+          </button>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        className={screenAudio ? "is-on" : ""}
+        disabled={!canPublish || screenShare || busy === "screen"}
+        onClick={onScreenAudio}
+        title={screenShare ? "Pare a transmissão para alterar o áudio da tela." : undefined}
+      >
+        <span>🔊</span>ÁUDIO DA TELA {screenAudio ? "ON" : "OFF"}
       </button>
 
-      <button type="button" className={screenShare ? "is-on" : ""} disabled={!canPublish || busy === "screen"} onClick={onScreenShare} title={!canPublish ? "Você está assistindo esta live." : undefined}>
-        <span>🖥</span>{screenShare ? "PARAR TELA" : "COMPARTILHAR TELA"}
+      <button type="button" className={screenShare ? "is-on" : ""} disabled={!canPublish || busy === "screen"} onClick={onScreenShare} title={!canPublish ? "Você está assistindo esta transmissão." : undefined}>
+        <span>🖥</span>{screenShare ? "PARAR TRANSMISSÃO" : "COMPARTILHAR TELA"}
       </button>
 
       <button

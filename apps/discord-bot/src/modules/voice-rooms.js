@@ -1,11 +1,12 @@
 import {ActionRowBuilder,ButtonBuilder,ButtonStyle,ChannelType,ModalBuilder,TextInputBuilder,TextInputStyle,UserSelectMenuBuilder,PermissionFlagsBits} from 'discord.js';
 import {randomBytes,createHash} from 'node:crypto';
 import {RoomServiceClient} from 'livekit-server-sdk';
+import {TrackSource} from '@livekit/protocol';
 const row=(...components)=>new ActionRowBuilder().addComponents(components);
 const button=(id,label,style=ButtonStyle.Secondary)=>new ButtonBuilder().setCustomId('voice:'+id).setLabel(label).setStyle(style);
 const input=(id,label,value='')=>row(new TextInputBuilder().setCustomId(id).setLabel(label).setStyle(TextInputStyle.Short).setValue(value).setRequired(true));
 const checked=async promise=>{const r=await promise;if(r.error)throw new Error(r.error.message);return r.data;};
-const publicPanel=()=>({content:'🎧 **CRAZZY VOICE**\nCrie uma call temporária. Voz no Discord; tela e webcam na CRAZZY CALL.',components:[row(button('create','Criar call',ButtonStyle.Primary),button('mine','Minha call'),button('invites','Meus convites'),button('screen','Abrir CRAZZY CALL'))]});
+const publicPanel=()=>({content:'🎧 **CRAZZY VOICE**\nCrie uma call temporária. Voz no Discord · compartilhamento de tela na CRAZZY CALL.',components:[row(button('create','Criar call',ButtonStyle.Primary),button('mine','Minha call'),button('invites','Meus convites'),button('screen','Abrir CRAZZY CALL'))]});
 export function startVoiceRooms(client,db,config){
  let cfg=null,stopped=false,running=false,firstTick=true;
  const pending=new Map();
@@ -29,7 +30,7 @@ export function startVoiceRooms(client,db,config){
   if(livekit)await livekit.deleteRoom(screenName(r.call_room_id)).catch(error=>{if(!String(error.message).includes('not found'))throw error;});
   const channel=r.channel_id?await guild.channels.fetch(r.channel_id).catch(e=>{if(e.code===10003)return null;throw e;}):null;
   if(channel)await channel.delete('CRAZZY: sala temporária encerrada');
-  await checked(db.from('voice_members').update({status:'removed',presence_at:null}).eq('room_id',r.id));
+  await checked(db.from('voice_members').update({status:'removed',presence_at:null,media_left_at:new Date().toISOString()}).eq('room_id',r.id));
   await checked(db.from('voice_rooms').update({status:'closed',closed_at:new Date().toISOString()}).eq('id',r.id));
   await audit(r.id,r.owner_discord_id,'ROOM_CLOSED');
  };
@@ -41,7 +42,7 @@ export function startVoiceRooms(client,db,config){
   await channel.permissionOverwrites.set(overrides);
  };
  const management=r=>({content:`🎧 **Call ${String(r.room_number).padStart(3,'0')}**\n${r.privacy==='public'?'🔓 Pública':r.privacy==='locked'?'🔒 Trancada':'🔒 Privada'} · ${r.user_limit||'Sem'} limite`,components:[row(button('privacy:'+r.id,'Mudar privacidade'),button('limit:'+r.id,'Alterar limite'),button('invite:'+r.id,'Convidar'),button('remove:'+r.id,'Remover')),
- row(button('transfer:'+r.id,'Transferir dono'),button('mute:'+r.id,'Mutar'),button('unmute:'+r.id,'Desmutar'),button('screen','Tela / webcam'),button('close:'+r.id,'Encerrar',ButtonStyle.Danger))]});
+ row(button('transfer:'+r.id,'Transferir dono'),button('mute:'+r.id,'Mutar'),button('unmute:'+r.id,'Desmutar'),button('screen','Compartilhar tela'),button('close:'+r.id,'Encerrar',ButtonStyle.Danger))]});
  const handoff=async(interaction)=>{
   const member=await interaction.guild.members.fetch(interaction.user.id);
   const r=await checked(db.from('voice_rooms').select('*').eq('channel_id',member.voice.channelId||'none').eq('status','active').maybeSingle());
@@ -51,7 +52,7 @@ export function startVoiceRooms(client,db,config){
   const token=randomBytes(32).toString('hex');
   await checked(db.from('voice_handoffs').insert({room_id:r.id,discord_user_id:member.id,token_hash:createHash('sha256').update(token).digest('hex')}));
   const link=new URL('/call/handoff',config.siteUrl);link.hash=token;
-  await interaction.editReply({content:'🖥️ Acesso pessoal, válido por 2 minutos. Entre com a mesma conta Discord.',components:[row(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Abrir tela e webcam').setURL(link.href))]});
+  await interaction.editReply({content:'🖥️ Acesso pessoal, válido por 2 minutos. Entre com a mesma conta Discord.',components:[row(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Abrir CRAZZY CALL').setURL(link.href))]});
  };
  const handler=async interaction=>{
   if(!interaction.customId?.startsWith('voice:')||interaction.guildId!==config.guildId)return;
@@ -167,8 +168,8 @@ export function startVoiceRooms(client,db,config){
     if(!channel||['ended','disabled'].includes(site.status)){await closeRoom(guild,r);return;}
     const occupants=[...channel.members.values()].filter(m=>!m.user.bot),now=new Date().toISOString();
     const known=await checked(db.from('voice_members').select('*').eq('room_id',r.id));
-    for(const m of occupants){const saved=known.find(x=>x.discord_user_id===m.id);if(saved?.status==='removed'||(r.privacy!=='public'&&saved?.status!=='accepted')){await m.voice.disconnect('Call privada');continue;}await checked(db.from('voice_members').upsert({room_id:r.id,discord_user_id:m.id,status:'accepted',presence_at:now},{onConflict:'room_id,discord_user_id'}));}
-    for(const saved of known.filter(m=>m.presence_at&&!occupants.some(p=>p.id===m.discord_user_id)))await checked(db.from('voice_members').update({presence_at:null}).eq('room_id',r.id).eq('discord_user_id',saved.discord_user_id));
+    for(const m of occupants){const saved=known.find(x=>x.discord_user_id===m.id);if(saved?.status==='removed'||(r.privacy!=='public'&&saved?.status!=='accepted')){await m.voice.disconnect('Call privada');continue;}await checked(db.from('voice_members').upsert({room_id:r.id,discord_user_id:m.id,status:'accepted',presence_at:now,media_left_at:null},{onConflict:'room_id,discord_user_id'}));}
+    for(const saved of known.filter(m=>m.presence_at&&!occupants.some(p=>p.id===m.discord_user_id)))await checked(db.from('voice_members').update({presence_at:null,media_left_at:now}).eq('room_id',r.id).eq('discord_user_id',saved.discord_user_id));
     if(!occupants.length){if(r.empty_since&&Date.now()-Date.parse(r.empty_since)>cfg.grace_seconds*1000){await closeRoom(guild,r);return;}if(!r.empty_since)await checked(db.from('voice_rooms').update({empty_since:now}).eq('id',r.id));}
     else{await checked(db.from('voice_rooms').update({empty_since:null,owner_left_since:occupants.some(m=>m.id===r.owner_discord_id)?null:r.owner_left_since||now}).eq('id',r.id));
      if(r.owner_left_since&&Date.now()-Date.parse(r.owner_left_since)>cfg.grace_seconds*1000&&!occupants.some(m=>m.id===r.owner_discord_id)){
@@ -179,17 +180,21 @@ export function startVoiceRooms(client,db,config){
    });
    if(livekit){
     const sharing=new Set();
+    const mediaGrace=Math.max(5,Math.min(60,Number(cfg.media_grace_seconds||20)));
     for(const room of await rooms())if(room.status==='active'){
      const participants=await livekit.listParticipants(screenName(room.call_room_id));
      for(const participant of participants){
       const identity=await checked(db.from('discord_identities').select('discord_user_id,guild_member,guild_id').eq('user_id',participant.identity).maybeSingle());
-      const membership=identity?await checked(db.from('voice_members').select('status').eq('room_id',room.id).eq('discord_user_id',identity.discord_user_id).maybeSingle()):null;
+      const membership=identity?await checked(db.from('voice_members').select('status,presence_at,media_left_at').eq('room_id',room.id).eq('discord_user_id',identity.discord_user_id).maybeSingle()):null;
       const cp=await checked(db.from('call_participants').select('kicked_at').eq('room_id',room.call_room_id).eq('user_id',participant.identity).maybeSingle());
-      if(!identity?.guild_member||identity.guild_id!==config.guildId||membership?.status!=='accepted'||cp?.kicked_at){
+      const physicallyPresent=Boolean(membership?.presence_at);
+      const leftAt=membership?.media_left_at?Date.parse(membership.media_left_at):0;
+      const withinMediaGrace=!physicallyPresent&&leftAt>0&&Date.now()-leftAt<=mediaGrace*1000;
+      if(!identity?.guild_member||identity.guild_id!==config.guildId||membership?.status!=='accepted'||cp?.kicked_at||(!physicallyPresent&&!withinMediaGrace)){
        if(identity&&cp?.kicked_at)await checked(db.from('voice_members').update({status:'removed'}).eq('room_id',room.id).eq('discord_user_id',identity.discord_user_id));
        await livekit.removeParticipant(screenName(room.call_room_id),participant.identity);continue;
       }
-      if(participant.tracks?.some(t=>t.source===3&&!t.muted))sharing.add(identity.discord_user_id);
+      if(physicallyPresent&&participant.tracks?.some(t=>t.source===TrackSource.SCREEN_SHARE&&!t.muted))sharing.add(identity.discord_user_id);
      }
     }
     const sessions=await checked(db.from('activity_xp_sessions').select('discord_user_id').eq('source','screen'));

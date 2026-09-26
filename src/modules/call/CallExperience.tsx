@@ -4,11 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/modules/auth/AuthProvider";
 import { CallLobby } from "./CallLobby";
 import { CallRoom } from "./CallRoom";
-import type {
-  CallMediaPreferences,
-  CallRoomPreview,
-  CallRoomSnapshot,
-} from "./types";
+import type { CallRoomPreview, CallRoomSnapshot } from "./types";
 
 type Credentials = {
   token: string;
@@ -25,10 +21,9 @@ function messageFor(error?: string) {
   if (value.includes("INVALID_ROOM_PASSWORD")) return "Senha incorreta.";
   if (value.includes("PASSWORD_RATE_LIMITED")) return "Muitas tentativas. Aguarde alguns minutos.";
   if (value.includes("ROOM_FULL")) return "Sala lotada.";
-  if (value.includes("PARTICIPANT_KICKED")) return "Você foi removido pelo host.";
-  if (value.includes("LIVEKIT_NOT_CONFIGURED")) {
-    return "O servidor de mídia da CRAZZY CALL ainda não foi configurado.";
-  }
+  if (value.includes("DISCORD_VOICE_REQUIRED")) return "Entre novamente na call de voz do Discord para usar a CRAZZY CALL.";
+  if (value.includes("PARTICIPANT_KICKED") || value.includes("FORBIDDEN")) return "Você foi removido pelo host.";
+  if (value.includes("LIVEKIT_NOT_CONFIGURED")) return "O servidor de mídia da CRAZZY CALL ainda não foi configurado.";
   return "Não foi possível entrar na sala.";
 }
 
@@ -37,10 +32,6 @@ export function CallExperience({ code }: { code: string }) {
   const [preview, setPreview] = useState<CallRoomPreview | null>(null);
   const [snapshot, setSnapshot] = useState<CallRoomSnapshot | null>(null);
   const [credentials, setCredentials] = useState<Credentials | null>(null);
-  const [preferences, setPreferences] = useState<CallMediaPreferences>({
-    microphone: false,
-    camera: false,
-  });
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,21 +63,16 @@ export function CallExperience({ code }: { code: string }) {
       return;
     }
     if (user.discord.guildId && !user.discord.guildMember) {
-      window.location.assign(
-        "/login?next=" +
-          encodeURIComponent(next) +
-          "&error=discord_guild_required"
-      );
+      window.location.assign("/login?next=" + encodeURIComponent(next) + "&error=discord_guild_required");
       return;
     }
     void loadPreview();
   }, [authLoading, code, loadPreview, user]);
 
-  const join = async (nextPreferences: CallMediaPreferences, password: string) => {
+  const join = async (password: string) => {
     if (!user || joining) return;
     setJoining(true);
     setError(null);
-    setPreferences(nextPreferences);
 
     try {
       const joinResponse = await fetch("/api/call/join", {
@@ -136,31 +122,14 @@ export function CallExperience({ code }: { code: string }) {
       <main className="crz-call-state">
         <img src="/brand/crazzy-logo-hero.png" alt="CRAZZY PROJECT" />
         <strong>{error || "Não foi possível carregar esta sala."}</strong>
-        <a className="crz-button crz-button--secondary crz-button--md" href="/call">
-          Voltar para CRAZZY CALL
-        </a>
+        <a className="crz-button crz-button--secondary crz-button--md" href="/call">Voltar para CRAZZY CALL</a>
       </main>
     );
   }
 
   if (snapshot && credentials) {
-    return (
-      <CallRoom
-        initialSnapshot={snapshot}
-        credentials={credentials}
-        preferences={preferences}
-        user={user}
-      />
-    );
+    return <CallRoom initialSnapshot={snapshot} credentials={credentials} user={user} />;
   }
 
-  return (
-    <CallLobby
-      room={preview}
-      user={user}
-      busy={joining}
-      error={error}
-      onJoin={(next, password) => void join(next, password)}
-    />
-  );
+  return <CallLobby room={preview} user={user} busy={joining} error={error} onJoin={(password) => void join(password)} />;
 }

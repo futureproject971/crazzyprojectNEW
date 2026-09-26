@@ -28,6 +28,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
   }
 
+  const { data: voiceAllowed, error: voiceError } = await supabase.rpc(
+    "check_call_voice_presence",
+    { p_call_room_id: snapshot.room.id },
+  );
+  if (voiceError) {
+    return NextResponse.json({ error: "VOICE_PRESENCE_CHECK_FAILED" }, { status: 503 });
+  }
+  if (voiceAllowed === false) {
+    return NextResponse.json({ error: "DISCORD_VOICE_REQUIRED" }, { status: 403 });
+  }
+
   try {
     const credentials = await createLiveKitJoinToken({
       room: snapshot.room,

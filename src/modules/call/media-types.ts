@@ -1,4 +1,5 @@
 import type {
+  ConnectionQuality,
   LocalAudioTrack,
   LocalVideoTrack,
   RemoteAudioTrack,
@@ -17,4 +18,5 @@ export type ActiveScreenShare = {
   videoTrack: CallVideoTrack;
   audioTrack?: CallAudioTrack;
   remotePublication?: RemoteTrackPublication;
+  connectionQuality?: ConnectionQuality;
 };

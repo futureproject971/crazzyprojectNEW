@@ -14,6 +14,7 @@ export type CallRoom = {
   max_participants: number;
   allow_guests: boolean;
   allow_screen_share: boolean;
+  // Legacy DB fields kept for migration compatibility. CRAZZY CALL runtime is screen-only.
   allow_camera: boolean;
   allow_microphone: boolean;
   created_at: string;
@@ -47,6 +48,7 @@ export type CallRoomPreview = {
   max_participants: number;
   participant_count: number;
   allow_screen_share: boolean;
+  // Legacy compatibility only. Do not use to request camera/microphone.
   allow_camera: boolean;
   allow_microphone: boolean;
 };
@@ -63,11 +65,6 @@ export type CallMessage = {
   message: string;
   created_at: string;
   deleted_at?: string | null;
-};
-
-export type CallMediaPreferences = {
-  microphone: boolean;
-  camera: boolean;
 };
 
 export type CallStreamSelection = {

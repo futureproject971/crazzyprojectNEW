@@ -111,6 +111,21 @@ expect(
     migration.includes("admin_sync_purincash_supplier_binding"),
   "supplier import, rebind and sync database operations exist",
 );
+
+const hardeningMigration = await read(
+  "supabase/migrations/20260926224000_supplier_hardening_crazzy_screen_presence.sql",
+);
+expect(
+  hardeningMigration.includes("from public,anon,authenticated") &&
+    (hardeningMigration.match(/to service_role;/g) || []).length >= 4,
+  "supplier SECURITY DEFINER mutations are no longer executable by authenticated browser sessions",
+);
+expect(
+  purin.includes('markSupplierStatus(supabaseAdmin, planId, "unavailable")') &&
+    purin.includes('markSupplierCheckoutStatus(supabaseAdmin, checkout, "stale")') &&
+    purin.includes('supabaseAdmin.rpc("admin_import_purincash_supplier_plans"'),
+  "supplier sync/checkout failures invalidate stale bindings through service-role RPCs",
+);
 expect(
   migration.includes("get_public_store_catalog") &&
     migration.includes("supplier_sync_status") &&

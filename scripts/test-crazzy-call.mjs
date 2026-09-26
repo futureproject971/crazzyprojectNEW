@@ -118,4 +118,120 @@ for (const [file, content, required] of [
 }
 console.log("[PASS] password-protected rooms and live spectator mode are wired");
 
+
+
+const screenOnlyFiles = {
+  room: await readFile("src/modules/call/CallRoom.tsx", "utf8"),
+  lobby: await readFile("src/modules/call/CallLobby.tsx", "utf8"),
+  controls: await readFile("src/modules/call/CallControls.tsx", "utf8"),
+  participants: await readFile("src/modules/call/ParticipantList.tsx", "utf8"),
+  livekitServer: await readFile("src/lib/call/livekit-server.ts", "utf8"),
+  bot: await readFile("apps/discord-bot/src/modules/voice-rooms.js", "utf8"),
+  profiles: await readFile("src/modules/call/screen-share/profiles.ts", "utf8"),
+  engine: await readFile("src/modules/call/screen-share/useScreenShareEngine.ts", "utf8"),
+  quality: await readFile("src/modules/call/screen-share/useScreenTrackQuality.ts", "utf8"),
+  migration: await readFile("supabase/migrations/20260926224000_supplier_hardening_crazzy_screen_presence.sql", "utf8"),
+};
+
+for (const [name, content] of Object.entries({
+  room: screenOnlyFiles.room,
+  lobby: screenOnlyFiles.lobby,
+  controls: screenOnlyFiles.controls,
+})) {
+  for (const forbidden of ["setCameraEnabled(", "setMicrophoneEnabled(", "getUserMedia("]) {
+    if (content.includes(forbidden)) {
+      throw new Error(name + " reintroduced forbidden camera/microphone runtime API: " + forbidden);
+    }
+  }
+}
+console.log("[PASS] CRAZZY CALL runtime does not request camera or microphone");
+
+for (const forbidden of ["TrackSource.CAMERA", "TrackSource.MICROPHONE", "canPublishSources: [1, 3]"]) {
+  if (screenOnlyFiles.livekitServer.includes(forbidden)) {
+    throw new Error("LiveKit token reintroduced forbidden publish source: " + forbidden);
+  }
+}
+for (const required of ["TrackSource.SCREEN_SHARE", "TrackSource.SCREEN_SHARE_AUDIO"]) {
+  if (!screenOnlyFiles.livekitServer.includes(required)) {
+    throw new Error("LiveKit token is missing " + required);
+  }
+}
+console.log("[PASS] LiveKit tokens are screen-share-only");
+
+for (const required of [
+  "createScreenTracks(",
+  "applyConstraints(",
+  "Track.Source.ScreenShare",
+  "Track.Source.ScreenShareAudio",
+]) {
+  if (!screenOnlyFiles.engine.includes(required)) {
+    throw new Error("Screen Engine is missing " + required);
+  }
+}
+for (const required of [
+  'label: "AUTO"',
+  'label: "NITIDEZ"',
+  'label: "GAME"',
+  '"maintain-resolution"',
+  '"maintain-framerate"',
+  "screenShareEncoding",
+  "maxFramerate: 60",
+]) {
+  if (!screenOnlyFiles.profiles.includes(required)) {
+    throw new Error("Screen profile engine is missing " + required);
+  }
+}
+console.log("[PASS] transmitter profiles use real capture/publish controls");
+
+for (const required of [
+  "getRTCStatsReport()",
+  "framesPerSecond",
+  "currentRoundTripTime",
+  "qualityLimitationReason",
+  "nackCount",
+  "pliCount",
+]) {
+  if (!screenOnlyFiles.quality.includes(required)) {
+    throw new Error("Quality monitor is missing " + required);
+  }
+}
+console.log("[PASS] screen quality monitor reads real WebRTC statistics");
+
+for (const required of [
+  "prepareConnection(",
+  "RoomEvent.ConnectionQualityChanged",
+  "RoomEvent.TrackStreamStateChanged",
+  "RoomEvent.TrackSubscriptionFailed",
+]) {
+  if (!screenOnlyFiles.room.includes(required)) {
+    throw new Error("CRAZZY CALL connection lifecycle is missing " + required);
+  }
+}
+console.log("[PASS] LiveKit preconnect, quality and recovery events are wired");
+
+if (/webcam/i.test(screenOnlyFiles.bot)) {
+  throw new Error("Discord voice bot still advertises webcam");
+}
+for (const required of [
+  "media_grace_seconds",
+  "media_left_at",
+  "TrackSource.SCREEN_SHARE",
+]) {
+  if (!screenOnlyFiles.bot.includes(required)) {
+    throw new Error("Discord voice presence/screen reconciliation is missing " + required);
+  }
+}
+if (!screenOnlyFiles.migration.includes("check_call_voice_presence")) {
+  throw new Error("Discord voice presence RPC is missing");
+}
+console.log("[PASS] Discord voice presence gates CRAZZY CALL media access");
+
+if (
+  screenOnlyFiles.participants.includes("microphone: boolean") ||
+  screenOnlyFiles.participants.includes("camera: boolean")
+) {
+  throw new Error("Participant media state still models CRAZZY CALL camera/microphone");
+}
+console.log("[PASS] participant UI is screen-share-only");
+
 console.log("[PASS] CRAZZY CALL security smoke");
