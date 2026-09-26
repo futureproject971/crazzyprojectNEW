@@ -69,7 +69,8 @@ expect(
 );
 expect(
   purin.includes('"/store/products?includeInactive=true"') &&
-    purin.includes('"/deliveries/'),
+    purin.includes("fetchProviderDelivery") &&
+    purin.includes("/deliveries/"),
   "PurinCash integration uses catalog plus delivery reconciliation",
 );
 expect(

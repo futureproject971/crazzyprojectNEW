@@ -1324,6 +1324,8 @@ export function ProductManagerPage() {
 
                                 {workingPlan.plan_code==="custom"&&<label><span>Duração personalizada (minutos)</span><input type="number" min="1" max="5256000" placeholder="Sem expiração" value={workingPlan.entitlement_duration_minutes??""} onChange={event=>editPlan({...planDraft,entitlement_duration_minutes:event.target.value?Number(event.target.value):null})}/></label>}
 
+                                <h4 className="crz-purin-delivery-heading">Entrega e estoque</h4>
+
                                 <button
                                   type="button"
                                   className={"crz-purin-hidden-sale " + (!workingPlan.active ? "is-on" : "")}
@@ -1387,7 +1389,7 @@ export function ProductManagerPage() {
 
                                 {!["internal_stock","purincash_supplier"].includes(workingPlan.delivery_mode) && (
                                   <section className="crz-purin-stock-simple">
-                                    <header><div><strong>Modo de entrega</strong><small>{workingPlan.delivery_mode === "ghost_stock" ? "Estoque virtual / atendimento por ticket." : "Este plano não utiliza o estoque local de keys."}</small></div><span className="crz-purin-stock-pill is-manual">{workingPlan.delivery_mode}</span></header>
+                                    <header><div><strong>Entrega</strong><small>{workingPlan.delivery_mode === "ghost_stock" ? "Estoque virtual / atendimento por ticket." : "Este plano não utiliza o estoque local de keys."}</small></div><span className="crz-purin-stock-pill is-manual">{workingPlan.delivery_mode}</span></header>
                                     <div className="crz-purin-stock-simple__controls">
                                       <button type="button" className="crz-purin-save-field" disabled={busy || stockBusy} onClick={() => void savePlan()}>{busy ? "Salvando..." : "Salvar plano"}</button>
                                     </div>

@@ -223,10 +223,14 @@ export async function calculateServerTotal(
       return { total: 0, subtotal: 0, discountAmount: 0, cartSnapshot: [], couponId: null, error: "Produto não encontrado ou inativo" };
     }
 
-    const { data: operationRaw, error: operationError } = await supabaseAdmin.rpc(
-      "resolve_checkout_plan_operation",
-      { p_plan_id: planData.id },
-    );
+    const operationResult = typeof supabaseAdmin?.rpc === "function"
+      ? await supabaseAdmin.rpc(
+          "resolve_checkout_plan_operation",
+          { p_plan_id: planData.id },
+        )
+      : { data: null, error: { code: "PGRST202", message: "resolve_checkout_plan_operation unavailable" } };
+    const operationRaw = operationResult?.data;
+    const operationError = operationResult?.error;
     const operationFunctionMissing =
       operationError &&
       (
