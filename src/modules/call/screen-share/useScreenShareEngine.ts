@@ -134,8 +134,16 @@ export function useScreenShareEngine({
 
       return true;
     } catch (error) {
-      if (video) video.stop();
-      if (audio) audio.stop();
+      if (video && room) {
+        await room.localParticipant.unpublishTrack(video, true).catch(() => undefined);
+      } else {
+        video?.stop();
+      }
+      if (audio && room) {
+        await room.localParticipant.unpublishTrack(audio, true).catch(() => undefined);
+      } else {
+        audio?.stop();
+      }
       tracksRef.current = null;
       setActive(false);
       setSettings(null);

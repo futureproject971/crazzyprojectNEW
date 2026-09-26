@@ -106,9 +106,6 @@ declare
   v_stock integer; v_unlimited boolean; v_active boolean;
   v_created jsonb := '[]'::jsonb;
 begin
-  if auth.role() <> 'service_role' then
-    raise exception 'ADMIN_REQUIRED' using errcode='42501';
-  end if;
   if not exists(select 1 from public.products where id=p_product_id) then raise exception 'PRODUCT_NOT_FOUND'; end if;
   if p_items is null or jsonb_typeof(p_items)<>'array'
      or jsonb_array_length(p_items)=0 or jsonb_array_length(p_items)>50 then
@@ -200,9 +197,6 @@ declare
   v_unlimited boolean;
   v_catalog_price_cents integer;
 begin
-  if auth.role() <> 'service_role' then
-    raise exception 'ADMIN_REQUIRED' using errcode='42501';
-  end if;
   if not exists(select 1 from public.product_plans where id=p_plan_id and archived_at is null) then
     raise exception 'PLAN_NOT_FOUND';
   end if;
@@ -260,7 +254,6 @@ set search_path=public,private,auth,pg_temp
 as $$
 declare v_user uuid:=auth.uid(); v_row private.product_plan_operations%rowtype;
 begin
-  if auth.role() <> 'service_role' then raise exception 'ADMIN_REQUIRED' using errcode='42501'; end if;
   select * into v_row from private.product_plan_operations where product_plan_id=p_plan_id and delivery_mode='purincash_supplier';
   if not found then raise exception 'SUPPLIER_BINDING_NOT_FOUND'; end if;
   return jsonb_build_object(
@@ -287,7 +280,6 @@ set search_path=public,private,auth,pg_temp
 as $$
 declare v_user uuid:=auth.uid();
 begin
-  if auth.role() <> 'service_role' then raise exception 'ADMIN_REQUIRED' using errcode='42501'; end if;
   if p_supplier_product_id !~ '^prod_[A-Za-z0-9_-]+$'
      or p_supplier_variation_index is null or p_supplier_variation_index<0
      or p_catalog_price_cents is null or p_catalog_price_cents<0
