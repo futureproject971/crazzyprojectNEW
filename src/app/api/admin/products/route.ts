@@ -97,13 +97,34 @@ async function syncProductExtras(supabase: any, productId: string, mediaInput: u
 function safeAutomationFlags(value: unknown) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   const input = value as Record<string, unknown>;
-  const keys = [
-    "auto_delivery",
-    "auto_discord_role",
-    "auto_tutorial_unlock",
-    "auto_expire",
-  ];
-  return Object.fromEntries(keys.map((key) => [key, input[key] === true]));
+  const result: Record<string, unknown> = Object.fromEntries(
+    ["auto_delivery", "auto_discord_role", "auto_tutorial_unlock", "auto_expire"]
+      .map((key) => [key, input[key] === true])
+  );
+
+  for (const [key, max] of [
+    ["supplier_store_product_id", 200],
+    ["supplier_display_name", 160],
+    ["supplier_variation_name", 160],
+    ["supplier_last_synced_at", 64],
+  ] as const) {
+    const cleaned = nullableString(input[key], max);
+    if (cleaned) result[key] = cleaned;
+  }
+
+  const syncStatus = cleanString(input.supplier_sync_status, 32);
+  if (["synced", "stale", "needs_review", "unavailable"].includes(syncStatus)) {
+    result.supplier_sync_status = syncStatus;
+  }
+
+  for (const key of ["supplier_variation_index", "supplier_catalog_price_cents", "supplier_stock"] as const) {
+    if (input[key] === null || input[key] === undefined || input[key] === "") continue;
+    const parsed = Number(input[key]);
+    if (Number.isInteger(parsed) && parsed >= 0) result[key] = parsed;
+  }
+  result.supplier_unlimited = input.supplier_unlimited === true;
+
+  return result;
 }
 
 async function adminClient() {
@@ -201,7 +222,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
     }
 
-    const presetPlans: string[] = [];
+    const allowedPresets = new Set<string>(["1d", "3d", "7d", "15d", "30d", "90d", "lifetime"]);
+    const presetPlans: string[] = Array.isArray(body?.presetPlans)
+      ? Array.from(
+          new Set<string>(
+            body.presetPlans.map((value: unknown) => cleanString(value, 20).toLowerCase())
+          )
+        ).filter((code: string) => allowedPresets.has(code))
+      : [];
+    if (body?.createDefaultPlans === true && presetPlans.length === 0) {
+      presetPlans.push("1d", "3d", "7d", "15d", "30d", "90d", "lifetime");
+    }
     const { data, error } = await supabase.rpc("create_product_manager_product", {
       p_game_id: gameId,
       p_name: name,
@@ -394,6 +425,36 @@ export async function PATCH(request: NextRequest) {
         ? null
         : Math.max(0, Math.min(100000, safeInteger(plan.discord_role_position)));
 
+    const automationFlags = safeAutomationFlags(plan.automation_flags);
+    if (deliveryMode !== "purincash_supplier") {
+      for (const key of Object.keys(automationFlags)) {
+        if (key.startsWith("supplier_")) delete automationFlags[key];
+      }
+    }
+    const supplierProvider = deliveryMode === "purincash_supplier"
+      ? nullableString(plan.supplier_provider, 80)
+      : null;
+    const supplierProductId = deliveryMode === "purincash_supplier"
+      ? nullableString(plan.supplier_product_id, 200)
+      : null;
+    const supplierVariationId = deliveryMode === "purincash_supplier"
+      ? nullableString(plan.supplier_variation_id, 200)
+      : null;
+    const supplierVariationIndex = Number(automationFlags.supplier_variation_index);
+
+    if (
+      deliveryMode === "purincash_supplier" &&
+      (
+        supplierProvider !== "purincash" ||
+        !supplierProductId ||
+        !/^prod_[A-Za-z0-9_-]+$/.test(supplierProductId) ||
+        !Number.isInteger(supplierVariationIndex) ||
+        supplierVariationIndex < 0
+      )
+    ) {
+      return NextResponse.json({ error: "SUPPLIER_BINDING_INVALID" }, { status: 400 });
+    }
+
     const { data, error } = await supabase.rpc("save_product_manager_plan", {
       p_plan_id: planId,
       p_name: name,
@@ -410,10 +471,10 @@ export async function PATCH(request: NextRequest) {
       p_discord_role_color: safeColor(plan.discord_role_color),
       p_discord_role_position: rolePosition,
       p_entitlement_duration_minutes: duration,
-      p_supplier_provider: nullableString(plan.supplier_provider, 80),
-      p_supplier_product_id: nullableString(plan.supplier_product_id, 200),
-      p_supplier_variation_id: nullableString(plan.supplier_variation_id, 200),
-      p_automation_flags: safeAutomationFlags(plan.automation_flags),
+      p_supplier_provider: supplierProvider,
+      p_supplier_product_id: supplierProductId,
+      p_supplier_variation_id: supplierVariationId,
+      p_automation_flags: automationFlags,
       p_tutorial_ids: safeTutorialIds(plan.tutorial_ids),
     });
 
