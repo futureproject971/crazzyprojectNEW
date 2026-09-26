@@ -159,6 +159,211 @@ async function fetchProviderPayment(apiKey: string, providerId: string, kind: Pr
   return purincashRequest(apiKey, path);
 }
 
+function deliveredContentText(payload: any): string {
+  const value = payload?.deliveredContent;
+  if (typeof value === "string") return value.trim().slice(0, 200_000);
+  if (Array.isArray(value)) {
+    const parts = value.map((item) => {
+      if (typeof item === "string") return item.trim();
+      if (!item || typeof item !== "object") return "";
+      for (const key of ["content", "value", "key", "credential"]) {
+        if (typeof item[key] === "string" && item[key].trim()) return item[key].trim();
+      }
+      return "";
+    }).filter(Boolean);
+    return parts.join("\n").slice(0, 200_000);
+  }
+  if (value && typeof value === "object") {
+    for (const key of ["content", "value", "key", "credential"]) {
+      if (typeof value[key] === "string" && value[key].trim()) {
+        return value[key].trim().slice(0, 200_000);
+      }
+    }
+  }
+  return "";
+}
+
+async function fetchProviderDelivery(apiKey: string, providerId: string) {
+  return purincashRequest(apiKey, `/deliveries/${encodeURIComponent(providerId)}`);
+}
+
+function parseStorePriceCents(raw: any): number {
+  for (const key of ["priceCents", "valueCents", "amountCents"]) {
+    const direct = Number(raw?.[key]);
+    if (Number.isFinite(direct) && direct >= 0) return Math.round(direct);
+  }
+  if (typeof raw?.price === "number" && Number.isFinite(raw.price) && raw.price >= 0) {
+    return Math.round(raw.price * 100);
+  }
+  const text = String(raw?.price ?? raw?.value ?? "").trim();
+  if (!text) return 0;
+  const normalized = text.includes(",")
+    ? text.replace(/[^0-9,.-]/g, "").replace(/\./g, "").replace(",", ".")
+    : text.replace(/[^0-9.-]/g, "");
+  const amount = Number(normalized);
+  return Number.isFinite(amount) && amount >= 0 ? Math.round(amount * 100) : 0;
+}
+
+function inferSupplierPlanCode(name: string) {
+  const value = name.toLowerCase();
+  if (/lifetime|vital[ií]cio|permanente/.test(value)) return "lifetime";
+  if (/90\s*d|90\s*dias|trimestral|3\s*mes/.test(value)) return "90d";
+  if (/30\s*d|30\s*dias|mensal|1\s*mes/.test(value)) return "30d";
+  if (/15\s*d|15\s*dias|quinzenal/.test(value)) return "15d";
+  if (/7\s*d|7\s*dias|semanal/.test(value)) return "7d";
+  if (/3\s*d|3\s*dias/.test(value)) return "3d";
+  if (/1\s*d|1\s*dia|di[aá]rio/.test(value)) return "1d";
+  if (/trial|teste/.test(value)) return "trial";
+  return "custom";
+}
+
+function normalizeStoreProducts(payload: any) {
+  let rawProducts: any[] = [];
+  if (Array.isArray(payload)) rawProducts = payload;
+  else if (Array.isArray(payload?.products)) rawProducts = payload.products;
+  else if (Array.isArray(payload?.data)) rawProducts = payload.data;
+  else if (Array.isArray(payload?.items)) rawProducts = payload.items;
+  else if (Array.isArray(payload?.categories)) {
+    rawProducts = payload.categories.flatMap((category: any) =>
+      (Array.isArray(category?.products) ? category.products : []).map((product: any) => ({
+        ...product,
+        __categoryName: category?.name || category?.title || "",
+      }))
+    );
+  }
+
+  return rawProducts.slice(0, 1000).map((product: any) => {
+    const publicCandidates = [
+      product?.supplierProductId,
+      product?.supplier?.productId,
+      product?.publicProductId,
+      product?.publicId,
+    ].map((value) => String(value || "").trim());
+    const supplierProductId = publicCandidates.find((value) => /^prod_[A-Za-z0-9_-]+$/.test(value)) || null;
+    const storeProductId = String(
+      product?.id ?? product?._id ?? product?.storeProductId ?? product?.publicId ?? supplierProductId ?? "",
+    ).trim();
+    const productName = String(product?.name ?? product?.title ?? "Produto").trim().slice(0, 160);
+    const category = String(
+      product?.category?.name ?? product?.categoryName ?? product?.__categoryName ?? product?.category ?? "",
+    ).trim().slice(0, 120);
+    const variations = (Array.isArray(product?.variations) ? product.variations : []).slice(0, 200).map(
+      (variation: any, index: number) => {
+        const stockValue =
+          variation?.stock === null || variation?.stock === undefined
+            ? null
+            : Number(variation.stock);
+        const stock = Number.isFinite(stockValue) && Number(stockValue) >= 0
+          ? Math.trunc(Number(stockValue))
+          : null;
+        const name = String(variation?.name ?? variation?.title ?? variation?.label ?? `Variação ${index + 1}`)
+          .trim().slice(0, 160);
+        return {
+          id: String(variation?.id ?? variation?._id ?? "").trim().slice(0, 200) || null,
+          index,
+          name,
+          planCode: inferSupplierPlanCode(name),
+          priceCents: parseStorePriceCents(variation),
+          stock,
+          unlimited: variation?.unlimited === true,
+          active: product?.active !== false && variation?.active !== false,
+        };
+      },
+    );
+    return {
+      storeProductId,
+      supplierProductId,
+      name: productName,
+      category,
+      active: product?.active !== false,
+      variations,
+    };
+  }).filter((product: any) => product.storeProductId || product.supplierProductId);
+}
+
+async function fetchSupplierCatalog(apiKey: string) {
+  const { response, body } = await purincashRequest(apiKey, "/store/products?includeInactive=true");
+  return { response, body, products: response.ok ? normalizeStoreProducts(body) : [] };
+}
+
+function supplierFromCheckout(checkout: any) {
+  const items = Array.isArray(checkout?.cartSnapshot) ? checkout.cartSnapshot : [];
+  const supplierItems = items.filter(
+    (item: any) => item?.type === "purincash-supplier" || item?.deliveryMode === "purincash_supplier",
+  );
+  if (!supplierItems.length) return null;
+  if (supplierItems.length !== 1 || items.length !== 1 || Number(supplierItems[0]?.quantity || 1) !== 1) {
+    throw new Error("SUPPLIER_CART_UNSUPPORTED");
+  }
+  const item = supplierItems[0];
+  const productId = String(item?.supplierProductId || "");
+  const variationIndex = Number(item?.supplierVariationIndex);
+  if (
+    item?.supplierProvider !== "purincash" ||
+    !/^prod_[A-Za-z0-9_-]+$/.test(productId) ||
+    !Number.isInteger(variationIndex) ||
+    variationIndex < 0
+  ) {
+    throw new Error("SUPPLIER_BINDING_INVALID");
+  }
+  return {
+    item,
+    productId,
+    variationIndex,
+    variationId: item?.supplierVariationId ? String(item.supplierVariationId) : null,
+    storeProductId: item?.supplierStoreProductId ? String(item.supplierStoreProductId) : null,
+  };
+}
+
+async function markSupplierNeedsReview(supabaseAdmin: any, checkout: any) {
+  const item = (Array.isArray(checkout?.cartSnapshot) ? checkout.cartSnapshot : []).find(
+    (candidate: any) => candidate?.type === "purincash-supplier" || candidate?.deliveryMode === "purincash_supplier",
+  );
+  if (!item?.planId) return;
+  await supabaseAdmin.rpc("mark_purincash_supplier_binding_status", {
+    p_plan_id: item.planId,
+    p_status: "needs_review",
+  });
+}
+
+async function validateSupplierCheckout(apiKey: string, checkout: any) {
+  const supplier = supplierFromCheckout(checkout);
+  if (!supplier) return null;
+
+  const catalog = await fetchSupplierCatalog(apiKey);
+  if (!catalog.response.ok) throw new Error("SUPPLIER_CATALOG_UNAVAILABLE");
+
+  const product = catalog.products.find((candidate: any) =>
+    (supplier.storeProductId && candidate.storeProductId === supplier.storeProductId) ||
+    candidate.supplierProductId === supplier.productId
+  );
+  if (!product || product.active === false) throw new Error("SUPPLIER_PRODUCT_UNAVAILABLE");
+
+  let variation = supplier.variationId
+    ? product.variations.find((candidate: any) => candidate.id === supplier.variationId)
+    : null;
+  if (!variation) variation = product.variations[supplier.variationIndex] || null;
+  if (!variation || variation.active === false) throw new Error("SUPPLIER_VARIATION_UNAVAILABLE");
+  if (
+    !variation.unlimited &&
+    (variation.stock === null || !Number.isFinite(Number(variation.stock)) || Number(variation.stock) <= 0)
+  ) {
+    throw new Error("SUPPLIER_OUT_OF_STOCK");
+  }
+
+  const publicId = product.supplierProductId || supplier.productId;
+  if (!/^prod_[A-Za-z0-9_-]+$/.test(publicId)) throw new Error("SUPPLIER_PUBLIC_ID_REQUIRED");
+  if (product.supplierProductId && product.supplierProductId !== supplier.productId) {
+    throw new Error("SUPPLIER_BINDING_CHANGED");
+  }
+
+  supplier.item.supplierVariationIndex = variation.index;
+  supplier.item.supplierVariationId = variation.id || supplier.variationId || null;
+  supplier.item.supplierStoreProductId = product.storeProductId || supplier.storeProductId || null;
+
+  return { productId: publicId, variationIndex: variation.index };
+}
+
 async function hmacHex(secret: string, rawBody: string) {
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
@@ -187,6 +392,7 @@ async function claimAndFulfill(
   providerPayload: any,
   providerKind: ProviderKind,
   checkoutSigningSecret: string,
+  purincashApiKey: string,
 ) {
   // The signed checkout is immutable and bound to this exact internal payment ID,
   // provider transaction, user, total and cart. Never rebuild paid orders from
@@ -206,6 +412,27 @@ async function claimAndFulfill(
   if (providerAmount === null || providerAmount !== expectedTotal) {
     console.error("[purincash] provider amount mismatch", { providerAmount, expected: expectedTotal, id: payment.id });
     return { ok: false, status: 409, error: "Valor pago não confere com o pedido" };
+  }
+
+  const supplierItem = proof.cartSnapshot.find(
+    (item: any) => item?.type === "purincash-supplier" || item?.deliveryMode === "purincash_supplier",
+  );
+  let supplierDeliveredContent = "";
+  if (supplierItem) {
+    if (!purincashApiKey) return { ok: false, status: 500, error: "Integração de fornecedor indisponível" };
+    supplierDeliveredContent = deliveredContentText(providerPayload);
+    if (!supplierDeliveredContent) {
+      const delivery = await fetchProviderDelivery(purincashApiKey, String(payment.charge_id || ""));
+      if (delivery.response.ok) supplierDeliveredContent = deliveredContentText(delivery.body);
+    }
+    if (!supplierDeliveredContent) {
+      return {
+        ok: false,
+        status: 409,
+        error: "Pagamento confirmado, aguardando a entrega automática do fornecedor.",
+        retryable: true,
+      };
+    }
   }
 
   // Recover a worker lease only after it is clearly stale. Individual delivery units are
@@ -253,10 +480,17 @@ async function claimAndFulfill(
   }
 
   try {
-    await fulfillOrder(supabaseAdmin, {
-      ...payment,
-      cart_snapshot: proof.cartSnapshot,
-    });
+    await fulfillOrder(
+      supabaseAdmin,
+      {
+        ...payment,
+        cart_snapshot: proof.cartSnapshot,
+      },
+      {
+        providerPaymentId: String(payment.charge_id || ""),
+        supplierDeliveredContent: supplierDeliveredContent || null,
+      },
+    );
 
     const { data: completedPayment, error: completeError } = await supabaseAdmin
       .from("payments")
@@ -538,7 +772,14 @@ Deno.serve(async (req) => {
     }
     if (payment.status === "COMPLETED") return json({ ok: true, duplicate: true });
 
-    const fulfillment = await claimAndFulfill(supabaseAdmin, payment, providerData, providerKind, CHECKOUT_SIGNING_SECRET);
+    const fulfillment = await claimAndFulfill(
+      supabaseAdmin,
+      payment,
+      providerData,
+      providerKind,
+      CHECKOUT_SIGNING_SECRET,
+      PURINCASH_API_KEY,
+    );
     if (!fulfillment.ok) return json({ error: fulfillment.error }, fulfillment.status || 409);
     return json({ ok: true, duplicate: fulfillment.alreadyClaimed === true });
   }
@@ -553,6 +794,194 @@ Deno.serve(async (req) => {
   const { data: userData, error: userError } = await supabaseUser.auth.getUser(token);
   if (userError || !userData.user) return json({ error: "Unauthorized" }, 401);
   const userId = userData.user.id;
+
+  if (["supplier-catalog", "supplier-import", "supplier-bind", "supplier-sync"].includes(action)) {
+    const { data: isAdmin, error: adminError } = await supabaseUser.rpc("is_current_admin");
+    if (adminError || isAdmin !== true) return json({ error: "Forbidden" }, 403);
+    if (!PURINCASH_API_KEY) return json({ error: "Integração PurinCash não configurada" }, 503);
+
+    const catalog = await fetchSupplierCatalog(PURINCASH_API_KEY);
+    if (!catalog.response.ok) {
+      if (catalog.response.status === 429) {
+        return json({ error: "A PurinCash limitou temporariamente as consultas. Aguarde e tente novamente." }, 429);
+      }
+      return json({ error: "Não foi possível consultar o catálogo do provedor." }, 502);
+    }
+
+    if (action === "supplier-catalog" && req.method === "GET") {
+      return json({ products: catalog.products, syncedAt: new Date().toISOString() });
+    }
+
+    if (action === "supplier-import" && req.method === "POST") {
+      const body = await req.json().catch(() => ({}));
+      const productId = String(body?.productId || "").trim();
+      const selections = Array.isArray(body?.selections) ? body.selections.slice(0, 50) : [];
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(productId) || !selections.length) {
+        return json({ error: "Seleção de fornecedor inválida." }, 400);
+      }
+
+      const importItems: any[] = [];
+      for (const selection of selections) {
+        const storeProductId = String(selection?.storeProductId || "").trim();
+        const suppliedPublicId = String(selection?.supplierProductId || "").trim();
+        const requestedVariationId = String(selection?.variationId || "").trim();
+        const requestedIndex = Number(selection?.variationIndex);
+
+        const product = catalog.products.find((candidate: any) =>
+          (storeProductId && candidate.storeProductId === storeProductId) ||
+          (suppliedPublicId && candidate.supplierProductId === suppliedPublicId)
+        );
+        if (!product) return json({ error: "Produto do provedor não encontrado. Atualize o catálogo." }, 409);
+
+        let variation = requestedVariationId
+          ? product.variations.find((candidate: any) => candidate.id === requestedVariationId)
+          : null;
+        if (!variation && Number.isInteger(requestedIndex) && requestedIndex >= 0) {
+          variation = product.variations[requestedIndex] || null;
+        }
+        if (!variation) return json({ error: "Variação do provedor mudou. Atualize o catálogo." }, 409);
+        if (!variation.active || (!variation.unlimited && (variation.stock === null || Number(variation.stock) <= 0))) {
+          return json({ error: "Esta variação está indisponível no provedor." }, 409);
+        }
+
+        const supplierProductId = product.supplierProductId || suppliedPublicId;
+        if (!/^prod_[A-Za-z0-9_-]+$/.test(supplierProductId)) {
+          return json({ error: "Informe o ID público do fornecedor no formato prod_... para este produto." }, 400);
+        }
+        if (product.supplierProductId && suppliedPublicId && product.supplierProductId !== suppliedPublicId) {
+          return json({ error: "O ID público informado não corresponde ao catálogo atual." }, 409);
+        }
+
+        importItems.push({
+          name: variation.name,
+          plan_code: variation.planCode,
+          price_cents: variation.priceCents,
+          active: variation.active === true,
+          supplier_product_id: supplierProductId,
+          supplier_variation_id: variation.id,
+          supplier_variation_index: variation.index,
+          supplier_store_product_id: product.storeProductId,
+          supplier_display_name: product.name,
+          supplier_variation_name: variation.name,
+          supplier_stock: variation.stock,
+          supplier_unlimited: variation.unlimited === true,
+        });
+      }
+
+      const { data, error } = await supabaseUser.rpc("admin_import_purincash_supplier_plans", {
+        p_product_id: productId,
+        p_items: importItems,
+      });
+      if (error) return json({ error: "Não foi possível importar as variações selecionadas." }, 409);
+      return json({ imported: data });
+    }
+
+    if (action === "supplier-bind" && req.method === "POST") {
+      const body = await req.json().catch(() => ({}));
+      const planId = String(body?.planId || "").trim();
+      const selection = body?.selection || {};
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(planId)) {
+        return json({ error: "Plano inválido." }, 400);
+      }
+
+      const storeProductId = String(selection?.storeProductId || "").trim();
+      const suppliedPublicId = String(selection?.supplierProductId || "").trim();
+      const requestedVariationId = String(selection?.variationId || "").trim();
+      const requestedIndex = Number(selection?.variationIndex);
+      const product = catalog.products.find((candidate: any) =>
+        (storeProductId && candidate.storeProductId === storeProductId) ||
+        (suppliedPublicId && candidate.supplierProductId === suppliedPublicId)
+      );
+      if (!product) return json({ error: "Produto do provedor não encontrado. Atualize o catálogo." }, 409);
+
+      let variation = requestedVariationId
+        ? product.variations.find((candidate: any) => candidate.id === requestedVariationId)
+        : null;
+      if (!variation && Number.isInteger(requestedIndex) && requestedIndex >= 0) {
+        variation = product.variations[requestedIndex] || null;
+      }
+      if (!variation) return json({ error: "Variação do provedor mudou. Atualize o catálogo." }, 409);
+      if (!variation.active || (!variation.unlimited && (variation.stock === null || Number(variation.stock) <= 0))) {
+        return json({ error: "Esta variação está indisponível no provedor." }, 409);
+      }
+
+      const supplierProductId = product.supplierProductId || suppliedPublicId;
+      if (!/^prod_[A-Za-z0-9_-]+$/.test(supplierProductId)) {
+        return json({ error: "Informe o ID público do fornecedor no formato prod_... para este produto." }, 400);
+      }
+      if (product.supplierProductId && suppliedPublicId && product.supplierProductId !== suppliedPublicId) {
+        return json({ error: "O ID público informado não corresponde ao catálogo atual." }, 409);
+      }
+
+      const { error } = await supabaseUser.rpc("admin_bind_purincash_supplier_plan", {
+        p_plan_id: planId,
+        p_item: {
+          price_cents: variation.priceCents,
+          supplier_product_id: supplierProductId,
+          supplier_variation_id: variation.id,
+          supplier_variation_index: variation.index,
+          supplier_store_product_id: product.storeProductId,
+          supplier_display_name: product.name,
+          supplier_variation_name: variation.name,
+          supplier_stock: variation.stock,
+          supplier_unlimited: variation.unlimited === true,
+        },
+      });
+      if (error) return json({ error: "Não foi possível trocar o vínculo deste plano." }, 409);
+      return json({ bound: true, planId });
+    }
+
+    if (action === "supplier-sync" && req.method === "POST") {
+      const body = await req.json().catch(() => ({}));
+      const planId = String(body?.planId || "").trim();
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(planId)) {
+        return json({ error: "Plano inválido." }, 400);
+      }
+
+      const { data: binding, error: bindingError } = await supabaseUser.rpc(
+        "admin_get_purincash_supplier_binding",
+        { p_plan_id: planId },
+      );
+      if (bindingError || !binding) return json({ error: "Vínculo do provedor não encontrado." }, 404);
+
+      const product = catalog.products.find((candidate: any) =>
+        (binding.supplier_store_product_id && candidate.storeProductId === binding.supplier_store_product_id) ||
+        candidate.supplierProductId === binding.supplier_product_id
+      );
+      if (!product) return json({ error: "Produto não está mais disponível no provedor." }, 409);
+
+      let variation = binding.supplier_variation_id
+        ? product.variations.find((candidate: any) => candidate.id === binding.supplier_variation_id)
+        : null;
+      const oldIndex = Number(binding.supplier_variation_index);
+      if (!variation && Number.isInteger(oldIndex) && oldIndex >= 0) {
+        variation = product.variations[oldIndex] || null;
+      }
+      if (!variation) return json({ error: "A variação mudou ou foi removida no provedor." }, 409);
+
+      const supplierProductId = product.supplierProductId || String(binding.supplier_product_id || "");
+      const { error: syncError } = await supabaseUser.rpc("admin_sync_purincash_supplier_binding", {
+        p_plan_id: planId,
+        p_supplier_product_id: supplierProductId,
+        p_supplier_variation_id: variation.id,
+        p_supplier_variation_index: variation.index,
+        p_supplier_store_product_id: product.storeProductId,
+        p_supplier_display_name: product.name,
+        p_supplier_variation_name: variation.name,
+        p_catalog_price_cents: variation.priceCents,
+        p_stock: variation.stock,
+        p_unlimited: variation.unlimited === true,
+      });
+      if (syncError) return json({ error: "Não foi possível sincronizar este vínculo." }, 409);
+      return json({
+        synced: true,
+        variation,
+        product: { name: product.name, supplierProductId, storeProductId: product.storeProductId },
+      });
+    }
+
+    return json({ error: "Ação de fornecedor inválida." }, 405);
+  }
 
   if (action === "admin-reconcile" && req.method === "POST") {
     const { data: isAdmin, error: adminError } = await supabaseUser.rpc("is_current_admin");
@@ -718,6 +1147,7 @@ Deno.serve(async (req) => {
           providerData,
           providerKind,
           CHECKOUT_SIGNING_SECRET,
+          PURINCASH_API_KEY,
         );
 
         if (!fulfillment.ok) {
@@ -930,6 +1360,13 @@ Deno.serve(async (req) => {
     if (checkout.error) return json({ error: checkout.error }, 400);
     if (checkout.total < 80) return json({ error: "Valor abaixo do mínimo permitido pelo gateway" }, 400);
 
+    let supplier: { productId: string; variationIndex: number } | null = null;
+    try {
+      supplier = await validateSupplierCheckout(PURINCASH_API_KEY, checkout);
+    } catch {
+      return json({ error: "O produto do fornecedor precisa ser atualizado antes da compra." }, 409);
+    }
+
     const reservation = await reserveCheckoutAttempt(supabaseAdmin, {
       id: internalPaymentId,
       userId,
@@ -959,10 +1396,14 @@ Deno.serve(async (req) => {
         expiresIn: 1800,
         callbackUrl,
         customer,
+        ...(supplier ? { supplier } : {}),
         metadata: JSON.stringify({ source: "crazzy-project", orderId: internalPaymentId, userId }),
       }),
     });
     if (!response.ok || !provider?.paymentId) {
+      if (supplier && (response.status === 400 || response.status === 403)) {
+        await markSupplierNeedsReview(supabaseAdmin, checkout);
+      }
       await failCheckoutAttempt(supabaseAdmin, internalPaymentId);
       return json({ error: provider?.error || "Erro ao criar cobrança PIX" }, response.status || 502);
     }
@@ -1034,6 +1475,13 @@ Deno.serve(async (req) => {
     const checkout = await getCheckout(body);
     if (checkout.error) return json({ error: checkout.error }, 400);
     if (checkout.total < 100) return json({ error: "Valor abaixo do mínimo permitido" }, 400);
+    try {
+      if (supplierFromCheckout(checkout)) {
+        return json({ error: "Pagamento por cartão não está disponível para produtos de fornecedor." }, 400);
+      }
+    } catch {
+      return json({ error: "Carrinho de fornecedor inválido." }, 400);
+    }
 
     const reservation = await reserveCheckoutAttempt(supabaseAdmin, {
       id: internalPaymentId,
@@ -1137,6 +1585,13 @@ Deno.serve(async (req) => {
     if (checkout.error) return json({ error: checkout.error }, 400);
     if (checkout.total < 80) return json({ error: "Valor abaixo do mínimo permitido" }, 400);
 
+    let supplier: { productId: string; variationIndex: number } | null = null;
+    try {
+      supplier = await validateSupplierCheckout(PURINCASH_API_KEY, checkout);
+    } catch {
+      return json({ error: "O produto do fornecedor precisa ser atualizado antes da compra." }, 409);
+    }
+
     const reservation = await reserveCheckoutAttempt(supabaseAdmin, {
       id: internalPaymentId,
       userId,
@@ -1166,10 +1621,14 @@ Deno.serve(async (req) => {
         description: String(body?.description || "Compra CRAZZY PROJECT").slice(0, 200),
         callbackUrl,
         customer,
+        ...(supplier ? { supplier } : {}),
         metadata: JSON.stringify({ source: "crazzy-project", orderId: internalPaymentId, userId }),
       }),
     });
     if (!response.ok || !provider?.paymentId || !provider?.ltc?.address) {
+      if (supplier && (response.status === 400 || response.status === 403)) {
+        await markSupplierNeedsReview(supabaseAdmin, checkout);
+      }
       await failCheckoutAttempt(supabaseAdmin, internalPaymentId);
       return json({ error: provider?.error || "Erro ao criar pagamento em Litecoin" }, response.status || 502);
     }
@@ -1252,7 +1711,14 @@ Deno.serve(async (req) => {
 
     const newStatus = normalizeProviderStatus(provider?.status);
     if (newStatus === "COMPLETED") {
-      const fulfillment = await claimAndFulfill(supabaseAdmin, payment, provider, providerKind, CHECKOUT_SIGNING_SECRET);
+      const fulfillment = await claimAndFulfill(
+        supabaseAdmin,
+        payment,
+        provider,
+        providerKind,
+        CHECKOUT_SIGNING_SECRET,
+        PURINCASH_API_KEY,
+      );
       if (!fulfillment.ok) return json({ error: fulfillment.error, status: "ACTIVE" }, fulfillment.status || 409);
       return json({ success: true, status: "COMPLETED" });
     }
